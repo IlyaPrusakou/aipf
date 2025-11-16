@@ -13,7 +13,7 @@ ENDCLASS.
 
 
 
-CLASS ZPRU_CL_REQUEST IMPLEMENTATION.
+CLASS zpru_cl_request IMPLEMENTATION.
 
 
   METHOD zpru_if_request~get_data.
@@ -24,4 +24,9 @@ CLASS ZPRU_CL_REQUEST IMPLEMENTATION.
   METHOD zpru_if_request~set_data.
     mr_data = ir_data.
   ENDMETHOD.
+
+  METHOD zpru_if_request~clear_data.
+    CLEAR: mr_data.
+  ENDMETHOD.
+
 ENDCLASS.

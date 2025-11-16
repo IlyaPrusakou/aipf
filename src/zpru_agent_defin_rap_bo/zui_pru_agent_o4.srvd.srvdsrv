@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_PRU_AGENT'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_PRU_AGENT'
+  }
+}
+define service ZUI_PRU_AGENT_O4 provider contracts odata_v4_ui {
+  expose ZC_PRU_AGENT;
+}

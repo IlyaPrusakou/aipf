@@ -13,7 +13,7 @@ ENDCLASS.
 
 
 
-CLASS ZPRU_CL_RESPONSE IMPLEMENTATION.
+CLASS zpru_cl_response IMPLEMENTATION.
 
 
   METHOD zpru_if_response~get_data.
@@ -24,4 +24,9 @@ CLASS ZPRU_CL_RESPONSE IMPLEMENTATION.
   METHOD zpru_if_response~set_data.
     mr_data = ir_data.
   ENDMETHOD.
+
+  METHOD zpru_if_response~clear_data.
+    CLEAR mr_data.
+  ENDMETHOD.
+
 ENDCLASS.

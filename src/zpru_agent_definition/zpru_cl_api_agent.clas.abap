@@ -7,13 +7,14 @@ CLASS zpru_cl_api_agent DEFINITION
     INTERFACES zpru_if_api_agent.
 
   PROTECTED SECTION.
+    DATA mo_controller TYPE REF TO zpru_if_agent_controller.
     DATA ms_agent            TYPE zpru_agent.
     DATA mt_agent_tools      TYPE STANDARD TABLE OF zpru_agent_tool WITH EMPTY KEY.
     DATA mv_input_query      TYPE zpru_if_agent_frw=>ts_json.
 
     DATA ms_execution_header TYPE zpru_axc_head.
     DATA ms_execution_query  TYPE zpru_axc_query.
-    DATA ms_execution_steps  TYPE STANDARD TABLE OF zpru_axc_step WITH EMPTY KEY.
+    DATA mt_execution_steps  TYPE STANDARD TABLE OF zpru_axc_step WITH EMPTY KEY.
 
 ENDCLASS.
 
@@ -60,7 +61,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_query = NEW zpru_cl_request( ).
     lo_query->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( mv_input_query ) ).
 
-    lo_decision_provider->call_decision_engine( EXPORTING io_input               = lo_query
+    lo_decision_provider->call_decision_engine( EXPORTING io_controller          = mo_controller
+                                                          io_input               = lo_query
                                                           io_system_prompt       = lo_system_prompt_provider
                                                           io_short_memory        = lo_short_memory
                                                           io_long_memory         = lo_long_memory
@@ -100,7 +102,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             RETURN.
           ENDIF.
 
-          APPEND INITIAL LINE TO ms_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
+          APPEND INITIAL LINE TO mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
           <ls_execution_step>-query_uuid          =  ms_execution_query-query_uuid.
           <ls_execution_step>-run_uuid            =  ms_execution_header-run_uuid.
           <ls_execution_step>-tool_uuid           = <ls_tool_master_data>-tool_uuid.
@@ -120,6 +122,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~initialize.
+
+    mo_controller = NEW zpru_cl_agent_controller( ).
+
     SELECT * FROM zpru_agent
       WHERE agent_name = @iv_agent_name
       INTO TABLE @DATA(lt_agent).
@@ -145,6 +150,58 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~run.
+
+    DATA lo_executor TYPE REF TO zpru_if_tool_executor.
+    DATA lo_input TYPE REF TO zpru_if_request.
+    DATA lo_output TYPE REF TO zpru_if_response.
+
+    IF ms_execution_header IS INITIAL OR
+    ms_execution_query IS INITIAL OR
+    mt_execution_steps IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    LOOP AT mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
+
+      DATA(lv_tabix) = sy-tabix.
+
+      ASSIGN mt_agent_tools[ tool_uuid = <ls_execution_step>-tool_uuid ] TO FIELD-SYMBOL(<ls_tool_master_data>).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      CREATE OBJECT lo_executor TYPE (<ls_tool_master_data>-tool_provider).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      IF lv_tabix = 1.
+        lo_input = NEW zpru_cl_request( ).
+        lo_input->set_data( ir_data = REF #( <ls_execution_step>-input_prompt ) ).
+        lo_output = NEW zpru_cl_response( ).
+      ELSE.
+        DATA(lr_output) = lo_output->get_data( ).
+        IF lr_output IS BOUND AND lr_output->* IS NOT INITIAL.
+          lo_input->set_data( ir_data = lo_output->get_data( ) ).
+        ELSE.
+          lo_input->clear_data( ).
+        ENDIF.
+        lo_output->clear_data( ).
+      ENDIF.
+
+      lo_executor->execute_tool(
+        EXPORTING
+          io_controller = mo_controller
+          io_request    = lo_input
+        IMPORTING
+          eo_response   = lo_output ).
+
+      IF mo_controller->mv_stop_agent = abap_true.
+        EXIT.
+      ENDIF.
+
+    ENDLOOP.
+
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~set_input_query.
@@ -163,4 +220,5 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     mv_input_query = iv_input_query.
   ENDMETHOD.
+
 ENDCLASS.

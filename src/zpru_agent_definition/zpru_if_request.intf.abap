@@ -9,4 +9,6 @@ INTERFACE zpru_if_request
     RETURNING
       VALUE(rr_data) TYPE REF TO data.
 
+  METHODS clear_data.
+
 ENDINTERFACE.
