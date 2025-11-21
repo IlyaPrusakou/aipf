@@ -1,0 +1,90 @@
+@Metadata.layer: #CORE
+annotate entity ZC_PRU_AGENT_TOOL with
+{
+  @EndUserText.label: 'AgentUUID'
+  @UI.facet: [ {
+    label: 'General Information',
+    id: 'GeneralInfo',
+    purpose: #STANDARD,
+    position: 10 ,
+    type: #IDENTIFICATION_REFERENCE
+  } ]
+  @UI.identification: [ {
+    position: 10 ,
+    label: 'AgentUUID'
+  } ]
+  @UI.lineItem: [ {
+    position: 10 ,
+    label: 'AgentUUID'
+  } ]
+  @UI.selectionField: [ {
+    position: 10
+  } ]
+  AgentUuid;
+  @EndUserText.label: 'ToolName'
+  @UI.identification: [ {
+    position: 20 ,
+    label: 'ToolName'
+  } ]
+  @UI.lineItem: [ {
+    position: 20 ,
+    label: 'ToolName'
+  } ]
+  @UI.selectionField: [ {
+    position: 20
+  } ]
+  ToolName;
+  @EndUserText.label: 'ToolProvider'
+  @UI.identification: [ {
+    position: 30 ,
+    label: 'ToolProvider'
+  } ]
+  @UI.lineItem: [ {
+    position: 30 ,
+    label: 'ToolProvider'
+  } ]
+  @UI.selectionField: [ {
+    position: 30
+  } ]
+  ToolProvider;
+  @EndUserText.label: 'StepType'
+  @UI.identification: [ {
+    position: 40 ,
+    label: 'StepType'
+  } ]
+  @UI.lineItem: [ {
+    position: 40 ,
+    label: 'StepType'
+  } ]
+  @UI.selectionField: [ {
+    position: 40
+  } ]
+  StepType;
+  @EndUserText.label: 'InputSchemaProvider'
+  @UI.identification: [ {
+    position: 50 ,
+    label: 'InputSchemaProvider'
+  } ]
+  @UI.lineItem: [ {
+    position: 50 ,
+    label: 'InputSchemaProvider'
+  } ]
+  @UI.selectionField: [ {
+    position: 50
+  } ]
+  InputSchemaProvider;
+  @EndUserText.label: 'ToolInfoProvider'
+  @UI.identification: [ {
+    position: 60 ,
+    label: 'ToolInfoProvider'
+  } ]
+  @UI.lineItem: [ {
+    position: 60 ,
+    label: 'ToolInfoProvider'
+  } ]
+  @UI.selectionField: [ {
+    position: 60
+  } ]
+  ToolInfoProvider;
+
+}

@@ -11,7 +11,7 @@ use etag
   use update;
   use delete;
 
-  use association _tool { with draft; }
+  use association _tool { create; with draft; }
 
   use action Edit;
   use action Activate;

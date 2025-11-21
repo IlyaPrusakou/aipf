@@ -14,7 +14,7 @@ ENDCLASS.
 
 
 
-CLASS ZPRU_CL_DECISION_PROVIDER IMPLEMENTATION.
+CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
 
   METHOD zpru_if_decision_provider~call_decision_engine.
@@ -25,9 +25,12 @@ CLASS ZPRU_CL_DECISION_PROVIDER IMPLEMENTATION.
 
     CASE lv_input.
       WHEN 'TOOL_1'.
-        eo_output->set_data( ir_data = NEW string( 'TOOL_1' ) ).
+        APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+        <ls_execution_plan>-agent_uuid =  io_controller->mv_agent_uuid.
+        <ls_execution_plan>-sequence = 1.
+        <ls_execution_plan>-tool_name = 'AddTwoNumbers'.
       WHEN OTHERS.
-        eo_output->set_data( ir_data = NEW string( 'STOP_WORK' ) ).
+        io_controller->mv_stop_agent = abap_true.
         RETURN.
     ENDCASE.
 

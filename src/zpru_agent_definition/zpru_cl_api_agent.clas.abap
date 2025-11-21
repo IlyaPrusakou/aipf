@@ -61,13 +61,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_query = NEW zpru_cl_request( ).
     lo_query->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( mv_input_query ) ).
 
+    mo_controller->mv_agent_uuid = ms_agent-agent_uuid.
+
     lo_decision_provider->call_decision_engine( EXPORTING io_controller          = mo_controller
                                                           io_input               = lo_query
                                                           io_system_prompt       = lo_system_prompt_provider
                                                           io_short_memory        = lo_short_memory
                                                           io_long_memory         = lo_long_memory
                                                           io_agent_info_provider = lo_agent_info_provider
-                                                IMPORTING eo_execution_plan      = lt_decision_engine_out
+                                                IMPORTING et_execution_plan      = lt_decision_engine_out
                                                           eo_first_tool_input    = lo_first_tool_input ).
 
 
