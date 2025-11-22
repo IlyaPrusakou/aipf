@@ -16,6 +16,11 @@ EQUIPED TOOL - tool added to agent execution ad hoc via API method during buildi
 
 DECISION PROVIDER - ABAP class contained in agent definition which is using any decision platform(LLM, ML, Condition technique API etc. or combination of them) and produces invocation sequence of tools. 
 
+SHORT MEMORY PROVIDER - ABAP class saving query, input and output messages and final response during one execution run
+
+LONG MEMORY PROVIDER - ABAP class persists in database table all data during one or more execution runs
+
+INFO PROVIDER - ABAP class for getting info about agent, tool etc.
 
 Framework stucture
 1 ZPRU_AGENT_FRAMEWORK
