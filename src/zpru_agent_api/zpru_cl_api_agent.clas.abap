@@ -8,6 +8,8 @@ CLASS zpru_cl_api_agent DEFINITION
 
   PROTECTED SECTION.
     DATA mo_controller       TYPE REF TO zpru_if_agent_controller.
+    DATA mo_short_memory     TYPE REF TO zpru_if_short_memory_provider.
+
     DATA ms_agent            TYPE zpru_agent.
     DATA mt_agent_tools      TYPE STANDARD TABLE OF zpru_agent_tool WITH EMPTY KEY.
     DATA mv_input_query      TYPE zpru_if_agent_frw=>ts_json.
@@ -15,6 +17,9 @@ CLASS zpru_cl_api_agent DEFINITION
     DATA ms_execution_header TYPE zpru_axc_head.
     DATA ms_execution_query  TYPE zpru_axc_query.
     DATA mt_execution_steps  TYPE STANDARD TABLE OF zpru_axc_step WITH EMPTY KEY.
+
+    METHODS get_short_memory
+      RETURNING VALUE(ro_short_memory) TYPE REF TO zpru_if_short_memory_provider.
 
 ENDCLASS.
 
@@ -24,6 +29,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_axc_database_access TYPE REF TO zpru_if_axc_database_access.
 
     IF ms_execution_header IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
@@ -35,7 +41,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       IF iv_do_commit = abap_true.
         ROLLBACK WORK.
       ENDIF.
-      RETURN.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     lo_axc_database_access->modify_query( EXPORTING it_axc_query = VALUE #( ( ms_execution_query ) )
@@ -44,7 +50,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       IF iv_do_commit = abap_true.
         ROLLBACK WORK.
       ENDIF.
-      RETURN.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     lo_axc_database_access->modify_step( EXPORTING it_axc_step = mt_execution_steps
@@ -53,7 +59,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       IF iv_do_commit = abap_true.
         ROLLBACK WORK.
       ENDIF.
-      RETURN.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     IF iv_do_commit = abap_true.
@@ -64,7 +70,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD zpru_if_api_agent~build_execution.
     DATA lo_decision_provider      TYPE REF TO zpru_if_decision_provider.
     DATA lo_query                  TYPE REF TO zpru_if_request.
-    DATA lt_decision_engine_out    TYPE zpru_if_decision_provider=>tt_execution_plan.
+    DATA lt_execution_plan         TYPE zpru_if_decision_provider=>tt_execution_plan.
     DATA lo_short_memory           TYPE REF TO zpru_if_short_memory_provider.
     DATA lo_long_memory            TYPE REF TO zpru_if_long_memory_provider.
     DATA lo_agent_info_provider    TYPE REF TO zpru_if_agent_info_provider.
@@ -73,14 +79,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     IF    ms_agent       IS INITIAL
        OR mv_input_query IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
     CREATE OBJECT lo_decision_provider TYPE (ms_agent-decision_provider).
 
-    IF ms_agent-short_memory_provider IS NOT INITIAL.
-      CREATE OBJECT lo_short_memory TYPE (ms_agent-short_memory_provider).
-    ENDIF.
+    lo_short_memory = get_short_memory( ).
 
     IF ms_agent-long_memory_provider IS NOT INITIAL.
       CREATE OBJECT lo_long_memory TYPE (ms_agent-long_memory_provider).
@@ -105,10 +110,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                           io_short_memory        = lo_short_memory
                                                           io_long_memory         = lo_long_memory
                                                           io_agent_info_provider = lo_agent_info_provider
-                                                IMPORTING et_execution_plan      = lt_decision_engine_out
+                                                IMPORTING et_execution_plan      = lt_execution_plan
                                                           eo_first_tool_input    = lo_first_tool_input ).
 
-    IF lt_decision_engine_out IS INITIAL.
+    IF lt_execution_plan IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
@@ -128,10 +134,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         ms_execution_query-query_uuid   = cl_system_uuid=>create_uuid_x16_static( ).
         ms_execution_query-run_uuid     = ms_execution_header-run_uuid.
         ms_execution_query-language     = sy-langu. " where to take?
-        ms_execution_query-input_prompt = VALUE #( lt_history[ 1 ]-history OPTIONAL ). " only user input or full first prompt?
+*        ms_execution_query-input_prompt = VALUE #( lt_history[ 1 ]- OPTIONAL ). " only user input or full first prompt?
 *ms_execution_query-output_response     =  .
 
-        LOOP AT lt_decision_engine_out ASSIGNING FIELD-SYMBOL(<ls_tool>).
+        LOOP AT lt_execution_plan ASSIGNING FIELD-SYMBOL(<ls_tool>).
 
           ASSIGN mt_agent_tools[ agent_uuid = <ls_tool>-agent_uuid
                                  tool_name  = <ls_tool>-tool_name ] TO FIELD-SYMBOL(<ls_tool_master_data>).
@@ -140,6 +146,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           ENDIF.
 
           APPEND INITIAL LINE TO mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
+          <ls_execution_step>-step_uuid       = cl_system_uuid=>create_uuid_x16_static( ).
           <ls_execution_step>-query_uuid      = ms_execution_query-query_uuid.
           <ls_execution_step>-run_uuid        = ms_execution_header-run_uuid.
           <ls_execution_step>-tool_uuid       = <ls_tool_master_data>-tool_uuid.
@@ -159,8 +166,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
   METHOD zpru_if_api_agent~initialize.
     DATA lo_adf_database_access TYPE REF TO zpru_if_adf_database_access.
+    DATA lo_short_memory        TYPE REF TO zpru_if_short_memory_provider.
+    DATA lt_message TYPE zpru_tt_key_value_tuple.
 
     IF iv_agent_name IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
@@ -177,12 +187,14 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lt_agent) = lo_adf_database_access->select_agent( it_agent_k = lt_agent_k ).
 
     IF lt_agent IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
     ms_agent = VALUE #( lt_agent[ 1 ] OPTIONAL ).
 
     IF ms_agent IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
@@ -194,6 +206,25 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                          it_agent_tool_k = VALUE #( FOR <ls_l> IN et_tool_agent_link
                                                     WHERE ( agent_uuid = ms_agent-agent_uuid )
                                                     ( tool_uuid = <ls_l>-tool_uuid ) ) ).
+
+    lo_short_memory = get_short_memory( ).
+
+    lt_message = VALUE #( ( name = 'STAGE'
+                            value = 'INITIALIZE' )
+                          ( name = 'AGENT_NAME'
+                            value = iv_agent_name ) ).
+
+    LOOP AT mt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
+      APPEND INITIAL LINE TO lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
+      <ls_message>-name = 'TOOL'.
+      <ls_message>-value = <ls_tool>-tool_name.
+    ENDLOOP.
+
+
+    lo_short_memory->save_message(
+      is_message = VALUE #( agent_uuid   = ms_agent-agent_uuid
+                            message_type = zpru_if_short_memory_provider=>info
+                            message_tuple = lt_message ) ).
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun_execution.
@@ -210,6 +241,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     IF    ms_execution_header IS INITIAL
        OR ms_execution_query  IS INITIAL
        OR mt_execution_steps  IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       RETURN.
     ENDIF.
 
@@ -256,16 +288,24 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
     IF iv_input_query IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      RETURN.
+    ENDIF.
+
+    lo_short_memory = get_short_memory( ).
+*    lo_short_memory->save_message( is_message   = iv_input_query ).
+
+    mv_input_query = iv_input_query.
+  ENDMETHOD.
+
+  METHOD get_short_memory.
+    IF mo_short_memory IS BOUND.
+      ro_short_memory = mo_short_memory.
       RETURN.
     ENDIF.
 
     IF ms_agent-short_memory_provider IS NOT INITIAL.
-      CREATE OBJECT lo_short_memory TYPE (ms_agent-short_memory_provider).
+      CREATE OBJECT mo_short_memory TYPE (ms_agent-short_memory_provider).
     ENDIF.
-
-    lo_short_memory->save_message( iv_message_type = zpru_if_short_memory_provider=>query
-                                   is_message      = iv_input_query ).
-
-    mv_input_query = iv_input_query.
   ENDMETHOD.
 ENDCLASS.

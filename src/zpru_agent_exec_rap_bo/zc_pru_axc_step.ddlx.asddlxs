@@ -1,6 +1,6 @@
 @Metadata.layer: #CORE
 
-annotate entity ZR_PRU_AXC_STEP with
+annotate entity ZC_PRU_AXC_STEP with
 
 {
   @EndUserText.label: 'StepUuid'
