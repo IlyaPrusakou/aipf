@@ -321,4 +321,23 @@ INTERFACE zpru_if_axc_service
               cs_failed        TYPE ts_failed
               cs_mapped        TYPE ts_mapped.
 
+  " Higher-level lifecycle helpers
+  METHODS determine
+    CHANGING cs_reported TYPE ts_reported
+             cs_failed   TYPE ts_failed
+             cs_mapped   TYPE ts_mapped.
+
+  METHODS validate
+    CHANGING cs_reported TYPE ts_reported
+             cs_failed   TYPE ts_failed.
+
+  METHODS clean_up
+    CHANGING cs_mapped TYPE ts_mapped.
+
+  METHODS do_save
+    IMPORTING iv_do_commit TYPE abap_boolean DEFAULT abap_true
+    CHANGING  cs_reported  TYPE ts_reported
+              cs_failed    TYPE ts_failed
+              cs_mapped    TYPE ts_mapped.
+
 ENDINTERFACE.

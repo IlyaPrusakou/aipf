@@ -63,6 +63,13 @@ CLASS zpru_cl_axc_service DEFINITION
     METHODS fill_head_admin_fields
       IMPORTING iv_during_create TYPE abap_boolean DEFAULT abap_false
       CHANGING  cs_header        TYPE zpru_cl_axc_buffer=>ts_header.
+
+    METHODS db_modify
+      IMPORTING iv_do_commit TYPE abap_boolean
+      CHANGING  cs_reported   TYPE zpru_if_axc_service=>ts_reported
+                cs_failed     TYPE zpru_if_axc_service=>ts_failed
+                cs_mapped     TYPE zpru_if_axc_service=>ts_mapped
+      RETURNING VALUE(rv_error) TYPE abap_boolean.
 ENDCLASS.
 
 
@@ -87,6 +94,131 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     cs_header-instance-last_changed = COND #( WHEN cs_header-instance-last_changed IS INITIAL
                                               THEN lv_now
                                               ELSE cs_header-instance-last_changed ).
+  ENDMETHOD.
+
+  METHOD db_modify.
+    rv_error = abap_false.
+
+    DATA(lo_db) = NEW zpru_cl_axc_database_access( ).
+
+    " Prepare tables for modify/delete operations
+    DATA: lt_modify_head  TYPE TABLE OF zpru_axc_head WITH EMPTY KEY,
+          lt_modify_query TYPE TABLE OF zpru_axc_query WITH EMPTY KEY,
+          lt_modify_step  TYPE TABLE OF zpru_axc_step WITH EMPTY KEY,
+
+          lt_delete_head  TYPE TABLE OF zpru_axc_head WITH EMPTY KEY,
+          lt_delete_query TYPE TABLE OF zpru_axc_query WITH EMPTY KEY,
+          lt_delete_step  TYPE TABLE OF zpru_axc_step WITH EMPTY KEY.
+
+    " Collect deletes / modifies from buffers
+    LOOP AT zpru_cl_axc_buffer=>step_buffer ASSIGNING FIELD-SYMBOL(<ls_s>) WHERE changed = abap_true.
+      IF <ls_s>-deleted = abap_true.
+        APPEND <ls_s>-instance TO lt_delete_step.
+      ELSE.
+        APPEND <ls_s>-instance TO lt_modify_step.
+      ENDIF.
+    ENDLOOP.
+
+    LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_q>) WHERE changed = abap_true.
+      IF <ls_q>-deleted = abap_true.
+        APPEND <ls_q>-instance TO lt_delete_query.
+      ELSE.
+        APPEND <ls_q>-instance TO lt_modify_query.
+      ENDIF.
+    ENDLOOP.
+
+    LOOP AT zpru_cl_axc_buffer=>header_buffer ASSIGNING FIELD-SYMBOL(<ls_h>) WHERE changed = abap_true.
+      IF <ls_h>-deleted = abap_true.
+        APPEND <ls_h>-instance TO lt_delete_head.
+      ELSE.
+        APPEND <ls_h>-instance TO lt_modify_head.
+      ENDIF.
+    ENDLOOP.
+
+    " Cascade: if headers deleted, fetch their queries and steps
+    IF lt_delete_head IS NOT INITIAL.
+      DATA(lt_head_keys) = VALUE #( FOR <ls> IN lt_delete_head ( run_uuid = <ls>-run_uuid ) ).
+      DATA(lt_q_from_db) = lo_db->select_query_by_head( lt_head_keys ).
+      IF lt_q_from_db IS NOT INITIAL.
+        LOOP AT lt_q_from_db ASSIGNING FIELD-SYMBOL(<ls_qdb>).
+          IF NOT line_exists( lt_delete_query[ query_uuid = <ls_qdb>-query_uuid ] ).
+            APPEND <ls_qdb> TO lt_delete_query.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+    " Cascade: if queries deleted, fetch their steps
+    IF lt_delete_query IS NOT INITIAL.
+      DATA(lt_query_keys) = VALUE #( FOR <ls> IN lt_delete_query ( query_uuid = <ls>-query_uuid ) ).
+      DATA(lt_s_from_db) = lo_db->select_step_by_query( lt_query_keys ).
+      IF lt_s_from_db IS NOT INITIAL.
+        LOOP AT lt_s_from_db ASSIGNING FIELD-SYMBOL(<ls_sdb>).
+          IF NOT line_exists( lt_delete_step[ step_uuid = <ls_sdb>-step_uuid ] ).
+            APPEND <ls_sdb> TO lt_delete_step.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+    " Perform deletes first: steps -> queries -> headers
+    IF lt_delete_step IS NOT INITIAL.
+      lo_db->delete_step( EXPORTING it_axc_step = lt_delete_step
+                          IMPORTING ev_error    = DATA(lv_step_del_err) ).
+      IF lv_step_del_err = abap_true.
+        rv_error = abap_true.
+      ENDIF.
+    ENDIF.
+
+    IF rv_error = abap_false AND lt_delete_query IS NOT INITIAL.
+      lo_db->delete_query( EXPORTING it_axc_query = lt_delete_query
+                           IMPORTING ev_error     = DATA(lv_query_del_err) ).
+      IF lv_query_del_err = abap_true.
+        rv_error = abap_true.
+      ENDIF.
+    ENDIF.
+
+    IF rv_error = abap_false AND lt_delete_head IS NOT INITIAL.
+      lo_db->delete_head( EXPORTING it_axc_head = lt_delete_head
+                          IMPORTING ev_error    = DATA(lv_head_del_err) ).
+      IF lv_head_del_err = abap_true.
+        rv_error = abap_true.
+      ENDIF.
+    ENDIF.
+
+    " If any delete failed, return error
+    IF rv_error = abap_true.
+      RETURN.
+    ENDIF.
+
+    " Perform modifies/inserts: head -> query -> step
+    IF lt_modify_head IS NOT INITIAL.
+      lo_db->modify_head( EXPORTING it_axc_head = lt_modify_head
+                          IMPORTING ev_error    = DATA(lv_head_mod_err) ).
+      IF lv_head_mod_err = abap_true.
+        rv_error = abap_true.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+    IF lt_modify_query IS NOT INITIAL.
+      lo_db->modify_query( EXPORTING it_axc_query = lt_modify_query
+                           IMPORTING ev_error     = DATA(lv_query_mod_err) ).
+      IF lv_query_mod_err = abap_true.
+        rv_error = abap_true.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+    IF lt_modify_step IS NOT INITIAL.
+      lo_db->modify_step( EXPORTING it_axc_step = lt_modify_step
+                          IMPORTING ev_error    = DATA(lv_step_mod_err) ).
+      IF lv_step_mod_err = abap_true.
+        rv_error = abap_true.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~cba_step.
@@ -456,6 +588,69 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       et_axc_step = lo_axc_database_access->select_step_by_query( VALUE #( FOR <ls_q_k> IN et_axc_query
                                                                            ( query_uuid = <ls_q_k>-query_uuid  ) ) ).
     ENDIF.
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~determine.
+    " Placeholder for business logic that determines what to persist.
+    " Currently a no-op; callers populate buffers via CBA/UPDATE/DELETE flows.
+    IF cs_mapped IS INITIAL.
+      " leave as-is
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~validate.
+    " Placeholder for validation logic. Add domain-specific checks here.
+    " For now, we keep this minimal: if there are existing failures, leave them.
+    IF cs_failed-header IS NOT INITIAL OR cs_failed-query IS NOT INITIAL OR cs_failed-step IS NOT INITIAL.
+      " existing failures already present
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~clean_up.
+    " Clear in-memory buffers and mapped entries after save/rollback.
+    CLEAR cs_mapped.
+    CLEAR: zpru_cl_axc_buffer=>header_buffer,
+           zpru_cl_axc_buffer=>query_buffer,
+           zpru_cl_axc_buffer=>step_buffer.
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~do_save.
+    DATA(lv_err) = abap_false.
+
+    " Run determination step
+    me->determine( CHANGING cs_reported = cs_reported
+                             cs_failed   = cs_failed
+                             cs_mapped   = cs_mapped ).
+
+    " Run validation
+    me->validate( CHANGING cs_reported = cs_reported
+                            cs_failed   = cs_failed ).
+
+    " If validation produced failures, skip DB modification
+    IF cs_failed-header IS NOT INITIAL OR cs_failed-query IS NOT INITIAL OR cs_failed-step IS NOT INITIAL.
+      RETURN.
+    ENDIF.
+
+    " Persist buffers to DB (returns abap_true on error)
+    lv_err = me->db_modify( EXPORTING iv_do_commit = iv_do_commit
+                CHANGING  cs_reported   = cs_reported
+                      cs_failed     = cs_failed
+                      cs_mapped     = cs_mapped ).
+
+    IF lv_err = abap_true.
+      IF iv_do_commit = abap_true.
+        ROLLBACK WORK.
+      ENDIF.
+      " leave failure info in cs_failed
+      me->clean_up( CHANGING cs_mapped = cs_mapped ).
+      RETURN.
+    ENDIF.
+
+    IF iv_do_commit = abap_true.
+      COMMIT WORK AND WAIT.
+    ENDIF.
+
+    me->clean_up( CHANGING cs_mapped = cs_mapped ).
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~get_actual_query.
