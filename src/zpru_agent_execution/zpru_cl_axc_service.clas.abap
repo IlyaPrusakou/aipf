@@ -24,6 +24,24 @@ CLASS zpru_cl_axc_service DEFINITION
       CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
                 cs_failed      TYPE zpru_if_axc_service=>ts_failed.
 
+    METHODS precheck_read_query
+      IMPORTING it_QUERY_read_k TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
+                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+
+    METHODS precheck_UPDATE_query
+      IMPORTING it_QUERY_read_k TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
+                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+
+    METHODS precheck_DELETE_query
+      IMPORTING it_QUERY_read_k TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_QUERY_read_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
+                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+
     METHODS precheck_rba_query
       IMPORTING it_rba_query_k TYPE zpru_if_axc_service=>tt_rba_query_k
       EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_rba_query_k
@@ -32,15 +50,15 @@ CLASS zpru_cl_axc_service DEFINITION
 
     METHODS precheck_cba_step
       IMPORTING it_axc_step_imp TYPE zpru_if_axc_service=>tt_step_create_imp
-      EXPORTING et_entities      TYPE zpru_if_axc_service=>tt_step_create_imp
-      CHANGING  cs_reported      TYPE zpru_if_axc_service=>ts_reported
-                cs_failed        TYPE zpru_if_axc_service=>ts_failed.
+      EXPORTING et_entities     TYPE zpru_if_axc_service=>tt_step_create_imp
+      CHANGING  cs_reported     TYPE zpru_if_axc_service=>ts_reported
+                cs_failed       TYPE zpru_if_axc_service=>ts_failed.
 
     METHODS precheck_rba_step
       IMPORTING it_rba_step_k TYPE zpru_if_axc_service=>tt_rba_step_k
-      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_rba_step_k
-      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
-                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+      EXPORTING et_entities   TYPE zpru_if_axc_service=>tt_rba_step_k
+      CHANGING  cs_reported   TYPE zpru_if_axc_service=>ts_reported
+                cs_failed     TYPE zpru_if_axc_service=>ts_failed.
 
     METHODS precheck_read_step
       IMPORTING it_step_read_k TYPE zpru_if_axc_service=>tt_step_read_k
@@ -50,25 +68,25 @@ CLASS zpru_cl_axc_service DEFINITION
 
     METHODS precheck_update_step
       IMPORTING it_step_update_imp TYPE zpru_if_axc_service=>tt_step_update_imp
-      EXPORTING et_entities       TYPE zpru_if_axc_service=>tt_step_update_imp
-      CHANGING  cs_reported       TYPE zpru_if_axc_service=>ts_reported
-                cs_failed         TYPE zpru_if_axc_service=>ts_failed.
+      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_step_update_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
+                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
 
     METHODS precheck_delete_step
       IMPORTING it_step_delete_imp TYPE zpru_if_axc_service=>tt_step_delete_imp
-      EXPORTING et_entities       TYPE zpru_if_axc_service=>tt_step_delete_imp
-      CHANGING  cs_reported       TYPE zpru_if_axc_service=>ts_reported
-                cs_failed         TYPE zpru_if_axc_service=>ts_failed.
+      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_step_delete_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
+                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
 
     METHODS fill_head_admin_fields
       IMPORTING iv_during_create TYPE abap_boolean DEFAULT abap_false
       CHANGING  cs_header        TYPE zpru_cl_axc_buffer=>ts_header.
 
     METHODS db_modify
-      IMPORTING iv_do_commit TYPE abap_boolean
-      CHANGING  cs_reported   TYPE zpru_if_axc_service=>ts_reported
-                cs_failed     TYPE zpru_if_axc_service=>ts_failed
-                cs_mapped     TYPE zpru_if_axc_service=>ts_mapped
+      IMPORTING iv_do_commit    TYPE abap_boolean
+      CHANGING  cs_reported     TYPE zpru_if_axc_service=>ts_reported
+                cs_failed       TYPE zpru_if_axc_service=>ts_failed
+                cs_mapped       TYPE zpru_if_axc_service=>ts_mapped
       RETURNING VALUE(rv_error) TYPE abap_boolean.
 
   PRIVATE SECTION.
@@ -86,9 +104,9 @@ CLASS zpru_cl_axc_service DEFINITION
                 et_delete_step  TYPE tt_axc_step.
 
     METHODS cascade_deletes
-      CHANGING  ct_delete_head  TYPE tt_axc_head
-                ct_delete_query TYPE tt_axc_query
-                ct_delete_step  TYPE tt_axc_step.
+      CHANGING ct_delete_head  TYPE tt_axc_head
+               ct_delete_query TYPE tt_axc_query
+               ct_delete_step  TYPE tt_axc_step.
 
     METHODS apply_db_changes
       IMPORTING it_modify_head  TYPE tt_axc_head
@@ -100,20 +118,23 @@ CLASS zpru_cl_axc_service DEFINITION
       RETURNING VALUE(rv_error) TYPE abap_boolean.
 
     METHODS check_row
-      IMPORTING io_util         TYPE REF TO zpru_if_agent_util
-                iv_struct_name  TYPE string
-                it_req_fields   TYPE string_table OPTIONAL
-                iv_pk_field     TYPE string OPTIONAL
-                iv_fail_cause   TYPE if_abap_behv=>t_fail_cause DEFAULT zpru_if_agent_frw=>cs_fail_cause-dependency
-                iv_msg_num      TYPE symsgno DEFAULT '007'
-      CHANGING  cs_row          TYPE any
-                ct_failed       TYPE ANY TABLE
-                ct_reported     TYPE ANY TABLE
-      RETURNING VALUE(rv_ok)    TYPE abap_boolean.
+      IMPORTING io_util        TYPE REF TO zpru_if_agent_util
+                iv_struct_name TYPE string
+                it_req_fields  TYPE string_table OPTIONAL
+                iv_pk_field    TYPE string OPTIONAL
+                iv_fail_cause  TYPE i DEFAULT zpru_if_agent_frw=>cs_fail_cause-dependency
+                iv_msg_num     TYPE symsgno DEFAULT '007'
+      CHANGING  cs_row         TYPE any
+                ct_failed      TYPE INDEX TABLE
+                ct_reported    TYPE INDEX TABLE
+      RETURNING VALUE(rv_ok)   TYPE abap_boolean.
 ENDCLASS.
 
 
+
 CLASS zpru_cl_axc_service IMPLEMENTATION.
+
+
   METHOD fill_head_admin_fields.
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -136,6 +157,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                               ELSE cs_header-instance-last_changed ).
   ENDMETHOD.
 
+
   METHOD db_modify.
     DATA: lt_modify_head  TYPE tt_axc_head,
           lt_modify_query TYPE tt_axc_query,
@@ -151,17 +173,18 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                et_delete_query = lt_delete_query
                                et_delete_step  = lt_delete_step ).
 
-    cascade_deletes( CHANGING  ct_delete_head  = lt_delete_head
-                               ct_delete_query = lt_delete_query
-                               ct_delete_step  = lt_delete_step ).
+    cascade_deletes( CHANGING ct_delete_head  = lt_delete_head
+                              ct_delete_query = lt_delete_query
+                              ct_delete_step  = lt_delete_step ).
 
-    rv_error = apply_db_changes( Exporting it_modify_head  = lt_modify_head
+    rv_error = apply_db_changes( EXPORTING it_modify_head  = lt_modify_head
                                            it_modify_query = lt_modify_query
                                            it_modify_step  = lt_modify_step
                                            it_delete_head  = lt_delete_head
                                            it_delete_query = lt_delete_query
                                            it_delete_step  = lt_delete_step ).
   ENDMETHOD.
+
 
   METHOD collect_changes.
     CLEAR: et_modify_head, et_modify_query, et_modify_step,
@@ -192,10 +215,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD cascade_deletes.
     " Cascade: if headers deleted, fetch their queries and steps
     IF ct_delete_head IS NOT INITIAL.
-      DATA(lt_head_keys) = VALUE #( FOR <ls> IN ct_delete_head ( run_uuid = <ls>-run_uuid ) ).
+      DATA(lt_head_keys) = VALUE tt_axc_head( FOR <ls> IN ct_delete_head ( run_uuid = <ls>-run_uuid ) ).
 
       SELECT * FROM zpru_axc_query
         FOR ALL ENTRIES IN @lt_head_keys
@@ -213,7 +237,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     " Cascade: if queries deleted, fetch their steps
     IF ct_delete_query IS NOT INITIAL.
-      DATA(lt_query_keys) = VALUE #( FOR <ls> IN ct_delete_query ( query_uuid = <ls>-query_uuid ) ).
+      DATA(lt_query_keys) = VALUE tt_axc_query( FOR <lq> IN ct_delete_query ( query_uuid = <lq>-query_uuid ) ).
 
       SELECT * FROM zpru_axc_step
         FOR ALL ENTRIES IN @lt_query_keys
@@ -230,26 +254,27 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD apply_db_changes.
     rv_error = abap_false.
 
     " Perform deletes first: steps -> queries -> headers
     IF it_delete_step IS NOT INITIAL.
-      DELETE zpru_axc_step FROM TABLE it_delete_step.
+      DELETE zpru_axc_step FROM TABLE @it_delete_step.
       IF sy-subrc <> 0.
         rv_error = abap_true.
       ENDIF.
     ENDIF.
 
     IF rv_error = abap_false AND it_delete_query IS NOT INITIAL.
-      DELETE zpru_axc_query FROM TABLE it_delete_query.
+      DELETE zpru_axc_query FROM TABLE @it_delete_query.
       IF sy-subrc <> 0.
         rv_error = abap_true.
       ENDIF.
     ENDIF.
 
     IF rv_error = abap_false AND it_delete_head IS NOT INITIAL.
-      DELETE zpru_axc_head FROM TABLE it_delete_head.
+      DELETE zpru_axc_head FROM TABLE @it_delete_head.
       IF sy-subrc <> 0.
         rv_error = abap_true.
       ENDIF.
@@ -262,7 +287,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     " Perform modifies/inserts: head -> query -> step
     IF it_modify_head IS NOT INITIAL.
-      MODIFY zpru_axc_head FROM TABLE it_modify_head.
+      MODIFY zpru_axc_head FROM TABLE @it_modify_head.
       IF sy-subrc <> 0.
         rv_error = abap_true.
         RETURN.
@@ -270,7 +295,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
 
     IF it_modify_query IS NOT INITIAL.
-      MODIFY zpru_axc_query FROM TABLE it_modify_query.
+      MODIFY zpru_axc_query FROM TABLE @it_modify_query.
       IF sy-subrc <> 0.
         rv_error = abap_true.
         RETURN.
@@ -278,7 +303,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
 
     IF it_modify_step IS NOT INITIAL.
-      MODIFY zpru_axc_step FROM TABLE it_modify_step.
+      MODIFY zpru_axc_step FROM TABLE @it_modify_step.
       IF sy-subrc <> 0.
         rv_error = abap_true.
         RETURN.
@@ -286,15 +311,16 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~cba_step.
     IF it_axc_step_imp IS INITIAL.
       RETURN.
     ENDIF.
 
     precheck_cba_step( EXPORTING it_axc_step_imp = it_axc_step_imp
-                        IMPORTING et_entities      = DATA(lt_entities)
-                        CHANGING  cs_reported      = cs_reported
-                                  cs_failed        = cs_failed ).
+                       IMPORTING et_entities     = DATA(lt_entities)
+                       CHANGING  cs_reported     = cs_reported
+                                 cs_failed       = cs_failed ).
 
     IF lt_entities IS INITIAL.
       RETURN.
@@ -354,32 +380,30 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
                     iv_number   = `001`
                     iv_severity = zpru_if_agent_message=>sc_severity-success )
-            run_uuid  = <ls_create>-run_uuid
             query_uuid = <ls_create>-query_uuid
             step_uuid = <ls_create>-step_uuid ) TO cs_reported-step.
 
       ELSE.
 
-         APPEND VALUE #( run_uuid   = <ls_create>-run_uuid
-               query_uuid  = <ls_create>-query_uuid
-               step_uuid   = <ls_create>-step_uuid
-               create      = abap_true
-               fail        = zpru_if_agent_frw=>cs_fail_cause-unspecific )
-           TO cs_failed-step.
+        APPEND VALUE #( query_uuid  = <ls_create>-query_uuid
+              step_uuid   = <ls_create>-step_uuid
+              create      = abap_true
+              fail        = zpru_if_agent_frw=>cs_fail_cause-unspecific )
+          TO cs_failed-step.
 
-         APPEND VALUE #( run_uuid   = <ls_create>-run_uuid
-               query_uuid  = <ls_create>-query_uuid
-               step_uuid   = <ls_create>-step_uuid
-               create      = abap_true
-               msg         = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
-                   iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                   iv_number   = `002`
-                   iv_severity = zpru_if_agent_message=>sc_severity-error ) )
-           TO cs_reported-step.
+        APPEND VALUE #( query_uuid  = <ls_create>-query_uuid
+              step_uuid   = <ls_create>-step_uuid
+              create      = abap_true
+              msg         = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
+                  iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+                  iv_number   = `002`
+                  iv_severity = zpru_if_agent_message=>sc_severity-error ) )
+          TO cs_reported-step.
 
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~rba_step.
     CLEAR et_axc_step.
@@ -389,9 +413,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
 
     precheck_rba_step( EXPORTING it_rba_step_k = it_rba_step_k
-                       IMPORTING et_entities    = DATA(lt_entities)
-                       CHANGING  cs_reported    = cs_reported
-                                 cs_failed      = cs_failed ).
+                       IMPORTING et_entities   = DATA(lt_entities)
+                       CHANGING  cs_reported   = cs_reported
+                                 cs_failed     = cs_failed ).
 
     IF lt_entities IS INITIAL.
       RETURN.
@@ -429,6 +453,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~read_step.
     CLEAR et_axc_step.
@@ -478,14 +503,12 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
         APPEND ls_out TO et_axc_step.
       ELSE.
-        APPEND VALUE #( run_uuid   = <ls_ent>-run_uuid
-                        query_uuid = <ls_ent>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_ent>-query_uuid
                         step_uuid  = <ls_ent>-step_uuid
                         fail       = zpru_if_agent_frw=>cs_fail_cause-not_found )
                TO cs_failed-step.
 
-        APPEND VALUE #( run_uuid   = <ls_ent>-run_uuid
-                        query_uuid = <ls_ent>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_ent>-query_uuid
                         step_uuid  = <ls_ent>-step_uuid
                         msg        = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
                                     iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
@@ -496,6 +519,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~update_step.
     IF it_step_update_imp IS INITIAL.
       RETURN.
@@ -503,9 +527,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     " Precheck and populate control flags
     precheck_update_step( EXPORTING it_step_update_imp = it_step_update_imp
-                          IMPORTING et_entities         = DATA(lt_entities)
-                          CHANGING  cs_reported         = cs_reported
-                                    cs_failed           = cs_failed ).
+                          IMPORTING et_entities        = DATA(lt_entities)
+                          CHANGING  cs_reported        = cs_reported
+                                    cs_failed          = cs_failed ).
 
     IF lt_entities IS INITIAL.
       RETURN.
@@ -549,15 +573,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
         <ls_buf>-deleted = abap_false.
 
       ELSE.
-        APPEND VALUE #( run_uuid   = <ls_update>-run_uuid
-                        query_uuid = <ls_update>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_update>-query_uuid
                         step_uuid  = <ls_update>-step_uuid
                         update     = abap_true
                         fail       = zpru_if_agent_frw=>cs_fail_cause-not_found )
                TO cs_failed-step.
 
-        APPEND VALUE #( run_uuid   = <ls_update>-run_uuid
-                        query_uuid = <ls_update>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_update>-query_uuid
                         step_uuid  = <ls_update>-step_uuid
                         update     = abap_true
                         msg        = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
@@ -569,6 +591,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~delete_step.
     IF it_step_delete_imp IS INITIAL.
       RETURN.
@@ -576,9 +599,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     " Precheck and populate entities
     precheck_delete_step( EXPORTING it_step_delete_imp = it_step_delete_imp
-                          IMPORTING et_entities         = DATA(lt_entities)
-                          CHANGING  cs_reported         = cs_reported
-                                    cs_failed           = cs_failed ).
+                          IMPORTING et_entities        = DATA(lt_entities)
+                          CHANGING  cs_reported        = cs_reported
+                                    cs_failed          = cs_failed ).
 
     IF lt_entities IS INITIAL.
       RETURN.
@@ -598,27 +621,21 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
         <ls_buf>-deleted = abap_true.
         <ls_buf>-changed = abap_true.
 
-        INSERT VALUE #( query_uuid = <ls_delete>-query_uuid
-                        step_uuid  = <ls_delete>-step_uuid ) INTO TABLE cs_mapped-step.
-
         APPEND VALUE #( msg      = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
                                            iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
                                            iv_number   = `005`
                                            iv_severity = zpru_if_agent_message=>sc_severity-success )
-                        run_uuid  = <ls_delete>-run_uuid
                         query_uuid = <ls_delete>-query_uuid
                         step_uuid = <ls_delete>-step_uuid ) TO cs_reported-step.
 
       ELSE.
-        APPEND VALUE #( run_uuid   = <ls_delete>-run_uuid
-                        query_uuid = <ls_delete>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_delete>-query_uuid
                         step_uuid  = <ls_delete>-step_uuid
                         delete     = abap_true
                         fail       = zpru_if_agent_frw=>cs_fail_cause-not_found )
                TO cs_failed-step.
 
-        APPEND VALUE #( run_uuid   = <ls_delete>-run_uuid
-                        query_uuid = <ls_delete>-query_uuid
+        APPEND VALUE #( query_uuid = <ls_delete>-query_uuid
                         step_uuid  = <ls_delete>-step_uuid
                         delete     = abap_true
                         msg        = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
@@ -629,6 +646,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~read_agent_execution.
     DATA lo_axc_database_access TYPE REF TO zpru_if_axc_database_access.
@@ -655,6 +673,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~determine.
     " Placeholder for business logic that determines what to persist.
     " Currently a no-op; callers populate buffers via CBA/UPDATE/DELETE flows.
@@ -662,6 +681,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       " leave as-is
     ENDIF.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~validate.
     " Placeholder for validation logic. Add domain-specific checks here.
@@ -671,6 +691,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~clean_up.
     " Clear in-memory buffers and mapped entries after save/rollback.
     CLEAR cs_mapped.
@@ -679,17 +700,18 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
            zpru_cl_axc_buffer=>step_buffer.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~do_save.
     DATA(lv_err) = abap_false.
 
     " Run determination step
-    me->determine( CHANGING cs_reported = cs_reported
-                             cs_failed   = cs_failed
-                             cs_mapped   = cs_mapped ).
+    me->zpru_if_axc_service~determine( CHANGING cs_reported = cs_reported
+                                                cs_failed   = cs_failed
+                                                cs_mapped   = cs_mapped ).
 
     " Run validation
-    me->validate( CHANGING cs_reported = cs_reported
-                            cs_failed   = cs_failed ).
+    me->zpru_if_axc_service~validate( CHANGING cs_reported = cs_reported
+                                               cs_failed   = cs_failed ).
 
     " If validation produced failures, skip DB modification
     IF cs_failed-header IS NOT INITIAL OR cs_failed-query IS NOT INITIAL OR cs_failed-step IS NOT INITIAL.
@@ -698,16 +720,16 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     " Persist buffers to DB (returns abap_true on error)
     lv_err = me->db_modify( EXPORTING iv_do_commit = iv_do_commit
-                CHANGING  cs_reported   = cs_reported
-                      cs_failed     = cs_failed
-                      cs_mapped     = cs_mapped ).
+                            CHANGING  cs_reported  = cs_reported
+                                      cs_failed    = cs_failed
+                                      cs_mapped    = cs_mapped ).
 
     IF lv_err = abap_true.
       IF iv_do_commit = abap_true.
         ROLLBACK WORK.
       ENDIF.
       " leave failure info in cs_failed
-      me->clean_up( CHANGING cs_mapped = cs_mapped ).
+      me->zpru_if_axc_service~clean_up( CHANGING cs_mapped = cs_mapped ).
       RETURN.
     ENDIF.
 
@@ -715,8 +737,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       COMMIT WORK AND WAIT.
     ENDIF.
 
-    me->clean_up( CHANGING cs_mapped = cs_mapped ).
+    me->zpru_if_axc_service~clean_up( CHANGING cs_mapped = cs_mapped ).
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~get_actual_query.
     DATA lo_axc_database_access TYPE REF TO zpru_if_axc_database_access.
@@ -743,6 +766,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~cba_query.
     IF it_axc_query_imp IS INITIAL.
       RETURN.
@@ -767,24 +791,21 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
 
-      ASSIGN zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_create>-run_uuid
-                                               instance-query_uuid = <ls_create>-query_uuid
-                                               deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-
       IF    NOT line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_create>-run_uuid
                                                                instance-query_uuid = <ls_create>-query_uuid ] )
          OR     line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_create>-run_uuid
                                                                instance-query_uuid = <ls_create>-query_uuid
                                                                deleted             = abap_true ] ).
 
-        DELETE zpru_cl_axc_buffer=>query_buffer
-               WHERE     instance-run_uuid   = VALUE #( zpru_cl_axc_buffer=>query_buffer[
-                                                          instance-run_uuid   = <ls_create>-run_uuid
-                                                          instance-query_uuid = <ls_create>-query_uuid ]-instance-run_uuid OPTIONAL )
-                     AND instance-query_uuid = VALUE #( zpru_cl_axc_buffer=>query_buffer[
-                                                          instance-run_uuid   = <ls_create>-run_uuid
-                                                          instance-query_uuid = <ls_create>-query-query_uuid ]-instance-query_uuid OPTIONAL )
-                     AND deleted             = abap_true.
+        ASSIGN zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_create>-run_uuid
+                                                 instance-query_uuid = <ls_create>-query_uuid
+                                                 deleted             = abap_true ] TO FIELD-SYMBOL(<ls_buffer>).
+        IF sy-subrc = 0.
+          DELETE zpru_cl_axc_buffer=>query_buffer
+                 WHERE     instance-run_uuid   = <ls_buffer>-instance-run_uuid
+                       AND instance-query_uuid = <ls_buffer>-instance-query_uuid
+                       AND deleted             = abap_true.
+        ENDIF.
 
         APPEND VALUE #(
             instance-run_uuid        = <ls_create>-run_uuid
@@ -823,26 +844,30 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
       ELSE.
 
-         APPEND VALUE #( run_uuid  = <ls_create>-run_uuid
-               query_uuid = <ls_create>-query_uuid
-               create    = abap_true
-               fail      = zpru_if_agent_frw=>cs_fail_cause-unspecific )
-           TO cs_failed-query.
+        APPEND VALUE #( run_uuid  = <ls_create>-run_uuid
+              query_uuid = <ls_create>-query_uuid
+              create    = abap_true
+              fail      = zpru_if_agent_frw=>cs_fail_cause-unspecific )
+          TO cs_failed-query.
 
-         APPEND VALUE #( run_uuid   = <ls_create>-run_uuid
-               query_uuid  = <ls_create>-query_uuid
-               create      = abap_true
-               msg         = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
-                   iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                   iv_number   = `002`
-                   iv_severity = zpru_if_agent_message=>sc_severity-error ) )
-           TO cs_reported-query.
+        APPEND VALUE #( run_uuid   = <ls_create>-run_uuid
+              query_uuid  = <ls_create>-query_uuid
+              create      = abap_true
+              msg         = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
+                  iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+                  iv_number   = `002`
+                  iv_severity = zpru_if_agent_message=>sc_severity-error ) )
+          TO cs_reported-query.
 
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~delete_header.
+
+    DATA lt_fetched_query LIKE zpru_cl_axc_buffer=>query_buffer.
+
     IF it_head_delete_imp IS INITIAL.
       RETURN.
     ENDIF.
@@ -850,6 +875,21 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     zpru_cl_axc_buffer=>prep_header_buffer( VALUE #( FOR <ls_k>
                                                      IN     it_head_delete_imp
                                                      ( run_uuid = <ls_k>-run_uuid ) ) ).
+
+    zpru_cl_axc_buffer=>prep_query_buffer( VALUE #( FOR <ls_q>
+                                                     IN     it_head_delete_imp
+                                                     ( run_uuid = <ls_q>-run_uuid ) ) ).
+
+    LOOP AT it_head_delete_imp ASSIGNING FIELD-SYMBOL(<ls_prelim>).
+      LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_fq>) WHERE instance-run_uuid = <ls_prelim>-run_uuid.
+        APPEND INITIAL LINE TO lt_fetched_query ASSIGNING FIELD-SYMBOL(<ls_target_query>).
+        <ls_target_query> = <ls_fq>.
+      ENDLOOP.
+    ENDLOOP.
+
+    zpru_cl_axc_buffer=>prep_step_buffer( VALUE #( FOR <ls_s>
+                                                     IN lt_fetched_query
+                                                     ( query_uuid = <ls_s>-instance-query_uuid ) ) ).
 
     LOOP AT it_head_delete_imp ASSIGNING FIELD-SYMBOL(<ls_delete>).
 
@@ -862,13 +902,24 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
         fill_head_admin_fields( EXPORTING iv_during_create = abap_false
                                 CHANGING  cs_header        = <ls_buffer> ).
 
-        INSERT VALUE #( run_uuid = <ls_delete>-run_uuid ) INTO TABLE cs_mapped-header.
-
         APPEND VALUE #( msg      = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
                                            iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
                                            iv_number   = `005`
                                            iv_severity = zpru_if_agent_message=>sc_severity-success )
                         run_uuid = <ls_delete>-run_uuid ) TO cs_reported-header.
+
+        LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_query_del>)
+        WHERE instance-run_uuid = <ls_delete>-run_uuid.
+          <ls_query_del>-changed = abap_true.
+          <ls_query_del>-deleted = abap_true.
+
+          LOOP AT zpru_cl_axc_buffer=>step_buffer ASSIGNING FIELD-SYMBOL(<ls_step_del>)
+          WHERE instance-query_uuid = <ls_query_del>-instance-query_uuid.
+            <ls_step_del>-changed = abap_true.
+            <ls_step_del>-deleted = abap_true.
+
+          ENDLOOP.
+        ENDLOOP.
 
       ELSE.
 
@@ -888,8 +939,10 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~lock.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~rba_query.
     " Read queries by association (header keys and query control expected)
@@ -944,6 +997,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~read_query.
     CLEAR et_axc_query.
 
@@ -955,9 +1009,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT it_query_read_k ASSIGNING FIELD-SYMBOL(<ls_k>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
-        EXPORTING iv_name = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
-        CHANGING  cs_data = <ls_k>
-                  cs_control = <ls_k>-control ).
+        EXPORTING
+          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+        CHANGING
+          cs_data    = <ls_k>
+          cs_control = <ls_k>-control ).
 
       IF <ls_k>-run_uuid IS INITIAL OR <ls_k>-query_uuid IS INITIAL.
         APPEND VALUE #( run_uuid = <ls_k>-run_uuid
@@ -984,9 +1040,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDIF.
 
     " Load exact queries into buffer
-    zpru_cl_axc_buffer=>prep_query_buffer( VALUE #( FOR <ls_k> IN lt_entities
-                                                   ( run_uuid   = <ls_k>-run_uuid
-                                                     query_uuid = <ls_k>-query_uuid
+    zpru_cl_axc_buffer=>prep_query_buffer( VALUE #( FOR <ls_Q> IN lt_entities
+                                                   ( run_uuid   = <ls_Q>-run_uuid
+                                                     query_uuid = <ls_Q>-query_uuid
                                                      full_key   = abap_true ) ) ).
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_ent>).
@@ -1030,6 +1086,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~update_query.
     IF it_query_update_imp IS INITIAL.
       RETURN.
@@ -1043,9 +1100,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     LOOP AT it_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
 
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
-        EXPORTING iv_name = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
-        CHANGING  cs_data = <ls_update>
-                  cs_control = <ls_update>-control ).
+        EXPORTING
+          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+        CHANGING
+          cs_data    = <ls_update>
+          cs_control = <ls_update>-control ).
 
       ASSIGN zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_update>-run_uuid
                                                instance-query_uuid = <ls_update>-query_uuid
@@ -1096,6 +1155,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~delete_query.
     IF it_query_delete_imp IS INITIAL.
       RETURN.
@@ -1114,9 +1174,6 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       IF sy-subrc = 0.
         <ls_buf>-deleted = abap_true.
         <ls_buf>-changed = abap_true.
-
-        INSERT VALUE #( run_uuid = <ls_delete>-run_uuid
-                        query_uuid = <ls_delete>-query_uuid ) INTO TABLE cs_mapped-query.
 
         APPEND VALUE #( msg      = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
                                            iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
@@ -1144,9 +1201,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD zpru_if_axc_service~read_header.
 
-    clear et_axc_head.
+DATA Ls_reported    TYPE zpru_if_axc_service=>ts_reported.
+     DATA         Ls_failed      TYPE zpru_if_axc_service=>ts_failed.
+
+    CLEAR et_axc_head.
 
     " Read header nodes from in-memory buffer honoring control flags
     IF it_head_read_k IS INITIAL.
@@ -1156,8 +1217,8 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     " Precheck and ensure control flags are populated
     precheck_read( EXPORTING it_head_read_k = it_head_read_k
                    IMPORTING et_entities    = DATA(lt_entities)
-                   CHANGING  cs_reported    = DATA(ls_reported)
-                             cs_failed      = DATA(ls_failed) ).
+                   CHANGING  cs_reported    = ls_reported
+                             cs_failed      = ls_failed ).
 
     IF lt_entities IS INITIAL.
       RETURN.
@@ -1208,8 +1269,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                     iv_severity = zpru_if_agent_message=>sc_severity-error ) )
                TO ls_reported-header.
       ENDIF.
-      ENDLOOP.
-    ENDMETHOD.
+    ENDLOOP.
+  ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~update_header.
 
@@ -1273,6 +1335,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD zpru_if_axc_service~create_header.
     IF it_head_create_imp IS INITIAL.
@@ -1352,6 +1415,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD check_row.
     rv_ok = abap_true.
     FIELD-SYMBOLS: <lv_field> TYPE any.
@@ -1372,8 +1436,8 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     " We need to access the 'control' component of the row structure
     ASSIGN COMPONENT 'CONTROL' OF STRUCTURE cs_row TO FIELD-SYMBOL(<ls_control>).
     IF sy-subrc = 0.
-      io_util->fill_flags( EXPORTING iv_name = iv_struct_name
-                           CHANGING  cs_data = cs_row
+      io_util->fill_flags( EXPORTING iv_name    = iv_struct_name
+                           CHANGING  cs_data    = cs_row
                                      cs_control = <ls_control> ).
     ENDIF.
 
@@ -1396,15 +1460,16 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
         MOVE-CORRESPONDING cs_row TO <ls_rep>.
         ASSIGN COMPONENT 'MSG' OF STRUCTURE <ls_rep> TO FIELD-SYMBOL(<lv_msg>).
         IF sy-subrc = 0.
-           <lv_msg> = io_util->new_message( iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                            iv_number   = iv_msg_num
-                                            iv_severity = zpru_if_agent_message=>sc_severity-error ).
+          <lv_msg> = io_util->new_message( iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+                                           iv_number   = iv_msg_num
+                                           iv_severity = zpru_if_agent_message=>sc_severity-error ).
         ENDIF.
 
         RETURN. " Fail on first missing required field
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_create.
     CLEAR et_entities.
@@ -1419,10 +1484,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_create>
                               ct_failed      = cs_failed-header
                               ct_reported    = cs_reported-header ).
-         APPEND <ls_create> TO et_entities.
+        APPEND <ls_create> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_cba_query.
     CLEAR et_entities.
@@ -1437,10 +1503,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_create>
                               ct_failed      = cs_failed-query
                               ct_reported    = cs_reported-query ).
-         APPEND <ls_create> TO et_entities.
+        APPEND <ls_create> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_read.
     CLEAR et_entities.
@@ -1453,10 +1520,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_k>
                               ct_failed      = cs_failed-header
                               ct_reported    = cs_reported-header ).
-         APPEND <ls_k> TO et_entities.
+        APPEND <ls_k> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_rba_query.
     CLEAR et_entities.
@@ -1470,10 +1538,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_in>
                               ct_failed      = cs_failed-header
                               ct_reported    = cs_reported-header ).
-         APPEND <ls_in> TO et_entities.
+        APPEND <ls_in> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_read_query.
     CLEAR et_entities.
@@ -1486,54 +1555,57 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_k>
                               ct_failed      = cs_failed-query
                               ct_reported    = cs_reported-query ).
-         APPEND <ls_k> TO et_entities.
+        APPEND <ls_k> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_update_query.
-    CLEAR et_entities.
-    DATA(lo_util) = CAST zpru_if_agent_util( NEW zpru_cl_agent_util( ) ).
-
-    LOOP AT it_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_k>).
-      IF check_row( EXPORTING io_util        = lo_util
-                              iv_struct_name = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
-                              it_req_fields  = VALUE #( ( `RUN_UUID` ) ( `QUERY_UUID` ) )
-                    CHANGING  cs_row         = <ls_k>
-                              ct_failed      = cs_failed-query
-                              ct_reported    = cs_reported-query ).
-         APPEND <ls_k> TO et_entities.
-      ENDIF.
-    ENDLOOP.
+*    CLEAR et_entities.
+*    DATA(lo_util) = CAST zpru_if_agent_util( NEW zpru_cl_agent_util( ) ).
+*
+*    LOOP AT it_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_k>).
+*      IF check_row( EXPORTING io_util        = lo_util
+*                              iv_struct_name = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+*                              it_req_fields  = VALUE #( ( `RUN_UUID` ) ( `QUERY_UUID` ) )
+*                    CHANGING  cs_row         = <ls_k>
+*                              ct_failed      = cs_failed-query
+*                              ct_reported    = cs_reported-query ).
+*        APPEND <ls_k> TO et_entities.
+*      ENDIF.
+*    ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_delete_query.
-    CLEAR et_entities.
-    " Delete doesn't use fill_flags, so we might just use Check Row for the required fields mainly?
-    " The original code ONLY checked required fields, no fill_flags call.
-    " However, check_row calls fill_flags. Is that harmful? No, but maybe wasteful if not needed.
-    " Actually Delete inputs usually don't have control structures, but here `it_query_delete_imp` are likely keys.
-    " Let's see: `it_query_delete_imp` type `tt_query_delete_imp` usually just keys.
-    " If it has no `control` component, `check_row`'s `ASSIGN ... 'CONTROL'` will fail (sy-subrc <> 0) and skip fill_flags.
-    " So `check_row` is safe to use if we treat it as just checking required fields.
-    DATA(lo_util) = CAST zpru_if_agent_util( NEW zpru_cl_agent_util( ) ).
-
-    LOOP AT it_query_delete_imp ASSIGNING FIELD-SYMBOL(<ls_k>).
-       " We need to populate et_entities differently here (mapping structure)?
-       " Original code: <ls_ent>-run_uuid = <ls_k>-run_uuid...
-       " check_row works on <ls_k>.
-       " We can append to et_entities if check passes.
-       IF check_row( EXPORTING io_util        = lo_util
-                               iv_struct_name = `` " No control structure expected? Or just ignore.
-                               it_req_fields  = VALUE #( ( `RUN_UUID` ) ( `QUERY_UUID` ) )
-                     CHANGING  cs_row         = <ls_k>
-                               ct_failed      = cs_failed-query
-                               ct_reported    = cs_reported-query ).
-         APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_ent>).
-         MOVE-CORRESPONDING <ls_k> TO <ls_ent>.
-       ENDIF.
-    ENDLOOP.
+*    CLEAR et_entities.
+*    " Delete doesn't use fill_flags, so we might just use Check Row for the required fields mainly?
+*    " The original code ONLY checked required fields, no fill_flags call.
+*    " However, check_row calls fill_flags. Is that harmful? No, but maybe wasteful if not needed.
+*    " Actually Delete inputs usually don't have control structures, but here `it_query_delete_imp` are likely keys.
+*    " Let's see: `it_query_delete_imp` type `tt_query_delete_imp` usually just keys.
+*    " If it has no `control` component, `check_row`'s `ASSIGN ... 'CONTROL'` will fail (sy-subrc <> 0) and skip fill_flags.
+*    " So `check_row` is safe to use if we treat it as just checking required fields.
+*    DATA(lo_util) = CAST zpru_if_agent_util( NEW zpru_cl_agent_util( ) ).
+*
+*    LOOP AT it_query_delete_imp ASSIGNING FIELD-SYMBOL(<ls_k>).
+*      " We need to populate et_entities differently here (mapping structure)?
+*      " Original code: <ls_ent>-run_uuid = <ls_k>-run_uuid...
+*      " check_row works on <ls_k>.
+*      " We can append to et_entities if check passes.
+*      IF check_row( EXPORTING io_util        = lo_util
+*                              iv_struct_name = `` " No control structure expected? Or just ignore.
+*                              it_req_fields  = VALUE #( ( `RUN_UUID` ) ( `QUERY_UUID` ) )
+*                    CHANGING  cs_row         = <ls_k>
+*                              ct_failed      = cs_failed-query
+*                              ct_reported    = cs_reported-query ).
+*        APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_ent>).
+*        MOVE-CORRESPONDING <ls_k> TO <ls_ent>.
+*      ENDIF.
+*    ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_cba_step.
     CLEAR et_entities.
@@ -1548,7 +1620,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_create>
                               ct_failed      = cs_failed-step
                               ct_reported    = cs_reported-step ).
-         APPEND <ls_create> TO et_entities.
+        APPEND <ls_create> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
@@ -1565,10 +1637,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_in>
                               ct_failed      = cs_failed-query
                               ct_reported    = cs_reported-query ).
-         APPEND <ls_in> TO et_entities.
+        APPEND <ls_in> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_read_step.
     CLEAR et_entities.
@@ -1581,10 +1654,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_k>
                               ct_failed      = cs_failed-step
                               ct_reported    = cs_reported-step ).
-         APPEND <ls_k> TO et_entities.
+        APPEND <ls_k> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_update_step.
     CLEAR et_entities.
@@ -1597,10 +1671,11 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_k>
                               ct_failed      = cs_failed-step
                               ct_reported    = cs_reported-step ).
-         APPEND <ls_k> TO et_entities.
+        APPEND <ls_k> TO et_entities.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD precheck_delete_step.
     CLEAR et_entities.
@@ -1613,8 +1688,8 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                     CHANGING  cs_row         = <ls_k>
                               ct_failed      = cs_failed-step
                               ct_reported    = cs_reported-step ).
-         APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_ent>).
-         MOVE-CORRESPONDING <ls_k> TO <ls_ent>.
+        APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_ent>).
+        MOVE-CORRESPONDING <ls_k> TO <ls_ent>.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
