@@ -38,6 +38,18 @@
      <MSGNR>004</MSGNR>
      <TEXT>Agent UUID is not provided</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Step creation is failed.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Deletion of Step &amp;1 is failed.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>
