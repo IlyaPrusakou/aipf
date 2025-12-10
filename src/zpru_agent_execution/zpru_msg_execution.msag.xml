@@ -18,19 +18,19 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
      <MSGNR>001</MSGNR>
-     <TEXT>Execution header created</TEXT>
+     <TEXT>Execution Header is created</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
      <MSGNR>002</MSGNR>
-     <TEXT>Execution header creation is failed</TEXT>
+     <TEXT>Execution Header creation is failed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
      <MSGNR>003</MSGNR>
-     <TEXT>Execution header update is failed</TEXT>
+     <TEXT>Execution Header update is failed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -42,13 +42,43 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
      <MSGNR>005</MSGNR>
-     <TEXT>Step creation is failed.</TEXT>
+     <TEXT>Execution Step creation with key &amp;1 is failed.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
      <MSGNR>006</MSGNR>
-     <TEXT>Deletion of Step &amp;1 is failed.</TEXT>
+     <TEXT>Execution Step deletion with key &amp;1 is failed</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Execution Step with key &amp;1 is created</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Execution Query with key &amp;1 is created</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Execution Query creation with key &amp;1 is failed</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Execution Step with key &amp;1 is not found</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_EXECUTION</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Execution Query with key &amp;1 is not found</TEXT>
     </T100>
    </T100>
   </asx:values>
