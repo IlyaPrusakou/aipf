@@ -1,0 +1,16 @@
+CLASS zpru_cl_adf_precheck DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES zpru_if_adf_precheck .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zpru_cl_adf_precheck IMPLEMENTATION.
+ENDCLASS.
