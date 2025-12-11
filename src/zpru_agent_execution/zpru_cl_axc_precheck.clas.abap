@@ -26,7 +26,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_HEAD_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_HEAD_CONTROL`
         CHANGING
           cs_data    = <ls_create>
           cs_control = <ls_create>-control ).
@@ -59,7 +59,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_head_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_HEAD_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_HEAD_CONTROL`
         CHANGING
           cs_data    = <ls_update>
           cs_control = <ls_update>-control ).
@@ -83,7 +83,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_QUERY_CONTROL`
         CHANGING
           cs_data    = <ls_create>
           cs_control = <ls_create>-control ).
@@ -117,7 +117,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_head_read_k ASSIGNING FIELD-SYMBOL(<ls_read>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_HEAD_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_HEAD_CONTROL`
         CHANGING
           cs_data    = <ls_read>
           cs_control = <ls_read>-control ).
@@ -133,7 +133,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_rba_query_k ASSIGNING FIELD-SYMBOL(<ls_rba>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_QUERY_CONTROL`
         CHANGING
           cs_data    = <ls_rba>
           cs_control = <ls_rba>-control ).
@@ -157,7 +157,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_STEP_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_STEP_CONTROL`
         CHANGING
           cs_data    = <ls_create>
           cs_control = <ls_create>-control ).
@@ -191,7 +191,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_rba_step_k ASSIGNING FIELD-SYMBOL(<ls_rba>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_STEP_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_STEP_CONTROL`
         CHANGING
           cs_data    = <ls_rba>
           cs_control = <ls_rba>-control ).
@@ -207,7 +207,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_step_read_k ASSIGNING FIELD-SYMBOL(<ls_read>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_STEP_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_STEP_CONTROL`
         CHANGING
           cs_data    = <ls_read>
           cs_control = <ls_read>-control ).
@@ -223,7 +223,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_STEP_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_STEP_CONTROL`
         CHANGING
           cs_data    = <ls_update>
           cs_control = <ls_update>-control ).
@@ -248,7 +248,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_query_read_k ASSIGNING FIELD-SYMBOL(<ls_read>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_QUERY_CONTROL`
         CHANGING
           cs_data    = <ls_read>
           cs_control = <ls_read>-control ).
@@ -264,7 +264,7 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     LOOP AT it_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
-          iv_name    = `ZPRU_IF_AXC_SERVICE=>TS_QUERY_CONTROL`
+          iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_QUERY_CONTROL`
         CHANGING
           cs_data    = <ls_update>
           cs_control = <ls_update>-control ).

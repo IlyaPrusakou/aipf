@@ -7,82 +7,82 @@ CLASS zpru_cl_axc_service DEFINITION
 
   PROTECTED SECTION.
     METHODS precheck_create_header
-      IMPORTING it_head_create_imp TYPE zpru_if_axc_service=>tt_head_create_imp
-      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_head_create_imp
-      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
-                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_head_create_imp TYPE zpru_if_axc_type_and_constant=>tt_head_create_imp
+      EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_head_create_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_update_header
-      IMPORTING it_head_update_imp TYPE zpru_if_axc_service=>tt_head_update_imp
-      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_head_update_imp
-      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
-                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_head_update_imp TYPE zpru_if_axc_type_and_constant=>tt_head_update_imp
+      EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_head_update_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_cba_query
-      IMPORTING it_axc_query_imp TYPE zpru_if_axc_service=>tt_query_create_imp
-      EXPORTING et_entities      TYPE zpru_if_axc_service=>tt_query_create_imp
-      CHANGING  cs_reported      TYPE zpru_if_axc_service=>ts_reported
-                cs_failed        TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_axc_query_imp TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp
+      EXPORTING et_entities      TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp
+      CHANGING  cs_reported      TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed        TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_read_header
-      IMPORTING it_head_read_k TYPE zpru_if_axc_service=>tt_head_read_k
-      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_head_read_k
-      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
-                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_head_read_k TYPE zpru_if_axc_type_and_constant=>tt_head_read_k
+      EXPORTING et_entities    TYPE zpru_if_axc_type_and_constant=>tt_head_read_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed      TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_read_query
-      IMPORTING it_query_read_k TYPE zpru_if_axc_service=>tt_query_read_k
-      EXPORTING et_entities     TYPE zpru_if_axc_service=>tt_query_read_k
-      CHANGING  cs_reported     TYPE zpru_if_axc_service=>ts_reported
-                cs_failed       TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_query_read_k TYPE zpru_if_axc_type_and_constant=>tt_query_read_k
+      EXPORTING et_entities     TYPE zpru_if_axc_type_and_constant=>tt_query_read_k
+      CHANGING  cs_reported     TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed       TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_update_query
-      IMPORTING it_query_update_imp TYPE zpru_if_axc_service=>tt_query_update_imp
-      EXPORTING et_entities         TYPE zpru_if_axc_service=>tt_query_update_imp
-      CHANGING  cs_reported         TYPE zpru_if_axc_service=>ts_reported
-                cs_failed           TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_query_update_imp TYPE zpru_if_axc_type_and_constant=>tt_query_update_imp
+      EXPORTING et_entities         TYPE zpru_if_axc_type_and_constant=>tt_query_update_imp
+      CHANGING  cs_reported         TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed           TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_delete_query
-      IMPORTING it_query_delete_imp TYPE zpru_if_axc_service=>tt_query_delete_imp
-      EXPORTING et_entities         TYPE zpru_if_axc_service=>tt_query_delete_imp
-      CHANGING  cs_reported         TYPE zpru_if_axc_service=>ts_reported
-                cs_failed           TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_query_delete_imp TYPE zpru_if_axc_type_and_constant=>tt_query_delete_imp
+      EXPORTING et_entities         TYPE zpru_if_axc_type_and_constant=>tt_query_delete_imp
+      CHANGING  cs_reported         TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed           TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_rba_query
-      IMPORTING it_rba_query_k TYPE zpru_if_axc_service=>tt_rba_query_k
-      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_rba_query_k
-      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
-                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_rba_query_k TYPE zpru_if_axc_type_and_constant=>tt_rba_query_k
+      EXPORTING et_entities    TYPE zpru_if_axc_type_and_constant=>tt_rba_query_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed      TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_cba_step
-      IMPORTING it_axc_step_imp TYPE zpru_if_axc_service=>tt_step_create_imp
-      EXPORTING et_entities     TYPE zpru_if_axc_service=>tt_step_create_imp
-      CHANGING  cs_reported     TYPE zpru_if_axc_service=>ts_reported
-                cs_failed       TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_axc_step_imp TYPE zpru_if_axc_type_and_constant=>tt_step_create_imp
+      EXPORTING et_entities     TYPE zpru_if_axc_type_and_constant=>tt_step_create_imp
+      CHANGING  cs_reported     TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed       TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_rba_step
-      IMPORTING it_rba_step_k TYPE zpru_if_axc_service=>tt_rba_step_k
-      EXPORTING et_entities   TYPE zpru_if_axc_service=>tt_rba_step_k
-      CHANGING  cs_reported   TYPE zpru_if_axc_service=>ts_reported
-                cs_failed     TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_rba_step_k TYPE zpru_if_axc_type_and_constant=>tt_rba_step_k
+      EXPORTING et_entities   TYPE zpru_if_axc_type_and_constant=>tt_rba_step_k
+      CHANGING  cs_reported   TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed     TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_read_step
-      IMPORTING it_step_read_k TYPE zpru_if_axc_service=>tt_step_read_k
-      EXPORTING et_entities    TYPE zpru_if_axc_service=>tt_step_read_k
-      CHANGING  cs_reported    TYPE zpru_if_axc_service=>ts_reported
-                cs_failed      TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_step_read_k TYPE zpru_if_axc_type_and_constant=>tt_step_read_k
+      EXPORTING et_entities    TYPE zpru_if_axc_type_and_constant=>tt_step_read_k
+      CHANGING  cs_reported    TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed      TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_update_step
-      IMPORTING it_step_update_imp TYPE zpru_if_axc_service=>tt_step_update_imp
-      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_step_update_imp
-      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
-                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_step_update_imp TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp
+      EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS precheck_delete_step
-      IMPORTING it_step_delete_imp TYPE zpru_if_axc_service=>tt_step_delete_imp
-      EXPORTING et_entities        TYPE zpru_if_axc_service=>tt_step_delete_imp
-      CHANGING  cs_reported        TYPE zpru_if_axc_service=>ts_reported
-                cs_failed          TYPE zpru_if_axc_service=>ts_failed.
+      IMPORTING it_step_delete_imp TYPE zpru_if_axc_type_and_constant=>tt_step_delete_imp
+      EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_step_delete_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
     METHODS fill_head_admin_fields
       IMPORTING iv_during_create TYPE abap_boolean DEFAULT abap_false
@@ -90,9 +90,9 @@ CLASS zpru_cl_axc_service DEFINITION
 
     METHODS db_modify
       IMPORTING iv_do_commit    TYPE abap_boolean
-      CHANGING  cs_reported     TYPE zpru_if_axc_service=>ts_reported
-                cs_failed       TYPE zpru_if_axc_service=>ts_failed
-                cs_mapped       TYPE zpru_if_axc_service=>ts_mapped
+      CHANGING  cs_reported     TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed       TYPE zpru_if_axc_type_and_constant=>ts_failed
+                cs_mapped       TYPE zpru_if_axc_type_and_constant=>ts_mapped
       RETURNING VALUE(rv_error) TYPE abap_boolean.
 
   PRIVATE SECTION.
@@ -1418,300 +1418,145 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
 
   METHOD precheck_update_header.
-    DATA(lo_pre) = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_head_update_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_head_update_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
+    DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
+    lo_pre = NEW zpru_cl_axc_precheck( ).
 
-    lt_imp_pc = CORRESPONDING #( it_head_update_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_update_header(
-      EXPORTING it_head_update_imp = lt_imp_pc
-      IMPORTING et_entities        = lt_ent_pc
-      CHANGING  cs_reported        = ls_rep_pc
-                cs_failed          = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_update_header(
+      EXPORTING it_head_update_imp = it_head_update_imp
+      IMPORTING et_entities        = et_entities
+      CHANGING  cs_reported        = cs_reported
+                cs_failed          = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_create_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_head_create_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_head_create_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_head_create_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_create_header(
-      EXPORTING it_head_create_imp = lt_imp_pc
-      IMPORTING et_entities        = lt_ent_pc
-      CHANGING  cs_reported        = ls_rep_pc
-                cs_failed          = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_create_header(
+      EXPORTING it_head_create_imp = it_head_create_imp
+      IMPORTING et_entities        = et_entities
+      CHANGING  cs_reported        = cs_reported
+                cs_failed          = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_cba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_query_create_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_query_create_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_axc_query_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_cba_query(
-      EXPORTING it_axc_query_imp = lt_imp_pc
-      IMPORTING et_entities      = lt_ent_pc
-      CHANGING  cs_reported      = ls_rep_pc
-                cs_failed        = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_cba_query(
+      EXPORTING it_axc_query_imp = it_axc_query_imp
+      IMPORTING et_entities      = et_entities
+      CHANGING  cs_reported      = cs_reported
+                cs_failed        = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_read_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_head_read_k,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_head_read_k,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_head_read_k ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_read_header(
-      EXPORTING it_head_read_k = lt_imp_pc
-      IMPORTING et_entities    = lt_ent_pc
-      CHANGING  cs_reported    = ls_rep_pc
-                cs_failed      = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_read_header(
+      EXPORTING it_head_read_k = it_head_read_k
+      IMPORTING et_entities    = et_entities
+      CHANGING  cs_reported    = cs_reported
+                cs_failed      = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_rba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_rba_query_k,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_rba_query_k,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_rba_query_k ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_rba_query(
-      EXPORTING it_rba_query_k = lt_imp_pc
-      IMPORTING et_entities    = lt_ent_pc
-      CHANGING  cs_reported    = ls_rep_pc
-                cs_failed      = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_rba_query(
+      EXPORTING it_rba_query_k = it_rba_query_k
+      IMPORTING et_entities    = et_entities
+      CHANGING  cs_reported    = cs_reported
+                cs_failed      = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_read_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_query_read_k,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_query_read_k,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_query_read_k ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_read_query(
-      EXPORTING it_query_read_k = lt_imp_pc
-      IMPORTING et_entities     = lt_ent_pc
-      CHANGING  cs_reported     = ls_rep_pc
-                cs_failed       = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_read_query(
+      EXPORTING it_query_read_k = it_query_read_k
+      IMPORTING et_entities     = et_entities
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_update_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_query_update_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_query_update_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_query_update_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_update_query(
-      EXPORTING it_query_update_imp = lt_imp_pc
-      IMPORTING et_entities         = lt_ent_pc
-      CHANGING  cs_reported         = ls_rep_pc
-                cs_failed           = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_update_query(
+      EXPORTING it_query_update_imp = it_query_update_imp
+      IMPORTING et_entities         = et_entities
+      CHANGING  cs_reported         = cs_reported
+                cs_failed           = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_delete_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_query_delete_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_query_delete_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_query_delete_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_delete_query(
-      EXPORTING it_query_delete_imp = lt_imp_pc
-      IMPORTING et_entities         = lt_ent_pc
-      CHANGING  cs_reported         = ls_rep_pc
-                cs_failed           = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_delete_query(
+      EXPORTING it_query_delete_imp = it_query_delete_imp
+      IMPORTING et_entities         = et_entities
+      CHANGING  cs_reported         = cs_reported
+                cs_failed           = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_cba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_step_create_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_step_create_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_axc_step_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_cba_step(
-      EXPORTING it_axc_step_imp = lt_imp_pc
-      IMPORTING et_entities     = lt_ent_pc
-      CHANGING  cs_reported     = ls_rep_pc
-                cs_failed       = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_cba_step(
+      EXPORTING it_axc_step_imp = it_axc_step_imp
+      IMPORTING et_entities     = et_entities
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_rba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_rba_step_k,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_rba_step_k,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_rba_step_k ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_rba_step(
-      EXPORTING it_rba_step_k = lt_imp_pc
-      IMPORTING et_entities   = lt_ent_pc
-      CHANGING  cs_reported   = ls_rep_pc
-                cs_failed     = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_rba_step(
+      EXPORTING it_rba_step_k = it_rba_step_k
+      IMPORTING et_entities   = et_entities
+      CHANGING  cs_reported   = cs_reported
+                cs_failed     = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_read_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_step_read_k,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_step_read_k,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_step_read_k ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_read_step(
-      EXPORTING it_step_read_k = lt_imp_pc
-      IMPORTING et_entities    = lt_ent_pc
-      CHANGING  cs_reported    = ls_rep_pc
-                cs_failed      = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_read_step(
+      EXPORTING it_step_read_k = it_step_read_k
+      IMPORTING et_entities    = et_entities
+      CHANGING  cs_reported    = cs_reported
+                cs_failed      = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_update_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_step_update_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_step_update_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_step_update_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_update_step(
-      EXPORTING it_step_update_imp = lt_imp_pc
-      IMPORTING et_entities        = lt_ent_pc
-      CHANGING  cs_reported        = ls_rep_pc
-                cs_failed          = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_update_step(
+      EXPORTING it_step_update_imp = it_step_update_imp
+      IMPORTING et_entities        = et_entities
+      CHANGING  cs_reported        = cs_reported
+                cs_failed          = cs_failed ).
   ENDMETHOD.
 
   METHOD precheck_delete_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
     lo_pre = NEW zpru_cl_axc_precheck( ).
-    DATA: lt_imp_pc   TYPE zpru_if_axc_precheck=>tt_step_delete_imp,
-          lt_ent_pc   TYPE zpru_if_axc_precheck=>tt_step_delete_imp,
-          ls_rep_pc   TYPE zpru_if_axc_precheck=>ts_reported,
-          ls_fail_pc  TYPE zpru_if_axc_precheck=>ts_failed.
 
-    lt_imp_pc = CORRESPONDING #( it_step_delete_imp ).
-    ls_rep_pc = CORRESPONDING #( cs_reported ).
-    ls_fail_pc = CORRESPONDING #( cs_failed ).
-
-    lo_pre->zpru_if_axc_precheck~precheck_delete_step(
-      EXPORTING it_step_delete_imp = lt_imp_pc
-      IMPORTING et_entities        = lt_ent_pc
-      CHANGING  cs_reported        = ls_rep_pc
-                cs_failed          = ls_fail_pc ).
-
-    cs_reported = CORRESPONDING #( ls_rep_pc ).
-    cs_failed   = CORRESPONDING #( ls_fail_pc ).
-    et_entities = CORRESPONDING #( lt_ent_pc ).
+    lo_pre->precheck_delete_step(
+      EXPORTING it_step_delete_imp = it_step_delete_imp
+      IMPORTING et_entities        = et_entities
+      CHANGING  cs_reported        = cs_reported
+                cs_failed          = cs_failed ).
   ENDMETHOD.
 ENDCLASS.
