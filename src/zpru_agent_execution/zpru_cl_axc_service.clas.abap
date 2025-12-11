@@ -653,7 +653,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    lo_axc_database_access = NEW zpru_cl_axc_database_access( ).
+    lo_axc_database_access = zpru_cl_axc_factory=>get_zpru_if_axc_db_access( ).
 
     et_axc_head = lo_axc_database_access->select_head( it_axc_head_k ).
 
@@ -737,7 +737,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    lo_axc_database_access = NEW zpru_cl_axc_database_access( ).
+    lo_axc_database_access = zpru_cl_axc_factory=>get_zpru_if_axc_db_access( ).
     DATA(lt_query_candidates) = lo_axc_database_access->select_query_by_head( it_axc_head_k ).
 
     LOOP AT it_axc_head_k ASSIGNING FIELD-SYMBOL(<ls_axc_head_k>).
@@ -1445,7 +1445,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_delete_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_delete_header(
       EXPORTING it_head_delete_imp = it_head_delete_imp
@@ -1456,7 +1456,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_create_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_create_header(
       EXPORTING it_head_create_imp = it_head_create_imp
@@ -1467,7 +1467,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_cba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_cba_query(
       EXPORTING it_axc_query_imp = it_axc_query_imp
@@ -1478,7 +1478,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_read_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_read_header(
       EXPORTING it_head_read_k = it_head_read_k
@@ -1489,7 +1489,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_rba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_rba_query(
       EXPORTING it_rba_query_k = it_rba_query_k
@@ -1500,7 +1500,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_read_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_read_query(
       EXPORTING it_query_read_k = it_query_read_k
@@ -1511,7 +1511,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_update_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_update_query(
       EXPORTING it_query_update_imp = it_query_update_imp
@@ -1522,7 +1522,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_delete_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_delete_query(
       EXPORTING it_query_delete_imp = it_query_delete_imp
@@ -1533,7 +1533,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_cba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_cba_step(
       EXPORTING it_axc_step_imp = it_axc_step_imp
@@ -1544,7 +1544,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_rba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_rba_step(
       EXPORTING it_rba_step_k = it_rba_step_k
@@ -1555,7 +1555,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_read_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_read_step(
       EXPORTING it_step_read_k = it_step_read_k
@@ -1566,7 +1566,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_update_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_update_step(
       EXPORTING it_step_update_imp = it_step_update_imp
@@ -1577,7 +1577,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
   METHOD precheck_delete_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
-    lo_pre = NEW zpru_cl_axc_precheck( ).
+    lo_pre = zpru_cl_axc_factory=>get_zpru_if_axc_precheck( ).
 
     lo_pre->precheck_delete_step(
       EXPORTING it_step_delete_imp = it_step_delete_imp
