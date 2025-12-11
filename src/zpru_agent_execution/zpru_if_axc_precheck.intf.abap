@@ -13,6 +13,12 @@ INTERFACE zpru_if_axc_precheck
     CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
               cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
+  METHODS precheck_delete_header
+    IMPORTING it_head_delete_imp TYPE zpru_if_axc_type_and_constant=>tt_header_delete_imp
+    EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_header_delete_imp
+    CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+              cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
+
   METHODS precheck_cba_query
     IMPORTING it_axc_query_imp TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp
     EXPORTING et_entities      TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp

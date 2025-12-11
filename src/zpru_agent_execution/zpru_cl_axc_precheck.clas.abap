@@ -69,6 +69,15 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+  METHOD zpru_if_axc_precheck~precheck_delete_header.
+    CLEAR et_entities.
+
+    LOOP AT it_head_delete_imp ASSIGNING FIELD-SYMBOL(<ls_delete>).
+      APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
+      <ls_entity> = <ls_delete>.
+    ENDLOOP.
+  ENDMETHOD.
+
   METHOD zpru_if_axc_precheck~precheck_cba_query.
     CLEAR et_entities.
 

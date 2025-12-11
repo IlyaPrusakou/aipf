@@ -18,6 +18,12 @@ CLASS zpru_cl_axc_service DEFINITION
       CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
                 cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
 
+    METHODS precheck_delete_header
+      IMPORTING it_head_delete_imp TYPE zpru_if_axc_type_and_constant=>tt_header_delete_imp
+      EXPORTING et_entities        TYPE zpru_if_axc_type_and_constant=>tt_header_delete_imp
+      CHANGING  cs_reported        TYPE zpru_if_axc_type_and_constant=>ts_reported
+                cs_failed          TYPE zpru_if_axc_type_and_constant=>ts_failed.
+
     METHODS precheck_cba_query
       IMPORTING it_axc_query_imp TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp
       EXPORTING et_entities      TYPE zpru_if_axc_type_and_constant=>tt_query_create_imp
@@ -850,15 +856,24 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    precheck_delete_header( EXPORTING it_head_delete_imp = it_head_delete_imp
+                            IMPORTING et_entities        = DATA(lt_entities)
+                            CHANGING  cs_reported        = cs_reported
+                                      cs_failed          = cs_failed ).
+
+    IF lt_entities IS INITIAL.
+      RETURN.
+    ENDIF.
+
     zpru_cl_axc_buffer=>prep_header_buffer( VALUE #( FOR <ls_k>
-                                                     IN     it_head_delete_imp
+                                                     IN     lt_entities
                                                      ( run_uuid = <ls_k>-run_uuid ) ) ).
 
     zpru_cl_axc_buffer=>prep_query_buffer( VALUE #( FOR <ls_q>
-                                                    IN     it_head_delete_imp
+                                                    IN     lt_entities
                                                     ( run_uuid = <ls_q>-run_uuid ) ) ).
 
-    LOOP AT it_head_delete_imp ASSIGNING FIELD-SYMBOL(<ls_prelim>).
+    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_prelim>).
       LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_fq>) WHERE instance-run_uuid = <ls_prelim>-run_uuid.
         APPEND INITIAL LINE TO lt_fetched_query ASSIGNING FIELD-SYMBOL(<ls_target_query>).
         <ls_target_query> = <ls_fq>.
@@ -869,7 +884,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                                    IN lt_fetched_query
                                                    ( query_uuid = <ls_s>-instance-query_uuid ) ) ).
 
-    LOOP AT it_head_delete_imp ASSIGNING FIELD-SYMBOL(<ls_delete>).
+    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
 
       ASSIGN zpru_cl_axc_buffer=>header_buffer[ instance-run_uuid = <ls_delete>-run_uuid
                                                 deleted           = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
@@ -1423,6 +1438,17 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     lo_pre->precheck_update_header(
       EXPORTING it_head_update_imp = it_head_update_imp
+      IMPORTING et_entities        = et_entities
+      CHANGING  cs_reported        = cs_reported
+                cs_failed          = cs_failed ).
+  ENDMETHOD.
+
+  METHOD precheck_delete_header.
+    DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
+    lo_pre = NEW zpru_cl_axc_precheck( ).
+
+    lo_pre->precheck_delete_header(
+      EXPORTING it_head_delete_imp = it_head_delete_imp
       IMPORTING et_entities        = et_entities
       CHANGING  cs_reported        = cs_reported
                 cs_failed          = cs_failed ).
