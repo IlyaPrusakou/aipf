@@ -240,6 +240,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~initialize.
+    " from vs code
     DATA lo_adf_service  TYPE REF TO zpru_if_adf_service.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
     DATA lt_message      TYPE zpru_tt_key_value_tuple.
