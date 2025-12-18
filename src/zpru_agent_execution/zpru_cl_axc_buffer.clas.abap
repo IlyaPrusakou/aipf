@@ -91,18 +91,15 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key_child>).
       IF <ls_key_child>-full_key = abap_true.
-        IF line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_key_child>-run_uuid
-                                                          instance-query_uuid = <ls_key_child>-query_uuid ] ).
+        IF line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-query_uuid = <ls_key_child>-query_uuid ] ).
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_query
-            WHERE run_uuid   = @<ls_key_child>-run_uuid
-              AND query_uuid = @<ls_key_child>-query_uuid
+            WHERE query_uuid = @<ls_key_child>-query_uuid
             INTO @DATA(lv_exists).
           IF lv_exists = abap_true.
             SELECT SINGLE * FROM zpru_axc_query
-              WHERE run_uuid   = @<ls_key_child>-run_uuid
-                AND query_uuid = @<ls_key_child>-query_uuid
+              WHERE query_uuid = @<ls_key_child>-query_uuid
               INTO CORRESPONDING FIELDS OF @ls_child_line.
             IF sy-subrc = 0.
               APPEND VALUE #( instance = ls_child_line ) TO zpru_cl_axc_buffer=>query_buffer.
@@ -142,18 +139,15 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key_child>).
       IF <ls_key_child>-full_key = abap_true.
-        IF line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-query_uuid = <ls_key_child>-query_uuid
-                                                         instance-step_uuid  = <ls_key_child>-step_uuid ] ).
+        IF line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-step_uuid  = <ls_key_child>-step_uuid ] ).
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_step
-            WHERE query_uuid = @<ls_key_child>-query_uuid
-              AND step_uuid  = @<ls_key_child>-step_uuid
+            WHERE step_uuid  = @<ls_key_child>-step_uuid
             INTO @DATA(lv_exists).
           IF lv_exists = abap_true.
             SELECT SINGLE * FROM zpru_axc_step
-              WHERE query_uuid = @<ls_key_child>-query_uuid
-                AND step_uuid  = @<ls_key_child>-step_uuid
+              WHERE step_uuid  = @<ls_key_child>-step_uuid
               INTO CORRESPONDING FIELDS OF @ls_child_line.
             IF sy-subrc = 0.
               APPEND VALUE #( instance = ls_child_line ) TO zpru_cl_axc_buffer=>step_buffer.

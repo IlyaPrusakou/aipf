@@ -19,8 +19,11 @@ CLASS zpru_cl_api_agent DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS process_execution_steps
-      IMPORTING it_execution_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
-                it_agent_tools     TYPE zpru_if_adf_type_and_constant=>tt_agent_tool.
+      IMPORTING is_execution_query TYPE zpru_if_axc_type_and_constant=>ts_axc_query
+                it_execution_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
+                it_agent_tools     TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+      CHANGING  cs_axc_reported    TYPE zpru_if_agent_frw=>ts_axc_reported
+                cs_axc_failed      TYPE zpru_if_agent_frw=>ts_axc_failed.
 
     METHODS prepare_execution
       IMPORTING iv_run_uuid        TYPE sysuuid_x16
@@ -167,6 +170,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_short_memory->save_message( iv_agent_uuid   = ls_agent-agent_uuid
                                    iv_message_type = zpru_if_short_memory_provider=>info
                                    ir_message      = REF #( lt_message_in ) ).
+
     lo_first_tool_input = NEW zpru_cl_response( ).
     lo_execution_plan   = NEW zpru_cl_response( ).
     lo_langu            = NEW zpru_cl_response( ).
@@ -450,12 +454,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-end_timestamp IS NOT INITIAL.
+    IF ls_execution_query-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-new OR
+       ls_execution_query-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    process_execution_steps( it_execution_steps = lt_execution_steps
-                             it_agent_tools     = lt_agent_tools ).
+    process_execution_steps( EXPORTING is_execution_query = ls_execution_query
+                                       it_execution_steps = lt_execution_steps
+                                       it_agent_tools     = lt_agent_tools
+                             CHANGING  cs_axc_reported    = cs_axc_reported
+                                       cs_axc_failed      = cs_axc_failed ).
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun_from_step.
@@ -481,7 +489,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-end_timestamp IS NOT INITIAL.
+    IF ls_execution_query-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -498,7 +506,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF <ls_step_2_start>-end_timestamp IS NOT INITIAL.
+    IF <ls_step_2_start>-step_status = zpru_if_axc_type_and_constant=>sc_step_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -510,8 +518,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       CLEAR <ls_valid_step>-input_prompt.
       CLEAR <ls_valid_step>-output_prompt.
 
-      IF iv_new_step_prompt IS NOT INITIAL AND
-         <ls_valid_step>-step_uuid = iv_starting_step_uuid.
+      IF     iv_new_step_prompt        IS NOT INITIAL
+         AND <ls_valid_step>-step_uuid  = iv_starting_step_uuid.
         <ls_valid_step>-input_prompt = iv_new_step_prompt.
       ENDIF.
 
@@ -521,8 +529,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    process_execution_steps( it_execution_steps = lt_valid_steps
-                             it_agent_tools     = lt_agent_tools ).
+    process_execution_steps( EXPORTING is_execution_query = ls_execution_query
+                                       it_execution_steps = lt_execution_steps
+                                       it_agent_tools     = lt_agent_tools
+                             CHANGING  cs_axc_reported    = cs_axc_reported
+                                       cs_axc_failed      = cs_axc_failed ).
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~run.
@@ -542,8 +553,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    process_execution_steps( it_execution_steps = lt_execution_steps
-                             it_agent_tools     = lt_agent_tools ).
+    IF ls_execution_query-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-complete OR
+       ls_execution_query-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-error.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    process_execution_steps( EXPORTING is_execution_query = ls_execution_query
+                                       it_execution_steps = lt_execution_steps
+                                       it_agent_tools     = lt_agent_tools
+                             CHANGING  cs_axc_reported    = cs_axc_reported
+                                       cs_axc_failed      = cs_axc_failed ).
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~set_input_query.
@@ -620,9 +639,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD process_execution_steps.
-    DATA lo_executor TYPE REF TO zpru_if_tool_executor.
-    DATA lo_input    TYPE REF TO zpru_if_request.
-    DATA lo_output   TYPE REF TO zpru_if_response.
+    DATA lo_executor         TYPE REF TO zpru_if_tool_executor.
+    DATA lo_input            TYPE REF TO zpru_if_request.
+    DATA lo_output           TYPE REF TO zpru_if_response.
+    DATA lo_axc_service      TYPE REF TO zpru_if_axc_service.
+    DATA lt_query_update_imp TYPE zpru_if_axc_type_and_constant=>tt_query_update_imp.
+    DATA lt_step_update_imp  TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp.
+    DATA lv_error_flag       TYPE abap_boolean.
+
+    lo_axc_service = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_service( ).
 
     LOOP AT it_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
 
@@ -652,22 +677,92 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         lo_output->clear_data( ).
       ENDIF.
 
+      lv_error_flag = abap_false.
+
+      GET TIME STAMP FIELD DATA(lv_now).
+
       lo_executor->execute_tool( EXPORTING io_controller = mo_controller
                                            io_request    = lo_input
-                                 IMPORTING eo_response   = lo_output ).
+                                 IMPORTING eo_response   = lo_output
+                                           ev_error_flag = lv_error_flag ).
 
-      " SET INPUT AND OUTPUT PROMPT FOR EACH TOOL
+      IF lv_error_flag = abap_true.
+        APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
+        <ls_step_2_upd>-step_uuid     = <ls_execution_step>-step_uuid.
+        <ls_step_2_upd>-query_uuid    = <ls_execution_step>-query_uuid.
+        <ls_step_2_upd>-run_uuid      = <ls_execution_step>-run_uuid.
+        <ls_step_2_upd>-step_status   = zpru_if_axc_type_and_constant=>sc_step_status-error.
+        <ls_step_2_upd>-end_timestamp = lv_now.
+        <ls_step_2_upd>-control-step_status   = abap_true.
+        <ls_step_2_upd>-control-end_timestamp = abap_true.
+
+        APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
+        <ls_query_2_upd>-query_uuid       = is_execution_query-query_uuid.
+        <ls_query_2_upd>-run_uuid         = is_execution_query-run_uuid.
+        <ls_query_2_upd>-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-error.
+        <ls_query_2_upd>-end_timestamp    = lv_now.
+        <ls_query_2_upd>-control-execution_status = abap_true.
+        <ls_query_2_upd>-control-end_timestamp    = abap_true.
+        EXIT.
+      ENDIF.
+
+      APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING <ls_step_2_upd>.
+      <ls_step_2_upd>-step_uuid     = <ls_execution_step>-step_uuid.
+      <ls_step_2_upd>-query_uuid    = <ls_execution_step>-query_uuid.
+      <ls_step_2_upd>-run_uuid      = <ls_execution_step>-run_uuid.
+      <ls_step_2_upd>-step_status   = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      <ls_step_2_upd>-end_timestamp = lv_now.
+      <ls_step_2_upd>-control-step_status   = abap_true.
+      <ls_step_2_upd>-control-end_timestamp = abap_true.
 
       IF mo_controller->mv_stop_agent = abap_true.
         EXIT.
       ENDIF.
 
     ENDLOOP.
+
+    IF lt_step_update_imp IS NOT INITIAL.
+      lo_axc_service->update_step( EXPORTING it_step_update_imp = lt_step_update_imp
+                                   CHANGING  cs_reported        = cs_axc_reported
+                                             cs_failed          = cs_axc_failed ).
+    ENDIF.
+
+    IF lt_query_update_imp IS NOT INITIAL.
+      lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
+                                    CHANGING  cs_reported         = cs_axc_reported
+                                              cs_failed           = cs_axc_failed ).
+    ELSE.
+      lo_axc_service->rba_step( EXPORTING it_rba_step_k = VALUE #( ( query_uuid          = is_execution_query-query_uuid
+                                                                     control-run_uuid    = abap_true
+                                                                     control-query_uuid  = abap_true
+                                                                     control-step_status = abap_true  ) )
+                                IMPORTING et_axc_step   = DATA(lt_step_final_state)
+                                CHANGING  cs_reported   = cs_axc_reported
+                                          cs_failed     = cs_axc_failed ).
+
+      LOOP AT lt_step_final_state TRANSPORTING NO FIELDS WHERE step_status <> zpru_if_axc_type_and_constant=>sc_step_status-complete.
+        EXIT.
+      ENDLOOP.
+      IF sy-subrc <> 0.
+
+        GET TIME STAMP FIELD lv_now.
+
+        APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING <ls_query_2_upd>.
+        <ls_query_2_upd>-query_uuid       = is_execution_query-query_uuid.
+        <ls_query_2_upd>-run_uuid         = is_execution_query-run_uuid.
+        <ls_query_2_upd>-execution_status = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+        <ls_query_2_upd>-end_timestamp    = lv_now.
+        <ls_query_2_upd>-control-execution_status = abap_true.
+        <ls_query_2_upd>-control-end_timestamp    = abap_true.
+
+        lo_axc_service->update_step( EXPORTING it_step_update_imp = lt_step_update_imp
+                                     CHANGING  cs_reported        = cs_axc_reported
+                                               cs_failed          = cs_axc_failed ).
+      ENDIF.
+    ENDIF.
   ENDMETHOD.
 
   METHOD prepare_execution.
-    " TODO: parameter ES_EXECUTION_QUERY is never cleared or assigned (ABAP cleaner)
-
     DATA lv_query_to_run     TYPE sysuuid_x16.
     DATA lo_axc_service      TYPE REF TO zpru_if_axc_service.
     DATA ls_execution_header TYPE zpru_axc_head.
@@ -675,7 +770,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_adf_service      TYPE REF TO zpru_if_adf_service.
 
     CLEAR: et_agent_tools,
-           et_execution_steps.
+           et_execution_steps,
+           es_execution_query.
 
     IF iv_run_uuid IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -706,21 +802,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     IF iv_query_uuid IS INITIAL.
 
-      lo_axc_service->get_actual_query(
-        EXPORTING
-          it_axc_head_k          = CORRESPONDING #( lt_axc_head )
-        IMPORTING
-          et_axc_head_query_link = DATA(lt_query_to_read)
-        CHANGING
-          cs_reported            = cs_axc_reported
-          cs_failed              = cs_axc_failed ).
+      lo_axc_service->get_actual_query( EXPORTING it_axc_head_k          = CORRESPONDING #( lt_axc_head )
+                                        IMPORTING et_axc_head_query_link = DATA(lt_query_to_read)
+                                        CHANGING  cs_reported            = cs_axc_reported
+                                                  cs_failed              = cs_axc_failed ).
 
+      lv_query_to_run = VALUE #( lt_query_to_read[ 1 ]-query_uuid OPTIONAL ).
     ELSE.
       lv_query_to_run = iv_query_uuid.
     ENDIF.
 
-    lo_axc_service->read_query( EXPORTING it_query_read_k = VALUE #( ( run_uuid   = ls_execution_header-run_uuid
-                                                                       query_uuid = lv_query_to_run
+    lo_axc_service->read_query( EXPORTING it_query_read_k = VALUE #( ( query_uuid = lv_query_to_run
                                                                        control    = VALUE #(
                                                                            run_uuid         = abap_true
                                                                            query_uuid       = abap_true

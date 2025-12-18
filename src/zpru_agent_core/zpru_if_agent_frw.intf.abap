@@ -115,7 +115,6 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_header_reported TYPE STANDARD TABLE OF ts_header_reported WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_query_reported,
-           run_uuid   TYPE sysuuid_x16,
            query_uuid TYPE sysuuid_x16,
            msg        TYPE REF TO zpru_if_agent_message,
            create     TYPE abap_boolean,
@@ -126,7 +125,6 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_query_reported TYPE STANDARD TABLE OF ts_query_reported WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_reported,
-           query_uuid TYPE sysuuid_x16,
            step_uuid  TYPE sysuuid_x16,
            msg        TYPE REF TO zpru_if_agent_message,
            create     TYPE abap_boolean,
@@ -147,7 +145,6 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_header_failed TYPE STANDARD TABLE OF ts_header_failed WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_query_failed,
-           run_uuid   TYPE sysuuid_x16,
            query_uuid TYPE sysuuid_x16,
            fail       TYPE i,
            create     TYPE abap_boolean,
@@ -158,7 +155,6 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_query_failed TYPE STANDARD TABLE OF ts_query_failed WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_failed,
-           query_uuid TYPE sysuuid_x16,
            step_uuid  TYPE sysuuid_x16,
            fail       TYPE i,
            create     TYPE abap_boolean,
@@ -175,14 +171,12 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_header_mapped TYPE STANDARD TABLE OF ts_header_mapped WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_query_mapped,
-           run_uuid   TYPE sysuuid_x16,
            query_uuid TYPE sysuuid_x16,
          END OF ts_query_mapped.
 
   TYPES tt_query_mapped TYPE STANDARD TABLE OF ts_query_mapped WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_mapped,
-           query_uuid TYPE sysuuid_x16,
            step_uuid  TYPE sysuuid_x16,
          END OF ts_step_mapped.
 

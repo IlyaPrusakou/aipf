@@ -1,6 +1,26 @@
 INTERFACE zpru_if_axc_type_and_constant
   PUBLIC .
 
+  CONSTANTS:
+    BEGIN OF sc_step_status,
+      new      TYPE zpru_de_axc_step_status VALUE 'N',
+      error    TYPE zpru_de_axc_step_status VALUE 'E',
+      complete TYPE zpru_de_axc_step_status VALUE 'C',
+    END OF sc_step_status.
+
+  CONSTANTS:
+    BEGIN OF sc_query_status,
+      new      TYPE zpru_de_axc_query_status VALUE 'N',
+      error    TYPE zpru_de_axc_query_status VALUE 'E',
+      complete TYPE zpru_de_axc_query_status VALUE 'C',
+    END OF sc_query_status.
+
+  TYPES: BEGIN OF ts_calculate_query_status_k,
+           query_uuid TYPE sysuuid_x16,
+         END OF ts_calculate_query_status_k.
+
+  TYPES tt_calculate_query_status_k TYPE STANDARD TABLE OF ts_calculate_query_status_k WITH EMPTY KEY.
+
   TYPES: BEGIN OF ts_axc_head_k,
            run_uuid TYPE sysuuid_x16,
          END OF ts_axc_head_k.
@@ -23,12 +43,12 @@ INTERFACE zpru_if_axc_type_and_constant
   TYPES tt_axc_step_k          TYPE STANDARD TABLE OF ts_axc_step_k WITH EMPTY KEY.
   TYPES tt_axc_head_query_link TYPE STANDARD TABLE OF ts_axc_head_query_link WITH EMPTY KEY.
 
-  TYPES tS_axc_head            TYPE zpru_axc_head .
-  TYPES tS_axc_query           TYPE zpru_axc_query.
-  TYPES tS_axc_step            TYPE zpru_axc_step .
-  TYPES tt_axc_head            TYPE STANDARD TABLE OF tS_axc_head WITH EMPTY KEY.
-  TYPES tt_axc_query           TYPE STANDARD TABLE OF tS_axc_query WITH EMPTY KEY.
-  TYPES tt_axc_step            TYPE STANDARD TABLE OF tS_axc_step WITH EMPTY KEY.
+  TYPES ts_axc_head            TYPE zpru_axc_head .
+  TYPES ts_axc_query           TYPE zpru_axc_query.
+  TYPES ts_axc_step            TYPE zpru_axc_step .
+  TYPES tt_axc_head            TYPE STANDARD TABLE OF ts_axc_head WITH EMPTY KEY.
+  TYPES tt_axc_query           TYPE STANDARD TABLE OF ts_axc_query WITH EMPTY KEY.
+  TYPES tt_axc_step            TYPE STANDARD TABLE OF ts_axc_step WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_head_control,
            run_uuid           TYPE abap_boolean,
@@ -91,7 +111,6 @@ INTERFACE zpru_if_axc_type_and_constant
   TYPES tt_query_create_imp TYPE STANDARD TABLE OF ts_query_create_imp WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_query_read_k,
-           run_uuid   TYPE sysuuid_x16,
            query_uuid TYPE sysuuid_x16,
            control    TYPE ts_query_control,
          END OF ts_query_read_k.
@@ -112,7 +131,6 @@ INTERFACE zpru_if_axc_type_and_constant
   TYPES tt_header_delete_imp TYPE STANDARD TABLE OF ts_header_delete_imp WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_query_delete_imp,
-           run_uuid   TYPE sysuuid_x16,
            query_uuid TYPE sysuuid_x16,
          END OF ts_query_delete_imp.
 
@@ -124,6 +142,7 @@ INTERFACE zpru_if_axc_type_and_constant
            run_uuid        TYPE abap_boolean,
            tool_uuid       TYPE abap_boolean,
            execution_seq   TYPE abap_boolean,
+           step_status     TYPE abap_boolean,
            start_timestamp TYPE abap_boolean,
            end_timestamp   TYPE abap_boolean,
            input_prompt    TYPE abap_boolean,
@@ -145,9 +164,8 @@ INTERFACE zpru_if_axc_type_and_constant
   TYPES tt_rba_step_k TYPE STANDARD TABLE OF ts_rba_step_k WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_read_k,
-           query_uuid TYPE sysuuid_x16,
-           step_uuid  TYPE sysuuid_x16,
-           control    TYPE ts_step_control,
+           step_uuid TYPE sysuuid_x16,
+           control   TYPE ts_step_control,
          END OF ts_step_read_k.
 
   TYPES tt_step_read_k TYPE STANDARD TABLE OF ts_step_read_k WITH EMPTY KEY.
@@ -161,8 +179,7 @@ INTERFACE zpru_if_axc_type_and_constant
 
 
   TYPES: BEGIN OF ts_step_delete_imp,
-           query_uuid TYPE sysuuid_x16,
-           step_uuid  TYPE sysuuid_x16,
+           step_uuid TYPE sysuuid_x16,
          END OF ts_step_delete_imp.
 
   TYPES tt_step_delete_imp TYPE STANDARD TABLE OF ts_step_delete_imp WITH EMPTY KEY.
