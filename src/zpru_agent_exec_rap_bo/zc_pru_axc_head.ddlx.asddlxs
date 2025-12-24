@@ -22,6 +22,12 @@ annotate view ZC_PRU_AXC_HEAD with
   @UI.selectionField: [ { position: 10 } ]
   RunUUID;
 
+  @EndUserText.label: 'RunID'
+  @UI.identification: [ { position: 11, label: 'RunID' } ]
+  @UI.lineItem: [ { position: 11, label: 'RunID' } ]
+  @UI.selectionField: [ { position: 11 } ]
+  RunID;
+
   @EndUserText.label: 'AgentUUID'
   @UI.identification: [ { position: 20, label: 'AgentUUID' } ]
   @UI.lineItem: [ { position: 20, label: 'AgentUUID' } ]

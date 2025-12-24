@@ -6,11 +6,12 @@ define view entity ZC_PRU_AXC_QUERY
   as projection on ZR_PRU_AXC_QUERY
 {
   key QueryUuid,
+      QueryNumber,
       RunUuid,
       Language,
       ExecutionStatus,
       StartTimestamp,
-      EndTimestamp,      
+      EndTimestamp,
       InputPrompt,
       OutputResponse,
       /* Associations */

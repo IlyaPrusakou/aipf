@@ -7,6 +7,7 @@ define view entity ZR_PRU_AXC_QUERY
   composition of exact one to many ZR_PRU_AXC_STEP   as _executionstep
 {
   key query_uuid       as QueryUuid,
+      query_number     as QueryNumber,
       run_uuid         as RunUuid,
       language         as Language,
       execution_status as ExecutionStatus,

@@ -1541,4 +1541,88 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                   CHANGING  cs_reported        = cs_reported
                                             cs_failed          = cs_failed ).
   ENDMETHOD.
+
+  METHOD zpru_if_axc_service~generate_run_id.
+
+    DATA lv_run_id_base TYPE i.
+    DATA lv_run_id_base_char TYPE zpru_de_run_id.
+
+    SELECT SINGLE MAX( run_id )
+      FROM zpru_axc_head
+      INTO @DATA(lv_last_db_run_id).
+
+    DATA(lt_head_buffer) = zpru_cl_axc_buffer=>header_buffer.
+    SORT lt_head_buffer BY instance-run_id DESCENDING.
+    DATA(lv_last_buf_run_id) = VALUE #( lt_head_buffer[ 1 ]-instance-run_id OPTIONAL ).
+
+    IF lv_last_db_run_id = lv_last_buf_run_id.
+      lv_run_id_base = CONV #( lv_last_buf_run_id ).
+    ENDIF.
+
+    IF lv_run_id_base IS INITIAL.
+      IF lv_last_db_run_id < lv_last_buf_run_id.
+        lv_run_id_base = CONV #( lv_last_buf_run_id ).
+      ELSE.
+        lv_run_id_base = CONV #( lv_last_db_run_id ).
+      ENDIF.
+    ENDIF.
+
+    lv_run_id_base = lv_run_id_base + 1.
+
+    lv_run_id_base_char = CONV #( lv_run_id_base ).
+    rv_run_id = |{ lv_run_id_base_char ALPHA = OUT }|.
+
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~generate_query_number.
+
+    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+
+    IF iv_run_uuid IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    zpru_if_axc_service~rba_query(
+      EXPORTING
+        it_rba_query_k = VALUE #( ( run_uuid = iv_run_uuid
+                                    control = VALUE #( query_number = abap_true ) ) )
+      IMPORTING
+        et_axc_query   = DATA(lt_axc_query)
+      CHANGING
+        cs_reported    = ls_reported
+        cs_failed      = ls_failed   ).
+
+    SORT lt_axc_query BY query_number DESCENDING.
+    DATA(lv_last_query_number) = VALUE #( lt_axc_query[ 1 ]-query_number OPTIONAL ).
+
+    lv_last_query_number = lv_last_query_number + 1.
+    rv_query_number = lv_last_query_number.
+  ENDMETHOD.
+
+  METHOD zpru_if_axc_service~generate_step_number.
+    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+
+    IF iv_query_uuid IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    zpru_if_axc_service~rba_step(
+      EXPORTING
+            it_rba_step_k = VALUE #( ( query_uuid = iv_query_uuid
+                                       control = VALUE #( step_number = abap_true ) ) )
+      IMPORTING
+        et_axc_step   = DATA(lt_axc_step)
+      CHANGING
+        cs_reported    = ls_reported
+        cs_failed      = ls_failed   ).
+
+    SORT lt_axc_step BY step_number DESCENDING.
+    DATA(lv_last_step_number) = VALUE #( lt_axc_step[ 1 ]-step_number OPTIONAL ).
+
+    lv_last_step_number = lv_last_step_number + 1.
+    rv_step_number = lv_last_step_number.
+  ENDMETHOD.
+
 ENDCLASS.

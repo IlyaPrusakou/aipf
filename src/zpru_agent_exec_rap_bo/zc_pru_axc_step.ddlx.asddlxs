@@ -14,6 +14,12 @@ annotate entity ZC_PRU_AXC_STEP with
   @UI.selectionField: [ { position: 10 } ]
   StepUuid;
 
+  @EndUserText.label: 'StepNumber'
+  @UI.identification: [ { position: 11, label: 'StepNumber' } ]
+  @UI.lineItem: [ { position: 11, label: 'StepNumber' } ]
+  @UI.selectionField: [ { position: 11 } ]
+  StepNumber;
+
   @EndUserText.label: 'QueryUuid'
   @UI.identification: [ { position: 20, label: 'QueryUuid' } ]
   @UI.lineItem: [ { position: 20, label: 'QueryUuid' } ]

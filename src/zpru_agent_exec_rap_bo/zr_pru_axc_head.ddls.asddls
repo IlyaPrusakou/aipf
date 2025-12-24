@@ -8,6 +8,7 @@ define root view entity ZR_PRU_AXC_HEAD
   association of exact one to many ZR_PRU_AXC_STEP as _executionstep on $projection.RunUUID = _executionstep.RunUuid
 {
   key run_uuid           as RunUUID,
+      run_id             as RunID,
       agent_uuid         as AgentUUID,
       user_id            as UserID,
       start_timestamp    as StartTimestamp,

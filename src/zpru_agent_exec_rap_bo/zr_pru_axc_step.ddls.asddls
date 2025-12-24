@@ -7,6 +7,7 @@ define view entity ZR_PRU_AXC_STEP
   association of many to exact one ZR_PRU_AXC_HEAD as _executionheader on $projection.RunUuid = _executionheader.RunUUID
 {
   key step_uuid       as StepUuid,
+      step_number     as StepNumber,
       query_uuid      as QueryUuid,
       run_uuid        as RunUuid,
       tool_uuid       as ToolUuid,

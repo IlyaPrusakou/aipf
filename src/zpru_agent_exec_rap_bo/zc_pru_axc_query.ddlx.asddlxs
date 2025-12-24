@@ -19,6 +19,12 @@ annotate entity ZC_PRU_AXC_QUERY with
   @UI.selectionField: [ { position: 10 } ]
   QueryUuid;
 
+  @EndUserText.label: 'QueryNumber'
+  @UI.identification: [ { position: 11, label: 'QueryNumber' } ]
+  @UI.lineItem: [ { position: 11, label: 'QueryNumber' } ]
+  @UI.selectionField: [ { position: 11 } ]
+  QueryNumber;
+
   @EndUserText.label: 'RunUUID'
   @UI.identification: [ { position: 20, label: 'RunUUID' } ]
   @UI.lineItem: [ { position: 20, label: 'RunUUID' } ]
