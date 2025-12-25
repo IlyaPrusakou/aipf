@@ -21,6 +21,7 @@ INTERFACE zpru_if_agent_frw
 
   CONSTANTS: BEGIN OF cs_message_class,
                zpru_msg_execution TYPE symsgid VALUE `ZPRU_MSG_EXECUTION`,
+               zpru_msg_definition TYPE symsgid VALUE `ZPRU_MSG_DEFINITION`,
              END OF cs_message_class.
 
   CONSTANTS: BEGIN OF cs_sign,
