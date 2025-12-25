@@ -9,66 +9,76 @@ CLASS zpru_cl_adf_service DEFINITION
     TYPES tt_agent      TYPE STANDARD TABLE OF zpru_agent WITH EMPTY KEY.
     TYPES tt_agent_tool TYPE STANDARD TABLE OF zpru_agent_tool WITH EMPTY KEY.
 
+    METHODS calculate_triggers
+      EXPORTING et_check_decision_provider_v TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
+      CHANGING  cs_reported                  TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed                    TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
+
+    METHODS check_decision_provider
+      IMPORTING it_keys     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
+      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
+
     METHODS db_modify
       IMPORTING iv_do_commit    TYPE abap_boolean
-      CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed
-                cs_mapped       TYPE zpru_if_agent_frw=>ts_adf_mapped
+      CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL
+                cs_mapped       TYPE zpru_if_agent_frw=>ts_adf_mapped   OPTIONAL
       RETURNING VALUE(rv_error) TYPE abap_bool.
 
     METHODS precheck_create_agent
       IMPORTING it_agent_create_imp TYPE zpru_if_adf_type_and_constant=>tt_agent_create_imp
       EXPORTING et_entities         TYPE zpru_if_adf_type_and_constant=>tt_agent_create_imp
-      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_update_agent
       IMPORTING it_agent_update_imp TYPE zpru_if_adf_type_and_constant=>tt_agent_update_imp
       EXPORTING et_entities         TYPE zpru_if_adf_type_and_constant=>tt_agent_update_imp
-      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_delete_agent
       IMPORTING it_agent_delete_imp TYPE zpru_if_adf_type_and_constant=>tt_agent_delete_imp
       EXPORTING et_entities         TYPE zpru_if_adf_type_and_constant=>tt_agent_delete_imp
-      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported         TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed           TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_read_agent
       IMPORTING it_agent_read_k TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
       EXPORTING et_entities     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
-      CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_cba_tool
       IMPORTING it_tool_create_imp TYPE zpru_if_adf_type_and_constant=>tt_tool_create_imp
       EXPORTING et_entities        TYPE zpru_if_adf_type_and_constant=>tt_tool_create_imp
-      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_update_tool
       IMPORTING it_tool_update_imp TYPE zpru_if_adf_type_and_constant=>tt_tool_update_imp
       EXPORTING et_entities        TYPE zpru_if_adf_type_and_constant=>tt_tool_update_imp
-      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_delete_tool
       IMPORTING it_tool_delete_imp TYPE zpru_if_adf_type_and_constant=>tt_tool_delete_imp
       EXPORTING et_entities        TYPE zpru_if_adf_type_and_constant=>tt_tool_delete_imp
-      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported        TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed          TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_read_tool
       IMPORTING it_tool_read_k TYPE zpru_if_adf_type_and_constant=>tt_tool_read_k
       EXPORTING et_entities    TYPE zpru_if_adf_type_and_constant=>tt_tool_read_k
-      CHANGING  cs_reported    TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed      TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported    TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed      TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS precheck_rba_tool
       IMPORTING it_rba_tool_k TYPE zpru_if_adf_type_and_constant=>tt_rba_tool_k
       EXPORTING et_entities   TYPE zpru_if_adf_type_and_constant=>tt_rba_tool_k
-      CHANGING  cs_reported   TYPE zpru_if_agent_frw=>ts_adf_reported
-                cs_failed     TYPE zpru_if_agent_frw=>ts_adf_failed.
+      CHANGING  cs_reported   TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
+                cs_failed     TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
     METHODS collect_changes
       EXPORTING et_modify_agent TYPE tt_agent
@@ -865,12 +875,17 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~do_save.
+    calculate_triggers( IMPORTING et_check_decision_provider_v = DATA(lt_check_decision_provider_v)
+                        CHANGING  cs_reported                  = cs_reported
+                                  cs_failed                    = cs_failed ).
+
     zpru_if_adf_service~determine( CHANGING cs_reported = cs_reported
                                             cs_failed   = cs_failed
                                             cs_mapped   = cs_mapped ).
 
-    zpru_if_adf_service~validate( CHANGING cs_reported = cs_reported
-                                           cs_failed   = cs_failed ).
+    zpru_if_adf_service~validate( EXPORTING it_check_decision_provider_v = lt_check_decision_provider_v
+                                  CHANGING  cs_reported                  = cs_reported
+                                            cs_failed                    = cs_failed ).
 
     IF cs_failed IS NOT INITIAL.
       RETURN.
@@ -893,7 +908,14 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~validate.
-    " Placeholder for validation logic
+    IF it_check_decision_provider_v IS NOT INITIAL.
+      check_decision_provider(
+        EXPORTING
+          it_keys     = it_check_decision_provider_v
+        CHANGING
+          cs_reported = cs_reported
+          cs_failed   = cs_failed ).
+    ENDIF.
   ENDMETHOD.
 
   METHOD db_modify.
@@ -949,7 +971,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD apply_db_changes.
-
     rv_error = abap_false.
 
     IF it_modify_agent IS NOT INITIAL.
@@ -959,7 +980,7 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-    IF  it_delete_agent IS NOT INITIAL.
+    IF it_delete_agent IS NOT INITIAL.
       DELETE zpru_agent FROM TABLE @it_delete_agent.
       IF sy-subrc <> 0.
         rv_error = abap_true.
@@ -973,13 +994,12 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-    IF  it_delete_tool IS NOT INITIAL.
+    IF it_delete_tool IS NOT INITIAL.
       DELETE zpru_agent_tool FROM TABLE @it_delete_tool.
       IF sy-subrc <> 0.
         rv_error = abap_true.
       ENDIF.
     ENDIF.
-
   ENDMETHOD.
 
   METHOD fill_agent_admin_fields.
@@ -997,5 +1017,212 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     cs_agent-instance-last_changed       = lv_now.
     cs_agent-instance-changed_by         = sy-uname.
     cs_agent-instance-local_last_changed = lv_now.
+  ENDMETHOD.
+
+  METHOD calculate_triggers.
+    " TODO: parameter CS_REPORTED is never used or assigned (ABAP cleaner)
+    " TODO: parameter CS_FAILED is never used or assigned (ABAP cleaner)
+
+    DATA lt_agent_2_select            LIKE zpru_cl_adf_buffer=>agent_buffer.
+    DATA lt_tool_2_select             LIKE zpru_cl_adf_buffer=>tool_buffer.
+    DATA lo_agent_descr               TYPE REF TO cl_abap_structdescr.
+    DATA lo_tool_descr                TYPE REF TO cl_abap_structdescr.
+    DATA lt_check_decision_provider_v TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "decision_provider"
+
+    CLEAR et_check_decision_provider_v.
+
+    LOOP AT zpru_cl_adf_buffer=>agent_buffer ASSIGNING FIELD-SYMBOL(<ls_agent_buffer>).
+      APPEND INITIAL LINE TO lt_agent_2_select ASSIGNING FIELD-SYMBOL(<ls_agent_2_select>).
+      <ls_agent_2_select>-instance = CORRESPONDING #( <ls_agent_buffer>-instance ).
+      <ls_agent_2_select>-deleted  = <ls_agent_buffer>-deleted.
+
+      LOOP AT zpru_cl_adf_buffer=>tool_buffer ASSIGNING FIELD-SYMBOL(<ls_tool_buffer>)
+           WHERE instance-agent_uuid = <ls_agent_buffer>-instance-agent_uuid.
+        APPEND INITIAL LINE TO lt_tool_2_select ASSIGNING FIELD-SYMBOL(<ls_tool_2_select>).
+        <ls_tool_2_select>-instance = CORRESPONDING #( <ls_tool_buffer>-instance ).
+        <ls_tool_2_select>-deleted  = <ls_tool_buffer>-deleted.
+      ENDLOOP.
+    ENDLOOP.
+
+    IF lt_agent_2_select IS INITIAL AND lt_tool_2_select IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    IF lt_agent_2_select IS NOT INITIAL.
+      SELECT * FROM zpru_agent AS agent
+        FOR ALL ENTRIES IN @lt_agent_2_select
+        WHERE agent~agent_uuid = @lt_agent_2_select-instance-agent_uuid
+        INTO TABLE @DATA(lt_agent_db_state).
+    ENDIF.
+
+    IF lt_tool_2_select IS NOT INITIAL.
+      SELECT * FROM zpru_agent_tool AS tool
+        FOR ALL ENTRIES IN @lt_tool_2_select
+        WHERE tool~tool_uuid = @lt_tool_2_select-instance-tool_uuid
+        INTO TABLE @DATA(lt_tool_db_state).
+    ENDIF.
+
+    lo_agent_descr ?= cl_abap_structdescr=>describe_by_name( 'ZPRU_AGENT' ).
+    DATA(lt_agent_fields) = lo_agent_descr->get_symbols( ).
+    lo_tool_descr ?= cl_abap_structdescr=>describe_by_name( 'ZPRU_AGENT_TOOL' ).
+    DATA(lt_tool_fields) = lo_tool_descr->get_symbols( ).
+
+    LOOP AT lt_agent_2_select ASSIGNING <ls_agent_2_select>.
+
+      " calculate CREATE trigger
+      IF     NOT line_exists( lt_agent_db_state[ agent_uuid = <ls_agent_2_select>-instance-agent_uuid ] )
+         AND     <ls_agent_2_select>-deleted = abap_false.
+        APPEND INITIAL LINE TO lt_check_decision_provider_v ASSIGNING FIELD-SYMBOL(<ls_check_decision_provider_v>).
+        <ls_check_decision_provider_v> = CORRESPONDING #( <ls_agent_2_select>-instance ).
+      ENDIF.
+
+      ASSIGN lt_agent_db_state[ agent_uuid = <ls_agent_2_select>-instance-agent_uuid ] TO FIELD-SYMBOL(<ls_agent_db_state>).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      " calculate DELETE trigger before update
+      " just skip deleted entries
+      IF <ls_agent_2_select>-deleted = abap_true.
+        CONTINUE.
+      ENDIF.
+
+      " calculate UPDATE trigger
+      LOOP AT lt_agent_fields ASSIGNING FIELD-SYMBOL(<lv_agent_fields>).
+
+        ASSIGN COMPONENT <lv_agent_fields>-name OF STRUCTURE <ls_agent_2_select>-instance TO FIELD-SYMBOL(<lv_buffer_value>).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        ASSIGN COMPONENT <lv_agent_fields>-name OF STRUCTURE <ls_agent_db_state> TO FIELD-SYMBOL(<lv_db_value>).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        IF <lv_buffer_value> <> <lv_db_value>.
+*          APPEND INITIAL LINE TO validation / determination
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+
+      " FIELD decision_provider
+      ASSIGN COMPONENT 'DECISION_PROVIDER' OF STRUCTURE <ls_agent_2_select>-instance TO <lv_buffer_value>.
+      IF sy-subrc = 0.
+        ASSIGN COMPONENT 'DECISION_PROVIDER' OF STRUCTURE <ls_agent_db_state> TO <lv_db_value>.
+        IF sy-subrc = 0.
+          IF <lv_buffer_value> <> <lv_db_value>.
+            APPEND INITIAL LINE TO lt_check_decision_provider_v ASSIGNING <ls_check_decision_provider_v>.
+            <ls_check_decision_provider_v> = CORRESPONDING #( <ls_agent_2_select>-instance ).
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+    LOOP AT lt_tool_2_select ASSIGNING <ls_tool_2_select>.
+
+      " CREATE
+      IF     NOT line_exists( lt_tool_db_state[ tool_uuid = <ls_tool_2_select>-instance-tool_uuid ] )
+         AND     <ls_tool_2_select>-deleted = abap_false.
+*        APPEND INITIAL LINE TO validation / determination
+      ENDIF.
+
+      ASSIGN lt_tool_db_state[ tool_uuid = <ls_tool_2_select>-instance-tool_uuid ] TO FIELD-SYMBOL(<ls_tool_db_state>).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      " calc DELETE trigger before update
+      " just skip deleted entries
+      IF <ls_tool_2_select>-deleted = abap_true.
+        CONTINUE.
+      ENDIF.
+
+      " UPDATE
+      LOOP AT lt_tool_fields ASSIGNING FIELD-SYMBOL(<ls_tool_fields>).
+
+        ASSIGN COMPONENT <ls_tool_fields>-name OF STRUCTURE <ls_tool_2_select>-instance TO <lv_buffer_value>.
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        ASSIGN COMPONENT <ls_tool_fields>-name OF STRUCTURE <ls_tool_db_state> TO <lv_db_value>.
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        IF <lv_buffer_value> <> <lv_db_value>.
+*          APPEND INITIAL LINE TO validation / determination
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+
+*      " FIELD field
+*      ASSIGN COMPONENT 'FIELD' OF STRUCTURE <ls_tool_2_select>-instance TO <lv_buffer_value>.
+*      IF sy-subrc = 0.
+*        ASSIGN COMPONENT 'FIELD' OF STRUCTURE <ls_tool_db_state> TO <lv_db_value>.
+*        IF sy-subrc = 0.
+*          IF <lv_buffer_value> <> <lv_db_value>.
+*            APPEND INITIAL LINE TO validation / determination
+*          ENDIF.
+*        ENDIF.
+*      ENDIF.
+    ENDLOOP.
+
+    SORT lt_check_decision_provider_v BY table_line.
+    DELETE ADJACENT DUPLICATES FROM lt_check_decision_provider_v COMPARING table_line.
+
+    et_check_decision_provider_v = lt_check_decision_provider_v.
+  ENDMETHOD.
+
+  METHOD check_decision_provider.
+
+    DATA lo_object_descr TYPE REF TO cl_abap_typedescr.
+    DATA lo_descr_ref  TYPE REF TO cl_abap_intfdescr.
+
+    IF it_keys IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    me->zpru_if_adf_service~read_agent(
+      EXPORTING
+        it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys ( agent_uuid = <ls_k>-agent_uuid
+                                                           control-decision_provider = abap_true ) )
+      IMPORTING
+        et_agent        = DATA(lt_agent)
+      CHANGING
+        cs_reported     = cs_reported
+        cs_failed       = cs_failed ).
+
+    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
+
+      IF <ls_agent>-decision_provider IS INITIAL.
+        " ERROR
+      ENDIF.
+
+*      cl_abap_typedescr=>describe_by_name(
+*         EXPORTING
+*           p_name = <ls_agent>-decision_provider
+*         RECEIVING
+*           p_descr_ref    =   lo_object_descr   ).
+*      IF sy-subrc <> 0.
+*        "ERROR"
+*      ENDIF.
+*
+*      CAST cl_abap_objectdescr( lo_object_descr )->get_interface_type(
+*        EXPORTING
+*          p_name              =  'ZPRU_IF_DECISION_PROVIDER'
+*        RECEIVING
+*          p_descr_ref         = lo_descr_ref
+*        EXCEPTIONS
+*          interface_not_found = 1
+*          OTHERS              = 2 ).
+*      IF sy-subrc <> 0.
+*        "ERROR
+*      ENDIF.
+
+    ENDLOOP.
+
+
   ENDMETHOD.
 ENDCLASS.

@@ -24,6 +24,21 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
         ENDTRY.
       ENDIF.
 
+      IF <ls_create>-agent_name IS INITIAL.
+        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
+        <ls_agent_failed>-agent_uuid = <ls_create>-agent_uuid.
+        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
+        <ls_agent_failed>-create     = abap_true.
+
+        APPEND INITIAL LINE TO cs_reported-agent ASSIGNING FIELD-SYMBOL(<ls_agent_reported>).
+        <ls_agent_reported>-agent_uuid = <ls_create>-agent_uuid.
+        <ls_agent_reported>-create = abap_true.
+        <ls_agent_reported>-msg = NEW zpru_cl_agent_util( )->zpru_if_agent_util~new_message(
+                                                     iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
+                                                     iv_number   = `001`
+                                                     iv_severity = zpru_if_agent_message=>sc_severity-error ).
+      ENDIF.
+
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(
         EXPORTING
           iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
