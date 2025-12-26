@@ -37,6 +37,7 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
                                                      iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
                                                      iv_number   = `001`
                                                      iv_severity = zpru_if_agent_message=>sc_severity-error ).
+        CONTINUE.
       ENDIF.
 
       NEW zpru_cl_agent_util( )->zpru_if_agent_util~fill_flags(

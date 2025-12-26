@@ -20,6 +20,42 @@
      <MSGNR>001</MSGNR>
      <TEXT>Missing Agent Name</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Missing Decision provider for agent &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Class &amp;1 isn&apos;t found for agent &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Class &amp;1 doesn&apos;t implement interface &amp;2 for agent &amp;3</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Type &amp;1 is not a class</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Missing Short memory provider for agent &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZPRU_MSG_DEFINITION</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Missing Long memory provider for agent &amp;1</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>
