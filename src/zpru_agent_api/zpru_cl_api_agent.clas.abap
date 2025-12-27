@@ -1094,6 +1094,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                        run_uuid        = abap_true
                                                                        tool_uuid       = abap_true
                                                                        execution_seq   = abap_true
+                                                                       step_status     = abap_true
                                                                        start_timestamp = abap_true
                                                                        end_timestamp   = abap_true
                                                                        input_prompt    = abap_true
