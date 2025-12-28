@@ -34,6 +34,7 @@ authorization master ( global )
   mapping for zpru_agent corresponding extensible
     {
       AgentUUID            = agent_uuid;
+      AgentType            = agent_type;
       AgentName            = agent_name;
       DecisionProvider     = decision_provider;
       ShortMemoryProvider  = short_memory_provider;

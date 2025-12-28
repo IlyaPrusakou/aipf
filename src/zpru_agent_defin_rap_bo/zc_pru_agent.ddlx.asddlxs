@@ -22,6 +22,12 @@ annotate view ZC_PRU_AGENT with
   @UI.selectionField: [ { position: 10 } ]
   AgentUUID;
 
+  @EndUserText.label: 'AgentType'
+  @UI.identification: [ { position: 11, label: 'AgentType' } ]
+  @UI.lineItem: [ { position: 11, label: 'AgentType' } ]
+  @UI.selectionField: [ { position: 11 } ]
+  AgentType;
+
   @EndUserText.label: 'AgentName'
   @UI.identification: [ { position: 20, label: 'AgentName' } ]
   @UI.lineItem: [ { position: 20, label: 'AgentName' } ]

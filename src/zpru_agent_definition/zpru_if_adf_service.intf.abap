@@ -2,12 +2,13 @@ INTERFACE zpru_if_adf_service
   PUBLIC.
 
   TYPES tt_agent_name             TYPE RANGE OF char100.
+  TYPES tt_agent_TYPE             TYPE RANGE OF ZPRU_DE_AGENT_TYPE.
   TYPES tt_decision_provider      TYPE RANGE OF char30.
   TYPES tt_short_memory_provider  TYPE RANGE OF char30.
   TYPES tt_long_memory_provider   TYPE RANGE OF char30.
   TYPES tt_agent_info_provider    TYPE RANGE OF char30.
   TYPES tt_system_prompt_provider TYPE RANGE OF char30.
-  TYPES tt_status                 TYPE RANGE OF char1.
+  TYPES tt_status                 TYPE RANGE OF zpru_de_adf_agent_status.
   TYPES tt_created_by             TYPE RANGE OF syuname.
   TYPES tt_created_at             TYPE RANGE OF timestampl.
   TYPES tt_changed_by             TYPE RANGE OF syuname.
@@ -22,6 +23,7 @@ INTERFACE zpru_if_adf_service
 
   METHODS query_agent
     IMPORTING it_agent_name             TYPE tt_agent_name             OPTIONAL
+              It_agent_TYPE             TYPE tt_agent_TYPE             OPTIONAL
               it_decision_provider      TYPE tt_decision_provider      OPTIONAL
               it_short_memory_provider  TYPE tt_short_memory_provider  OPTIONAL
               it_long_memory_provider   TYPE tt_long_memory_provider   OPTIONAL
