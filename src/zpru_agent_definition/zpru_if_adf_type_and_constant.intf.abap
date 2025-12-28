@@ -16,6 +16,7 @@ INTERFACE zpru_if_adf_type_and_constant
   TYPES: BEGIN OF ts_agent_control,
            agent_uuid             TYPE abap_boolean,
            agent_name             TYPE abap_boolean,
+           AGENT_TYPE             TYPE ABAP_BOOLEAN,
            decision_provider      TYPE abap_boolean,
            short_memory_provider  TYPE abap_boolean,
            long_memory_provider   TYPE abap_boolean,

@@ -9,6 +9,7 @@ CLASS zpru_cl_api_agent DEFINITION
   PROTECTED SECTION.
     DATA mo_controller   TYPE REF TO zpru_if_agent_controller.
     DATA mo_short_memory TYPE REF TO zpru_if_short_memory_provider.
+    DATA mo_long_memory TYPE REF TO zpru_if_long_memory_provider.
     DATA mv_input_query  TYPE zpru_if_agent_frw=>ts_json.
 
     METHODS get_short_memory
@@ -16,6 +17,13 @@ CLASS zpru_cl_api_agent DEFINITION
       EXPORTING eo_short_memory TYPE REF TO zpru_if_short_memory_provider
       CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported
                 cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS get_long_memory
+      IMPORTING iv_agent_uuid  TYPE sysuuid_x16
+      EXPORTING eo_long_memory TYPE REF TO zpru_if_long_memory_provider
+      CHANGING  cs_reported    TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed      TYPE zpru_if_agent_frw=>ts_adf_failed
       RAISING   zpru_cx_agent_core.
 
     METHODS process_execution_steps
@@ -112,6 +120,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = iv_agent_uuid
                                                                        control-agent_uuid             = abap_true
                                                                        control-agent_name             = abap_true
+                                                                       control-agent_type             = abap_true
                                                                        control-decision_provider      = abap_true
                                                                        control-short_memory_provider  = abap_true
                                                                        control-long_memory_provider   = abap_true
@@ -155,9 +164,14 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                       CHANGING  cs_reported     = cs_adf_reported
                                 cs_failed       = cs_adf_failed ).
 
-    IF ls_agent-long_memory_provider IS NOT INITIAL.
-      CREATE OBJECT lo_long_memory TYPE (ls_agent-long_memory_provider).
-    ENDIF.
+    get_long_memory(
+      EXPORTING
+        iv_agent_uuid  = ls_agent-agent_uuid
+      IMPORTING
+        eo_long_memory = lo_long_memory
+      CHANGING
+        cs_reported    = cs_adf_reported
+        cs_failed      = cs_adf_failed ).
 
     IF ls_agent-agent_info_provider IS NOT INITIAL.
       CREATE OBJECT lo_agent_info_provider TYPE (ls_agent-agent_info_provider).
@@ -501,6 +515,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                            ( agent_uuid                     = <ls_k>-agent_uuid
                                              control-agent_uuid             = abap_true
                                              control-agent_name             = abap_true
+                                             control-agent_type             = abap_true
                                              control-decision_provider      = abap_true
                                              control-short_memory_provider  = abap_true
                                              control-long_memory_provider   = abap_true
@@ -754,6 +769,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = iv_agent_uuid
                                                                        control-agent_uuid             = abap_true
                                                                        control-agent_name             = abap_true
+                                                                       control-agent_type             = abap_true
                                                                        control-decision_provider      = abap_true
                                                                        control-system_prompt_provider = abap_true
                                                                        control-status                 = abap_true  ) )
@@ -799,15 +815,19 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD get_short_memory.
     DATA lo_adf_service      TYPE REF TO zpru_if_adf_service.
     DATA lo_discard_strategy TYPE REF TO zpru_if_discard_strategy.
+    DATA lo_summary_strategy TYPE REF TO zpru_if_summarization.
+
+    IF iv_agent_uuid IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
     lo_adf_service = zpru_cl_adf_factory=>zpru_if_adf_factory~get_zpru_if_adf_service( ).
-
-    CLEAR eo_short_memory.
-
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                    = iv_agent_uuid
                                                                        control-agent_uuid            = abap_true
                                                                        control-agent_name            = abap_true
-                                                                       control-short_memory_provider = abap_true ) )
+                                                                       control-agent_type            = abap_true
+                                                                       control-short_memory_provider = abap_true
+                                                                       control-long_memory_provider = abap_true ) )
                                 IMPORTING et_agent        = DATA(lt_agent)
                                 CHANGING  cs_reported     = cs_reported
                                           cs_failed       = cs_failed ).
@@ -822,19 +842,50 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT SINGLE * FROM zpru_disc_strat WHERE discard_strategy = 'DEL1' INTO @DATA(ls_strategy).
+    CREATE OBJECT mo_short_memory TYPE (<ls_agent>-short_memory_provider).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
-    CREATE OBJECT lo_discard_strategy TYPE (ls_strategy-strategy_provider).
+    CREATE OBJECT mo_long_memory TYPE (<ls_agent>-long_memory_provider).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    mo_short_memory->set_long_memory( io_long_memory = mo_long_memory ).
+
+    eo_short_memory = mo_short_memory.
+
+    SELECT SINGLE type~agent_type,
+                  type~discard_strategy,
+                  type~summary_strategy,
+                  disc~strategy_provider AS disc_provider,
+                  summ~strategy_provider AS summ_provider
+      FROM zpru_agent_type AS type
+             LEFT OUTER JOIN
+               zpru_disc_strat AS disc ON disc~discard_strategy = type~discard_strategy
+                 LEFT OUTER JOIN
+                   zpru_summ_strat AS summ ON summ~summary_strategy = type~summary_strategy
+      WHERE type~agent_type = @<ls_agent>-agent_type
+      INTO @DATA(ls_agent_config).
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    CREATE OBJECT lo_discard_strategy TYPE (ls_agent_config-disc_provider).
     IF sy-subrc = 0.
       mo_short_memory->set_discard_strategy( io_discard_strategy = lo_discard_strategy ).
     ELSE.
       mo_short_memory->set_discard_strategy( io_discard_strategy = NEW zpru_cl_discard_delete( ) ).
     ENDIF.
 
-    IF <ls_agent>-short_memory_provider IS NOT INITIAL.
-      CREATE OBJECT mo_short_memory TYPE (<ls_agent>-short_memory_provider).
-      eo_short_memory = mo_short_memory.
+    CREATE OBJECT lo_summary_strategy TYPE (ls_agent_config-summ_provider).
+    IF sy-subrc = 0.
+      mo_long_memory->set_summarization( io_summarization = lo_summary_strategy ).
+    ELSE.
+      mo_long_memory->set_summarization( io_summarization = NEW zpru_cl_summarize_simple( ) ).
     ENDIF.
+
   ENDMETHOD.
 
   METHOD process_execution_steps.
@@ -1181,6 +1232,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = ls_execution_header-agent_uuid
                                              control-agent_uuid             = abap_true
                                              control-agent_name             = abap_true
+                                             control-agent_type             = abap_true
                                              control-decision_provider      = abap_true
                                              control-short_memory_provider  = abap_true
                                              control-long_memory_provider   = abap_true
@@ -1286,6 +1338,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = <ls_axc_head>-agent_uuid
                                              control-agent_uuid             = abap_true
                                              control-agent_name             = abap_true
+                                             control-agent_type             = abap_true
                                              control-decision_provider      = abap_true
                                              control-short_memory_provider  = abap_true
                                              control-long_memory_provider   = abap_true
@@ -1329,9 +1382,14 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                       CHANGING  cs_reported     = cs_adf_reported
                                 cs_failed       = cs_adf_failed ).
 
-    IF ls_agent-long_memory_provider IS NOT INITIAL.
-      CREATE OBJECT lo_long_memory TYPE (ls_agent-long_memory_provider).
-    ENDIF.
+    get_long_memory(
+      EXPORTING
+        iv_agent_uuid  = ls_agent-agent_uuid
+      IMPORTING
+        eo_long_memory = lo_long_memory
+      CHANGING
+        cs_reported    = cs_adf_reported
+        cs_failed      = cs_adf_failed ).
 
     IF ls_agent-agent_info_provider IS NOT INITIAL.
       CREATE OBJECT lo_agent_info_provider TYPE (ls_agent-agent_info_provider).
@@ -1607,4 +1665,28 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ev_run_uuid   = <ls_axc_head>-run_uuid.
     ev_query_uuid = ls_execution_query-query_uuid.
   ENDMETHOD.
+
+  METHOD get_long_memory.
+
+    IF  iv_agent_uuid IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    get_short_memory(
+      EXPORTING
+        iv_agent_uuid   = iv_agent_uuid
+      IMPORTING
+        eo_short_memory = DATA(lo_short_memory)
+      CHANGING
+        cs_reported     = cs_reported
+        cs_failed       = cs_failed ).
+
+    IF lo_short_memory IS NOT BOUND.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    eo_long_memory = lo_short_memory->get_long_memory( ).
+
+  ENDMETHOD.
+
 ENDCLASS.

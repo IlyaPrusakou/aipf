@@ -121,10 +121,7 @@ CLASS zpru_cl_adf_service DEFINITION
 ENDCLASS.
 
 
-
 CLASS zpru_cl_adf_service IMPLEMENTATION.
-
-
   METHOD precheck_create_agent.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
 
@@ -135,7 +132,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                    CHANGING  cs_reported         = cs_reported
                                              cs_failed           = cs_failed ).
   ENDMETHOD.
-
 
   METHOD precheck_update_agent.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
@@ -148,7 +144,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                              cs_failed           = cs_failed ).
   ENDMETHOD.
 
-
   METHOD precheck_delete_agent.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
 
@@ -159,7 +154,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                    CHANGING  cs_reported         = cs_reported
                                              cs_failed           = cs_failed ).
   ENDMETHOD.
-
 
   METHOD precheck_read_agent.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
@@ -172,7 +166,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                            cs_failed       = cs_failed ).
   ENDMETHOD.
 
-
   METHOD precheck_cba_tool.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
 
@@ -183,7 +176,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                CHANGING  cs_reported        = cs_reported
                                          cs_failed          = cs_failed ).
   ENDMETHOD.
-
 
   METHOD precheck_update_tool.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
@@ -196,7 +188,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                             cs_failed          = cs_failed ).
   ENDMETHOD.
 
-
   METHOD precheck_delete_tool.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
 
@@ -207,7 +198,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                   CHANGING  cs_reported        = cs_reported
                                             cs_failed          = cs_failed ).
   ENDMETHOD.
-
 
   METHOD precheck_read_tool.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
@@ -220,7 +210,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                           cs_failed      = cs_failed ).
   ENDMETHOD.
 
-
   METHOD precheck_rba_tool.
     DATA lo_pre TYPE REF TO zpru_if_adf_precheck.
 
@@ -232,13 +221,13 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                          cs_failed     = cs_failed ).
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~query_agent.
     CLEAR: et_agent_k,
            et_tool_agent_link.
 
     SELECT agent_uuid FROM zpru_agent
       WHERE agent_name             IN @it_agent_name
+        AND agent_type             IN @it_agent_type
         AND decision_provider      IN @it_decision_provider
         AND short_memory_provider  IN @it_short_memory_provider
         AND long_memory_provider   IN @it_long_memory_provider
@@ -262,7 +251,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         INTO TABLE @et_tool_agent_link.
     ENDIF.
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~create_agent.
     DATA ls_reported TYPE zpru_if_agent_frw=>ts_adf_reported.
@@ -302,6 +290,8 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         APPEND VALUE #(
             instance-agent_uuid             = <ls_create>-agent_uuid
             instance-agent_name             = <ls_create>-agent_name
+            instance-agent_type             = COND #( WHEN <ls_create>-control-agent_type = abap_true
+                                                      THEN <ls_create>-agent_type )
             instance-decision_provider      = COND #( WHEN <ls_create>-control-decision_provider = abap_true
                                                       THEN <ls_create>-decision_provider )
             instance-short_memory_provider  = COND #( WHEN <ls_create>-control-short_memory_provider = abap_true
@@ -357,7 +347,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~read_agent.
     DATA ls_out TYPE zpru_agent.
 
@@ -386,6 +375,8 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
         ls_out-agent_name             = COND #( WHEN <ls_read>-control-agent_name = abap_true
                                                 THEN <ls_buffer>-instance-agent_name ).
+        ls_out-agent_type             = COND #( WHEN <ls_read>-control-agent_type = abap_true
+                                                THEN <ls_buffer>-instance-agent_type ).
         ls_out-decision_provider      = COND #( WHEN <ls_read>-control-decision_provider = abap_true
                                                 THEN <ls_buffer>-instance-decision_provider ).
         ls_out-short_memory_provider  = COND #( WHEN <ls_read>-control-short_memory_provider = abap_true
@@ -419,7 +410,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~update_agent.
     precheck_update_agent( EXPORTING it_agent_update_imp = it_agent_update_imp
                            IMPORTING et_entities         = DATA(lt_entities)
@@ -442,6 +432,9 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         <ls_buffer>-instance-agent_name             = COND #( WHEN <ls_update>-control-agent_name = abap_true
                                                               THEN <ls_update>-agent_name
                                                               ELSE <ls_buffer>-instance-agent_name ).
+        <ls_buffer>-instance-agent_TYPE             = COND #( WHEN <ls_update>-control-agent_TYPE = abap_true
+                                                              THEN <ls_update>-agent_TYPE
+                                                              ELSE <ls_buffer>-instance-agent_TYPE ).
         <ls_buffer>-instance-decision_provider      = COND #( WHEN <ls_update>-control-decision_provider = abap_true
                                                               THEN <ls_update>-decision_provider
                                                               ELSE <ls_buffer>-instance-decision_provider ).
@@ -501,7 +494,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~delete_agent.
     precheck_delete_agent( EXPORTING it_agent_delete_imp = it_agent_delete_imp
                            IMPORTING et_entities         = DATA(lt_entities)
@@ -558,7 +550,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~cba_tool.
     precheck_cba_tool( EXPORTING it_tool_create_imp = it_tool_create_imp
@@ -666,7 +657,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~rba_tool.
     DATA ls_out TYPE zpru_agent_tool.
 
@@ -713,7 +703,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~read_tool.
     DATA ls_out TYPE zpru_agent_tool.
@@ -785,7 +774,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~update_tool.
     precheck_update_tool( EXPORTING it_tool_update_imp = it_tool_update_imp
@@ -859,7 +847,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~delete_tool.
     precheck_delete_tool( EXPORTING it_tool_delete_imp = it_tool_delete_imp
                           IMPORTING et_entities        = DATA(lt_entities)
@@ -914,12 +901,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~clean_up.
     CLEAR zpru_cl_adf_buffer=>agent_buffer.
     CLEAR zpru_cl_adf_buffer=>tool_buffer.
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~do_save.
     calculate_triggers( IMPORTING et_check_decision_provider_v = DATA(lt_check_decision_provider_v)
@@ -956,11 +941,9 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
   METHOD zpru_if_adf_service~determine.
     " Placeholder for determination logic
   ENDMETHOD.
-
 
   METHOD zpru_if_adf_service~validate.
     IF it_check_decision_provider_v IS NOT INITIAL.
@@ -976,16 +959,11 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDIF.
 
     IF it_check_long_memory_v IS NOT INITIAL.
-      check_long_memory(
-        EXPORTING
-          it_keys     = it_check_long_memory_v
-        CHANGING
-          cs_reported = cs_reported
-          cs_failed   = cs_failed ).
+      check_long_memory( EXPORTING it_keys     = it_check_long_memory_v
+                         CHANGING  cs_reported = cs_reported
+                                   cs_failed   = cs_failed ).
     ENDIF.
-
   ENDMETHOD.
-
 
   METHOD db_modify.
     " TODO: parameter IV_DO_COMMIT is never used (ABAP cleaner)
@@ -1009,7 +987,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                  it_delete_tool  = lt_del_tool ).
   ENDMETHOD.
 
-
   METHOD cascade_deletes.
     LOOP AT ct_delete_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
       zpru_cl_adf_buffer=>prep_tool_buffer( VALUE #( ( agent_uuid = <ls_agent>-agent_uuid ) ) ).
@@ -1021,7 +998,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
   ENDMETHOD.
-
 
   METHOD collect_changes.
     LOOP AT zpru_cl_adf_buffer=>agent_buffer ASSIGNING FIELD-SYMBOL(<ls_agent>) WHERE changed = abap_true.
@@ -1040,7 +1016,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
-
 
   METHOD apply_db_changes.
     rv_error = abap_false.
@@ -1074,7 +1049,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
   METHOD fill_agent_admin_fields.
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -1092,20 +1066,21 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     cs_agent-instance-local_last_changed = lv_now.
   ENDMETHOD.
 
-
   METHOD calculate_triggers.
-    " TODO: parameter ET_CHECK_SHORT_MEMORY_V is never cleared or assigned (ABAP cleaner)
     " TODO: parameter CS_REPORTED is never used or assigned (ABAP cleaner)
     " TODO: parameter CS_FAILED is never used or assigned (ABAP cleaner)
 
-    DATA lt_agent_2_proc            LIKE zpru_cl_adf_buffer=>agent_buffer.
-    DATA lt_tool_2_proc             LIKE zpru_cl_adf_buffer=>tool_buffer.
+    DATA lt_agent_2_proc              LIKE zpru_cl_adf_buffer=>agent_buffer.
+    DATA lt_tool_2_proc               LIKE zpru_cl_adf_buffer=>tool_buffer.
     DATA lo_agent_descr               TYPE REF TO cl_abap_structdescr.
     DATA lo_tool_descr                TYPE REF TO cl_abap_structdescr.
     DATA lt_check_decision_provider_v TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "decision_provider"
-    DATA lt_check_short_memory_v    TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "short_memory_provider"
-    DATA lt_check_long_memory_v    TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "long_memory_provider"
-    DATA lt_check_agent_info_v  TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "agent_info_provider"
+    " TODO: variable is assigned but never used (ABAP cleaner)
+    DATA lt_check_short_memory_v      TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "short_memory_provider"
+    " TODO: variable is assigned but never used (ABAP cleaner)
+    DATA lt_check_long_memory_v       TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "long_memory_provider"
+    " TODO: variable is assigned but never used (ABAP cleaner)
+    DATA lt_check_agent_info_v        TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k. " create and update field "agent_info_provider"
 
     CLEAR et_check_decision_provider_v.
     CLEAR et_check_short_memory_v.
@@ -1220,7 +1195,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
-
       " FIELD long_memory_provider
       ASSIGN COMPONENT 'LONG_MEMORY_PROVIDER' OF STRUCTURE <ls_agent_2_process>-instance TO <lv_buffer_value>.
       IF sy-subrc = 0.
@@ -1302,7 +1276,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     et_check_decision_provider_v = lt_check_decision_provider_v.
   ENDMETHOD.
-
 
   METHOD check_decision_provider.
     DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
@@ -1395,7 +1368,6 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-
   METHOD check_short_memory.
     DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
     DATA lo_abap_objectdescr TYPE REF TO cl_abap_objectdescr.
@@ -1404,12 +1376,13 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    zpru_if_adf_service~read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                                                         ( agent_uuid                = <ls_k>-agent_uuid
-                                                                           control-short_memory_provider = abap_true ) )
-                                    IMPORTING et_agent        = DATA(lt_agent)
-                                    CHANGING  cs_reported     = cs_reported
-                                              cs_failed       = cs_failed ).
+    zpru_if_adf_service~read_agent(
+      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
+                                           ( agent_uuid                    = <ls_k>-agent_uuid
+                                             control-short_memory_provider = abap_true ) )
+      IMPORTING et_agent        = DATA(lt_agent)
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
 
     LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
 
@@ -1495,12 +1468,13 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    zpru_if_adf_service~read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                                                         ( agent_uuid                = <ls_k>-agent_uuid
-                                                                           control-long_memory_provider = abap_true ) )
-                                    IMPORTING et_agent        = DATA(lt_agent)
-                                    CHANGING  cs_reported     = cs_reported
-                                              cs_failed       = cs_failed ).
+    zpru_if_adf_service~read_agent(
+      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
+                                           ( agent_uuid                   = <ls_k>-agent_uuid
+                                             control-long_memory_provider = abap_true ) )
+      IMPORTING et_agent        = DATA(lt_agent)
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
 
     LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
 
@@ -1586,12 +1560,13 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    zpru_if_adf_service~read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                                                         ( agent_uuid                = <ls_k>-agent_uuid
-                                                                           control-agent_info_provider = abap_true ) )
-                                    IMPORTING et_agent        = DATA(lt_agent)
-                                    CHANGING  cs_reported     = cs_reported
-                                              cs_failed       = cs_failed ).
+    zpru_if_adf_service~read_agent(
+      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
+                                           ( agent_uuid                  = <ls_k>-agent_uuid
+                                             control-agent_info_provider = abap_true ) )
+      IMPORTING et_agent        = DATA(lt_agent)
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
 
     LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>) WHERE agent_info_provider IS NOT INITIAL.
 
@@ -1653,5 +1628,4 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
-
 ENDCLASS.

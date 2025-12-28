@@ -13,6 +13,7 @@ define root view entity ZC_PRU_AGENT
   association [1..1] to ZR_PRU_AGENT as _BaseEntity on $projection.AgentUUID = _BaseEntity.AgentUUID
 {
   key AgentUUID,
+  AgentType,
   AgentName,
   DecisionProvider,
   ShortMemoryProvider,

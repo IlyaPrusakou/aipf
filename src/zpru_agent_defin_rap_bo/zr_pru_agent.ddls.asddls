@@ -8,6 +8,7 @@ define root view entity ZR_PRU_AGENT
 {
   key agent_uuid             as AgentUUID,
       agent_name             as AgentName,
+      agent_type             as AgentType,
       decision_provider      as DecisionProvider,
       short_memory_provider  as ShortMemoryProvider,
       long_memory_provider   as LongMemoryProvider,

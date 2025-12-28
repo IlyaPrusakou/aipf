@@ -33,7 +33,7 @@ annotate view ZC_PRU_AGENT_TYPE with
     position: 11 
   } ]
   @UI.selectionField: [ {
-    position: 1 
+    position: 11 
   } ]
   ShortMemVolume;
   
