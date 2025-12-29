@@ -1,3 +1,29 @@
+" technical class for example implementation
+CLASS lcl_stochastic_producer DEFINITION.
+  PUBLIC SECTION.
+    METHODS get_decision
+      RETURNING VALUE(rv_result) TYPE i.
+ENDCLASS.
+
+
+CLASS lcl_stochastic_producer IMPLEMENTATION.
+  METHOD get_decision.
+    DATA(lo_rand) = cl_abap_random_int=>create( seed = cl_abap_random=>seed( )
+                                                min  = 1
+                                                max  = 10 ).
+
+    DATA(lv_digit) = lo_rand->get_next( ).
+
+    IF lv_digit MOD 2 = 0.
+      rv_result = 2.
+    ELSE.
+      rv_result = 1.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
+
+" business classes
 CLASS lcl_decision_provider DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_decision_provider.
@@ -28,8 +54,7 @@ CLASS lcl_decision_provider IMPLEMENTATION.
     <ls_execution_plan>-sequence   = 3.
 
     eo_execution_plan->set_data( ir_data = NEW zpru_if_decision_provider=>tt_execution_plan( lt_execution_plan ) ).
-    eo_first_tool_input->set_data(
-        ir_data = NEW string( |FIRST TOOL INPUT - { lv_now }| ) ).
+    eo_first_tool_input->set_data( ir_data = NEW string( |FIRST TOOL INPUT - { lv_now }| ) ).
     eo_langu->set_data( ir_data = NEW spras( sy-langu ) ).
     eo_decision_log->set_data( ir_data = NEW string( |DECISION LOG - { lv_now }| ) ).
   ENDMETHOD.
@@ -54,16 +79,14 @@ CLASS lcl_short_memory_provider DEFINITION
   PUBLIC SECTION.
     CLASS-METHODS get_instance
       RETURNING VALUE(ro_instance) TYPE REF TO lcl_short_memory_provider.
+
   PROTECTED SECTION.
     CLASS-DATA so_instance TYPE REF TO lcl_short_memory_provider.
-  PRIVATE SECTION.
 ENDCLASS.
 
 
 CLASS lcl_short_memory_provider IMPLEMENTATION.
-
   METHOD get_instance.
-
     IF so_instance IS BOUND.
       ro_instance = so_instance.
       RETURN.
@@ -71,9 +94,7 @@ CLASS lcl_short_memory_provider IMPLEMENTATION.
 
     so_instance = NEW lcl_short_memory_provider( ).
     ro_instance = so_instance.
-
   ENDMETHOD.
-
 ENDCLASS.
 
 
@@ -82,15 +103,24 @@ CLASS lcl_long_memory_provider DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    CLASS-METHODS get_instance
+      RETURNING VALUE(ro_instance) TYPE REF TO lcl_long_memory_provider.
 
   PROTECTED SECTION.
-
-  PRIVATE SECTION.
+    CLASS-DATA so_instance TYPE REF TO lcl_long_memory_provider.
 ENDCLASS.
 
 
 CLASS lcl_long_memory_provider IMPLEMENTATION.
+  METHOD get_instance.
+    IF so_instance IS BOUND.
+      ro_instance = so_instance.
+      RETURN.
+    ENDIF.
 
+    so_instance = NEW lcl_long_memory_provider( ).
+    ro_instance = so_instance.
+  ENDMETHOD.
 ENDCLASS.
 
 
