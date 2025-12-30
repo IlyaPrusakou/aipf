@@ -814,6 +814,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_discard_strategy TYPE REF TO zpru_if_discard_strategy.
     DATA lo_summary_strategy TYPE REF TO zpru_if_summarization.
 
+    IF mo_short_memory IS BOUND.
+      eo_short_memory = mo_short_memory.
+      RETURN.
+    ENDIF.
+
     IF iv_agent_uuid IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
@@ -834,11 +839,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF mo_short_memory IS BOUND.
-      eo_short_memory = mo_short_memory.
-      RETURN.
-    ENDIF.
-
     CREATE OBJECT mo_short_memory TYPE (<ls_agent>-short_memory_provider).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -857,7 +857,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                   type~discard_strategy,
                   type~summary_strategy,
                   disc~strategy_provider AS disc_provider,
-                  summ~strategy_provider AS summ_provider
+                  summ~strategy_provider AS summ_provider,
+                  short_mem_volume
       FROM zpru_agent_type AS type
              LEFT OUTER JOIN
                zpru_disc_strat AS disc ON disc~discard_strategy = type~discard_strategy
@@ -868,6 +869,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
+
+    mo_short_memory->set_mem_volume( iv_mem_volume = ls_agent_config-short_mem_volume ).
 
     CREATE OBJECT lo_discard_strategy TYPE (ls_agent_config-disc_provider).
     IF sy-subrc = 0.

@@ -10,6 +10,7 @@ CLASS zpru_cl_short_memory_base DEFINITION
     DATA mt_agent_message        TYPE zpru_if_short_memory_provider=>tt_message.
     DATA mo_discard_strategy     TYPE REF TO zpru_if_discard_strategy.
     DATA mo_long_memory_provider TYPE REF TO zpru_if_long_memory_provider.
+    DATA mv_short_memory_size TYPE zpru_de_mem_volume VALUE 20.
 
     METHODS discard_messages
       IMPORTING io_input  TYPE REF TO zpru_if_payload
@@ -32,7 +33,6 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
     DATA lt_message_2_discard LIKE mt_agent_message.
     DATA lo_discard_input     TYPE REF TO zpru_if_payload.
     DATA lo_discard_output    TYPE REF TO zpru_if_payload.
-    DATA lv_short_memory_size TYPE i VALUE 20.
 
     IF it_message IS INITIAL.
       RETURN.
@@ -57,8 +57,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     SORT mt_agent_message BY message_time DESCENDING.
 
-    IF lines( mt_agent_message ) > lv_short_memory_size.
-      LOOP AT mt_agent_message FROM lv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
+    IF lines( mt_agent_message ) > mv_short_memory_size.
+      LOOP AT mt_agent_message FROM mv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
         APPEND INITIAL LINE TO lt_message_2_discard ASSIGNING FIELD-SYMBOL(<ls_discard>).
         <ls_discard> = <ls_message_to_discard>.
       ENDLOOP.
@@ -107,4 +107,13 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
   METHOD zpru_if_short_memory_provider~set_long_memory.
     mo_long_memory_provider = io_long_memory.
   ENDMETHOD.
+
+  METHOD zpru_if_short_memory_provider~get_mem_volume.
+    rv_mem_volume = mv_short_memory_size.
+  ENDMETHOD.
+
+  METHOD zpru_if_short_memory_provider~set_mem_volume.
+    mv_short_memory_size = iv_mem_volume.
+  ENDMETHOD.
+
 ENDCLASS.

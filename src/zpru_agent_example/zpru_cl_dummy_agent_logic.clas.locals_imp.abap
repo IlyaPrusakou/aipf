@@ -71,56 +71,30 @@ CLASS lcl_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 ENDCLASS.
 
-
 CLASS lcl_short_memory_provider DEFINITION
   INHERITING FROM zpru_cl_short_memory_base
   CREATE PUBLIC.
-
   PUBLIC SECTION.
-    CLASS-METHODS get_instance
-      RETURNING VALUE(ro_instance) TYPE REF TO lcl_short_memory_provider.
-
   PROTECTED SECTION.
-    CLASS-DATA so_instance TYPE REF TO lcl_short_memory_provider.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 CLASS lcl_short_memory_provider IMPLEMENTATION.
-  METHOD get_instance.
-    IF so_instance IS BOUND.
-      ro_instance = so_instance.
-      RETURN.
-    ENDIF.
-
-    so_instance = NEW lcl_short_memory_provider( ).
-    ro_instance = so_instance.
-  ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_long_memory_provider DEFINITION
   INHERITING FROM zpru_cl_long_memory_base
   CREATE PUBLIC.
-
   PUBLIC SECTION.
-    CLASS-METHODS get_instance
-      RETURNING VALUE(ro_instance) TYPE REF TO lcl_long_memory_provider.
-
   PROTECTED SECTION.
-    CLASS-DATA so_instance TYPE REF TO lcl_long_memory_provider.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 CLASS lcl_long_memory_provider IMPLEMENTATION.
-  METHOD get_instance.
-    IF so_instance IS BOUND.
-      ro_instance = so_instance.
-      RETURN.
-    ENDIF.
 
-    so_instance = NEW lcl_long_memory_provider( ).
-    ro_instance = so_instance.
-  ENDMETHOD.
 ENDCLASS.
 
 

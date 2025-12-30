@@ -40,14 +40,7 @@ CLASS zpru_cl_discard_summarize IMPLEMENTATION.
       EXPORTING
         io_input  = lo_summarized_data
       IMPORTING
-        eo_output = eo_output
-        ev_error  = lv_error ).
-
-    IF lv_error = abap_false.
-      COMMIT WORK.
-    ELSE.
-      ROLLBACK WORK.
-    ENDIF.
+        eo_output = eo_output ).
 
   ENDMETHOD.
 ENDCLASS.

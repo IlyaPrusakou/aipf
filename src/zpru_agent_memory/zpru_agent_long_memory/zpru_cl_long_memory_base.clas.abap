@@ -9,7 +9,7 @@ CLASS zpru_cl_long_memory_base DEFINITION
   PROTECTED SECTION.
     DATA mo_msg_persistence TYPE REF TO zpru_if_long_mem_persistence.
     DATA mo_sum_persistence TYPE REF TO zpru_if_long_mem_persistence.
-    DATA mo_summarize TYPE REF TO zpru_if_summarization.
+    DATA mo_summarize       TYPE REF TO zpru_if_summarization.
 
     METHODS prepare_db_msg
       IMPORTING io_input  TYPE REF TO zpru_if_payload
@@ -46,14 +46,8 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
     DATA(lo_sum_prst) = zpru_if_long_memory_provider~get_sum_persistence( ).
     lo_sum_prst->persist( EXPORTING io_input  = lo_persist_request
-                          IMPORTING eo_output = eo_output
-                                    ev_error  = DATA(lv_error) ).
+                          IMPORTING eo_output = eo_output ).
 
-    IF lv_error = abap_false.
-      COMMIT WORK.
-    ELSE.
-      ROLLBACK WORK.
-    ENDIF.
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~save_messages.
@@ -67,36 +61,24 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     lo_prepar_response = NEW zpru_cl_payload( ).
 
     prepare_db_msg( EXPORTING io_input  = io_input
-                     IMPORTING eo_output = lo_prepar_response ).
+                    IMPORTING eo_output = lo_prepar_response ).
 
     lo_persist_request = lo_prepar_response.
 
     DATA(lo_msg_prst) = zpru_if_long_memory_provider~get_msg_persistence( ).
     lo_msg_prst->persist( EXPORTING io_input  = lo_persist_request
-                          IMPORTING eo_output = eo_output
-                                    ev_error  = DATA(lv_error) ).
-
-    IF lv_error = abap_false.
-      COMMIT WORK.
-    ELSE.
-      ROLLBACK WORK.
-    ENDIF.
+                          IMPORTING eo_output = eo_output ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~summarize_conversation.
-
     IF io_input IS NOT BOUND.
       RETURN.
     ENDIF.
 
     DATA(lo_summarization) = zpru_if_long_memory_provider~get_summarization( ).
 
-    lo_summarization->summarize(
-      EXPORTING
-        io_input  = io_input
-      IMPORTING
-        eo_output = eo_output ).
-
+    lo_summarization->summarize( EXPORTING io_input  = io_input
+                                 IMPORTING eo_output = eo_output ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~get_msg_persistence.
@@ -165,10 +147,8 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
         <ls_message_db>-message_type = zpru_if_short_memory_provider=>cs_msg_type-info.
       ENDIF.
 
-      IF <ls_message_db>-content IS NOT INITIAL.
-        <ls_message_db>-content = NEW zpru_cl_agent_util( )->zpru_if_agent_util~serialize_json_2_xstring(
-                                          <ls_message>-content ).
-      ENDIF.
+      <ls_message_db>-content    = NEW zpru_cl_agent_util( )->zpru_if_agent_util~serialize_json_2_xstring(
+                                           <ls_message>-content ).
 
       <ls_message_db>-created_by = sy-uname.
       <ls_message_db>-created_at = lv_now.
@@ -178,8 +158,8 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       lv_count += 1.
     ENDLOOP.
 
-    IF     lt_message_db IS NOT INITIAL.
-      IF eo_output     IS BOUND.
+    IF lt_message_db IS NOT INITIAL.
+      IF eo_output IS BOUND.
         eo_output->set_data( ir_data = NEW zpru_if_long_mem_persistence=>tt_message_db( lt_message_db ) ).
       ELSE.
         eo_output = NEW zpru_cl_payload( ).
@@ -226,10 +206,8 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
         <ls_summarization_db>-user_name = sy-uname.
       ENDIF.
 
-      IF <ls_summarization_db>-content IS NOT INITIAL.
-        <ls_summarization_db>-content = NEW zpru_cl_agent_util( )->zpru_if_agent_util~serialize_json_2_xstring(
-                                          <ls_summarization>-content ).
-      ENDIF.
+      <ls_summarization_db>-content    = NEW zpru_cl_agent_util( )->zpru_if_agent_util~serialize_json_2_xstring(
+                                                 <ls_summarization>-content ).
 
       <ls_summarization_db>-created_by = sy-uname.
       <ls_summarization_db>-created_at = lv_now.
@@ -239,8 +217,8 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       lv_count += 1.
     ENDLOOP.
 
-    IF     lt_summarization_db IS NOT INITIAL.
-      IF eo_output     IS BOUND.
+    IF lt_summarization_db IS NOT INITIAL.
+      IF eo_output IS BOUND.
         eo_output->set_data( ir_data = NEW zpru_if_long_mem_persistence=>tt_summarization_db( lt_summarization_db ) ).
       ELSE.
         eo_output = NEW zpru_cl_payload( ).
@@ -248,8 +226,6 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       ENDIF.
     ENDIF.
   ENDMETHOD.
-
-
 
   METHOD zpru_if_long_memory_provider~get_summarization.
     IF mo_summarize IS NOT BOUND.
@@ -261,5 +237,4 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~set_summarization.
     mo_summarize = io_summarization.
   ENDMETHOD.
-
 ENDCLASS.

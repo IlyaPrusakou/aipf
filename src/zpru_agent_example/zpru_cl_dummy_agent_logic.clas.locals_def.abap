@@ -1,0 +1,2 @@
+CLASS lcl_short_memory_provider DEFINITION DEFERRED.
+CLASS lcl_long_memory_provider DEFINITION DEFERRED.

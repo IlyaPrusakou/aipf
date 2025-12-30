@@ -11,6 +11,7 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
     INTERFACES zpru_if_tool_provider.
     INTERFACES zpru_if_input_schema_provider.
 
+    " technical methods and attributes made for the sake of example
     TYPES: BEGIN OF ts_method_registr,
              call_decision_engine   TYPE abap_boolean,
              prepare_final_response TYPE abap_boolean,
@@ -24,7 +25,6 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
              nested_agent           TYPE abap_boolean,
            END OF ts_method_registr.
 
-    " technical methods and attributes made for the sake of example
     CLASS-DATA ms_method_registr TYPE ts_method_registr.
 
     CLASS-METHODS get_input_prompt
@@ -33,10 +33,23 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
     " I recommend to read body of this method just for your information
     CLASS-METHODS read_me.
 
+  PROTECTED SECTION.
+
+  PRIVATE SECTION.
+    CLASS-DATA so_short_memory TYPE REF TO lcl_short_memory_provider.
+    CLASS-DATA so_long_memory TYPE REF TO lcl_long_memory_provider.
+
+    CLASS-METHODS get_short_memory
+      RETURNING VALUE(ro_instance) TYPE REF TO lcl_short_memory_provider.
+
+    CLASS-METHODS get_long_memory
+      RETURNING VALUE(ro_instance) TYPE REF TO lcl_long_memory_provider.
+
 ENDCLASS.
 
 
 CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
+
   METHOD read_me.
     " 1 INTRODUCTION
 
@@ -160,7 +173,7 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_short_memory_provider~clear_history.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     lo_short_memory->clear_history( ).
   ENDMETHOD.
 
@@ -174,28 +187,28 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_short_memory_provider~get_discard_strategy.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     ro_discard_strategy = lo_short_memory->get_discard_strategy( ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~get_history.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     rt_history = lo_short_memory->get_history( ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~get_long_memory.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     ro_long_memory = lo_short_memory->get_long_memory( ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~get_msg_persistence.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     ro_msg_persistence = lo_long_memory->get_msg_persistence( ).
   ENDMETHOD.
 
@@ -209,14 +222,14 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~get_summarization.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     ro_summarization = lo_long_memory->get_summarization( ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~get_sum_persistence.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     ro_sum_persistence = lo_long_memory->get_sum_persistence( ).
   ENDMETHOD.
 
@@ -244,28 +257,28 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~retrieve_message.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->retrieve_message( ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~retrieve_summary.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->retrieve_summary( ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~save_message.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     lo_short_memory->save_message( it_message = it_message ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~save_messages.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->save_messages( EXPORTING io_input  = io_input
                                    IMPORTING eo_output = eo_output
                                              ev_error  = ev_error ).
@@ -274,7 +287,7 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~save_summary.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->save_summary( EXPORTING io_input  = io_input
                                   IMPORTING eo_output = eo_output
                                             ev_error  = ev_error ).
@@ -283,42 +296,42 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
   METHOD zpru_if_short_memory_provider~set_discard_strategy.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     lo_short_memory->set_discard_strategy( io_discard_strategy = io_discard_strategy ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~set_long_memory.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
-    lo_short_memory = lcl_short_memory_provider=>get_instance( ).
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
     lo_short_memory->set_long_memory( io_long_memory = io_long_memory ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~set_msg_persistence.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->set_msg_persistence( io_msg_persistence = io_msg_persistence ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~set_summarization.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->set_summarization( io_summarization = io_summarization ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~set_sum_persistence.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->set_sum_persistence( io_sum_persistence = io_sum_persistence ).
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~summarize_conversation.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
-    lo_long_memory = lcl_long_memory_provider=>get_instance( ).
+    lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
     lo_long_memory->summarize_conversation( EXPORTING io_input  = io_input
                                             IMPORTING eo_output = eo_output
                                                       ev_error  = ev_error ).
@@ -338,6 +351,43 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     lo_input_schema_provider = NEW lcl_input_schema_provider( ).
     ro_input_schema = lo_input_schema_provider->get_input_schema( is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step ).
+  ENDMETHOD.
+
+  METHOD zpru_if_short_memory_provider~get_mem_volume.
+    DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
+
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
+    rv_mem_volume = lo_short_memory->get_mem_volume( ).
+
+  ENDMETHOD.
+
+  METHOD zpru_if_short_memory_provider~set_mem_volume.
+    DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
+
+    lo_short_memory = zpru_cl_dummy_agent_logic=>get_short_memory( ).
+    lo_short_memory->set_mem_volume( iv_mem_volume = iv_mem_volume ).
+
+  ENDMETHOD.
+
+  METHOD get_long_memory.
+    IF zpru_cl_dummy_agent_logic=>so_long_memory IS BOUND.
+      ro_instance = zpru_cl_dummy_agent_logic=>so_long_memory.
+      RETURN.
+    ENDIF.
+
+    zpru_cl_dummy_agent_logic=>so_long_memory = NEW lcl_long_memory_provider( ).
+    ro_instance = zpru_cl_dummy_agent_logic=>so_long_memory.
+
+  ENDMETHOD.
+
+  METHOD get_short_memory.
+    IF zpru_cl_dummy_agent_logic=>so_short_memory IS BOUND.
+      ro_instance = zpru_cl_dummy_agent_logic=>so_short_memory.
+      RETURN.
+    ENDIF.
+
+    zpru_cl_dummy_agent_logic=>so_short_memory = NEW lcl_short_memory_provider( ).
+    ro_instance = zpru_cl_dummy_agent_logic=>so_short_memory.
   ENDMETHOD.
 
   METHOD get_input_prompt.
@@ -366,4 +416,5 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
                 | Special_Instructions: Fragile loading { cl_abap_char_utilities=>newline }| &&
                 | Payment_Terms: Prepaid |.
   ENDMETHOD.
+
 ENDCLASS.
