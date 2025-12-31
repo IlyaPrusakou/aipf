@@ -33,7 +33,7 @@ CLASS zpru_cl_discard_summarize IMPLEMENTATION.
         ev_error  = DATA(lv_error) ).
 
     IF lv_error = abap_true.
-      RETURN.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     io_long_memory->save_summary(
@@ -43,10 +43,8 @@ CLASS zpru_cl_discard_summarize IMPLEMENTATION.
         eo_output = eo_output
         ev_error  = lv_error ).
 
-    IF lv_error = abap_false.
-      COMMIT WORK.
-    ELSE.
-      ROLLBACK WORK.
+     IF lv_error = abap_true.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
   ENDMETHOD.
