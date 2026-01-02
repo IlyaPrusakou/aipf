@@ -147,25 +147,24 @@ ENDCLASS.
 
 
 CLASS lcl_prompt_provider DEFINITION
-  CREATE PUBLIC.
+  CREATE PUBLIC INHERITING FROM zpru_cl_syst_prmpt_prvdr_base.
 
   PUBLIC SECTION.
-    INTERFACES zpru_if_prompt_provider.
+    METHODS zpru_if_prompt_provider~get_system_prompt REDEFINITION.
 ENDCLASS.
 
 
 CLASS lcl_prompt_provider IMPLEMENTATION.
-  METHOD zpru_if_prompt_provider~get_prompt_language.
-    zpru_cl_dummy_agent_logic=>ms_method_registr-get_prompt_language = abap_true.
-    rv_language = sy-langu.
-  ENDMETHOD.
 
   METHOD zpru_if_prompt_provider~get_system_prompt.
+
+    rv_system_prompt = super->zpru_if_prompt_provider~get_system_prompt( ).
+
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_system_prompt = abap_true.
 
-    rv_system_prompt = | CONVENTION ON THE CONTRACT FOR THE INTERNATIONAL { cl_abap_char_utilities=>newline } | &&
-                       | CARRIAGE OF GOODS BY ROAD { cl_abap_char_utilities=>newline } | &&
-                       | (CMR) { cl_abap_char_utilities=>newline } |.
+    rv_system_prompt = |{ rv_system_prompt } CONVENTION ON THE CONTRACT FOR THE INTERNATIONAL { cl_abap_char_utilities=>newline } | &&
+                                           | CARRIAGE OF GOODS BY ROAD { cl_abap_char_utilities=>newline } | &&
+                                           | (CMR) { cl_abap_char_utilities=>newline } |.
 
     rv_system_prompt = |{ rv_system_prompt } Consignment note is the same term as CMR { cl_abap_char_utilities=>newline }|.
 

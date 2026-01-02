@@ -264,13 +264,6 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     ro_msg_persistence = lo_long_memory->get_msg_persistence( ).
   ENDMETHOD.
 
-  METHOD zpru_if_prompt_provider~get_prompt_language.
-    DATA lo_prompt_provider TYPE REF TO zpru_if_prompt_provider.
-
-    lo_prompt_provider = NEW lcl_prompt_provider( ).
-    rv_language = lo_prompt_provider->get_prompt_language( ).
-  ENDMETHOD.
-
   METHOD zpru_if_long_memory_provider~get_summarization.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
