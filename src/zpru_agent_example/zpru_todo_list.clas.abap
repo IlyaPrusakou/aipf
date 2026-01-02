@@ -4,7 +4,7 @@ CLASS zpru_todo_list DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-  METHODS TODO.
+    METHODS todo.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -34,6 +34,15 @@ CLASS zpru_todo_list IMPLEMENTATION.
 *2 what do with error flags in long memory save methods and in io_long_memory->save_summary - fixed
 *3 add possibility to provide configuration outside of agent definition
 *4 add paralel save flag and logic in long memory save methods - refused
+
+*1 do we need user defined tool when we have simple abap code
+*2 add configuration for strategy( additional table and field in step definition )
+*possible values
+*RETRY_LIMIT INT1        INT1    3   Max Retries for Handler
+*REQ_USER_APP    ABAP_BOOL       CHAR    1   Pause for User Approval
+*COMMIT_REQ  ABAP_BOOL       CHAR    1   Trigger COMMIT WORK
+*IS_IDEMPOTENT   ABAP_BOOL       CHAR    1   Safe for Auto-Retry
+*TERM_ON_FAIL    ABAP_BOOL       CHAR    1   Terminate Process on Error
 
   ENDMETHOD.
 

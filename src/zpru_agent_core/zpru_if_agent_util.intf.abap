@@ -30,7 +30,7 @@ INTERFACE zpru_if_agent_util
 
   METHODS convert_to_abap
     IMPORTING ir_string TYPE REF TO data
-    CHANGING  cr_abap   TYPE REF TO data.
+    CHANGING  cr_abap   TYPE data.
 
   METHODS convert_to_string
     IMPORTING ir_abap   TYPE REF TO data
