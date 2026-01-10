@@ -15,6 +15,21 @@ INTERFACE zpru_if_axc_type_and_constant
       complete TYPE zpru_de_axc_query_status VALUE 'C',
     END OF sc_query_status.
 
+    TYPES: BEGIN OF ts_json_parameter,
+             name  TYPE ZPRU_DE_SEOPNAMPAS,
+             type  TYPE string,
+             value TYPE string,
+           END OF ts_json_parameter.
+
+    TYPES: tt_json_parameters TYPE STANDARD TABLE OF ts_json_parameter WITH EMPTY KEY.
+
+    TYPES: BEGIN OF ts_tool_invocation,
+             log_area    TYPE char20,
+             class_name  TYPE ZPRU_DE_SEOCLNAME,
+             method_name TYPE ZPRU_DE_SEOMTDNAME,
+             parameters  TYPE tt_json_parameters,
+           END OF ts_tool_invocation.
+
   TYPES: BEGIN OF ts_calculate_query_status_k,
            query_uuid TYPE sysuuid_x16,
          END OF ts_calculate_query_status_k.
