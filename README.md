@@ -29,3 +29,23 @@ Standard AI calls in ABAP are stateless—they send a prompt and get a response.
 1. Install [abapGit](https://abapgit.org/).
 2. Create a new Online Repo with the URL: `https://github.com/IlyaPrusakou/aipf`
 3. Pull the objects into the system.
+
+### :mechanical_arm: Technical Overview
+```mermaid
+
+flowchart TD
+    Start(["User Input: Prompt String + Agent Name"]) --> Init["Initialize Agent and Query Object"]
+    Init --> Decision1{"Invoke Decision Engine<br/>(LLM, ML, IF-ELSE)"}
+    Decision1 --> Plan["Generate Step Plan"]
+    Plan --> Build["Build Execution Run + Query + Steps"]
+    Build --> Exec["Execute Steps according to Step Plan"]
+    Exec --> Decision2{"Invoke Decision Engine"}
+    Decision2 --> Response["Generate Final Response"]
+    Response --> End(["Return Final Response String to User"])
+
+    style Start fill:#f9f,stroke:#333,stroke-width:2px
+    style End fill:#f9f,stroke:#333,stroke-width:2px
+    style Decision1 fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style Decision2 fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+
+```
