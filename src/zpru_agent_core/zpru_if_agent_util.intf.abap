@@ -54,4 +54,12 @@ INTERFACE zpru_if_agent_util
               iv_field_2_search   TYPE string
     RETURNING VALUE(rt_fragments) TYPE tt_fragment.
 
+  METHODS append_json_to_json
+    IMPORTING
+              iv_field_4_append  TYPE string
+              iv_json_4_append   TYPE zpru_if_agent_frw=>ts_json
+              iv_json_target     TYPE zpru_if_agent_frw=>ts_json
+    RETURNING VALUE(rv_new_json) TYPE zpru_if_agent_frw=>ts_json.
+
+
 ENDINTERFACE.

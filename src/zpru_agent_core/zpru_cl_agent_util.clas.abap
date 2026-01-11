@@ -4,6 +4,16 @@ CLASS zpru_cl_agent_util DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_util.
+  PROTECTED SECTION.
+    METHODS add_json_2_writer
+      IMPORTING iv_field_4_append TYPE string
+                iv_json_4_append  TYPE zpru_if_agent_frw=>ts_json
+                io_writer         TYPE REF TO if_sxml_writer.
+
+  PRIVATE SECTION.
+
+
+
 ENDCLASS.
 
 
@@ -194,7 +204,7 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
         rv_value = cl_abap_conv_codepage=>create_in( )->convert( CAST cl_sxml_string_writer( lo_writer )->get_output( ) ).
 
         DATA(lv_len) = strlen( rv_value ).
-        data(lv_len2) = lv_len - 1.
+        DATA(lv_len2) = lv_len - 1.
 
         IF lv_len >= 2 AND
            rv_value(1) = '"' AND
@@ -243,4 +253,115 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
+  METHOD zpru_if_agent_util~append_json_to_json.
+    DATA lv_depth     TYPE i            VALUE 0.
+    DATA lv_recording TYPE abap_boolean VALUE abap_false.
+
+    DATA(lo_writer) = CAST if_sxml_writer( cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ) ).
+    TRY.
+        DATA(lv_xml_to_parse) = cl_abap_conv_codepage=>create_out( )->convert( iv_json_target ).
+      CATCH cx_sy_conversion_codepage.
+        RETURN.
+    ENDTRY.
+
+    DATA(lo_reader) = cl_sxml_string_reader=>create( lv_xml_to_parse ).
+
+    TRY.
+        DO.
+          lo_reader->next_node( ).
+          IF lo_reader->node_type = if_sxml_node=>co_nt_final.
+            EXIT.
+          ENDIF.
+
+          CASE lo_reader->node_type.
+
+            WHEN if_sxml_node=>co_nt_element_open.
+              lv_depth += 1.
+
+              lo_writer->open_element( name = lo_reader->name ).
+
+              DATA(lo_curr_open) = CAST if_sxml_open_element( lo_reader->read_current_node( ) ).
+              DATA(lt_curr_attrs) = lo_curr_open->get_attributes( ).
+              LOOP AT lt_curr_attrs ASSIGNING FIELD-SYMBOL(<curr_attr>).
+                lo_writer->write_attribute( name  = <curr_attr>->qname-name
+                                            value = <curr_attr>->get_value( ) ).
+              ENDLOOP.
+
+            WHEN if_sxml_node=>co_nt_value.
+              lo_writer->write_value( value = lo_reader->value ).
+
+            WHEN if_sxml_node=>co_nt_element_close.
+              lv_depth -= 1.
+              " execute append here
+              IF lv_depth = 0.
+                add_json_2_writer(
+                  iv_field_4_append = iv_field_4_append
+                  iv_json_4_append  = iv_json_4_append
+                  io_writer         = lo_writer ).
+              ENDIF.
+
+              lo_writer->close_element( ).
+
+          ENDCASE.
+        ENDDO.
+
+        rv_new_json = cl_abap_conv_codepage=>create_in( )->convert( CAST cl_sxml_string_writer( lo_writer )->get_output( ) ).
+
+      CATCH cx_sxml_parse_error.
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD add_json_2_writer.
+    DATA lv_recording TYPE abap_boolean VALUE abap_false.
+
+    TRY.
+        DATA(lv_xml_to_parse) = cl_abap_conv_codepage=>create_out( )->convert( iv_json_4_append ).
+      CATCH cx_sy_conversion_codepage.
+        RETURN.
+    ENDTRY.
+
+    DATA(lo_reader) = cl_sxml_string_reader=>create( lv_xml_to_parse ).
+
+    TRY.
+
+        DATA(lv_first_iteration) = abap_true.
+        DO.
+          lo_reader->next_node( ).
+          IF lo_reader->node_type = if_sxml_node=>co_nt_final.
+            EXIT.
+          ENDIF.
+
+          CASE lo_reader->node_type.
+
+            WHEN if_sxml_node=>co_nt_element_open.
+              io_writer->open_element( name = lo_reader->name ).
+
+              DATA(lo_curr_open) = CAST if_sxml_open_element( lo_reader->read_current_node( ) ).
+              IF lv_first_iteration = abap_true.
+                io_writer->write_attribute( name = 'name' value = iv_field_4_append ).
+              ELSE.
+                DATA(lt_curr_attrs) = lo_curr_open->get_attributes( ).
+                LOOP AT lt_curr_attrs ASSIGNING FIELD-SYMBOL(<curr_attr>).
+                  io_writer->write_attribute( name  = <curr_attr>->qname-name
+                                          value = <curr_attr>->get_value( ) ).
+                ENDLOOP.
+              ENDIF.
+
+            WHEN if_sxml_node=>co_nt_value.
+              io_writer->write_value( value = lo_reader->value ).
+
+            WHEN if_sxml_node=>co_nt_element_close.
+              io_writer->close_element( ).
+          ENDCASE.
+
+          lv_first_iteration = abap_false.
+
+        ENDDO.
+
+      CATCH cx_sxml_parse_error.
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+
 ENDCLASS.

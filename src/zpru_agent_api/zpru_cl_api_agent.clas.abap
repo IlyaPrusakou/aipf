@@ -7,10 +7,15 @@ CLASS zpru_cl_api_agent DEFINITION
     INTERFACES zpru_if_api_agent.
 
   PROTECTED SECTION.
-    DATA mo_controller   TYPE REF TO zpru_if_agent_controller.
-    DATA mo_short_memory TYPE REF TO zpru_if_short_memory_provider.
-    DATA mo_long_memory  TYPE REF TO zpru_if_long_memory_provider.
-    DATA mv_input_query  TYPE zpru_if_agent_frw=>ts_json.
+    DATA mo_controller      TYPE REF TO zpru_if_agent_controller.
+    DATA mo_short_memory    TYPE REF TO zpru_if_short_memory_provider.
+    DATA mo_long_memory     TYPE REF TO zpru_if_long_memory_provider.
+    DATA mv_input_query     TYPE zpru_if_agent_frw=>ts_json.
+    DATA mv_output_response TYPE zpru_if_agent_frw=>ts_json.
+    DATA mv_output_response_prev TYPE zpru_if_agent_frw=>ts_json.
+
+    METHODS get_controller
+      RETURNING VALUE(ro_controller) TYPE REF TO zpru_if_agent_controller.
 
     METHODS get_short_memory
       IMPORTING iv_agent_uuid   TYPE sysuuid_x16
@@ -181,8 +186,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_query->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( lo_utility->search_node_in_json(
                                                                       iv_json           = mv_input_query
                                                                       iv_field_2_search = 'CONTENT' ) ) ).
-
-    mo_controller->mv_agent_uuid = ls_agent-agent_uuid.
+    DATA(lo_controller) = get_controller( ).
+    lo_controller->mv_agent_uuid = ls_agent-agent_uuid.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -215,7 +220,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_decision_provider->call_decision_engine( EXPORTING is_agent               = ls_agent
                                                           it_tool                = lt_agent_tools
-                                                          io_controller          = mo_controller
+                                                          io_controller          = lo_controller
                                                           io_input               = lo_query
                                                           io_system_prompt       = lo_system_prompt_provider
                                                           io_short_memory        = lo_short_memory
@@ -498,10 +503,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    mo_controller = NEW zpru_cl_agent_controller( ).
+    CLEAR: mv_output_response,
+    mv_output_response_prev,
+           mv_input_query,
+           mo_controller,
+           mo_long_memory,
+           mo_short_memory.
+
+    DATA(lo_controller) = get_controller( ).
 
     IF io_parent_controller IS BOUND.
-      mo_controller->mo_parent_controller = io_parent_controller.
+      lo_controller->mo_parent_controller = io_parent_controller.
     ENDIF.
 
     lo_adf_service = zpru_cl_adf_factory=>zpru_if_adf_factory~get_zpru_if_adf_service( ).
@@ -604,6 +616,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDLOOP.
 
     lo_short_memory->save_message( lt_message ).
+
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun.
@@ -789,6 +802,14 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
     mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
+    CLEAR: mv_output_response, mv_output_response_prev.
+
+
+    DATA(lo_controller) = get_controller( ).
+    DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
+    APPEND INITIAL LINE TO lo_controller->mt_input_output ASSIGNING FIELD-SYMBOL(<ls_input_output>).
+    <ls_input_output>-number      = lv_last_number + 1.
+    <ls_input_output>-input_query = mv_input_query.
 
     get_short_memory( EXPORTING iv_agent_uuid   = iv_agent_uuid
                       IMPORTING eo_short_memory = lo_short_memory
@@ -848,10 +869,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    DATA(lo_controller) = get_controller( ).
+    lo_controller->mo_short_memory = mo_short_memory.
+
     CREATE OBJECT mo_long_memory TYPE (<ls_agent>-long_memory_provider).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
+
+    lo_controller->mo_long_memory = mo_long_memory.
 
     mo_short_memory->set_long_memory( io_long_memory = mo_long_memory ).
 
@@ -914,6 +940,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                       CHANGING  cs_reported     = cs_adf_reported
                                 cs_failed       = cs_adf_failed ).
 
+    DATA(lo_controller) = get_controller( ).
+
     DATA(lv_count) = 1.
     LOOP AT it_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
 
@@ -949,55 +977,55 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       CASE <ls_tool_master_data>-step_type.
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
-          CAST zpru_if_abap_executor( lo_executor )->execute_code( EXPORTING io_controller = mo_controller
+          CAST zpru_if_abap_executor( lo_executor )->execute_code( EXPORTING io_controller = lo_controller
                                                                              io_request    = lo_input
                                                                    IMPORTING eo_response   = lo_output
                                                                              ev_error_flag = lv_error_flag ).
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
-          CAST zpru_if_knowledge_provider( lo_executor )->lookup_knowledge( EXPORTING io_controller = mo_controller
+          CAST zpru_if_knowledge_provider( lo_executor )->lookup_knowledge( EXPORTING io_controller = lo_controller
                                                                                       io_request    = lo_input
                                                                             IMPORTING eo_response   = lo_output
                                                                                       ev_error_flag = lv_error_flag ).
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
-          CAST zpru_if_nested_agent_runner( lo_executor )->run_nested_agent( EXPORTING io_controller = mo_controller
+          CAST zpru_if_nested_agent_runner( lo_executor )->run_nested_agent( EXPORTING io_controller = lo_controller
                                                                                        io_request    = lo_input
                                                                              IMPORTING eo_response   = lo_output
                                                                                        ev_error_flag = lv_error_flag ).
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
-          CAST zpru_if_http_request_sender( lo_executor )->send_http( EXPORTING io_controller = mo_controller
+          CAST zpru_if_http_request_sender( lo_executor )->send_http( EXPORTING io_controller = lo_controller
                                                                                 io_request    = lo_input
                                                                       IMPORTING eo_response   = lo_output
                                                                                 ev_error_flag = lv_error_flag ).
 
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
           CAST zpru_if_service_model_consumer( lo_executor )->consume_service_model(
-                                                             EXPORTING io_controller = mo_controller
+                                                             EXPORTING io_controller = lo_controller
                                                                        io_request    = lo_input
                                                              IMPORTING eo_response   = lo_output
                                                                        ev_error_flag = lv_error_flag ).
 
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
-          CAST zpru_if_llm_caller( lo_executor )->call_large_language_model( EXPORTING io_controller = mo_controller
+          CAST zpru_if_llm_caller( lo_executor )->call_large_language_model( EXPORTING io_controller = lo_controller
                                                                                        io_request    = lo_input
                                                                              IMPORTING eo_response   = lo_output
                                                                                        ev_error_flag = lv_error_flag ).
 
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
           CAST zpru_if_dynamic_abap_processor( lo_executor )->process_dynamic_abap(
-                                                             EXPORTING io_controller = mo_controller
+                                                             EXPORTING io_controller = lo_controller
                                                                        io_request    = lo_input
                                                              IMPORTING eo_response   = lo_output
                                                                        ev_error_flag = lv_error_flag ).
 
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
           CAST zpru_if_ml_model_inference( lo_executor )->get_machine_learning_inference(
-                                                         EXPORTING io_controller = mo_controller
+                                                         EXPORTING io_controller = lo_controller
                                                                    io_request    = lo_input
                                                          IMPORTING eo_response   = lo_output
                                                                    ev_error_flag = lv_error_flag ).
 
         WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
-          CAST zpru_if_user_tool( lo_executor )->execute_user_tool( EXPORTING io_controller = mo_controller
+          CAST zpru_if_user_tool( lo_executor )->execute_user_tool( EXPORTING io_controller = lo_controller
                                                                               io_request    = lo_input
                                                                     IMPORTING eo_response   = lo_output
                                                                               ev_error_flag = lv_error_flag ).
@@ -1075,7 +1103,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_step_2_upd>-control-input_prompt  = abap_true.
       <ls_step_2_upd>-control-output_prompt = abap_true.
 
-      IF mo_controller->mv_stop_agent = abap_true.
+      IF lo_controller->mv_stop_agent = abap_true.
         EXIT.
       ENDIF.
 
@@ -1146,6 +1174,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
         DATA(lv_final_response_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FINAL_RESPONSE", "TIMESTAMP" : "{ lv_now }",| &&
                                        | "CONTENT" : "{ <ls_query_2_upd>-output_response }" \}|.
+
+        DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
+        ASSIGN lo_controller->mt_input_output[ number = lv_last_number ] TO FIELD-SYMBOL(<ls_input_output>).
+        IF sy-subrc = 0.
+          <ls_input_output>-number      = lv_last_number + 1.
+          <ls_input_output>-output_response = lv_final_response_message.
+        ENDIF.
 
         lv_count += 1.
         APPEND INITIAL LINE TO lt_message ASSIGNING <ls_message>.
@@ -1378,6 +1413,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
     mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
+    mv_output_response_prev = mv_output_response.
+    CLEAR mv_output_response.
+
 
     lo_adf_service = zpru_cl_adf_factory=>zpru_if_adf_factory~get_zpru_if_adf_service( ).
 
@@ -1447,7 +1485,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                       iv_json           = mv_input_query
                                                                       iv_field_2_search = 'CONTENT' ) ) ).
 
-    mo_controller->mv_agent_uuid = ls_agent-agent_uuid.
+    DATA(lo_controller) = get_controller( ).
+    DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
+    APPEND INITIAL LINE TO lo_controller->mt_input_output ASSIGNING FIELD-SYMBOL(<ls_input_output>).
+    <ls_input_output>-number      = lv_last_number + 1.
+    <ls_input_output>-input_query = mv_input_query.
+
+    lo_controller->mv_agent_uuid = ls_agent-agent_uuid.
 
     GET TIME STAMP FIELD lv_now.
 
@@ -1480,7 +1524,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_decision_provider->call_decision_engine( EXPORTING is_agent               = ls_agent
                                                           it_tool                = lt_agent_tools
-                                                          io_controller          = mo_controller
+                                                          io_controller          = lo_controller
                                                           io_input               = lo_query
                                                           io_system_prompt       = lo_system_prompt_provider
                                                           io_short_memory        = lo_short_memory
@@ -1725,5 +1769,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     eo_long_memory = lo_short_memory->get_long_memory( ).
+  ENDMETHOD.
+
+  METHOD get_controller.
+    IF mo_controller IS BOUND.
+      ro_controller = mo_controller.
+      RETURN.
+    ENDIF.
+
+    mo_controller = NEW zpru_cl_agent_controller( ).
+    mo_controller->mo_api_agent = me.
+    ro_controller = mo_controller.
   ENDMETHOD.
 ENDCLASS.
