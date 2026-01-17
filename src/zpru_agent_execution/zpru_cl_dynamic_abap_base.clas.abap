@@ -1,10 +1,13 @@
 CLASS zpru_cl_dynamic_abap_base DEFINITION
-  PUBLIC FINAL
+  PUBLIC
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_dynamic_abap_processor.
     INTERFACES zpru_if_tool_executor.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 

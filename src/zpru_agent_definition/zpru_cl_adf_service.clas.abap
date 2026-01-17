@@ -3,6 +3,7 @@ CLASS zpru_cl_adf_service DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_adf_service.
 
   PROTECTED SECTION.

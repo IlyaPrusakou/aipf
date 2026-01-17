@@ -4,7 +4,7 @@ CLASS zpru_cl_adf_factory DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_adf_factory .
   PROTECTED SECTION.
   PRIVATE SECTION.

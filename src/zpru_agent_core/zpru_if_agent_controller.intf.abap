@@ -1,8 +1,6 @@
 INTERFACE zpru_if_agent_controller
   PUBLIC.
 
-  INTERFACES zpru_if_agent_frw.
-
   TYPES: BEGIN OF ts_input_output,
            number          TYPE i,
            input_query     TYPE zpru_if_agent_frw=>ts_json,

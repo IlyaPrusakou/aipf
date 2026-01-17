@@ -4,7 +4,7 @@ CLASS zpru_cl_stochastic_producer DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     CLASS-METHODS get_decision
       RETURNING VALUE(rv_result) TYPE i.
 

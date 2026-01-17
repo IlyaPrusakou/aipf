@@ -241,7 +241,7 @@ CLASS lcl_prompt_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_simple_tool DEFINITION
+CLASS lcl_abap_code_tool DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
@@ -250,7 +250,7 @@ CLASS lcl_simple_tool DEFINITION
 ENDCLASS.
 
 
-CLASS lcl_simple_tool IMPLEMENTATION.
+CLASS lcl_abap_code_tool IMPLEMENTATION.
   METHOD zpru_if_abap_executor~execute_code.
     DATA lv_payload    TYPE string.
     DATA lv_risk_score TYPE i.
@@ -530,29 +530,6 @@ CLASS lcl_nested_agent IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_tool_provider DEFINITION
-  CREATE PUBLIC.
-
-  PUBLIC SECTION.
-    INTERFACES zpru_if_tool_provider.
-ENDCLASS.
-
-
-CLASS lcl_tool_provider IMPLEMENTATION.
-  METHOD zpru_if_tool_provider~get_tool.
-    zpru_cl_dummy_agent_logic=>ms_method_registr-get_tool = abap_true.
-    CASE is_tool_master_data-tool_name.
-      WHEN 'SIMPLE_TOOL'.
-        ro_executor = NEW lcl_simple_tool( ).
-      WHEN 'KNOWLEDGE'.
-        ro_executor = NEW lcl_knowledge( ).
-      WHEN 'NESTED_AGENT'.
-        ro_executor = NEW lcl_nested_agent( ).
-      WHEN OTHERS.
-    ENDCASE.
-  ENDMETHOD.
-ENDCLASS.
-
 
 CLASS lcl_input_schema_provider DEFINITION
   CREATE PUBLIC.
@@ -584,6 +561,7 @@ ENDCLASS.
 " Local class for HTTP Request tool
 CLASS lcl_http_request_tool DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
     INTERFACES zpru_if_http_request_sender.
 
   PROTECTED SECTION.
@@ -596,13 +574,6 @@ CLASS lcl_http_request_tool DEFINITION CREATE PUBLIC.
                 io_request    TYPE REF TO zpru_if_payload
       EXPORTING eo_response   TYPE REF TO zpru_if_payload
                 ev_error_flag TYPE abap_boolean.
-
-    METHODS send_via_arrangement
-      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
-                io_request    TYPE REF TO zpru_if_payload
-      EXPORTING eo_response   TYPE REF TO zpru_if_payload
-                ev_error_flag TYPE abap_boolean.
-
 ENDCLASS.
 
 
@@ -615,7 +586,9 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD send_via_url.
-
+    " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
+    " TODO: parameter EO_RESPONSE is never cleared or assigned (ABAP cleaner)
+    " TODO: parameter EV_ERROR_FLAG is never cleared or assigned (ABAP cleaner)
 
     DATA lv_url         TYPE string.
     DATA lo_http_client TYPE REF TO if_web_http_client.
@@ -644,7 +617,9 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
 
         DATA(lv_input_json) = io_request->get_data( ).
 
-        DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'http_response'
+        lo_util = NEW zpru_cl_agent_util( ).
+
+        DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'http_result'
                                                         iv_json_4_append  = lv_reponse_json
                                                         iv_json_target    = lv_input_json->*  ).
 
@@ -657,6 +632,7 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
 
   METHOD get_http_client.
     DATA lo_http_destination TYPE REF TO if_http_destination.
+
     IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
       ro_http_client = NEW zpru_cl_web_http_client( ).
     ELSE.
@@ -670,28 +646,13 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
 
     ENDIF.
   ENDMETHOD.
-
-  METHOD send_via_arrangement.
-*    DATA lv_scenario_id TYPE if_com_management=>ty_cscn_id VALUE `Z_API_MY_SCENARIO_000`.
-*    DATA lv_service_id TYPE if_com_management=>ty_cscn_outb_srv_id VALUE `Z_API_MY_SERVICE_000_REST`.
-*    DATA lo_response    TYPE REF TO if_web_http_response.
-*    DATA lr_cscn TYPE if_com_scenario_factory=>ty_query-cscn_id_range.
-*    DATA LO TYPE REF TO if_com_scenario_factory.
-*
-*    lr_cscn = VALUE #( ( sign = 'I' option = 'EQ' low = lv_scenario_id ) ).
-*    DATA(lo_factory) = cl_com_scenario_factory=>create_instance( ).
-*    lo_factory->query_cscn(
-*      EXPORTING
-*        is_query        = VALUE #( cscn_id_range = lr_cscn )
-*      IMPORTING
-*        et_com_scenario = DATA(lt_com_scenario) ).
-  ENDMETHOD.
 ENDCLASS.
 
 
-" Local class for Service Consumption Model tool
+
 CLASS lcl_service_cons_model_tool DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
     INTERFACES zpru_if_service_model_consumer.
 ENDCLASS.
 
@@ -706,45 +667,291 @@ ENDCLASS.
 " Local class for Call LLM tool
 CLASS lcl_call_llm_tool DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
     INTERFACES zpru_if_llm_caller.
+
+    TYPES: BEGIN OF ts_result_payload,
+             llm_response               TYPE string,
+             llm_total_tokens           TYPE i,
+             llm_finish_reason          TYPE aic_finish_reason=>type,
+             llm_original_finish_reason TYPE string,
+           END OF ts_result_payload.
+
+  PROTECTED SECTION.
+    METHODS get_llm_api_factory
+      RETURNING VALUE(ro_llm_api_factory) TYPE REF TO if_aic_islm_compl_api_factory.
+
+    METHODS prepare_prompt
+      IMPORTING io_llm_api           TYPE REF TO if_aic_completion_api
+                iv_system_role       TYPE string
+                iv_user_message      TYPE string
+                iv_assistant_message TYPE string
+                iv_user_message_2    TYPE string
+      RETURNING VALUE(ro_message)    TYPE REF TO if_aic_message_container.
+
+    METHODS get_response_schema
+      RETURNING VALUE(rv_response_schema) TYPE  string.
+
+    METHODS preprocess_llm_request
+      IMPORTING io_controller    TYPE REF TO zpru_if_agent_controller
+                io_request       TYPE REF TO zpru_if_payload
+                iv_islm_scenario TYPE aic_islm_scenario_id=>type
+      EXPORTING eo_message       TYPE REF TO if_aic_message_container
+                eo_llm_api       TYPE REF TO if_aic_completion_api
+                ev_error_flag    TYPE abap_boolean.
+
+    METHODS process_llm_request
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+                io_message    TYPE REF TO if_aic_message_container
+                io_llm_api    TYPE REF TO if_aic_completion_api
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
 ENDCLASS.
 
 
 CLASS lcl_call_llm_tool IMPLEMENTATION.
   METHOD zpru_if_llm_caller~call_large_language_model.
-*    rv_output = |LLM Output for Prompt: { iv_prompt }|.
+    DATA lo_llm_api TYPE REF TO if_aic_completion_api.
+    DATA lo_message TYPE REF TO if_aic_message_container.
+
+    preprocess_llm_request( EXPORTING iv_islm_scenario = `MY_GEMINI_3`
+                                      io_controller    = io_controller
+                                      io_request       = io_request
+                            IMPORTING eo_message       = lo_message
+                                      eo_llm_api       = lo_llm_api
+                                      ev_error_flag    = ev_error_flag ).
+
+    IF ev_error_flag = abap_true.
+      RETURN.
+    ENDIF.
+
+    process_llm_request( EXPORTING io_controller = io_controller
+                                   io_request    = io_request
+                                   io_message    = lo_message
+                                   io_llm_api    = lo_llm_api
+                         IMPORTING eo_response   = eo_response
+                                   ev_error_flag = ev_error_flag ).
+  ENDMETHOD.
+
+  METHOD get_llm_api_factory.
+    IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
+      ro_llm_api_factory = NEW zpru_cl_islm_compl_api_factory( ).
+    ELSE.
+      TRY.
+          ro_llm_api_factory = cl_aic_islm_compl_api_factory=>get( ).
+        CATCH cx_aic_api_factory.
+          RETURN.
+      ENDTRY.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD prepare_prompt.
+    ro_message = io_llm_api->create_message_container( ).
+    ro_message->set_system_role( iv_system_role ).
+    ro_message->add_user_message( iv_user_message ).
+    ro_message->add_assistant_message( iv_assistant_message ).
+    ro_message->add_user_message( iv_user_message_2 ).
+  ENDMETHOD.
+
+  METHOD get_response_schema.
+    " {
+    "   "type": "object",
+    "   "properties": {
+    "     "explanation": {
+    "       "type": "string",
+    "       "description": "Short technical explanation of the solution."
+    "     },
+    "     "abap_code": {
+    "       "type": "string",
+    "       "description": "The executable ABAP code block."
+    "     },
+    "     "objects_used": {
+    "       "type": "array",
+    "       "items": { "type": "string" },
+    "       "description": "List of SAP standard tables or classes mentioned."
+    "     },
+    "     "confidence_score": {
+    "       "type": "number",
+    "       "description": "Model's certainty in this answer from 0 to 1."
+    "     }
+    "   },
+    "   "required": ["explanation", "abap_code", "objects_used"]
+    " }
+
+    rv_response_schema =
+       |\{ | &&
+       |  "type": "object", | &&
+       |  "properties": \{ | &&
+       |    "explanation": \{ "type": "string" \}, | &&
+       |    "abap_code": \{ "type": "string" \}, | &&
+       |    "objects_used": \{ "type": "array", "items": \{ "type": "string" \} \} | &&
+       |  \}, | &&
+       |  "required": ["explanation", "abap_code", "objects_used"] | &&
+       |\}|.
+  ENDMETHOD.
+
+  METHOD preprocess_llm_request.
+    " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
+    " TODO: parameter IO_REQUEST is never used (ABAP cleaner)
+    " TODO: parameter IV_ISLM_SCENARIO is never used (ABAP cleaner)
+
+    DATA lo_llm_parameter TYPE REF TO if_aic_completion_parameters.
+
+    CLEAR: eo_message,
+           eo_llm_api.
+
+    ev_error_flag = abap_false.
+
+    DATA(lo_llm_api_factory) = get_llm_api_factory( ).
+
+    TRY.
+        eo_llm_api = lo_llm_api_factory->create_instance( iv_islm_scenario ).
+      CATCH cx_aic_api_factory.
+        ev_error_flag = abap_true.
+        RETURN.
+    ENDTRY.
+
+    IF eo_llm_api IS NOT BOUND.
+      ev_error_flag = abap_true.
+      RETURN.
+    ENDIF.
+
+    eo_message = prepare_prompt( io_llm_api           = eo_llm_api
+                                 iv_system_role       = `You are an ABAP expert`
+                                 iv_user_message      = `Does ABAP support OO programming?`
+                                 iv_assistant_message = `Yes`
+                                 iv_user_message_2    = `Can you build RESTful applications in ABAP?` ).
+
+    lo_llm_parameter = eo_llm_api->get_parameter_setter( ).
+    lo_llm_parameter->set_temperature( `1.0` ).
+    lo_llm_parameter->set_maximum_tokens( 2000 ).
+    lo_llm_parameter->set_any_parameter( name  = `responseMimeType`
+                                         value = `application/json` ).
+    lo_llm_parameter->set_any_parameter( name  = `thinking_level`
+                                         value = `high` ).
+
+    DATA(lv_schema) = get_response_schema( ).
+    lo_llm_parameter->set_any_parameter( name  = `responseSchema`
+                                         value = lv_schema ).
+
+    lo_llm_parameter->set_any_parameter( name  = `tools`
+                                         value = `[{ "google_search": {} }]` ).
+  ENDMETHOD.
+
+  METHOD process_llm_request.
+    " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
+    " TODO: parameter EO_RESPONSE is never cleared or assigned (ABAP cleaner)
+    " TODO: parameter EV_ERROR_FLAG is never cleared or assigned (ABAP cleaner)
+
+    DATA ls_result_payload TYPE ts_result_payload.
+    DATA lo_llm_result     TYPE REF TO if_aic_completion_api_result.
+    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+    DATA lv_json_2_append  TYPE zpru_if_agent_frw=>ts_json.
+
+    TRY.
+        lo_llm_result = io_llm_api->execute_for_messages( io_message ).
+        ls_result_payload-llm_response = lo_llm_result->get_completion( ).
+
+      CATCH cx_aic_completion_api.
+        RETURN.
+    ENDTRY.
+
+    ls_result_payload-llm_total_tokens           = lo_llm_result->get_total_token_count( ).
+    ls_result_payload-llm_finish_reason          = lo_llm_result->get_finish_reason( ).
+    ls_result_payload-llm_original_finish_reason = lo_llm_result->get_original_finish_reason( ).
+
+    lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_result_payload )
+                                CHANGING  cr_string = lv_json_2_append ).
+
+    DATA(lv_input_json) = io_request->get_data( ).
+    lo_util = NEW zpru_cl_agent_util( ).
+    DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'llm_result'
+                                                    iv_json_4_append  = lv_json_2_append
+                                                    iv_json_target    = lv_input_json->*  ).
+
+    eo_response->set_data( ir_data = NEW string( lv_output ) ).
   ENDMETHOD.
 ENDCLASS.
 
-
-" Local class for Dynamic ABAP Code tool
-CLASS lcl_dynamic_abap_code_tool DEFINITION CREATE PUBLIC.
+CLASS lcl_dynamic_abap_code_tool DEFINITION CREATE PUBLIC INHERITING FROM zpru_cl_dynamic_abap_base.
 ENDCLASS.
 
 
 CLASS lcl_dynamic_abap_code_tool IMPLEMENTATION.
 ENDCLASS.
 
-*" Local class for Infer ML Model tool
-*CLASS lcl_infer_ml_model_tool DEFINITION CREATE PUBLIC.
-*  PUBLIC SECTION.
-*    INTERFACES zpru_if_infer_ml_model.
-*ENDCLASS.
-*
-*CLASS lcl_infer_ml_model_tool IMPLEMENTATION.
-*  METHOD zpru_if_infer_ml_model~infer.
-*    rv_prediction = |Prediction for Input: { iv_input }|.
-*  ENDMETHOD.
-*ENDCLASS.
-*
-*" Local class for User Tool
-*CLASS lcl_user_tool DEFINITION CREATE PUBLIC.
-*  PUBLIC SECTION.
-*    INTERFACES zpru_if_user_tool.
-*ENDCLASS.
-*
-*CLASS lcl_user_tool IMPLEMENTATION.
-*  METHOD zpru_if_user_tool~execute_user_tool.
-*    rv_result = |User Tool executed for Task: { iv_task }|.
-*  ENDMETHOD.
-*ENDCLASS.
+CLASS lcl_ml_model_inference DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
+    INTERFACES zpru_if_ml_model_inference.
+ENDCLASS.
+
+CLASS lcl_ml_model_inference IMPLEMENTATION.
+
+  METHOD zpru_if_ml_model_inference~get_machine_learning_inference.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+CLASS lcl_user_tool DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
+    INTERFACES zpru_if_user_tool.
+ENDCLASS.
+
+CLASS lcl_user_tool IMPLEMENTATION.
+  METHOD zpru_if_user_tool~execute_user_tool.
+
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_tool_provider DEFINITION
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+    INTERFACES zpru_if_tool_provider.
+ENDCLASS.
+
+
+CLASS lcl_tool_provider IMPLEMENTATION.
+  METHOD zpru_if_tool_provider~get_tool.
+    zpru_cl_dummy_agent_logic=>ms_method_registr-get_tool = abap_true.
+
+    CASE is_tool_master_data-tool_name.
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        ro_executor = NEW lcl_nested_agent( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        ro_executor = NEW lcl_knowledge( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        ro_executor = NEW lcl_abap_code_tool( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        ro_executor = NEW lcl_http_request_tool( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        ro_executor = NEW lcl_service_cons_model_tool( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        ro_executor = NEW lcl_call_llm_tool( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        ro_executor = NEW lcl_dynamic_abap_code_tool( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        ro_executor = NEW lcl_ml_model_inference( ).
+
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        ro_executor = NEW lcl_user_tool( ).
+
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
+
+  ENDMETHOD.
+ENDCLASS.

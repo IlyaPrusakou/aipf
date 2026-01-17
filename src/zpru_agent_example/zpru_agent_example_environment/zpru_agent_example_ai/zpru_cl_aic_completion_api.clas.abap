@@ -4,7 +4,7 @@ CLASS zpru_cl_aic_completion_api DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES if_aic_completion_api .
   PROTECTED SECTION.
   PRIVATE SECTION.

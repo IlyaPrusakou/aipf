@@ -4,7 +4,7 @@ CLASS zpru_cl_islm_compl_api_factory DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES if_aic_islm_compl_api_factory .
   PROTECTED SECTION.
   PRIVATE SECTION.

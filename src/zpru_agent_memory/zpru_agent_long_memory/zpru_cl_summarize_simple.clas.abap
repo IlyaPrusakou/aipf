@@ -4,7 +4,7 @@ CLASS zpru_cl_summarize_simple DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_summarization .
   PROTECTED SECTION.
   PRIVATE SECTION.

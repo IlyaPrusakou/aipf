@@ -1,7 +1,7 @@
 INTERFACE zpru_if_decision_provider
   PUBLIC.
 
-  INTERFACES zpru_if_agent_frw.
+
 
   TYPES: BEGIN OF ts_execution_plan,
            agent_uuid TYPE sysuuid_x16,

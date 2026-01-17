@@ -1,6 +1,16 @@
 INTERFACE zpru_if_agent_frw
   PUBLIC.
 
+  CONSTANTS: BEGIN OF cs_context,
+               standard                      TYPE  char100 VALUE 'STANDARD',
+               st_persistence_message        TYPE  char100 VALUE 'STANDARD_PERSISTENCE_MESSAGE',
+               st_persistence_summarize      TYPE  char100 VALUE 'STANDARD_PERSISTENCE_SUMMARIZE',
+               st_summarize                  TYPE  char100 VALUE 'STANDARD_SUMMARIZE',
+               st_discard_strategy_delete    TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_DELETE',
+               st_discard_strategy_summarize TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SUMMARIZE',
+               st_discard_strategy_save      TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SAVE',
+             END OF cs_context.
+
   CONSTANTS:
     BEGIN OF  cs_fail_cause,
       unspecific   TYPE i VALUE 0,
@@ -14,7 +24,7 @@ INTERFACE zpru_if_agent_frw
     END OF  cs_fail_cause.
 
   CONSTANTS: BEGIN OF cs_message_class,
-               zpru_msg_execution TYPE symsgid VALUE `ZPRU_MSG_EXECUTION`,
+               zpru_msg_execution  TYPE symsgid VALUE `ZPRU_MSG_EXECUTION`,
                zpru_msg_definition TYPE symsgid VALUE `ZPRU_MSG_DEFINITION`,
              END OF cs_message_class.
 
@@ -120,11 +130,11 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_query_reported TYPE STANDARD TABLE OF ts_query_reported WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_reported,
-           step_uuid  TYPE sysuuid_x16,
-           msg        TYPE REF TO zpru_if_agent_message,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           step_uuid TYPE sysuuid_x16,
+           msg       TYPE REF TO zpru_if_agent_message,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_step_reported.
 
   TYPES tt_step_reported TYPE STANDARD TABLE OF ts_step_reported WITH EMPTY KEY.
@@ -150,11 +160,11 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_query_failed TYPE STANDARD TABLE OF ts_query_failed WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_failed,
-           step_uuid  TYPE sysuuid_x16,
-           fail       TYPE i,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           step_uuid TYPE sysuuid_x16,
+           fail      TYPE i,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_step_failed.
 
   TYPES tt_step_failed TYPE STANDARD TABLE OF ts_step_failed WITH EMPTY KEY.
@@ -172,7 +182,7 @@ INTERFACE zpru_if_agent_frw
   TYPES tt_query_mapped TYPE STANDARD TABLE OF ts_query_mapped WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_step_mapped,
-           step_uuid  TYPE sysuuid_x16,
+           step_uuid TYPE sysuuid_x16,
          END OF ts_step_mapped.
 
   TYPES tt_step_mapped TYPE STANDARD TABLE OF ts_step_mapped WITH EMPTY KEY.

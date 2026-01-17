@@ -1,8 +1,6 @@
 INTERFACE zpru_if_api_agent
   PUBLIC.
 
-  INTERFACES zpru_if_agent_frw.
-
   TYPES tv_agent_name TYPE char100.
 
   METHODS add_query_2_run

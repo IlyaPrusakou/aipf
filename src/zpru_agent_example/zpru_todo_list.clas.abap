@@ -48,6 +48,25 @@ CLASS zpru_todo_list IMPLEMENTATION.
 *4 again recheck what formats to use json or string
 *5 finish with dynamic invokation
 
+*delete objects:
+*ZPRU_CL_ADF_BUFFER
+*ZPRU_CL_ADF_FACTORY
+*ZPRU_CL_ADF_PRECHECK
+*ZPRU_IF_ADF_FACTORY
+*ZPRU_IF_ADF_PRECHECK
+*ZPRU_CL_AXC_BUFFER
+*ZPRU_CL_AXC_FACTORY
+*ZPRU_CL_AXC_PRECHECK
+
+
+
+
+
+
+
+
+
+
   ENDMETHOD.
 
 ENDCLASS.

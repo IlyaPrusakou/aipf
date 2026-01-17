@@ -4,7 +4,7 @@ CLASS zpru_cl_web_http_response DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES if_web_http_response .
   PROTECTED SECTION.
   PRIVATE SECTION.

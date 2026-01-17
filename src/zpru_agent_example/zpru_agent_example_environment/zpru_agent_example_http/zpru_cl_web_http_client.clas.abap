@@ -4,7 +4,7 @@ CLASS zpru_cl_web_http_client DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES if_web_http_client .
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -28,6 +28,14 @@ CLASS zpru_cl_web_http_client IMPLEMENTATION.
 
 
   METHOD if_web_http_client~execute.
+    r_response = NEW zpru_cl_web_http_response( ).
+    TRY.
+        r_response->set_status( i_code   = 200
+                                i_reason = `SUCCESS` ).
+        r_response->set_text( `{ "http_result" : "SUCESS" }` ).
+      CATCH cx_web_message_error INTO DATA(lo_web_message_error).
+        RAISE EXCEPTION NEW cx_web_http_client_error( previous = lo_web_message_error ).
+    ENDTRY.
   ENDMETHOD.
 
 
@@ -40,6 +48,7 @@ CLASS zpru_cl_web_http_client IMPLEMENTATION.
 
 
   METHOD if_web_http_client~get_http_request.
+    r_http_request = NEW zpru_cl_web_http_request( ).
   ENDMETHOD.
 
 
@@ -52,6 +61,7 @@ CLASS zpru_cl_web_http_client IMPLEMENTATION.
 
 
   METHOD if_web_http_client~retry_execute.
+
   ENDMETHOD.
 
 

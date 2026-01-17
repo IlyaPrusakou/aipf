@@ -4,6 +4,7 @@ CLASS zpru_cl_agent_message DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_agent_message.
 
     ALIASES msgty FOR if_t100_dyn_msg~msgty.

@@ -3,6 +3,7 @@ CLASS zpru_cl_adf_buffer DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     TYPES: BEGIN OF ts_agent,
              instance TYPE zpru_agent,
              changed  TYPE abap_bool,

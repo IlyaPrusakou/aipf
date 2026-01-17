@@ -3,6 +3,7 @@ CLASS zpru_cl_unit_agent DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_unit_agent.
 ENDCLASS.
 

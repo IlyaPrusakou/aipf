@@ -4,7 +4,7 @@ CLASS zpru_cl_web_http_request DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES if_web_http_request .
   PROTECTED SECTION.
   PRIVATE SECTION.

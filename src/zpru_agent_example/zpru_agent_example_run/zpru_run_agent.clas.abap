@@ -3,6 +3,7 @@ CLASS zpru_run_agent DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_frw.
     INTERFACES if_oo_adt_classrun.
 ENDCLASS.
 

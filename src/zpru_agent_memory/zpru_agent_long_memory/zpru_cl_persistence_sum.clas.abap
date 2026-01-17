@@ -4,7 +4,7 @@ CLASS zpru_cl_persistence_sum DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_long_mem_persistence .
   PROTECTED SECTION.
   PRIVATE SECTION.
