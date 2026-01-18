@@ -1,0 +1,14 @@
+CLASS zpru_cl_nested_system_prompt DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zpru_cl_nested_system_prompt IMPLEMENTATION.
+ENDCLASS.
