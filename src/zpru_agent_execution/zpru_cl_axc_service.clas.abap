@@ -333,7 +333,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -488,7 +488,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -559,7 +559,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -637,7 +637,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -800,7 +800,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -893,7 +893,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1051,7 +1051,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1120,7 +1120,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1201,7 +1201,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1265,7 +1265,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1337,7 +1337,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1421,7 +1421,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1504,7 +1504,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_update_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_update_header( EXPORTING it_head_update_imp = it_head_update_imp
                                     IMPORTING et_entities        = et_entities
@@ -1515,7 +1521,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_delete_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_delete_header( EXPORTING it_head_delete_imp = it_head_delete_imp
                                     IMPORTING et_entities        = et_entities
@@ -1526,7 +1538,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_create_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_create_header( EXPORTING it_head_create_imp = it_head_create_imp
                                     IMPORTING et_entities        = et_entities
@@ -1537,7 +1555,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_cba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_cba_query( EXPORTING it_axc_query_imp = it_axc_query_imp
                                 IMPORTING et_entities      = et_entities
@@ -1548,7 +1572,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_read_header.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_read_header( EXPORTING it_head_read_k = it_head_read_k
                                   IMPORTING et_entities    = et_entities
@@ -1559,7 +1589,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_rba_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_rba_query( EXPORTING it_rba_query_k = it_rba_query_k
                                 IMPORTING et_entities    = et_entities
@@ -1570,7 +1606,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_read_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_read_query( EXPORTING it_query_read_k = it_query_read_k
                                  IMPORTING et_entities     = et_entities
@@ -1581,7 +1623,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_update_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_update_query( EXPORTING it_query_update_imp = it_query_update_imp
                                    IMPORTING et_entities         = et_entities
@@ -1592,7 +1640,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_delete_query.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_delete_query( EXPORTING it_query_delete_imp = it_query_delete_imp
                                    IMPORTING et_entities         = et_entities
@@ -1603,7 +1657,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_cba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_cba_step( EXPORTING it_axc_step_imp = it_axc_step_imp
                                IMPORTING et_entities     = et_entities
@@ -1614,7 +1674,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_rba_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_rba_step( EXPORTING it_rba_step_k = it_rba_step_k
                                IMPORTING et_entities   = et_entities
@@ -1625,7 +1691,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_read_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_read_step( EXPORTING it_step_read_k = it_step_read_k
                                 IMPORTING et_entities    = et_entities
@@ -1636,7 +1708,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_update_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_update_step( EXPORTING it_step_update_imp = it_step_update_imp
                                   IMPORTING et_entities        = et_entities
@@ -1647,7 +1725,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   METHOD precheck_delete_step.
     DATA lo_pre TYPE REF TO zpru_if_axc_precheck.
 
-    lo_pre = zpru_cl_axc_factory=>zpru_if_axc_factory~get_zpru_if_axc_precheck( ).
+    TRY.
+        lo_pre ?= zpru_cl_agent_service_mngr=>get_service(
+                      iv_service = `ZPRU_IF_AXC_PRECHECK`
+                      iv_context = zpru_if_agent_frw=>cs_context-st_agent_execution ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
 
     lo_pre->precheck_delete_step( EXPORTING it_step_delete_imp = it_step_delete_imp
                                   IMPORTING et_entities        = et_entities

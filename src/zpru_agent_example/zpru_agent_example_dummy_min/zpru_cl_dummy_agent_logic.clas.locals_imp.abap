@@ -319,7 +319,12 @@ CLASS lcl_abap_code_tool IMPLEMENTATION.
       <ls_context>-gate_pass_assessment-risk_score = 'RED'.
     ENDIF.
 
-    lo_agent_util = NEW zpru_cl_agent_util( ).
+    TRY.
+        lo_agent_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RETURN.
+    ENDTRY.
 
     lo_agent_util->convert_to_string( EXPORTING ir_abap   = REF #( <ls_context>-gate_pass_assessment )
                                       CHANGING  cr_string = <ls_context>-gate_pass_assessment_json ).
@@ -530,7 +535,6 @@ CLASS lcl_nested_agent IMPLEMENTATION.
 ENDCLASS.
 
 
-
 CLASS lcl_input_schema_provider DEFINITION
   CREATE PUBLIC.
 
@@ -613,14 +617,19 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
           " raise exception
         ENDIF.
 
-        DATA(lv_reponse_json) = lo_response->get_text( ).
+        DATA(lv_response_json) = lo_response->get_text( ).
 
         DATA(lv_input_json) = io_request->get_data( ).
 
-        lo_util = NEW zpru_cl_agent_util( ).
+        TRY.
+            lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
 
         DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'http_result'
-                                                        iv_json_4_append  = lv_reponse_json
+                                                        iv_json_4_append  = lv_response_json
                                                         iv_json_target    = lv_input_json->*  ).
 
         eo_response->set_data( ir_data = NEW string( lv_output ) ).
@@ -649,7 +658,6 @@ CLASS lcl_http_request_tool IMPLEMENTATION.
 ENDCLASS.
 
 
-
 CLASS lcl_service_cons_model_tool DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_executor.
@@ -659,7 +667,90 @@ ENDCLASS.
 
 CLASS lcl_service_cons_model_tool IMPLEMENTATION.
   METHOD zpru_if_service_model_consumer~consume_service_model.
-*    rv_result = |Service { iv_service_name } consumed successfully.|.
+    DATA lt_business_data         TYPE TABLE OF zpru_storage_bin=>tys_warehouse_storage_bin_type.
+    DATA lo_http_client           TYPE REF TO if_web_http_client.
+    DATA lo_client_proxy          TYPE REF TO /iwbep/if_cp_client_proxy.
+    DATA lo_request               TYPE REF TO /iwbep/if_cp_request_read_list.
+    DATA lo_response              TYPE REF TO /iwbep/if_cp_response_read_lst.
+    DATA lo_filter_factory        TYPE REF TO /iwbep/if_cp_filter_factory.
+    DATA lo_filter_node_1         TYPE REF TO /iwbep/if_cp_filter_node.
+    DATA lo_filter_node_2         TYPE REF TO /iwbep/if_cp_filter_node.
+    DATA lo_filter_node_root      TYPE REF TO /iwbep/if_cp_filter_node.
+    DATA lt_range_ewmwarehouse    TYPE RANGE OF char4.
+    DATA lt_range_ewmstorage_bin  TYPE RANGE OF char18.
+    DATA lv_comm_scenario         TYPE if_com_management=>ty_cscn_id.
+    DATA lv_service_id            TYPE if_com_management=>ty_cscn_outb_srv_id.
+    DATA lv_comm_system_id        TYPE if_com_management=>ty_cs_id.
+    DATA lv_repository_id         TYPE /iwbep/if_cp_runtime_types=>ty_proxy_model_repo_id.
+    DATA lv_proxy_model_id        TYPE /iwbep/if_cp_runtime_types=>ty_proxy_model_id.
+    DATA lv_proxy_model_version   TYPE /iwbep/if_cp_runtime_types=>ty_proxy_model_version.
+    DATA lv_relative_service_root TYPE string.
+    DATA lo_util                  TYPE REF TO zpru_if_agent_util.
+    DATA lv_response_json         TYPE string.
+
+    lv_comm_scenario = 'SAP_COM_0550'.
+    lv_service_id = 'API_WHSE_STORAGE_BIN_2'.
+    lv_comm_system_id = 'S4H_EXT_SYSTEM'.
+    lv_repository_id = 'DEFAULT'.
+    lv_proxy_model_id = 'ZPRU_STORAGE_BIN'.
+    lv_proxy_model_version = '0001'.
+    lv_relative_service_root = '/sap/opu/odata4/sap/api_whse_storage_bin_2/srvd_a2x/sap/warehousestoragebin/0001'.
+
+    TRY.
+        DATA(lo_destination) = cl_http_destination_provider=>create_by_comm_arrangement(
+                                   comm_scenario  = lv_comm_scenario
+                                   comm_system_id = lv_comm_system_id
+                                   service_id     = lv_service_id ).
+        lo_http_client = cl_web_http_client_manager=>create_by_http_destination( lo_destination ).
+        lo_client_proxy = /iwbep/cl_cp_factory_remote=>create_v4_remote_proxy(
+                              is_proxy_model_key       = VALUE #( repository_id       = lv_repository_id
+                                                                  proxy_model_id      = lv_proxy_model_id
+                                                                  proxy_model_version = lv_proxy_model_version )
+                              io_http_client           = lo_http_client
+                              iv_relative_service_root = lv_relative_service_root ).
+        ASSERT lo_http_client IS BOUND.
+
+        lo_request = lo_client_proxy->create_resource_for_entity_set( 'WAREHOUSE_STORAGE_BIN' )->create_request_for_read( ).
+
+        lo_filter_factory = lo_request->create_filter_factory( ).
+        lo_filter_node_1  = lo_filter_factory->create_by_range( iv_property_path = 'EWMWAREHOUSE'
+                                                                it_range         = lt_range_ewmwarehouse ).
+        lo_filter_node_2  = lo_filter_factory->create_by_range( iv_property_path = 'EWMSTORAGE_BIN'
+                                                                it_range         = lt_range_ewmstorage_bin ).
+        lo_filter_node_root = lo_filter_node_1->and( lo_filter_node_2 ).
+        lo_request->set_filter( lo_filter_node_root ).
+        lo_request->set_top( 50 )->set_skip( 0 ).
+
+        lo_response = lo_request->execute( ).
+        lo_response->get_business_data( IMPORTING et_business_data = lt_business_data ).
+
+        DATA(lv_input_json) = io_request->get_data( ).
+
+        TRY.
+            lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+
+        lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_business_data )
+                                    CHANGING  cr_string = lv_response_json ).
+
+        DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'csm_result'
+                                                        iv_json_4_append  = lv_response_json
+                                                        iv_json_target    = lv_input_json->*  ).
+
+        eo_response->set_data( ir_data = NEW string( lv_output ) ).
+
+      CATCH /iwbep/cx_cp_remote INTO DATA(lx_remote).
+        RAISE SHORTDUMP lx_remote.
+      CATCH /iwbep/cx_gateway INTO DATA(lx_gateway).
+        RAISE SHORTDUMP lx_gateway.
+      CATCH cx_http_dest_provider_error INTO DATA(lx_dest_provider_error).
+        RAISE SHORTDUMP lx_dest_provider_error.
+      CATCH cx_web_http_client_error INTO DATA(lx_web_http_client_error).
+        RAISE SHORTDUMP lx_web_http_client_error.
+    ENDTRY.
   ENDMETHOD.
 ENDCLASS.
 
@@ -794,7 +885,6 @@ CLASS lcl_call_llm_tool IMPLEMENTATION.
   METHOD preprocess_llm_request.
     " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
     " TODO: parameter IO_REQUEST is never used (ABAP cleaner)
-    " TODO: parameter IV_ISLM_SCENARIO is never used (ABAP cleaner)
 
     DATA lo_llm_parameter TYPE REF TO if_aic_completion_parameters.
 
@@ -865,7 +955,14 @@ CLASS lcl_call_llm_tool IMPLEMENTATION.
                                 CHANGING  cr_string = lv_json_2_append ).
 
     DATA(lv_input_json) = io_request->get_data( ).
-    lo_util = NEW zpru_cl_agent_util( ).
+
+    TRY.
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RETURN.
+    ENDTRY.
+
     DATA(lv_output) = lo_util->append_json_to_json( iv_field_4_append = 'llm_result'
                                                     iv_json_4_append  = lv_json_2_append
                                                     iv_json_target    = lv_input_json->*  ).
@@ -874,12 +971,14 @@ CLASS lcl_call_llm_tool IMPLEMENTATION.
   ENDMETHOD.
 ENDCLASS.
 
-CLASS lcl_dynamic_abap_code_tool DEFINITION CREATE PUBLIC INHERITING FROM zpru_cl_dynamic_abap_base.
+
+CLASS lcl_dynamic_abap_code_tool DEFINITION INHERITING FROM zpru_cl_dynamic_abap_base CREATE PUBLIC.
 ENDCLASS.
 
 
 CLASS lcl_dynamic_abap_code_tool IMPLEMENTATION.
 ENDCLASS.
+
 
 CLASS lcl_ml_model_inference DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
@@ -887,12 +986,10 @@ CLASS lcl_ml_model_inference DEFINITION CREATE PUBLIC.
     INTERFACES zpru_if_ml_model_inference.
 ENDCLASS.
 
+
 CLASS lcl_ml_model_inference IMPLEMENTATION.
-
   METHOD zpru_if_ml_model_inference~get_machine_learning_inference.
-
   ENDMETHOD.
-
 ENDCLASS.
 
 
@@ -902,11 +999,12 @@ CLASS lcl_user_tool DEFINITION CREATE PUBLIC.
     INTERFACES zpru_if_user_tool.
 ENDCLASS.
 
+
 CLASS lcl_user_tool IMPLEMENTATION.
   METHOD zpru_if_user_tool~execute_user_tool.
-
   ENDMETHOD.
 ENDCLASS.
+
 
 CLASS lcl_tool_provider DEFINITION
   CREATE PUBLIC.
@@ -952,6 +1050,5 @@ CLASS lcl_tool_provider IMPLEMENTATION.
       WHEN OTHERS.
         RETURN.
     ENDCASE.
-
   ENDMETHOD.
 ENDCLASS.

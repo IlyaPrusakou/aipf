@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>Consumption model for client proxy - generated</DESCRIPT>
+    <STATE>1</STATE>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>DEF_WAREHOUSE_STORAGE_BIN_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Define WarehouseStorageBinType</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>GCS_COMPLEX_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Internal names for complex types</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>GCS_ENTITY_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Internal Names of the entity sets</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>GCS_ENTITY_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Internal names for entity types</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>MO_MODEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Model</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>TYS_VALUE_CONTROLS_1</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Value Control Structure of WAREHOUSE_STORAGE_BIN_TYPE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>TYS_WAREHOUSE_STORAGE_BIN_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>WarehouseStorageBinType</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZPRU_STORAGE_BIN</CLSNAME>
+     <CMPNAME>TYT_WAREHOUSE_STORAGE_BIN_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>List of WarehouseStorageBinType</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>DEF_WAREHOUSE_STORAGE_BIN_TYPE</CMPNAME>
+     <SCONAME>/IWBEP/CX_GATEWAY</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Gateway Exception</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>

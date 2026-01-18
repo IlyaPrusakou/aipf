@@ -26,7 +26,7 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.

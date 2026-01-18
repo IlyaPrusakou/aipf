@@ -9,6 +9,8 @@ INTERFACE zpru_if_agent_frw
                st_discard_strategy_delete    TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_DELETE',
                st_discard_strategy_summarize TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SUMMARIZE',
                st_discard_strategy_save      TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SAVE',
+               st_agent_execution            type char100 value 'STANDARD_AGENT_EXECUTION',
+               st_agent_DEFINITION            type char100 value 'STANDARD_AGENT_DEFINITION',
              END OF cs_context.
 
   CONSTANTS:

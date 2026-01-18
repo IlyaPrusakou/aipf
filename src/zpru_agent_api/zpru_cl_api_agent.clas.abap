@@ -7,11 +7,11 @@ CLASS zpru_cl_api_agent DEFINITION
     INTERFACES zpru_if_api_agent.
 
   PROTECTED SECTION.
-    DATA mo_controller      TYPE REF TO zpru_if_agent_controller.
-    DATA mo_short_memory    TYPE REF TO zpru_if_short_memory_provider.
-    DATA mo_long_memory     TYPE REF TO zpru_if_long_memory_provider.
-    DATA mv_input_query     TYPE zpru_if_agent_frw=>ts_json.
-    DATA mv_output_response TYPE zpru_if_agent_frw=>ts_json.
+    DATA mo_controller           TYPE REF TO zpru_if_agent_controller.
+    DATA mo_short_memory         TYPE REF TO zpru_if_short_memory_provider.
+    DATA mo_long_memory          TYPE REF TO zpru_if_long_memory_provider.
+    DATA mv_input_query          TYPE zpru_if_agent_frw=>ts_json.
+    DATA mv_output_response      TYPE zpru_if_agent_frw=>ts_json.
     DATA mv_output_response_prev TYPE zpru_if_agent_frw=>ts_json.
 
     METHODS get_controller
@@ -66,8 +66,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_axc_service TYPE REF TO zpru_if_axc_service.
 
     TRY.
-        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_AXC_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -133,8 +134,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -237,15 +239,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_short_memory->save_message( lt_message_in ).
 
     TRY.
-        lo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service(
+                                   iv_service = `ZPRU_IF_PAYLOAD`
+                                   iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     TRY.
-        lo_execution_plan ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_execution_plan ?= zpru_cl_agent_service_mngr=>get_service(
+                                 iv_service = `ZPRU_IF_PAYLOAD`
+                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -258,8 +262,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     TRY.
-        lo_decision_log ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_decision_log ?= zpru_cl_agent_service_mngr=>get_service(
+                               iv_service = `ZPRU_IF_PAYLOAD`
+                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -341,8 +346,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_short_memory->save_message( lt_message_in ).
 
     TRY.
-        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_AXC_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -555,7 +561,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     CLEAR: mv_output_response,
-    mv_output_response_prev,
+           mv_output_response_prev,
            mv_input_query,
            mo_controller,
            mo_long_memory,
@@ -568,8 +574,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -672,7 +679,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDLOOP.
 
     lo_short_memory->save_message( lt_message ).
-
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun.
@@ -835,8 +841,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -863,8 +870,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
     mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
-    CLEAR: mv_output_response, mv_output_response_prev.
-
+    CLEAR: mv_output_response,
+           mv_output_response_prev.
 
     DATA(lo_controller) = get_controller( ).
     DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
@@ -910,8 +917,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -975,8 +983,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ELSE.
 
       TRY.
-          lo_discard_strategy ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_DISCARD_STRATEGY`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-st_discard_strategy_delete ).
+          lo_discard_strategy ?= zpru_cl_agent_service_mngr=>get_service(
+                                     iv_service = `ZPRU_IF_DISCARD_STRATEGY`
+                                     iv_context = zpru_if_agent_frw=>cs_context-st_discard_strategy_delete ).
         CATCH zpru_cx_agent_core.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       ENDTRY.
@@ -990,8 +999,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ELSE.
 
       TRY.
-          lo_summary_strategy ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_SUMMARIZATION`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-st_summarize ).
+          lo_summary_strategy ?= zpru_cl_agent_service_mngr=>get_service(
+                                     iv_service = `ZPRU_IF_SUMMARIZATION`
+                                     iv_context = zpru_if_agent_frw=>cs_context-st_summarize ).
         CATCH zpru_cx_agent_core.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       ENDTRY.
@@ -1017,8 +1027,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_decision_provider TYPE REF TO zpru_if_decision_provider.
 
     TRY.
-        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_AXC_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1059,7 +1070,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
         TRY.
             lo_output ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
           CATCH zpru_cx_agent_core.
             RAISE EXCEPTION NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -1214,8 +1225,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_last_output) = lv_output_prompt.
 
     TRY.
-        lo_last_output ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_last_output ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_PAYLOAD`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1263,8 +1275,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CREATE OBJECT lo_decision_provider TYPE (is_agent-decision_provider).
 
         TRY.
-            eo_final_response ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
+            eo_final_response ?= zpru_cl_agent_service_mngr=>get_service(
+                                     iv_service = `ZPRU_IF_PAYLOAD`
+                                     iv_context = zpru_if_agent_frw=>cs_context-standard ).
           CATCH zpru_cx_agent_core.
             RAISE EXCEPTION NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -1292,7 +1305,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
         ASSIGN lo_controller->mt_input_output[ number = lv_last_number ] TO FIELD-SYMBOL(<ls_input_output>).
         IF sy-subrc = 0.
-          <ls_input_output>-number      = lv_last_number + 1.
+          <ls_input_output>-number          = lv_last_number + 1.
           <ls_input_output>-output_response = lv_final_response_message.
         ENDIF.
 
@@ -1337,8 +1350,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_AXC_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1428,8 +1442,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1512,14 +1527,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     TRY.
         lo_utility ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     TRY.
-        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_AXC_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1552,8 +1568,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     CLEAR mv_output_response.
 
     TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-STANDARD ).
+        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_ADF_SERVICE`
+                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1663,15 +1680,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_short_memory->save_message( lt_message_in ).
 
     TRY.
-        lo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service(
+                                   iv_service = `ZPRU_IF_PAYLOAD`
+                                   iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     TRY.
-        lo_execution_plan ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_execution_plan ?= zpru_cl_agent_service_mngr=>get_service(
+                                 iv_service = `ZPRU_IF_PAYLOAD`
+                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1684,8 +1703,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     TRY.
-        lo_decision_log ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        lo_decision_log ?= zpru_cl_agent_service_mngr=>get_service(
+                               iv_service = `ZPRU_IF_PAYLOAD`
+                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -1947,7 +1967,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     TRY.
         mo_controller ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_CONTROLLER`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.

@@ -38,8 +38,9 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_prepar_response ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                            iv_context = `STANDARD` ).
+        lo_prepar_response ?= zpru_cl_agent_service_mngr=>get_service(
+                                  iv_service = `ZPRU_IF_PAYLOAD`
+                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -52,7 +53,6 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     DATA(lo_sum_prst) = zpru_if_long_memory_provider~get_sum_persistence( ).
     lo_sum_prst->persist( EXPORTING io_input  = lo_persist_request
                           IMPORTING eo_output = eo_output ).
-
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~save_messages.
@@ -64,8 +64,9 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_prepar_response ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                            iv_context = `STANDARD` ).
+        lo_prepar_response ?= zpru_cl_agent_service_mngr=>get_service(
+                                  iv_service = `ZPRU_IF_PAYLOAD`
+                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -95,8 +96,9 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     IF mo_msg_persistence IS NOT BOUND.
 
       TRY.
-          mo_msg_persistence ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_LONG_MEM_PERSISTENCE`
-                                                              iv_context = `STANDARD_PERSISTENCE_MESSAGE` ).
+          mo_msg_persistence ?= zpru_cl_agent_service_mngr=>get_service(
+                                    iv_service = `ZPRU_IF_LONG_MEM_PERSISTENCE`
+                                    iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
         CATCH zpru_cx_agent_core.
           RETURN.
       ENDTRY.
@@ -109,8 +111,9 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~get_sum_persistence.
     IF mo_sum_persistence IS NOT BOUND.
       TRY.
-          mo_sum_persistence ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_LONG_MEM_PERSISTENCE`
-                                                              iv_context = `STANDARD_PERSISTENCE_SUMMARIZE` ).
+          mo_sum_persistence ?= zpru_cl_agent_service_mngr=>get_service(
+                                    iv_service = `ZPRU_IF_LONG_MEM_PERSISTENCE`
+                                    iv_context = zpru_if_agent_frw=>cs_context-st_persistence_summarize ).
         CATCH zpru_cx_agent_core.
           RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
       ENDTRY.
@@ -129,7 +132,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
   METHOD prepare_db_msg.
     DATA lt_message_db TYPE zpru_if_long_mem_persistence=>tt_message_db.
-    DATA lo_util TYPE REF TO zpru_if_agent_util.
+    DATA lo_util       TYPE REF TO zpru_if_agent_util.
 
     FIELD-SYMBOLS <lt_message> TYPE zpru_if_long_mem_persistence=>tt_message.
 
@@ -148,7 +151,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -177,8 +180,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
         <ls_message_db>-message_type = zpru_if_short_memory_provider=>cs_msg_type-info.
       ENDIF.
 
-      <ls_message_db>-content    = lo_util->serialize_json_2_xstring(
-                                           <ls_message>-content ).
+      <ls_message_db>-content    = lo_util->serialize_json_2_xstring( <ls_message>-content ).
 
       <ls_message_db>-created_by = sy-uname.
       <ls_message_db>-created_at = lv_now.
@@ -194,7 +196,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       ELSE.
         TRY.
             eo_output ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                                iv_context = `STANDARD` ).
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
           CATCH zpru_cx_agent_core.
             RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -205,7 +207,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
   METHOD prepare_db_sum.
     DATA lt_summarization_db TYPE zpru_if_long_mem_persistence=>tt_summarization_db.
-    DATA lo_util TYPE REF TO zpru_if_agent_util.
+    DATA lo_util             TYPE REF TO zpru_if_agent_util.
 
     FIELD-SYMBOLS <lt_summarization> TYPE zpru_if_long_mem_persistence=>tt_summarization.
 
@@ -224,7 +226,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
     TRY.
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = `STANDARD` ).
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -249,8 +251,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
         <ls_summarization_db>-user_name = sy-uname.
       ENDIF.
 
-      <ls_summarization_db>-content    = lo_util->serialize_json_2_xstring(
-                                                 <ls_summarization>-content ).
+      <ls_summarization_db>-content    = lo_util->serialize_json_2_xstring( <ls_summarization>-content ).
 
       <ls_summarization_db>-created_by = sy-uname.
       <ls_summarization_db>-created_at = lv_now.
@@ -267,7 +268,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
         TRY.
             eo_output ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
-                                                                iv_context = `STANDARD` ).
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
           CATCH zpru_cx_agent_core.
             RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -280,8 +281,9 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
   METHOD zpru_if_long_memory_provider~get_summarization.
     IF mo_summarize IS NOT BOUND.
       TRY.
-          mo_summarize ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_SUMMARIZATION`
-                                                              iv_context = `STANDARD_SUMMARIZE` ).
+          mo_summarize ?= zpru_cl_agent_service_mngr=>get_service(
+                              iv_service = `ZPRU_IF_SUMMARIZATION`
+                              iv_context = zpru_if_agent_frw=>cs_context-st_summarize ).
         CATCH zpru_cx_agent_core.
           RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
       ENDTRY.

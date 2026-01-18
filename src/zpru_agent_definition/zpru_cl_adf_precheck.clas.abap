@@ -16,8 +16,8 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -42,16 +42,15 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
         <ls_agent_reported>-agent_uuid = ls_line-agent_uuid.
         <ls_agent_reported>-create     = abap_true.
         <ls_agent_reported>-msg        = lo_util->new_message(
-                                                 iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                                 iv_number   = `001`
-                                                 iv_severity = zpru_if_agent_message=>sc_severity-error ).
+                                             iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
+                                             iv_number   = `001`
+                                             iv_severity = zpru_if_agent_message=>sc_severity-error ).
         CONTINUE.
       ENDIF.
 
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
@@ -60,23 +59,22 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
 
   METHOD zpru_if_adf_precheck~precheck_update_agent.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_agent_update_imp.
-    data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     LOOP AT it_agent_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
       ls_line = <ls_update>.
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
@@ -97,23 +95,22 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
 
   METHOD zpru_if_adf_precheck~precheck_read_agent.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_agent_read_k.
-    data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     LOOP AT it_agent_read_k ASSIGNING FIELD-SYMBOL(<ls_read>).
       ls_line = <ls_read>.
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_AGENT_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
@@ -122,13 +119,13 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
 
   METHOD zpru_if_adf_precheck~precheck_cba_tool.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_tool_create_imp.
-data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -143,10 +140,9 @@ data lo_util type ref to zpru_if_agent_util.
         ENDTRY.
       ENDIF.
 
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       IF ls_line-agent_uuid IS INITIAL.
         APPEND VALUE #( agent_uuid = ls_line-agent_uuid
@@ -159,9 +155,9 @@ data lo_util type ref to zpru_if_agent_util.
                         tool_uuid  = ls_line-tool_uuid
                         create     = abap_true
                         msg        = lo_util->new_message(
-                                             iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                             iv_number   = `011` " Assumed message for missing parent key
-                                             iv_severity = zpru_if_agent_message=>sc_severity-error ) )
+                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+                                         iv_number   = `011` " Assumed message for missing parent key
+                                         iv_severity = zpru_if_agent_message=>sc_severity-error ) )
                TO cs_reported-tool.
         CONTINUE.
       ENDIF.
@@ -173,23 +169,22 @@ data lo_util type ref to zpru_if_agent_util.
 
   METHOD zpru_if_adf_precheck~precheck_update_tool.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_tool_update_imp.
-    data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     LOOP AT it_tool_update_imp ASSIGNING FIELD-SYMBOL(<ls_update>).
       ls_line = <ls_update>.
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
@@ -210,23 +205,22 @@ data lo_util type ref to zpru_if_agent_util.
 
   METHOD zpru_if_adf_precheck~precheck_read_tool.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_tool_read_k.
-    data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     LOOP AT it_tool_read_k ASSIGNING FIELD-SYMBOL(<ls_read>).
       ls_line = <ls_read>.
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
@@ -235,23 +229,22 @@ data lo_util type ref to zpru_if_agent_util.
 
   METHOD zpru_if_adf_precheck~precheck_rba_tool.
     DATA ls_line TYPE zpru_if_adf_type_and_constant=>ts_rba_tool_k.
-    data lo_util type ref to zpru_if_agent_util.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     CLEAR et_entities.
 
     TRY.
-      lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-            iv_context = `STANDARD` ).
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
       CATCH zpru_cx_agent_core.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
     LOOP AT it_rba_tool_k ASSIGNING FIELD-SYMBOL(<ls_rba>).
       ls_line = <ls_rba>.
-      lo_util->fill_flags(
-            EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
-            CHANGING  cs_data    = ls_line
-                      cs_control = ls_line-control ).
+      lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
+                           CHANGING  cs_data    = ls_line
+                                     cs_control = ls_line-control ).
 
       APPEND INITIAL LINE TO et_entities ASSIGNING FIELD-SYMBOL(<ls_entity>).
       <ls_entity> = ls_line.
