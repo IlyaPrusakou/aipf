@@ -60,12 +60,11 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 *wrap raise exception into method
 
+*IMPLEMENT INPUT SCHEMA PROVIDER AND TOOL INFO PROVIDER IN FRAMEWORK AND IN EXAMPLE
 
+*cleanup dummy agent from technical methods like get_input_prompt and readme.
 
-
-
-
-
+*rework idea of input and output in a way that we have short_memory + long_memory + context(will gather during run) + small input + small output
 
   ENDMETHOD.
 

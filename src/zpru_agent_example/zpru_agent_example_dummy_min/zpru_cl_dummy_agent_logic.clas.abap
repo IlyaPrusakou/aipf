@@ -4,7 +4,7 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_frw.
-    intERFACES zpru_if_dummy_agent_logic.
+    INTERFACES zpru_if_dummy_agent_logic.
     INTERFACES zpru_if_decision_provider.
     INTERFACES zpru_if_short_memory_provider.
     INTERFACES zpru_if_long_memory_provider.
@@ -12,6 +12,7 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
     INTERFACES zpru_if_prompt_provider.
     INTERFACES zpru_if_tool_provider.
     INTERFACES zpru_if_input_schema_provider.
+    INTERFACES zpru_if_tool_info_provider.
 
     TYPES: BEGIN OF ts_gate_pass_assessment,
              " --- Critical Question Answers ---
@@ -260,14 +261,14 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_UNIT_AGENT' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_UNIT_AGENT' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117150518.3887310' LOCAL_LAST_CHANGED = '20260117150518.3887310'  )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_API_AGENT' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_API_AGENT' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117150619.0368210' LOCAL_LAST_CHANGED = '20260117150619.0368210'  )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_AGENT_CONTROLLER' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_AGENT_CONTROLLER' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117150738.0236420' LOCAL_LAST_CHANGED = '20260117150738.0236420'
-" )
+    " )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_AGENT_UTIL' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_AGENT_UTIL' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117150935.4567820' LOCAL_LAST_CHANGED = '20260117150935.4567820'  )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_PAYLOAD' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_PAYLOAD' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117151018.7600370' LOCAL_LAST_CHANGED = '20260117151018.7600370'  )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_ADF_SERVICE' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_ADF_SERVICE' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117151237.1192170' LOCAL_LAST_CHANGED = '20260117151237.1192170'  )
 *( CLIENT = '100' SERVICE = 'ZPRU_IF_DUMMY_AGENT_LOGIC' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_DUMMY_AGENT_LOGIC' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117152144.6419870' LOCAL_LAST_CHANGED = '20260117152144.6419870
-"'  )
+    "'  )
 *( CLIENT = '100' SERVICE = 'IF_AIC_COMPLETION_API' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_AIC_COMPLETION_API' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117152251.0551680' LOCAL_LAST_CHANGED = '20260117152251.0551680'
-")
+    ")
 *( CLIENT = '100' SERVICE = 'IF_AIC_COMPLETION_API_RESULT' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_AIC_COMPLETION_API_RES' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117152343.0309600'
 *LOCAL_LAST_CHANGED = '20260117152343.0309600'  )
 *( CLIENT = '100' SERVICE = 'IF_AIC_COMPLETION_PARAMETERS' CONTEXT = 'STANDARD' CLASS = 'ZPRU_CL_AIC_COMPLETION_PARAM' CREATED_BY = '' CREATED_AT = '0.0000000' CHANGED_BY = '' LAST_CHANGED = '20260117152423.9709400'
@@ -500,6 +501,14 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     lo_input_schema_provider = NEW lcl_input_schema_provider( ).
     ro_input_schema = lo_input_schema_provider->get_input_schema( is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step ).
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_info_provider~get_tool_info.
+    DATA lo_tool_info_provider TYPE REF TO zpru_if_tool_info_provider.
+
+    lo_tool_info_provider = NEW lcl_tool_info_provider( ).
+    rv_tool_info = lo_tool_info_provider->get_tool_info( is_tool_master_data = is_tool_master_data
+                                               is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~get_mem_volume.

@@ -4,6 +4,7 @@ CLASS zpru_cl_nested_agent_info DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+  inteRFACES ZPRU_IF_AGENT_INFO_PROVIDER.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -11,4 +12,8 @@ ENDCLASS.
 
 
 CLASS zpru_cl_nested_agent_info IMPLEMENTATION.
+  METHOD zpru_if_agent_info_provider~get_agent_info.
+
+  ENDMETHOD.
+
 ENDCLASS.

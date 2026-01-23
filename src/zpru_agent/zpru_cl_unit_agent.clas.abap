@@ -21,8 +21,8 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
 
     TRY.
         lo_api_agent->initialize( EXPORTING iv_agent_name = iv_agent_name
+                                            io_parent_controller = io_parent_controller
                                   IMPORTING es_agent      = DATA(ls_agent)
-                                  " TODO: variable is assigned but never used (ABAP cleaner)
                                             et_tools      = DATA(lt_tools) ).
 
         lo_api_agent->set_input_query( iv_input_query = iv_input_query

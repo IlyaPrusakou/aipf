@@ -524,13 +524,22 @@ ENDCLASS.
 
 CLASS lcl_nested_agent IMPLEMENTATION.
   METHOD zpru_if_nested_agent_runner~run_nested_agent.
-    DATA lv_payload TYPE string.
+    DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
+    DATA lv_input_query    TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
 
     zpru_cl_dummy_agent_logic=>ms_method_registr-nested_agent = abap_true.
-    GET TIME STAMP FIELD DATA(lv_now).
-    lv_payload = io_request->get_data( )->*.
-    lv_payload = |{ lv_payload } - NESTED AGENT TOOL VISITED - { lv_now }|.
-    eo_response->set_data( ir_data = NEW string( lv_payload ) ).
+
+    lo_nested_agent = NEW zpru_cl_unit_agent( ).
+
+    lv_input_query = io_request->get_data( )->*.
+
+    lo_nested_agent->execute_agent( EXPORTING iv_agent_name        = 'NESTED_AGENT'
+                                              iv_input_query       = lv_input_query
+                                              io_parent_controller = io_controller
+                                    IMPORTING ev_final_response    = lv_final_response ).
+
+    eo_response->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( lv_final_response ) ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -1050,5 +1059,53 @@ CLASS lcl_tool_provider IMPLEMENTATION.
       WHEN OTHERS.
         RETURN.
     ENDCASE.
+  ENDMETHOD.
+ENDCLASS.
+
+
+CLASS lcl_tool_info_provider DEFINITION
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+    INTERFACES zpru_if_tool_info_provider.
+ENDCLASS.
+
+
+CLASS lcl_tool_info_provider IMPLEMENTATION.
+  METHOD zpru_if_tool_info_provider~get_tool_info.
+    zpru_cl_dummy_agent_logic=>ms_method_registr-get_tool = abap_true.
+
+*    CASE is_tool_master_data-tool_name.
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+*        ro_executor = NEW lcl_nested_agent( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+*        ro_executor = NEW lcl_knowledge( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+*        ro_executor = NEW lcl_abap_code_tool( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+*        ro_executor = NEW lcl_http_request_tool( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+*        ro_executor = NEW lcl_service_cons_model_tool( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+*        ro_executor = NEW lcl_call_llm_tool( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+*        ro_executor = NEW lcl_dynamic_abap_code_tool( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+*        ro_executor = NEW lcl_ml_model_inference( ).
+*
+*      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+*        ro_executor = NEW lcl_user_tool( ).
+*
+*      WHEN OTHERS.
+*        RETURN.
+*    ENDCASE.
   ENDMETHOD.
 ENDCLASS.
