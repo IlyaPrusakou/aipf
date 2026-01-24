@@ -1006,11 +1006,161 @@ CLASS lcl_user_tool DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_executor.
     INTERFACES zpru_if_user_tool.
+
+  PROTECTED SECTION.
+    METHODS process_dummy_email
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
+
+    METHODS process_prod_email
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
+
+    METHODS prepare_dummy_email
+      IMPORTING iv_sender       TYPE zpru_cl_bcs_mail_message=>ty_address
+                iv_recipient    TYPE zpru_cl_bcs_mail_message=>ty_address
+                iv_subject      TYPE zpru_cl_bcs_mail_message=>ty_subject
+                iv_content      TYPE string
+                iv_content_type TYPE char128
+      EXPORTING eo_mail_manager TYPE REF TO zpru_cl_bcs_mail_message.
 ENDCLASS.
 
 
 CLASS lcl_user_tool IMPLEMENTATION.
   METHOD zpru_if_user_tool~execute_user_tool.
+    IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
+
+      process_dummy_email( EXPORTING io_controller = io_controller
+                                     io_request    = io_request
+                           IMPORTING eo_response   = eo_response
+                                     ev_error_flag = ev_error_flag ).
+
+    ELSE.
+      process_prod_email( EXPORTING io_controller = io_controller
+                                    io_request    = io_request
+                          IMPORTING eo_response   = eo_response
+                                    ev_error_flag = ev_error_flag ).
+
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD process_dummy_email.
+    " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
+    " TODO: parameter EO_RESPONSE is never cleared or assigned (ABAP cleaner)
+
+    DATA lv_sender       TYPE cl_bcs_mail_message=>ty_address.
+    DATA lv_recipient    TYPE cl_bcs_mail_message=>ty_address.
+    DATA lv_subject      TYPE cl_bcs_mail_message=>ty_subject.
+    DATA lv_content      TYPE string.
+    DATA lv_content_type TYPE cl_bcs_mail_bodypart=>ty_content_type.
+    DATA lo_util         TYPE REF TO zpru_if_agent_util.
+    DATA lv_input        TYPE zpru_if_agent_frw=>ts_json.
+
+    ev_error_flag = abap_false.
+
+    TRY.
+        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RETURN.
+    ENDTRY.
+
+    lv_input =  io_request->get_data( )->*.
+
+    lv_sender = lo_util->search_node_in_json( iv_json           = lv_input
+                                              iv_field_2_search = 'sender' ).
+
+    lv_recipient = lo_util->search_node_in_json( iv_json           = lv_input
+                                                 iv_field_2_search = 'recipient' ).
+
+    lv_subject = lo_util->search_node_in_json( iv_json           = lv_input
+                                               iv_field_2_search = 'subject' ).
+
+    lv_content = lo_util->search_node_in_json( iv_json           = lv_input
+                                               iv_field_2_search = 'content' ).
+
+    lv_content = lo_util->search_node_in_json( iv_json           = lv_input
+                                               iv_field_2_search = 'content_type' ).
+
+    TRY.
+        prepare_dummy_email( EXPORTING iv_sender       = lv_sender
+                                       iv_recipient    = lv_recipient
+                                       iv_subject      = lv_subject
+                                       iv_content      = lv_content
+                                       iv_content_type = lv_content_type
+                             IMPORTING eo_mail_manager = DATA(lo_mail_manager) ).
+
+        lo_mail_manager->send( IMPORTING ev_mail_status = DATA(lv_email_status) ).
+
+        IF lv_email_status = 'E'.
+          ev_error_flag = abap_true.
+          RETURN.
+        ENDIF.
+
+        DATA(lv_response) = |EMAIL TO { lv_recipient } HAS BEEN SENT SUCCESSFULLY|.
+
+        DATA(lv_output) =  lo_util->append_json_to_json(
+           EXPORTING
+             iv_field_4_append = 'email_response'
+             iv_json_4_append  = lv_response
+             iv_json_target    = lv_input ).
+
+        eo_response->set_data( NEW string( lv_output ) ).
+
+      CATCH cx_bcs_mail.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD prepare_dummy_email.
+    TRY.
+        eo_mail_manager = zpru_cl_bcs_mail_message=>create_instance( ).
+        eo_mail_manager->set_sender( iv_sender ).
+        eo_mail_manager->add_recipient( iv_recipient ).
+        eo_mail_manager->set_subject( iv_subject ).
+
+        DATA(lo_email_message) = zpru_cl_mail_bodypart=>create_instance( iv_content      = iv_content
+                                                                         iv_content_type = iv_content_type ).
+
+        eo_mail_manager->set_main( lo_email_message ).
+      CATCH cx_bcs_mail.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD process_prod_email.
+*    DATA lo_mail_manager TYPE REF TO cl_bcs_mail_message.
+*    DATA lv_sender       TYPE cl_bcs_mail_message=>ty_address.
+*    DATA lv_recipient    TYPE cl_bcs_mail_message=>ty_address.
+*    DATA lv_subject      TYPE cl_bcs_mail_message=>ty_subject.
+*    DATA lv_content      TYPE string.
+*    DATA lv_content_type TYPE cl_bcs_mail_bodypart=>ty_content_type.
+*
+*    lv_sender = `my.email@gmail.com`.
+*    lv_recipient = `your.email@gmail.com`.
+*    lv_subject = `CMR processing`.
+*    lv_content = `Let's discuss CMR process`.
+*    lv_content_type = 'text/html'.
+*
+*
+*    TRY.
+*        lo_mail_manager = cl_bcs_mail_message=>create_instance( ).
+*        lo_mail_manager->set_sender( lv_sender ).
+*        lo_mail_manager->add_recipient( lv_recipient ).
+*        lo_mail_manager->set_subject( lv_subject ).
+*
+*        DATA(lo_email_message) = cl_bcs_mail_textpart=>create_instance( iv_content      = lv_content
+*                                                                        iv_content_type = lv_content_type ).
+*
+*        lo_mail_manager->set_main( lo_email_message ).
+*
+*        lo_mail_manager->send( IMPORTING et_status      = DATA(lt_status)
+*                                         ev_mail_status = DATA(lv_email_status) ).
+*
+*      CATCH cx_bcs_mail.
+*    ENDTRY.
   ENDMETHOD.
 ENDCLASS.
 
