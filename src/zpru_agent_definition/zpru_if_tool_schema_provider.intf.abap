@@ -1,4 +1,4 @@
-INTERFACE zpru_if_input_schema_provider
+INTERFACE zpru_if_tool_schema_provider
   PUBLIC.
 
   METHODS input_rtts_schema

@@ -548,13 +548,13 @@ CLASS lcl_schema_provider DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    INTERFACES zpru_if_input_schema_provider.
+    INTERFACES zpru_if_tool_schema_provider.
 ENDCLASS.
 
 
 CLASS lcl_schema_provider IMPLEMENTATION.
 
-  METHOD zpru_if_input_schema_provider~input_json_schema.
+  METHOD zpru_if_tool_schema_provider~input_json_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
     CASE is_tool_master_data-tool_name.
       WHEN 'DUMMY_CODE'.
@@ -567,7 +567,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~input_rtts_schema.
+  METHOD zpru_if_tool_schema_provider~input_rtts_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
     CASE is_tool_master_data-tool_name.
       WHEN 'DUMMY_CODE'.
@@ -580,7 +580,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~output_json_schema.
+  METHOD zpru_if_tool_schema_provider~output_json_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
     CASE is_tool_master_data-tool_name.
       WHEN 'DUMMY_CODE'.
@@ -593,7 +593,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~output_rtts_schema.
+  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
     CASE is_tool_master_data-tool_name.
       WHEN 'DUMMY_CODE'.

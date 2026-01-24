@@ -11,7 +11,7 @@ CLASS zpru_cl_dummy_agent_logic DEFINITION
     INTERFACES zpru_if_agent_info_provider.
     INTERFACES zpru_if_prompt_provider.
     INTERFACES zpru_if_tool_provider.
-    INTERFACES zpru_if_input_schema_provider.
+    INTERFACES zpru_if_tool_schema_provider.
     INTERFACES zpru_if_tool_info_provider.
 
     TYPES: BEGIN OF ts_gate_pass_assessment,
@@ -495,32 +495,32 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
                                               is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~input_json_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_input_schema_provider.
+  METHOD zpru_if_tool_schema_provider~input_json_schema.
+    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
 
     lo_input_schema_provider = NEW lcl_schema_provider( ).
     ro_json_schema = lo_input_schema_provider->input_json_schema( is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~input_rtts_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_input_schema_provider.
+  METHOD zpru_if_tool_schema_provider~input_rtts_schema.
+    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
 
     lo_input_schema_provider = NEW lcl_schema_provider( ).
     ro_structure_schema = lo_input_schema_provider->input_rtts_schema( is_tool_master_data = is_tool_master_data
                                                                        is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~output_json_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_input_schema_provider.
+  METHOD zpru_if_tool_schema_provider~output_json_schema.
+    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
 
     lo_input_schema_provider = NEW lcl_schema_provider( ).
     ro_json_schema = lo_input_schema_provider->output_json_schema( is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_input_schema_provider~output_rtts_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_input_schema_provider.
+  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
+    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
 
     lo_input_schema_provider = NEW lcl_schema_provider( ).
     ro_structure_schema = lo_input_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
