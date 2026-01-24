@@ -60,19 +60,19 @@ annotate entity ZC_PRU_AGENT_TOOL with
     position: 40
   } ]
   StepType;
-  @EndUserText.label: 'InputSchemaProvider'
+  @EndUserText.label: 'ToolSchemaProvider'
   @UI.identification: [ {
     position: 50 ,
-    label: 'InputSchemaProvider'
+    label: 'ToolSchemaProvider'
   } ]
   @UI.lineItem: [ {
     position: 50 ,
-    label: 'InputSchemaProvider'
+    label: 'ToolSchemaProvider'
   } ]
   @UI.selectionField: [ {
     position: 50
   } ]
-  InputSchemaProvider;
+  ToolSchemaProvider;
   @EndUserText.label: 'ToolInfoProvider'
   @UI.identification: [ {
     position: 60 ,

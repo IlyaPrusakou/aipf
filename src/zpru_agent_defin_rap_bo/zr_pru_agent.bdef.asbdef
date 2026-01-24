@@ -75,7 +75,7 @@ authorization dependent by _agent
       ToolName            = tool_name;
       ToolProvider        = tool_provider;
       StepType            = step_type;
-      InputSchemaProvider = input_schema_provider;
+      ToolSchemaProvider = tool_schema_provider;
       ToolInfoProvider    = tool_info_provider;
     }
 }

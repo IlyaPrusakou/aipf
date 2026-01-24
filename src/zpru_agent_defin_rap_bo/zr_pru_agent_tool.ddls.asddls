@@ -10,7 +10,7 @@ define view entity ZR_PRU_AGENT_TOOL
       tool_name             as ToolName,
       tool_provider         as ToolProvider,
       step_type             as StepType,
-      input_schema_provider as InputSchemaProvider,
+      tool_schema_provider as ToolSchemaProvider,
       tool_info_provider    as ToolInfoProvider,
       _agent 
 }

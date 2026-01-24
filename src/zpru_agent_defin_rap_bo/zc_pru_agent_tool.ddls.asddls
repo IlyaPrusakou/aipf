@@ -10,7 +10,7 @@ define view entity ZC_PRU_AGENT_TOOL
       ToolName,
       ToolProvider,
       StepType,
-      InputSchemaProvider,
+      ToolSchemaProvider,
       ToolInfoProvider,
       /* Associations */
       _agent : redirected to parent ZC_PRU_AGENT
