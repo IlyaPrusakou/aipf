@@ -26,12 +26,12 @@ CLASS lcl_decision_provider IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
     <ls_execution_plan>-agent_uuid = is_agent-agent_uuid.
-    <ls_execution_plan>-tool_name  = 'SIMPLE_TOOL'.
+    <ls_execution_plan>-tool_name  = 'DUMMY_CODE'.
     <ls_execution_plan>-sequence   = 1.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
     <ls_execution_plan>-agent_uuid = is_agent-agent_uuid.
-    <ls_execution_plan>-tool_name  = 'KNOWLEDGE'.
+    <ls_execution_plan>-tool_name  = 'DUMMY_KNOWLEDGE'.
     <ls_execution_plan>-sequence   = 2.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
@@ -544,7 +544,7 @@ CLASS lcl_nested_agent IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_input_schema_provider DEFINITION
+CLASS lcl_schema_provider DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
@@ -552,22 +552,60 @@ CLASS lcl_input_schema_provider DEFINITION
 ENDCLASS.
 
 
-CLASS lcl_input_schema_provider IMPLEMENTATION.
-  METHOD zpru_if_input_schema_provider~get_input_schema.
-    DATA lv_input_schema TYPE string.
+CLASS lcl_schema_provider IMPLEMENTATION.
 
+  METHOD zpru_if_input_schema_provider~input_json_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
     CASE is_tool_master_data-tool_name.
-      WHEN 'SIMPLE_TOOL'.
-        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
-      WHEN 'KNOWLEDGE'.
-        lv_input_schema = |KNOWLEDGE_SCHEMA"|.
+      WHEN 'DUMMY_CODE'.
+*        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
+      WHEN 'DUMMY_KNOWLEDGE'.
+*        lv_input_schema = |KNOWLEDGE_SCHEMA"|.
       WHEN 'NESTED_AGENT'.
-        lv_input_schema = |NESTED_AGENT_SCHEMA|.
+*        lv_input_schema = |NESTED_AGENT_SCHEMA|.
       WHEN OTHERS.
     ENDCASE.
-    ro_input_schema->set_data( ir_data = NEW string( lv_input_schema ) ).
   ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~input_rtts_schema.
+    zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
+    CASE is_tool_master_data-tool_name.
+      WHEN 'DUMMY_CODE'.
+*        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
+      WHEN 'DUMMY_KNOWLEDGE'.
+*        lv_input_schema = |KNOWLEDGE_SCHEMA"|.
+      WHEN 'NESTED_AGENT'.
+*        lv_input_schema = |NESTED_AGENT_SCHEMA|.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~output_json_schema.
+    zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
+    CASE is_tool_master_data-tool_name.
+      WHEN 'DUMMY_CODE'.
+*        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
+      WHEN 'DUMMY_KNOWLEDGE'.
+*        lv_input_schema = |KNOWLEDGE_SCHEMA"|.
+      WHEN 'NESTED_AGENT'.
+*        lv_input_schema = |NESTED_AGENT_SCHEMA|.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~output_rtts_schema.
+    zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
+    CASE is_tool_master_data-tool_name.
+      WHEN 'DUMMY_CODE'.
+*        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
+      WHEN 'DUMMY_KNOWLEDGE'.
+*        lv_input_schema = |KNOWLEDGE_SCHEMA"|.
+      WHEN 'NESTED_AGENT'.
+*        lv_input_schema = |NESTED_AGENT_SCHEMA|.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
 ENDCLASS.
 
 

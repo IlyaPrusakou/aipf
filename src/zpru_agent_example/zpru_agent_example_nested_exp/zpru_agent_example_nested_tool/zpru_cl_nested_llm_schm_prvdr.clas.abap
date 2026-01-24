@@ -13,7 +13,19 @@ ENDCLASS.
 
 CLASS zpru_cl_nested_llm_schm_prvdr IMPLEMENTATION.
 
-  METHOD zpru_if_input_schema_provider~get_input_schema.
+  METHOD zpru_if_input_schema_provider~input_json_schema.
+
+  ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~input_rtts_schema.
+
+  ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~output_json_schema.
+
+  ENDMETHOD.
+
+  METHOD zpru_if_input_schema_provider~output_rtts_schema.
 
   ENDMETHOD.
 
