@@ -76,6 +76,7 @@ authorization dependent by _executionheader
       StartTimestamp  = start_timestamp;
       EndTimestamp    = end_timestamp;
       InputPrompt     = input_prompt;
+      DecisionLog     = decision_log;
       OutputResponse  = output_response;
     }
 
@@ -108,6 +109,7 @@ authorization dependent by _executionheader
       RunUuid        = run_uuid;
       ToolUuid       = tool_uuid;
       ExecutionSeq   = execution_seq;
+      StepStatus     = step_status;
       StartTimestamp = start_timestamp;
       EndTimestamp   = end_timestamp;
       InputPrompt    = input_prompt;

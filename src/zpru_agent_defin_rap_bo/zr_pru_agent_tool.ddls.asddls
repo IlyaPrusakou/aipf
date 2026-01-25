@@ -12,5 +12,7 @@ define view entity ZR_PRU_AGENT_TOOL
       step_type             as StepType,
       tool_schema_provider as ToolSchemaProvider,
       tool_info_provider    as ToolInfoProvider,
+      is_borrowed   as IsBorrowed, 
+      is_transient  as IsTransient,
       _agent 
 }

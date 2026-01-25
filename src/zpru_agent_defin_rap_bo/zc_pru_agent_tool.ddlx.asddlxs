@@ -87,4 +87,34 @@ annotate entity ZC_PRU_AGENT_TOOL with
   } ]
   ToolInfoProvider;
 
+  @EndUserText.label: 'IsBorrowed'
+  @UI.identification: [ {
+    position: 70 ,
+    label: 'IsBorrowed'
+  } ]
+  @UI.lineItem: [ {
+    position: 70 ,
+    label: 'IsBorrowed'
+  } ]
+  @UI.selectionField: [ {
+    position: 70
+  } ]
+  IsBorrowed;
+
+  @EndUserText.label: 'IsTransient'
+  @UI.identification: [ {
+    position: 80 ,
+    label: 'IsTransient'
+  } ]
+  @UI.lineItem: [ {
+    position: 80 ,
+    label: 'IsTransient'
+  } ]
+  @UI.selectionField: [ {
+    position: 80
+  } ]
+  IsTransient;
+
+
+
 }

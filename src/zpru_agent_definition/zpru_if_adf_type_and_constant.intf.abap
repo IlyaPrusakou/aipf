@@ -89,6 +89,8 @@ INTERFACE zpru_if_adf_type_and_constant
            step_type             TYPE abap_boolean,
            tool_schema_provider TYPE abap_boolean,
            tool_info_provider    TYPE abap_boolean,
+           is_borrowed TYPE abap_boolean,
+           is_transient TYPE abap_boolean,
          END OF ts_tool_control.
 
   TYPES: BEGIN OF ts_rba_tool_k,

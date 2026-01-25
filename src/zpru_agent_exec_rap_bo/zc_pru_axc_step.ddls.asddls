@@ -11,6 +11,7 @@ define view entity ZC_PRU_AXC_STEP
       RunUuid,
       ToolUuid,
       ExecutionSeq,
+      StepStatus,
       StartTimestamp,
       EndTimestamp,
       InputPrompt,

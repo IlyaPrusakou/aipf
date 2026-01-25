@@ -13,6 +13,7 @@ define view entity ZC_PRU_AXC_QUERY
       StartTimestamp,
       EndTimestamp,
       InputPrompt,
+      DecisionLog,
       OutputResponse,
       /* Associations */
       _executionheader : redirected to parent ZC_PRU_AXC_HEAD,
