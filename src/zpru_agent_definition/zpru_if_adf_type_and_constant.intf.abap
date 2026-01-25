@@ -87,7 +87,7 @@ INTERFACE zpru_if_adf_type_and_constant
            tool_name             TYPE abap_boolean,
            tool_provider         TYPE abap_boolean,
            step_type             TYPE abap_boolean,
-           input_schema_provider TYPE abap_boolean,
+           tool_schema_provider TYPE abap_boolean,
            tool_info_provider    TYPE abap_boolean,
          END OF ts_tool_control.
 

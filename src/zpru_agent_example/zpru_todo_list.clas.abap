@@ -68,6 +68,11 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 *DURING MINI LOOP WE CAN GET TOOLS IN EXECUTION WHICH HAS NO DEFINITION. TWO CASES( 1 BORROWED FROM ANOTHER DEFINITION 2 WITHOUT DEFINITION)
 
+* rename fields in db and structures without underscore
+
+* add field to tool def table is_borrowed, is_transient
+* add field to query table decision_log
+* add field to step table step_status
 
   ENDMETHOD.
 

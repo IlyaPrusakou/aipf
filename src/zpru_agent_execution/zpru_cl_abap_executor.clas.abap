@@ -14,7 +14,8 @@ CLASS zpru_cl_abap_executor DEFINITION
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
                 io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider   OPTIONAL
       EXPORTING eo_output               TYPE REF TO data
-                ev_error_flag           TYPE abap_boolean.
+                ev_error_flag           TYPE abap_boolean
+                et_additional_step      TYPE zpru_tt_additional_step.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -29,6 +30,10 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
     DATA lv_output_json          TYPE zpru_if_agent_frw=>ts_json.
     DATA lo_popping_agent TYPE REF TO zpru_if_unit_agent.
+
+    CLEAR:       et_additional_steps,
+      et_additional_tools.
+    ev_error_flag = abap_false.
 
     CREATE OBJECT lo_tool_schema_provider TYPE (is_tool_master_data-tool_schema_provider).
     IF sy-subrc <> 0.
@@ -71,7 +76,17 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
                                 io_tool_schema_provider = lo_tool_schema_provider
                                 io_tool_info_provider   = lo_tool_info_provider
                       IMPORTING eo_output               = lr_output
-                                ev_error_flag           = ev_error_flag ).
+                                ev_error_flag           = ev_error_flag
+                                et_additional_step      = DATA(lt_additional_step) ).
+
+    IF lt_additional_step IS NOT INITIAL.
+      validate_additional_steps(
+        EXPORTING
+          it_step_4_validate = lt_additional_step
+        IMPORTING
+          et_additional_steps = et_additional_steps
+          et_additional_tools = et_additional_tools ).
+    ENDIF.
 
     lo_util->convert_to_string( EXPORTING ir_abap   = lr_output
                                 CHANGING  cr_string = lv_output_json ).

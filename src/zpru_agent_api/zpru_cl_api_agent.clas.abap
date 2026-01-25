@@ -195,7 +195,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-tool_name             = abap_true
                                                                    control-tool_provider         = abap_true
                                                                    control-step_type             = abap_true
-                                                                   control-input_schema_provider = abap_true
+                                                                   control-tool_schema_provider = abap_true
                                                                    control-tool_info_provider    = abap_true    ) )
                               IMPORTING et_tool       = DATA(lt_agent_tools)
                               CHANGING  cs_reported   = cs_adf_reported
@@ -653,7 +653,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-tool_name             = abap_true
                                                                    control-tool_provider         = abap_true
                                                                    control-step_type             = abap_true
-                                                                   control-input_schema_provider = abap_true
+                                                                   control-tool_schema_provider = abap_true
                                                                    control-tool_info_provider    = abap_true    ) )
                               IMPORTING et_tool       = et_tools
                               CHANGING  cs_reported   = cs_adf_reported
@@ -1556,7 +1556,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-tool_name             = abap_true
                                                                    control-tool_provider         = abap_true
                                                                    control-step_type             = abap_true
-                                                                   control-input_schema_provider = abap_true
+                                                                   control-tool_schema_provider = abap_true
                                                                    control-tool_info_provider    = abap_true    ) )
                               IMPORTING et_tool       = DATA(lt_agent_tools)
                               CHANGING  cs_reported   = cs_adf_reported
@@ -1682,7 +1682,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-tool_name             = abap_true
                                                                    control-tool_provider         = abap_true
                                                                    control-step_type             = abap_true
-                                                                   control-input_schema_provider = abap_true
+                                                                   control-tool_schema_provider = abap_true
                                                                    control-tool_info_provider    = abap_true    ) )
                               IMPORTING et_tool       = DATA(lt_agent_tools)
                               CHANGING  cs_reported   = cs_adf_reported

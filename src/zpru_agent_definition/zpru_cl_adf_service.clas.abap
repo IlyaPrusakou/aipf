@@ -18,26 +18,6 @@ CLASS zpru_cl_adf_service DEFINITION
       CHANGING  cs_reported                  TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
                 cs_failed                    TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
 
-    METHODS check_decision_provider
-      IMPORTING it_keys     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
-      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
-                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
-
-    METHODS check_short_memory
-      IMPORTING it_keys     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
-      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
-                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
-
-    METHODS check_long_memory
-      IMPORTING it_keys     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
-      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
-                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
-
-    METHODS check_agent_info
-      IMPORTING it_keys     TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k
-      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
-                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed   OPTIONAL.
-
     METHODS db_modify
       IMPORTING iv_do_commit    TYPE abap_boolean
       CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported OPTIONAL
@@ -684,20 +664,20 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
           ENDIF.
 
           APPEND VALUE #(
-              instance-tool_uuid             = <ls_create>-tool_uuid
-              instance-agent_uuid            = <ls_create>-agent_uuid
-              instance-tool_name             = COND #( WHEN <ls_create>-control-tool_name = abap_true
-                                                       THEN <ls_create>-tool_name )
-              instance-tool_provider         = COND #( WHEN <ls_create>-control-tool_provider = abap_true
-                                                       THEN <ls_create>-tool_provider )
-              instance-step_type             = COND #( WHEN <ls_create>-control-step_type = abap_true
-                                                       THEN <ls_create>-step_type )
-              instance-input_schema_provider = COND #( WHEN <ls_create>-control-input_schema_provider = abap_true
-                                                       THEN <ls_create>-input_schema_provider )
-              instance-tool_info_provider    = COND #( WHEN <ls_create>-control-tool_info_provider = abap_true
-                                                       THEN <ls_create>-tool_info_provider )
-              changed                        = abap_true
-              deleted                        = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
+              instance-tool_uuid            = <ls_create>-tool_uuid
+              instance-agent_uuid           = <ls_create>-agent_uuid
+              instance-tool_name            = COND #( WHEN <ls_create>-control-tool_name = abap_true
+                                                      THEN <ls_create>-tool_name )
+              instance-tool_provider        = COND #( WHEN <ls_create>-control-tool_provider = abap_true
+                                                      THEN <ls_create>-tool_provider )
+              instance-step_type            = COND #( WHEN <ls_create>-control-step_type = abap_true
+                                                      THEN <ls_create>-step_type )
+              instance-tool_schema_provider = COND #( WHEN <ls_create>-control-tool_schema_provider = abap_true
+                                                      THEN <ls_create>-tool_schema_provider )
+              instance-tool_info_provider   = COND #( WHEN <ls_create>-control-tool_info_provider = abap_true
+                                                      THEN <ls_create>-tool_info_provider )
+              changed                       = abap_true
+              deleted                       = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
 
           APPEND VALUE #( agent_uuid = <ls_create>-agent_uuid
                           tool_uuid  = <ls_create>-tool_uuid ) TO cs_mapped-tool.
@@ -775,19 +755,19 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                  AND deleted             = abap_false.
 
         CLEAR ls_out.
-        ls_out-tool_uuid             = <ls_t_buf>-instance-tool_uuid.
-        ls_out-agent_uuid            = COND #( WHEN <ls_h>-control-agent_uuid = abap_true
-                                               THEN <ls_t_buf>-instance-agent_uuid ).
-        ls_out-tool_name             = COND #( WHEN <ls_h>-control-tool_name = abap_true
-                                               THEN <ls_t_buf>-instance-tool_name ).
-        ls_out-tool_provider         = COND #( WHEN <ls_h>-control-tool_provider = abap_true
-                                               THEN <ls_t_buf>-instance-tool_provider ).
-        ls_out-step_type             = COND #( WHEN <ls_h>-control-step_type = abap_true
-                                               THEN <ls_t_buf>-instance-step_type ).
-        ls_out-input_schema_provider = COND #( WHEN <ls_h>-control-input_schema_provider = abap_true
-                                               THEN <ls_t_buf>-instance-input_schema_provider ).
-        ls_out-tool_info_provider    = COND #( WHEN <ls_h>-control-tool_info_provider = abap_true
-                                               THEN <ls_t_buf>-instance-tool_info_provider ).
+        ls_out-tool_uuid            = <ls_t_buf>-instance-tool_uuid.
+        ls_out-agent_uuid           = COND #( WHEN <ls_h>-control-agent_uuid = abap_true
+                                              THEN <ls_t_buf>-instance-agent_uuid ).
+        ls_out-tool_name            = COND #( WHEN <ls_h>-control-tool_name = abap_true
+                                              THEN <ls_t_buf>-instance-tool_name ).
+        ls_out-tool_provider        = COND #( WHEN <ls_h>-control-tool_provider = abap_true
+                                              THEN <ls_t_buf>-instance-tool_provider ).
+        ls_out-step_type            = COND #( WHEN <ls_h>-control-step_type = abap_true
+                                              THEN <ls_t_buf>-instance-step_type ).
+        ls_out-tool_schema_provider = COND #( WHEN <ls_h>-control-tool_schema_provider = abap_true
+                                              THEN <ls_t_buf>-instance-tool_schema_provider ).
+        ls_out-tool_info_provider   = COND #( WHEN <ls_h>-control-tool_info_provider = abap_true
+                                              THEN <ls_t_buf>-instance-tool_info_provider ).
 
         APPEND ls_out TO et_tool.
       ENDLOOP.
@@ -840,19 +820,19 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         ENDIF.
 
         CLEAR ls_out.
-        ls_out-tool_uuid             = <ls_buffer>-instance-tool_uuid.
-        ls_out-agent_uuid            = COND #( WHEN <ls_read>-control-agent_uuid = abap_true
-                                               THEN <ls_buffer>-instance-agent_uuid ).
-        ls_out-tool_name             = COND #( WHEN <ls_read>-control-tool_name = abap_true
-                                               THEN <ls_buffer>-instance-tool_name ).
-        ls_out-tool_provider         = COND #( WHEN <ls_read>-control-tool_provider = abap_true
-                                               THEN <ls_buffer>-instance-tool_provider ).
-        ls_out-step_type             = COND #( WHEN <ls_read>-control-step_type = abap_true
-                                               THEN <ls_buffer>-instance-step_type ).
-        ls_out-input_schema_provider = COND #( WHEN <ls_read>-control-input_schema_provider = abap_true
-                                               THEN <ls_buffer>-instance-input_schema_provider ).
-        ls_out-tool_info_provider    = COND #( WHEN <ls_read>-control-tool_info_provider = abap_true
-                                               THEN <ls_buffer>-instance-tool_info_provider ).
+        ls_out-tool_uuid            = <ls_buffer>-instance-tool_uuid.
+        ls_out-agent_uuid           = COND #( WHEN <ls_read>-control-agent_uuid = abap_true
+                                              THEN <ls_buffer>-instance-agent_uuid ).
+        ls_out-tool_name            = COND #( WHEN <ls_read>-control-tool_name = abap_true
+                                              THEN <ls_buffer>-instance-tool_name ).
+        ls_out-tool_provider        = COND #( WHEN <ls_read>-control-tool_provider = abap_true
+                                              THEN <ls_buffer>-instance-tool_provider ).
+        ls_out-step_type            = COND #( WHEN <ls_read>-control-step_type = abap_true
+                                              THEN <ls_buffer>-instance-step_type ).
+        ls_out-tool_schema_provider = COND #( WHEN <ls_read>-control-tool_schema_provider = abap_true
+                                              THEN <ls_buffer>-instance-tool_schema_provider ).
+        ls_out-tool_info_provider   = COND #( WHEN <ls_read>-control-tool_info_provider = abap_true
+                                              THEN <ls_buffer>-instance-tool_info_provider ).
 
         APPEND ls_out TO et_tool.
 
@@ -909,21 +889,21 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_update>-agent_uuid
                                               instance-tool_uuid  = <ls_update>-tool_uuid ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0 AND <ls_buffer>-deleted = abap_false.
-        <ls_buffer>-instance-tool_name             = COND #( WHEN <ls_update>-control-tool_name = abap_true
-                                                             THEN <ls_update>-tool_name
-                                                             ELSE <ls_buffer>-instance-tool_name ).
-        <ls_buffer>-instance-tool_provider         = COND #( WHEN <ls_update>-control-tool_provider = abap_true
-                                                             THEN <ls_update>-tool_provider
-                                                             ELSE <ls_buffer>-instance-tool_provider ).
-        <ls_buffer>-instance-step_type             = COND #( WHEN <ls_update>-control-step_type = abap_true
-                                                             THEN <ls_update>-step_type
-                                                             ELSE <ls_buffer>-instance-step_type ).
-        <ls_buffer>-instance-input_schema_provider = COND #( WHEN <ls_update>-control-input_schema_provider = abap_true
-                                                             THEN <ls_update>-input_schema_provider
-                                                             ELSE <ls_buffer>-instance-input_schema_provider ).
-        <ls_buffer>-instance-tool_info_provider    = COND #( WHEN <ls_update>-control-tool_info_provider = abap_true
-                                                             THEN <ls_update>-tool_info_provider
-                                                             ELSE <ls_buffer>-instance-tool_info_provider ).
+        <ls_buffer>-instance-tool_name            = COND #( WHEN <ls_update>-control-tool_name = abap_true
+                                                            THEN <ls_update>-tool_name
+                                                            ELSE <ls_buffer>-instance-tool_name ).
+        <ls_buffer>-instance-tool_provider        = COND #( WHEN <ls_update>-control-tool_provider = abap_true
+                                                            THEN <ls_update>-tool_provider
+                                                            ELSE <ls_buffer>-instance-tool_provider ).
+        <ls_buffer>-instance-step_type            = COND #( WHEN <ls_update>-control-step_type = abap_true
+                                                            THEN <ls_update>-step_type
+                                                            ELSE <ls_buffer>-instance-step_type ).
+        <ls_buffer>-instance-tool_schema_provider = COND #( WHEN <ls_update>-control-tool_schema_provider = abap_true
+                                                            THEN <ls_update>-tool_schema_provider
+                                                            ELSE <ls_buffer>-instance-tool_schema_provider ).
+        <ls_buffer>-instance-tool_info_provider   = COND #( WHEN <ls_update>-control-tool_info_provider = abap_true
+                                                            THEN <ls_update>-tool_info_provider
+                                                            ELSE <ls_buffer>-instance-tool_info_provider ).
         <ls_buffer>-changed = abap_true.
 
       ELSE.
@@ -1054,22 +1034,33 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~validate.
+    DATA lo_adf_validator TYPE REF TO zpru_if_adf_validator.
+
+    TRY.
+        lo_adf_validator ?= zpru_cl_agent_service_mngr=>get_service(
+                                iv_service = `ZPRU_IF_ADF_VALIDATOR`
+                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+    ENDTRY.
+
     IF it_check_decision_provider_v IS NOT INITIAL.
-      check_decision_provider( EXPORTING it_keys     = it_check_decision_provider_v
-                               CHANGING  cs_reported = cs_reported
-                                         cs_failed   = cs_failed ).
+
+      lo_adf_validator->check_decision_provider( EXPORTING it_keys     = it_check_decision_provider_v
+                                                 CHANGING  cs_reported = cs_reported
+                                                           cs_failed   = cs_failed ).
     ENDIF.
 
     IF it_check_short_memory_v IS NOT INITIAL.
-      check_short_memory( EXPORTING it_keys     = it_check_short_memory_v
-                          CHANGING  cs_reported = cs_reported
-                                    cs_failed   = cs_failed ).
+      lo_adf_validator->check_short_memory( EXPORTING it_keys     = it_check_short_memory_v
+                                            CHANGING  cs_reported = cs_reported
+                                                      cs_failed   = cs_failed ).
     ENDIF.
 
     IF it_check_long_memory_v IS NOT INITIAL.
-      check_long_memory( EXPORTING it_keys     = it_check_long_memory_v
-                         CHANGING  cs_reported = cs_reported
-                                   cs_failed   = cs_failed ).
+      lo_adf_validator->check_long_memory( EXPORTING it_keys     = it_check_long_memory_v
+                                           CHANGING  cs_reported = cs_reported
+                                                     cs_failed   = cs_failed ).
     ENDIF.
   ENDMETHOD.
 
@@ -1385,387 +1376,4 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     et_check_decision_provider_v = lt_check_decision_provider_v.
   ENDMETHOD.
 
-  METHOD check_decision_provider.
-    DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
-    DATA lo_abap_objectdescr TYPE REF TO cl_abap_objectdescr.
-    DATA lo_util             TYPE REF TO zpru_if_agent_util.
-
-    IF it_keys IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    zpru_if_adf_service~read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                                                         ( agent_uuid                = <ls_k>-agent_uuid
-                                                                           control-decision_provider = abap_true ) )
-                                    IMPORTING et_agent        = DATA(lt_agent)
-                                    CHANGING  cs_reported     = cs_reported
-                                              cs_failed       = cs_failed ).
-
-    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
-
-      IF <ls_agent>-decision_provider IS INITIAL.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `002`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = <ls_agent>-decision_provider
-                                           RECEIVING  p_descr_ref    = lo_type_descr
-                                           EXCEPTIONS type_not_found = 1
-                                                      OTHERS         = 99  ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `003`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-decision_provider
-                                         iv_v2       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      TRY.
-          lo_abap_objectdescr = CAST cl_abap_objectdescr( lo_type_descr ).
-        CATCH cx_sy_move_cast_error.
-          APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-          <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-          <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-          APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                          msg        = lo_util->new_message(
-                                           iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                           iv_number   = `005`
-                                           iv_severity = zpru_if_agent_message=>sc_severity-error
-                                           iv_v1       = <ls_agent>-decision_provider ) )
-                 TO cs_reported-agent.
-          CONTINUE.
-      ENDTRY.
-
-      lo_abap_objectdescr->get_interface_type( EXPORTING  p_name              = 'ZPRU_IF_DECISION_PROVIDER'
-                                               EXCEPTIONS interface_not_found = 1
-                                                          OTHERS              = 2 ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `004`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-decision_provider
-                                         iv_v2       = 'ZPRU_IF_DECISION_PROVIDER'
-                                         iv_v3       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
-  METHOD check_short_memory.
-    DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
-    DATA lo_abap_objectdescr TYPE REF TO cl_abap_objectdescr.
-    DATA lo_util             TYPE REF TO zpru_if_agent_util.
-
-    IF it_keys IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    zpru_if_adf_service~read_agent(
-      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                           ( agent_uuid                    = <ls_k>-agent_uuid
-                                             control-short_memory_provider = abap_true ) )
-      IMPORTING et_agent        = DATA(lt_agent)
-      CHANGING  cs_reported     = cs_reported
-                cs_failed       = cs_failed ).
-
-    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
-
-      IF <ls_agent>-short_memory_provider IS INITIAL.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `006`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = <ls_agent>-short_memory_provider
-                                           RECEIVING  p_descr_ref    = lo_type_descr
-                                           EXCEPTIONS type_not_found = 1
-                                                      OTHERS         = 99  ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `003`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-short_memory_provider
-                                         iv_v2       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      TRY.
-          lo_abap_objectdescr = CAST cl_abap_objectdescr( lo_type_descr ).
-        CATCH cx_sy_move_cast_error.
-          APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-          <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-          <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-          APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                          msg        = lo_util->new_message(
-                                           iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                           iv_number   = `005`
-                                           iv_severity = zpru_if_agent_message=>sc_severity-error
-                                           iv_v1       = <ls_agent>-short_memory_provider ) )
-                 TO cs_reported-agent.
-          CONTINUE.
-      ENDTRY.
-
-      lo_abap_objectdescr->get_interface_type( EXPORTING  p_name              = 'ZPRU_IF_SHORT_MEMORY_PROVIDER'
-                                               EXCEPTIONS interface_not_found = 1
-                                                          OTHERS              = 2 ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `004`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-short_memory_provider
-                                         iv_v2       = 'ZPRU_IF_SHORT_MEMORY_PROVIDER'
-                                         iv_v3       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
-  METHOD check_long_memory.
-    DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
-    DATA lo_abap_objectdescr TYPE REF TO cl_abap_objectdescr.
-    DATA lo_util             TYPE REF TO zpru_if_agent_util.
-
-    IF it_keys IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    zpru_if_adf_service~read_agent(
-      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                           ( agent_uuid                   = <ls_k>-agent_uuid
-                                             control-long_memory_provider = abap_true ) )
-      IMPORTING et_agent        = DATA(lt_agent)
-      CHANGING  cs_reported     = cs_reported
-                cs_failed       = cs_failed ).
-
-    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
-
-      IF <ls_agent>-long_memory_provider IS INITIAL.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `007`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = <ls_agent>-long_memory_provider
-                                           RECEIVING  p_descr_ref    = lo_type_descr
-                                           EXCEPTIONS type_not_found = 1
-                                                      OTHERS         = 99  ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `003`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-long_memory_provider
-                                         iv_v2       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      TRY.
-          lo_abap_objectdescr = CAST cl_abap_objectdescr( lo_type_descr ).
-        CATCH cx_sy_move_cast_error.
-          APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-          <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-          <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-          APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                          msg        = lo_util->new_message(
-                                           iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                           iv_number   = `005`
-                                           iv_severity = zpru_if_agent_message=>sc_severity-error
-                                           iv_v1       = <ls_agent>-long_memory_provider ) )
-                 TO cs_reported-agent.
-          CONTINUE.
-      ENDTRY.
-
-      lo_abap_objectdescr->get_interface_type( EXPORTING  p_name              = 'ZPRU_IF_LONG_MEMORY_PROVIDER'
-                                               EXCEPTIONS interface_not_found = 1
-                                                          OTHERS              = 2 ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `004`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-long_memory_provider
-                                         iv_v2       = 'ZPRU_IF_LONG_MEMORY_PROVIDER'
-                                         iv_v3       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
-  METHOD check_agent_info.
-    DATA lo_type_descr       TYPE REF TO cl_abap_typedescr.
-    DATA lo_abap_objectdescr TYPE REF TO cl_abap_objectdescr.
-    DATA lo_util             TYPE REF TO zpru_if_agent_util.
-
-    IF it_keys IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    zpru_if_adf_service~read_agent(
-      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN it_keys
-                                           ( agent_uuid                  = <ls_k>-agent_uuid
-                                             control-agent_info_provider = abap_true ) )
-      IMPORTING et_agent        = DATA(lt_agent)
-      CHANGING  cs_reported     = cs_reported
-                cs_failed       = cs_failed ).
-
-    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>) WHERE agent_info_provider IS NOT INITIAL.
-
-      cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = <ls_agent>-agent_info_provider
-                                           RECEIVING  p_descr_ref    = lo_type_descr
-                                           EXCEPTIONS type_not_found = 1
-                                                      OTHERS         = 99  ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `003`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-agent_info_provider
-                                         iv_v2       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-        CONTINUE.
-      ENDIF.
-
-      TRY.
-          lo_abap_objectdescr = CAST cl_abap_objectdescr( lo_type_descr ).
-        CATCH cx_sy_move_cast_error.
-          APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-          <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-          <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-          APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                          msg        = lo_util->new_message(
-                                           iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                           iv_number   = `005`
-                                           iv_severity = zpru_if_agent_message=>sc_severity-error
-                                           iv_v1       = <ls_agent>-agent_info_provider ) )
-                 TO cs_reported-agent.
-          CONTINUE.
-      ENDTRY.
-
-      lo_abap_objectdescr->get_interface_type( EXPORTING  p_name              = 'ZPRU_IF_AGENT_INFO_PROVIDER'
-                                               EXCEPTIONS interface_not_found = 1
-                                                          OTHERS              = 2 ).
-      IF sy-subrc <> 0.
-        APPEND INITIAL LINE TO cs_failed-agent ASSIGNING <ls_agent_failed>.
-        <ls_agent_failed>-agent_uuid = <ls_agent>-agent_uuid.
-        <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
-
-        APPEND VALUE #( agent_uuid = <ls_agent>-agent_uuid
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                         iv_number   = `004`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_agent>-agent_info_provider
-                                         iv_v2       = 'ZPRU_IF_AGENT_INFO_PROVIDER'
-                                         iv_v3       = <ls_agent>-agent_name ) )
-               TO cs_reported-agent.
-
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
 ENDCLASS.
