@@ -12,6 +12,7 @@ define view entity ZR_PRU_AXC_STEP
       run_uuid        as RunUuid,
       tool_uuid       as ToolUuid,
       execution_seq   as ExecutionSeq,
+      step_status     as StepStatus,
       start_timestamp as StartTimestamp,
       end_timestamp   as EndTimestamp,
       input_prompt    as InputPrompt,

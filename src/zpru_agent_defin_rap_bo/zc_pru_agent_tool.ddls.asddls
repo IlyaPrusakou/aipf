@@ -12,6 +12,8 @@ define view entity ZC_PRU_AGENT_TOOL
       StepType,
       ToolSchemaProvider,
       ToolInfoProvider,
+      IsBorrowed, 
+      IsTransient,
       /* Associations */
       _agent : redirected to parent ZC_PRU_AGENT
 }

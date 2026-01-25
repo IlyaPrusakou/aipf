@@ -61,9 +61,15 @@ annotate entity ZC_PRU_AXC_QUERY with
   @UI.selectionField: [ { position: 40 } ]
   InputPrompt;
 
-  @EndUserText.label: 'OutputResponse'
-  @UI.identification: [ { position: 50, label: 'OutputResponse' } ]
-  @UI.lineItem: [ { position: 50, label: 'OutputResponse' } ]
+  @EndUserText.label: 'DecisionLog'
+  @UI.identification: [ { position: 50, label: 'InputPrompt' } ]
+  @UI.lineItem: [ { position: 50, label: 'InputPrompt' } ]
   @UI.selectionField: [ { position: 50 } ]
+  DecisionLog;
+
+  @EndUserText.label: 'OutputResponse'
+  @UI.identification: [ { position: 60, label: 'OutputResponse' } ]
+  @UI.lineItem: [ { position: 60, label: 'OutputResponse' } ]
+  @UI.selectionField: [ { position: 60 } ]
   OutputResponse;
 }

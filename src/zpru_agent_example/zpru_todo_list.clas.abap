@@ -70,9 +70,9 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 * rename fields in db and structures without underscore
 
-* add field to tool def table is_borrowed, is_transient
-* add field to query table decision_log
-* add field to step table step_status
+* add field to tool def table is_borrowed, is_transient - DONE
+* add field to query table decision_log - DONE
+* add field to step table step_status - DONE
 
   ENDMETHOD.
 

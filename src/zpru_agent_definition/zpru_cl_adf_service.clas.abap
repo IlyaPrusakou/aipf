@@ -676,6 +676,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                       THEN <ls_create>-tool_schema_provider )
               instance-tool_info_provider   = COND #( WHEN <ls_create>-control-tool_info_provider = abap_true
                                                       THEN <ls_create>-tool_info_provider )
+              instance-is_borrowed          = COND #( WHEN <ls_create>-control-is_borrowed = abap_true
+                                                      THEN <ls_create>-is_borrowed )
+              instance-is_transient         = COND #( WHEN <ls_create>-control-is_transient = abap_true
+                                                      THEN <ls_create>-is_transient )
               changed                       = abap_true
               deleted                       = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
 
@@ -768,6 +772,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                               THEN <ls_t_buf>-instance-tool_schema_provider ).
         ls_out-tool_info_provider   = COND #( WHEN <ls_h>-control-tool_info_provider = abap_true
                                               THEN <ls_t_buf>-instance-tool_info_provider ).
+        ls_out-is_borrowed          = COND #( WHEN <ls_h>-control-is_borrowed = abap_true
+                                              THEN <ls_t_buf>-instance-is_borrowed ).
+        ls_out-is_transient         = COND #( WHEN <ls_h>-control-is_transient = abap_true
+                                              THEN <ls_t_buf>-instance-is_transient ).
 
         APPEND ls_out TO et_tool.
       ENDLOOP.
@@ -833,6 +841,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                               THEN <ls_buffer>-instance-tool_schema_provider ).
         ls_out-tool_info_provider   = COND #( WHEN <ls_read>-control-tool_info_provider = abap_true
                                               THEN <ls_buffer>-instance-tool_info_provider ).
+        ls_out-is_borrowed          = COND #( WHEN <ls_read>-control-is_borrowed = abap_true
+                                              THEN <ls_buffer>-instance-is_borrowed ).
+        ls_out-is_transient         = COND #( WHEN <ls_read>-control-is_transient = abap_true
+                                              THEN <ls_buffer>-instance-is_transient ).
 
         APPEND ls_out TO et_tool.
 
@@ -904,6 +916,12 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         <ls_buffer>-instance-tool_info_provider   = COND #( WHEN <ls_update>-control-tool_info_provider = abap_true
                                                             THEN <ls_update>-tool_info_provider
                                                             ELSE <ls_buffer>-instance-tool_info_provider ).
+        <ls_buffer>-instance-is_borrowed          = COND #( WHEN <ls_update>-control-is_borrowed = abap_true
+                                                            THEN <ls_update>-is_borrowed
+                                                            ELSE <ls_buffer>-instance-is_borrowed ).
+        <ls_buffer>-instance-is_transient         = COND #( WHEN <ls_update>-control-is_transient = abap_true
+                                                            THEN <ls_update>-is_transient
+                                                            ELSE <ls_buffer>-instance-is_transient ).
         <ls_buffer>-changed = abap_true.
 
       ELSE.
@@ -1375,5 +1393,4 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     et_check_decision_provider_v = lt_check_decision_provider_v.
   ENDMETHOD.
-
 ENDCLASS.

@@ -77,5 +77,7 @@ authorization dependent by _agent
       StepType            = step_type;
       ToolSchemaProvider = tool_schema_provider;
       ToolInfoProvider    = tool_info_provider;
+      IsBorrowed          = is_borrowed;
+      IsTransient         = is_transient;
     }
 }

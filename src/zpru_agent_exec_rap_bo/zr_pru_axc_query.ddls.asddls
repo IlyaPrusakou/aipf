@@ -14,6 +14,7 @@ define view entity ZR_PRU_AXC_QUERY
       start_timestamp  as StartTimestamp,
       end_timestamp    as EndTimestamp,
       input_prompt     as InputPrompt,
+      decision_log     as DecisionLog,
       output_response  as OutputResponse,
       _executionheader,
       _executionstep
