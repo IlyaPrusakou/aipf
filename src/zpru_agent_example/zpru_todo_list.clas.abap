@@ -74,6 +74,8 @@ CLASS zpru_todo_list IMPLEMENTATION.
 * add field to query table decision_log - DONE
 * add field to step table step_status - DONE
 
+* use agent type lopp_numb to control number of miniloops
+
   ENDMETHOD.
 
 ENDCLASS.

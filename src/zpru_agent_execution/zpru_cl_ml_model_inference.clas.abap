@@ -1,14 +1,14 @@
-CLASS zpru_cl_nested_agent_runner DEFINITION
+CLASS zpru_cl_ml_model_inference DEFINITION
   PUBLIC
 INHERITING FROM zpru_cl_tool_executor ABSTRACT
   CREATE PUBLIC .
 
   PUBLIC SECTION.
 
-    INTERFACES zpru_if_nested_agent_runner .
+    INTERFACES zpru_if_ml_model_inference .
   PROTECTED SECTION.
 
-    METHODS run_nested_agent_int
+    METHODS get_ml_inference_int
       ABSTRACT
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
                 io_input                TYPE REF TO data
@@ -24,21 +24,9 @@ ENDCLASS.
 
 
 
-CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
+CLASS zpru_cl_ml_model_inference IMPLEMENTATION.
 
 
-  METHOD zpru_if_nested_agent_runner~run_nested_agent.
-
-*   run_nested_agent_int(
-*     EXPORTING
-*       io_controller           =
-*       io_input                =
-**       io_tool_schema_provider =
-**       io_tool_info_provider   =
-**     IMPORTING
-**       eo_output               =
-**       ev_error_flag           =
-*   ).
-
+  METHOD zpru_if_ml_model_inference~get_machine_learning_inference.
   ENDMETHOD.
 ENDCLASS.

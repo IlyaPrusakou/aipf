@@ -1,14 +1,13 @@
-CLASS zpru_cl_nested_agent_runner DEFINITION
+CLASS zpru_cl_http_request_sender DEFINITION
   PUBLIC
 INHERITING FROM zpru_cl_tool_executor ABSTRACT
   CREATE PUBLIC .
 
   PUBLIC SECTION.
 
-    INTERFACES zpru_if_nested_agent_runner .
+    INTERFACES zpru_if_http_request_sender .
   PROTECTED SECTION.
-
-    METHODS run_nested_agent_int
+    METHODS send_http_int
       ABSTRACT
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
                 io_input                TYPE REF TO data
@@ -18,27 +17,14 @@ INHERITING FROM zpru_cl_tool_executor ABSTRACT
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
       RAISING   zpru_cx_agent_core.
-
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
+CLASS zpru_cl_http_request_sender IMPLEMENTATION.
 
 
-  METHOD zpru_if_nested_agent_runner~run_nested_agent.
-
-*   run_nested_agent_int(
-*     EXPORTING
-*       io_controller           =
-*       io_input                =
-**       io_tool_schema_provider =
-**       io_tool_info_provider   =
-**     IMPORTING
-**       eo_output               =
-**       ev_error_flag           =
-*   ).
-
+  METHOD zpru_if_http_request_sender~send_http.
   ENDMETHOD.
 ENDCLASS.
