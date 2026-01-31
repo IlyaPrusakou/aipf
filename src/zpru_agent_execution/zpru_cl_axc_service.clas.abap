@@ -110,146 +110,146 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
 
   METHOD zpru_if_axc_service~cba_step.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-    DATA lt_cba_in   TYPE TABLE FOR CREATE zr_pru_axc_head\_executionstep.
-
-    IF it_axc_step_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_cba_step( EXPORTING it_axc_step_imp = it_axc_step_imp
-                       IMPORTING et_entities     = DATA(lt_entities)
-                       CHANGING  cs_reported     = ls_reported
-                                 cs_failed       = ls_failed ).
-
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-
-    IF    lt_entities    <> it_axc_step_imp
-       OR ls_failed-step IS NOT INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
-      APPEND INITIAL LINE TO lt_cba_in ASSIGNING FIELD-SYMBOL(<ls_cba_in>).
-      <ls_cba_in>-runuuid = <ls_create>-run_uuid.
-      APPEND INITIAL LINE TO <ls_cba_in>-%target ASSIGNING FIELD-SYMBOL(<ls_target>).
-      <ls_target>-%cid            = |CID_{ sy-index }_{ <ls_create>-step_uuid }|.
-      <ls_target>-stepuuid        = <ls_create>-step_uuid.
-      <ls_target>-queryuuid       = <ls_create>-query_uuid.
-      <ls_target>-runuuid         = <ls_create>-run_uuid.
-      <ls_target>-stepnumber      = COND #( WHEN <ls_create>-control-step_number     = abap_true THEN <ls_create>-step_number ).
-      <ls_target>-tooluuid        = COND #( WHEN <ls_create>-control-tool_uuid      = abap_true THEN <ls_create>-tool_uuid ).
-      <ls_target>-executionseq    = COND #( WHEN <ls_create>-control-execution_seq    = abap_true THEN <ls_create>-execution_seq ).
-      <ls_target>-stepstatus      = COND #( WHEN <ls_create>-control-step_status      = abap_true THEN <ls_create>-step_status ).
-      <ls_target>-starttimestamp  = COND #( WHEN <ls_create>-control-start_timestamp  = abap_true THEN <ls_create>-start_timestamp ).
-      <ls_target>-endtimestamp    = COND #( WHEN <ls_create>-control-end_timestamp    = abap_true THEN <ls_create>-end_timestamp ).
-      <ls_target>-inputprompt     = COND #( WHEN <ls_create>-control-input_prompt     = abap_true THEN <ls_create>-input_prompt ).
-      <ls_target>-outputprompt    = COND #( WHEN <ls_create>-control-output_prompt    = abap_true THEN <ls_create>-output_prompt ).
-
-      <ls_target>-%control-stepnumber      = COND #( WHEN <ls_create>-control-step_number     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-tooluuid        = COND #( WHEN <ls_create>-control-tool_uuid      = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-executionseq    = COND #( WHEN <ls_create>-control-execution_seq    = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-stepstatus      = COND #( WHEN <ls_create>-control-step_status      = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-starttimestamp  = COND #( WHEN <ls_create>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-endtimestamp    = COND #( WHEN <ls_create>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-inputprompt     = COND #( WHEN <ls_create>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-outputprompt    = COND #( WHEN <ls_create>-control-output_prompt    = abap_true THEN if_abap_behv=>mk-on ).
-    ENDLOOP.
-
-    MODIFY ENTITIES OF zr_pru_axc_head
-           ENTITY executionHeader
-           CREATE BY \_executionstep FROM lt_cba_in
-           MAPPED DATA(ls_mapped_eml)
-           FAILED DATA(ls_failed_eml)
-           REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
-      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
-      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
-      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
-      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
-      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
-*      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
-    ENDLOOP.
-
-    LOOP AT ls_mapped_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_mapped_step>).
-      APPEND INITIAL LINE TO cs_mapped-step ASSIGNING FIELD-SYMBOL(<ls_mapped_step_target>).
-      <ls_mapped_step_target>-step_uuid = <ls_mapped_step>-stepuuid.
-    ENDLOOP.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+*    DATA lt_cba_in   TYPE TABLE FOR CREATE zr_pru_axc_head\\executionQuery\_executionstep.
+*
+*    IF it_axc_step_imp IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_cba_step( EXPORTING it_axc_step_imp = it_axc_step_imp
+*                       IMPORTING et_entities     = DATA(lt_entities)
+*                       CHANGING  cs_reported     = ls_reported
+*                                 cs_failed       = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities    <> it_axc_step_imp
+*       OR ls_failed-step IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
+*      APPEND INITIAL LINE TO lt_cba_in ASSIGNING FIELD-SYMBOL(<ls_cba_in>).
+*      <ls_cba_in>-runuuid = <ls_create>-run_uuid.
+*      APPEND INITIAL LINE TO <ls_cba_in>-%target ASSIGNING FIELD-SYMBOL(<ls_target>).
+*      <ls_target>-%cid            = |CID_{ sy-index }_{ <ls_create>-step_uuid }|.
+*      <ls_target>-stepuuid        = <ls_create>-step_uuid.
+*      <ls_target>-queryuuid       = <ls_create>-query_uuid.
+*      <ls_target>-runuuid         = <ls_create>-run_uuid.
+*      <ls_target>-stepnumber      = COND #( WHEN <ls_create>-control-step_number     = abap_true THEN <ls_create>-step_number ).
+*      <ls_target>-tooluuid        = COND #( WHEN <ls_create>-control-tool_uuid      = abap_true THEN <ls_create>-tool_uuid ).
+*      <ls_target>-executionseq    = COND #( WHEN <ls_create>-control-execution_seq    = abap_true THEN <ls_create>-execution_seq ).
+*      <ls_target>-stepstatus      = COND #( WHEN <ls_create>-control-step_status      = abap_true THEN <ls_create>-step_status ).
+*      <ls_target>-starttimestamp  = COND #( WHEN <ls_create>-control-start_timestamp  = abap_true THEN <ls_create>-start_timestamp ).
+*      <ls_target>-endtimestamp    = COND #( WHEN <ls_create>-control-end_timestamp    = abap_true THEN <ls_create>-end_timestamp ).
+*      <ls_target>-inputprompt     = COND #( WHEN <ls_create>-control-input_prompt     = abap_true THEN <ls_create>-input_prompt ).
+*      <ls_target>-outputprompt    = COND #( WHEN <ls_create>-control-output_prompt    = abap_true THEN <ls_create>-output_prompt ).
+*
+*      <ls_target>-%control-stepnumber      = COND #( WHEN <ls_create>-control-step_number     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-tooluuid        = COND #( WHEN <ls_create>-control-tool_uuid      = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-executionseq    = COND #( WHEN <ls_create>-control-execution_seq    = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-stepstatus      = COND #( WHEN <ls_create>-control-step_status      = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-starttimestamp  = COND #( WHEN <ls_create>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-endtimestamp    = COND #( WHEN <ls_create>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-inputprompt     = COND #( WHEN <ls_create>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_target>-%control-outputprompt    = COND #( WHEN <ls_create>-control-output_prompt    = abap_true THEN if_abap_behv=>mk-on ).
+*    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zr_pru_axc_head
+*           ENTITY executionHeader
+*           CREATE BY \_executionstep FROM lt_cba_in
+*           MAPPED DATA(ls_mapped_eml)
+*           FAILED DATA(ls_failed_eml)
+*           REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
+*      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
+*      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
+*      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
+*      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
+*      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
+**      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
+*    ENDLOOP.
+*
+*    LOOP AT ls_mapped_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_mapped_step>).
+*      APPEND INITIAL LINE TO cs_mapped-step ASSIGNING FIELD-SYMBOL(<ls_mapped_step_target>).
+*      <ls_mapped_step_target>-step_uuid = <ls_mapped_step>-stepuuid.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~rba_step.
-    DATA lt_rba_in TYPE TABLE FOR READ BY \_executionstep zr_pru_axc_head\_executionquery.
-
-    IF it_rba_step_k IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_rba_step( EXPORTING it_rba_step_k = it_rba_step_k
-                       IMPORTING et_entities   = DATA(lt_entities)
-                       CHANGING  cs_reported   = cs_reported
-                                 cs_failed     = cs_failed ).
-
-    IF lt_entities IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
-      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
-      <ls_rba_in>-runuuid         = <ls_read>-run_uuid.
-      <ls_rba_in>-queryuuid       = <ls_read>-query_uuid.
-      <ls_rba_in>-%control-stepnumber      = <ls_read>-control-step_number.
-      <ls_rba_in>-%control-stepuuid        = <ls_read>-control-step_uuid.
-      <ls_rba_in>-%control-queryuuid       = <ls_read>-control-query_uuid.
-      <ls_rba_in>-%control-runuuid         = <ls_read>-control-run_uuid.
-      <ls_rba_in>-%control-tooluuid        = <ls_read>-control-tool_uuid.
-      <ls_rba_in>-%control-executionseq    = <ls_read>-control-execution_seq.
-      <ls_rba_in>-%control-stepstatus      = <ls_read>-control-step_status.
-      <ls_rba_in>-%control-starttimestamp  = <ls_read>-control-start_timestamp.
-      <ls_rba_in>-%control-endtimestamp    = <ls_read>-control-end_timestamp.
-      <ls_rba_in>-%control-inputprompt     = <ls_read>-control-input_prompt.
-      <ls_rba_in>-%control-outputprompt    = <ls_read>-control-output_prompt.
-    ENDLOOP.
-
-    READ ENTITIES OF zr_pru_axc_head
-         ENTITY executionQuery
-         BY \_executionstep
-         FROM lt_rba_in
-         RESULT DATA(lt_result)
-         FAILED DATA(ls_failed_eml)
-         REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
-      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
-      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
-      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
-*      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
-    ENDLOOP.
-
-    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
-      APPEND INITIAL LINE TO et_axc_step ASSIGNING FIELD-SYMBOL(<ls_out>).
-      <ls_out>-step_uuid       = <ls_res>-stepuuid.
-      <ls_out>-query_uuid      = <ls_res>-queryuuid.
-      <ls_out>-run_uuid        = <ls_res>-runuuid.
-      <ls_out>-tool_uuid       = <ls_res>-tooluuid.
-      <ls_out>-step_number     = <ls_res>-stepnumber.
-      <ls_out>-execution_seq   = <ls_res>-executionseq.
-      <ls_out>-start_timestamp = <ls_res>-starttimestamp.
-      <ls_out>-end_timestamp   = <ls_res>-endtimestamp.
-      <ls_out>-step_status     = <ls_res>-stepstatus.
-      <ls_out>-input_prompt    = <ls_res>-inputprompt.
-      <ls_out>-output_prompt   = <ls_res>-outputprompt.
-    ENDLOOP.
+*    DATA lt_rba_in TYPE TABLE FOR READ BY \_executionstep zr_pru_axc_head\_executionquery.
+*
+*    IF it_rba_step_k IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_rba_step( EXPORTING it_rba_step_k = it_rba_step_k
+*                       IMPORTING et_entities   = DATA(lt_entities)
+*                       CHANGING  cs_reported   = cs_reported
+*                                 cs_failed     = cs_failed ).
+*
+*    IF lt_entities IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
+*      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
+*      <ls_rba_in>-runuuid         = <ls_read>-run_uuid.
+*      <ls_rba_in>-queryuuid       = <ls_read>-query_uuid.
+*      <ls_rba_in>-%control-stepnumber      = <ls_read>-control-step_number.
+*      <ls_rba_in>-%control-stepuuid        = <ls_read>-control-step_uuid.
+*      <ls_rba_in>-%control-queryuuid       = <ls_read>-control-query_uuid.
+*      <ls_rba_in>-%control-runuuid         = <ls_read>-control-run_uuid.
+*      <ls_rba_in>-%control-tooluuid        = <ls_read>-control-tool_uuid.
+*      <ls_rba_in>-%control-executionseq    = <ls_read>-control-execution_seq.
+*      <ls_rba_in>-%control-stepstatus      = <ls_read>-control-step_status.
+*      <ls_rba_in>-%control-starttimestamp  = <ls_read>-control-start_timestamp.
+*      <ls_rba_in>-%control-endtimestamp    = <ls_read>-control-end_timestamp.
+*      <ls_rba_in>-%control-inputprompt     = <ls_read>-control-input_prompt.
+*      <ls_rba_in>-%control-outputprompt    = <ls_read>-control-output_prompt.
+*    ENDLOOP.
+*
+*    READ ENTITIES OF zr_pru_axc_head
+*         ENTITY executionQuery
+*         BY \_executionstep
+*         FROM lt_rba_in
+*         RESULT DATA(lt_result)
+*         FAILED DATA(ls_failed_eml)
+*         REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
+*      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
+*      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
+*      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
+*      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
+*      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
+**      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
+*    ENDLOOP.
+*
+*    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
+*      APPEND INITIAL LINE TO et_axc_step ASSIGNING FIELD-SYMBOL(<ls_out>).
+*      <ls_out>-step_uuid       = <ls_res>-stepuuid.
+*      <ls_out>-query_uuid      = <ls_res>-queryuuid.
+*      <ls_out>-run_uuid        = <ls_res>-runuuid.
+*      <ls_out>-tool_uuid       = <ls_res>-tooluuid.
+*      <ls_out>-step_number     = <ls_res>-stepnumber.
+*      <ls_out>-execution_seq   = <ls_res>-executionseq.
+*      <ls_out>-start_timestamp = <ls_res>-starttimestamp.
+*      <ls_out>-end_timestamp   = <ls_res>-endtimestamp.
+*      <ls_out>-step_status     = <ls_res>-stepstatus.
+*      <ls_out>-input_prompt    = <ls_res>-inputprompt.
+*      <ls_out>-output_prompt   = <ls_res>-outputprompt.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~read_step.
@@ -319,114 +319,114 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~update_step.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\_executionstep.
-
-    IF it_step_update_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_update_step( EXPORTING it_step_update_imp = it_step_update_imp
-                          IMPORTING et_entities        = DATA(lt_entities)
-                          CHANGING  cs_reported        = ls_reported
-                                    cs_failed          = ls_failed ).
-
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-
-    IF    lt_entities    <> it_step_update_imp
-       OR ls_failed-step IS NOT INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
-      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-stepuuid        = <ls_update>-step_uuid.
-      <ls_update_in>-queryuuid       = <ls_update>-query_uuid.
-      <ls_update_in>-runuuid         = <ls_update>-run_uuid.
-      <ls_update_in>-stepnumber      = COND #( WHEN <ls_update>-control-step_number     = abap_true THEN <ls_update>-step_number ).
-      <ls_update_in>-tooluuid        = COND #( WHEN <ls_update>-control-tool_uuid       = abap_true THEN <ls_update>-tool_uuid ).
-      <ls_update_in>-executionseq    = COND #( WHEN <ls_update>-control-execution_seq    = abap_true THEN <ls_update>-execution_seq ).
-      <ls_update_in>-stepstatus      = COND #( WHEN <ls_update>-control-step_status      = abap_true THEN <ls_update>-step_status ).
-      <ls_update_in>-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN <ls_update>-start_timestamp ).
-      <ls_update_in>-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN <ls_update>-end_timestamp ).
-      <ls_update_in>-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN <ls_update>-input_prompt ).
-      <ls_update_in>-outputprompt    = COND #( WHEN <ls_update>-control-output_prompt    = abap_true THEN <ls_update>-output_prompt ).
-
-      <ls_update_in>-%control-stepnumber      = COND #( WHEN <ls_update>-control-step_number     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-tooluuid        = COND #( WHEN <ls_update>-control-tool_uuid       = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-executionseq    = COND #( WHEN <ls_update>-control-execution_seq    = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-stepstatus      = COND #( WHEN <ls_update>-control-step_status      = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-outputprompt    = COND #( WHEN <ls_update>-control-output_prompt    = abap_true THEN if_abap_behv=>mk-on ).
-    ENDLOOP.
-
-    MODIFY ENTITIES OF zr_pru_axc_head
-           ENTITY executionStep
-           UPDATE FROM lt_update_in
-           FAILED DATA(ls_failed_eml)
-           REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
-      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
-      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
-      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
-      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
-      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
-*      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
-    ENDLOOP.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+*    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\_executionstep.
+*
+*    IF it_step_update_imp IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_update_step( EXPORTING it_step_update_imp = it_step_update_imp
+*                          IMPORTING et_entities        = DATA(lt_entities)
+*                          CHANGING  cs_reported        = ls_reported
+*                                    cs_failed          = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities    <> it_step_update_imp
+*       OR ls_failed-step IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
+*      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
+*      <ls_update_in>-stepuuid        = <ls_update>-step_uuid.
+*      <ls_update_in>-queryuuid       = <ls_update>-query_uuid.
+*      <ls_update_in>-runuuid         = <ls_update>-run_uuid.
+*      <ls_update_in>-stepnumber      = COND #( WHEN <ls_update>-control-step_number     = abap_true THEN <ls_update>-step_number ).
+*      <ls_update_in>-tooluuid        = COND #( WHEN <ls_update>-control-tool_uuid       = abap_true THEN <ls_update>-tool_uuid ).
+*      <ls_update_in>-executionseq    = COND #( WHEN <ls_update>-control-execution_seq    = abap_true THEN <ls_update>-execution_seq ).
+*      <ls_update_in>-stepstatus      = COND #( WHEN <ls_update>-control-step_status      = abap_true THEN <ls_update>-step_status ).
+*      <ls_update_in>-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN <ls_update>-start_timestamp ).
+*      <ls_update_in>-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN <ls_update>-end_timestamp ).
+*      <ls_update_in>-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN <ls_update>-input_prompt ).
+*      <ls_update_in>-outputprompt    = COND #( WHEN <ls_update>-control-output_prompt    = abap_true THEN <ls_update>-output_prompt ).
+*
+*      <ls_update_in>-%control-stepnumber      = COND #( WHEN <ls_update>-control-step_number     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-tooluuid        = COND #( WHEN <ls_update>-control-tool_uuid       = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-executionseq    = COND #( WHEN <ls_update>-control-execution_seq    = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-stepstatus      = COND #( WHEN <ls_update>-control-step_status      = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-outputprompt    = COND #( WHEN <ls_update>-control-output_prompt    = abap_true THEN if_abap_behv=>mk-on ).
+*    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zr_pru_axc_head
+*           ENTITY executionStep
+*           UPDATE FROM lt_update_in
+*           FAILED DATA(ls_failed_eml)
+*           REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
+*      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
+*      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
+*      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
+*      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
+*      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
+**      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~delete_step.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\_executionstep.
-
-    IF it_step_delete_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_delete_step( EXPORTING it_step_delete_imp = it_step_delete_imp
-                          IMPORTING et_entities        = DATA(lt_entities)
-                          CHANGING  cs_reported        = ls_reported
-                                    cs_failed          = ls_failed ).
-
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-
-    IF    lt_entities    <> it_step_delete_imp
-       OR ls_failed-step IS NOT INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
-      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-stepuuid = <ls_delete>-step_uuid.
-    ENDLOOP.
-
-    MODIFY ENTITIES OF zr_pru_axc_head
-           ENTITY executionStep
-           DELETE FROM lt_delete_in
-           FAILED DATA(ls_failed_eml)
-           REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
-      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
-      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
-      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
-      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
-      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
-*      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
-    ENDLOOP.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+*    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\_executionstep.
+*
+*    IF it_step_delete_imp IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_delete_step( EXPORTING it_step_delete_imp = it_step_delete_imp
+*                          IMPORTING et_entities        = DATA(lt_entities)
+*                          CHANGING  cs_reported        = ls_reported
+*                                    cs_failed          = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities    <> it_step_delete_imp
+*       OR ls_failed-step IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
+*      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
+*      <ls_delete_in>-stepuuid = <ls_delete>-step_uuid.
+*    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zr_pru_axc_head
+*           ENTITY executionStep
+*           DELETE FROM lt_delete_in
+*           FAILED DATA(ls_failed_eml)
+*           REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
+*      APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
+*      <ls_failed_step_target>-step_uuid = <ls_failed_step>-stepuuid.
+*      <ls_failed_step_target>-fail      = CONV #( <ls_failed_step>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
+*      APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
+*      <ls_reported_step_target>-step_uuid = <ls_reported_step>-stepuuid.
+**      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~determine.
@@ -608,69 +608,69 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~rba_query.
-    DATA lt_rba_in TYPE TABLE FOR READ BY \_executionquery zr_pru_axc_head.
-
-    IF it_rba_query_k IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_rba_query( EXPORTING it_rba_query_k = it_rba_query_k
-                        IMPORTING et_entities    = DATA(lt_entities)
-                        CHANGING  cs_reported    = cs_reported
-                                  cs_failed      = cs_failed ).
-
-    IF lt_entities IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
-      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
-      <ls_rba_in>-runuuid = <ls_read>-run_uuid.
-      <ls_rba_in>-%control-runuuid         = <ls_read>-control-run_uuid.
-      <ls_rba_in>-%control-querynumber     = <ls_read>-control-query_number.
-      <ls_rba_in>-%control-queryuuid       = <ls_read>-control-query_uuid.
-      <ls_rba_in>-%control-language        = <ls_read>-control-language.
-      <ls_rba_in>-%control-executionstatus = <ls_read>-control-execution_status.
-      <ls_rba_in>-%control-starttimestamp  = <ls_read>-control-start_timestamp.
-      <ls_rba_in>-%control-endtimestamp    = <ls_read>-control-end_timestamp.
-      <ls_rba_in>-%control-inputprompt     = <ls_read>-control-input_prompt.
-      <ls_rba_in>-%control-decisionlog     = <ls_read>-control-decision_log.
-      <ls_rba_in>-%control-outputresponse  = <ls_read>-control-output_response.
-    ENDLOOP.
-
-    READ ENTITIES OF zr_pru_axc_head
-         ENTITY executionHeader
-         BY \_executionquery
-         FROM lt_rba_in
-         RESULT DATA(lt_result)
-         FAILED DATA(ls_failed_eml)
-         REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
-      APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
-      <ls_failed_header_target>-run_uuid = <ls_failed_header>-runuuid.
-      <ls_failed_header_target>-fail     = CONV #( <ls_failed_header>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
-      APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-      <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
-*      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
-    ENDLOOP.
-
-    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
-      APPEND INITIAL LINE TO et_axc_query ASSIGNING FIELD-SYMBOL(<ls_out>).
-      <ls_out>-query_uuid       = <ls_res>-queryuuid.
-      <ls_out>-run_uuid         = <ls_res>-runuuid.
-      <ls_out>-query_number     = <ls_res>-querynumber.
-      <ls_out>-language         = <ls_res>-language.
-      <ls_out>-execution_status = <ls_res>-executionstatus.
-      <ls_out>-start_timestamp  = <ls_res>-starttimestamp.
-      <ls_out>-end_timestamp    = <ls_res>-endtimestamp.
-      <ls_out>-input_prompt     = <ls_res>-inputprompt.
-      <ls_out>-decision_log     = <ls_res>-decisionlog.
-      <ls_out>-output_response  = <ls_res>-outputresponse.
-    ENDLOOP.
+*    DATA lt_rba_in TYPE TABLE FOR READ BY \_executionquery zr_pru_axc_head.
+*
+*    IF it_rba_query_k IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_rba_query( EXPORTING it_rba_query_k = it_rba_query_k
+*                        IMPORTING et_entities    = DATA(lt_entities)
+*                        CHANGING  cs_reported    = cs_reported
+*                                  cs_failed      = cs_failed ).
+*
+*    IF lt_entities IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
+*      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
+*      <ls_rba_in>-runuuid = <ls_read>-run_uuid.
+*      <ls_rba_in>-%control-runuuid         = <ls_read>-control-run_uuid.
+*      <ls_rba_in>-%control-querynumber     = <ls_read>-control-query_number.
+*      <ls_rba_in>-%control-queryuuid       = <ls_read>-control-query_uuid.
+*      <ls_rba_in>-%control-language        = <ls_read>-control-language.
+*      <ls_rba_in>-%control-executionstatus = <ls_read>-control-execution_status.
+*      <ls_rba_in>-%control-starttimestamp  = <ls_read>-control-start_timestamp.
+*      <ls_rba_in>-%control-endtimestamp    = <ls_read>-control-end_timestamp.
+*      <ls_rba_in>-%control-inputprompt     = <ls_read>-control-input_prompt.
+*      <ls_rba_in>-%control-decisionlog     = <ls_read>-control-decision_log.
+*      <ls_rba_in>-%control-outputresponse  = <ls_read>-control-output_response.
+*    ENDLOOP.
+*
+*    READ ENTITIES OF zr_pru_axc_head
+*         ENTITY executionHeader
+*         BY \_executionquery
+*         FROM lt_rba_in
+*         RESULT DATA(lt_result)
+*         FAILED DATA(ls_failed_eml)
+*         REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
+*      APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
+*      <ls_failed_header_target>-run_uuid = <ls_failed_header>-runuuid.
+*      <ls_failed_header_target>-fail     = CONV #( <ls_failed_header>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
+*      APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
+*      <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
+**      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
+*    ENDLOOP.
+*
+*    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
+*      APPEND INITIAL LINE TO et_axc_query ASSIGNING FIELD-SYMBOL(<ls_out>).
+*      <ls_out>-query_uuid       = <ls_res>-queryuuid.
+*      <ls_out>-run_uuid         = <ls_res>-runuuid.
+*      <ls_out>-query_number     = <ls_res>-querynumber.
+*      <ls_out>-language         = <ls_res>-language.
+*      <ls_out>-execution_status = <ls_res>-executionstatus.
+*      <ls_out>-start_timestamp  = <ls_res>-starttimestamp.
+*      <ls_out>-end_timestamp    = <ls_res>-endtimestamp.
+*      <ls_out>-input_prompt     = <ls_res>-inputprompt.
+*      <ls_out>-decision_log     = <ls_res>-decisionlog.
+*      <ls_out>-output_response  = <ls_res>-outputresponse.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~read_query.
@@ -738,113 +738,113 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~update_query.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\_executionquery.
-
-    IF it_query_update_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_update_query( EXPORTING it_query_update_imp = it_query_update_imp
-                            IMPORTING et_entities        = DATA(lt_entities)
-                            CHANGING  cs_reported        = ls_reported
-                                      cs_failed          = ls_failed ).
-
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-
-    IF    lt_entities       <> it_query_update_imp
-       OR ls_failed-query   IS NOT INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
-      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-queryuuid       = <ls_update>-query_uuid.
-      <ls_update_in>-runuuid         = <ls_update>-run_uuid.
-      <ls_update_in>-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN <ls_update>-query_number ).
-      <ls_update_in>-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN <ls_update>-language ).
-      <ls_update_in>-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN <ls_update>-execution_status ).
-      <ls_update_in>-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN <ls_update>-start_timestamp ).
-      <ls_update_in>-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN <ls_update>-end_timestamp ).
-      <ls_update_in>-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN <ls_update>-input_prompt ).
-      <ls_update_in>-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN <ls_update>-decision_log ).
-      <ls_update_in>-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN <ls_update>-output_response ).
-
-      <ls_update_in>-%control-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN if_abap_behv=>mk-on ).
-    ENDLOOP.
-
-    MODIFY ENTITIES OF zr_pru_axc_head
-           ENTITY executionQuery
-           UPDATE FROM lt_update_in
-           FAILED DATA(ls_failed_eml)
-           REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
-      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
-      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
-      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
-*      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
-    ENDLOOP.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+*    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\_executionquery.
+*
+*    IF it_query_update_imp IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_update_query( EXPORTING it_query_update_imp = it_query_update_imp
+*                            IMPORTING et_entities        = DATA(lt_entities)
+*                            CHANGING  cs_reported        = ls_reported
+*                                      cs_failed          = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities       <> it_query_update_imp
+*       OR ls_failed-query   IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
+*      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
+*      <ls_update_in>-queryuuid       = <ls_update>-query_uuid.
+*      <ls_update_in>-runuuid         = <ls_update>-run_uuid.
+*      <ls_update_in>-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN <ls_update>-query_number ).
+*      <ls_update_in>-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN <ls_update>-language ).
+*      <ls_update_in>-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN <ls_update>-execution_status ).
+*      <ls_update_in>-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN <ls_update>-start_timestamp ).
+*      <ls_update_in>-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN <ls_update>-end_timestamp ).
+*      <ls_update_in>-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN <ls_update>-input_prompt ).
+*      <ls_update_in>-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN <ls_update>-decision_log ).
+*      <ls_update_in>-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN <ls_update>-output_response ).
+*
+*      <ls_update_in>-%control-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN if_abap_behv=>mk-on ).
+*      <ls_update_in>-%control-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN if_abap_behv=>mk-on ).
+*    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zr_pru_axc_head
+*           ENTITY executionQuery
+*           UPDATE FROM lt_update_in
+*           FAILED DATA(ls_failed_eml)
+*           REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
+*      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
+*      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
+*      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
+*      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
+*      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
+**      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~delete_query.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\_executionquery.
-
-    IF it_query_delete_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    precheck_delete_query( EXPORTING it_query_delete_imp = it_query_delete_imp
-                           IMPORTING et_entities         = DATA(lt_entities)
-                           CHANGING  cs_reported         = ls_reported
-                                     cs_failed           = ls_failed ).
-
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-
-    IF    lt_entities       <> it_query_delete_imp
-       OR ls_failed-query   IS NOT INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
-      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-queryuuid = <ls_delete>-query_uuid.
-    ENDLOOP.
-
-    MODIFY ENTITIES OF zr_pru_axc_head
-           ENTITY executionQuery
-           DELETE FROM lt_delete_in
-           FAILED DATA(ls_failed_eml)
-           REPORTED DATA(ls_reported_eml).
-
-    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
-      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
-      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
-    ENDLOOP.
-
-    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
-      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
-*      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
-    ENDLOOP.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+*    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\_executionquery.
+*
+*    IF it_query_delete_imp IS INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    precheck_delete_query( EXPORTING it_query_delete_imp = it_query_delete_imp
+*                           IMPORTING et_entities         = DATA(lt_entities)
+*                           CHANGING  cs_reported         = ls_reported
+*                                     cs_failed           = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities       <> it_query_delete_imp
+*       OR ls_failed-query   IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
+*      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
+*      <ls_delete_in>-queryuuid = <ls_delete>-query_uuid.
+*    ENDLOOP.
+*
+*    MODIFY ENTITIES OF zr_pru_axc_head
+*           ENTITY executionQuery
+*           DELETE FROM lt_delete_in
+*           FAILED DATA(ls_failed_eml)
+*           REPORTED DATA(ls_reported_eml).
+*
+*    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
+*      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
+*      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
+*      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
+*    ENDLOOP.
+*
+*    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
+*      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
+*      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
+**      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~read_header.
