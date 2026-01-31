@@ -110,6 +110,45 @@ INTERFACE zpru_if_agent_frw
            tool  TYPE tt_tool_mapped,
          END OF ts_adf_mapped.
 
+  " AGTY (Agent Type) types
+  TYPES: BEGIN OF ts_agty_reported,
+           agent_type TYPE zpru_de_agent_type,
+           msg        TYPE REF TO zpru_if_agent_message,
+           create     TYPE abap_boolean,
+           update     TYPE abap_boolean,
+           delete     TYPE abap_boolean,
+         END OF ts_agty_reported.
+
+  TYPES tt_agty_reported TYPE STANDARD TABLE OF ts_agty_reported WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agty_failed,
+           agent_type TYPE zpru_de_agent_type,
+           fail       TYPE i,
+           create     TYPE abap_boolean,
+           update     TYPE abap_boolean,
+           delete     TYPE abap_boolean,
+         END OF ts_agty_failed.
+
+  TYPES tt_agty_failed TYPE STANDARD TABLE OF ts_agty_failed WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agty_mapped,
+           agent_type TYPE zpru_de_agent_type,
+         END OF ts_agty_mapped.
+
+  TYPES tt_agty_mapped TYPE STANDARD TABLE OF ts_agty_mapped WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agty_bndl_reported,
+           agent_type TYPE tt_agty_reported,
+         END OF ts_agty_bndl_reported.
+
+  TYPES: BEGIN OF ts_agty_bndl_failed,
+           agent_type TYPE tt_agty_failed,
+         END OF ts_agty_bndl_failed.
+
+  TYPES: BEGIN OF ts_agty_bndl_mapped,
+           agent_type TYPE tt_agty_mapped,
+         END OF ts_agty_bndl_mapped.
+
   " AXC (Agent eXecution Context) types
   TYPES: BEGIN OF ts_header_reported,
            run_uuid TYPE sysuuid_x16,

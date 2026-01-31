@@ -16,12 +16,24 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     DATA lt_disc_strat      TYPE STANDARD TABLE OF zpru_disc_strat WITH EMPTY KEY.
     DATA lt_zpru_summ_strat TYPE STANDARD TABLE OF zpru_summ_strat WITH EMPTY KEY.
 
+
+
     lt_agent_serv = VALUE #( created_by = ''
                              created_at = '0.0000000'
                              changed_by = ''
                              ( service            = 'ZPRU_IF_ADF_VALIDATOR'
                                context            = 'STANDARD'
                                class              = 'ZPRU_CL_ADF_VALIDATOR'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
+                             ( service            = 'ZPRU_IF_AGTY_PRECHECK'
+                               context            = 'STANDARD_AGENT_DEFINITION'
+                               class              = 'ZPRU_CL_AGTY_PRECHECK'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
+                             ( service            = 'ZPRU_IF_AGTY_SERVICE'
+                               context            = 'STANDARD'
+                               class              = 'ZPRU_CL_AGTY_SERVICE'
                                last_changed       = '20260125095408.0057390'
                                local_last_changed = '20260125095408.0057390' )
                              ( service            = 'ZPRU_IF_UNIT_AGENT'
