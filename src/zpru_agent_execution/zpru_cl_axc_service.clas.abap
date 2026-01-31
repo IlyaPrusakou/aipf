@@ -677,97 +677,6 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-  METHOD zpru_if_axc_service~delete_header.
-    DATA lt_fetched_query LIKE zpru_cl_axc_buffer=>query_buffer.
-    DATA lo_util          TYPE REF TO zpru_if_agent_util.
-
-    IF it_head_delete_imp IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    precheck_delete_header( EXPORTING it_head_delete_imp = it_head_delete_imp
-                            IMPORTING et_entities        = DATA(lt_entities)
-                            CHANGING  cs_reported        = cs_reported
-                                      cs_failed          = cs_failed ).
-
-    IF lt_entities IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    zpru_cl_axc_buffer=>prep_header_buffer( VALUE #( FOR <ls_k>
-                                                     IN     lt_entities
-                                                     ( run_uuid = <ls_k>-run_uuid ) ) ).
-
-    zpru_cl_axc_buffer=>prep_query_buffer( VALUE #( FOR <ls_q>
-                                                    IN     lt_entities
-                                                    ( run_uuid = <ls_q>-run_uuid ) ) ).
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_prelim>).
-      LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_fq>) WHERE instance-run_uuid = <ls_prelim>-run_uuid.
-        APPEND INITIAL LINE TO lt_fetched_query ASSIGNING FIELD-SYMBOL(<ls_target_query>).
-        <ls_target_query> = <ls_fq>.
-      ENDLOOP.
-    ENDLOOP.
-
-    zpru_cl_axc_buffer=>prep_step_buffer( VALUE #( FOR <ls_s>
-                                                   IN lt_fetched_query
-                                                   ( query_uuid = <ls_s>-instance-query_uuid ) ) ).
-
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
-
-      ASSIGN zpru_cl_axc_buffer=>header_buffer[ instance-run_uuid = <ls_delete>-run_uuid
-                                                deleted           = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-      IF sy-subrc = 0.
-        <ls_buffer>-deleted = abap_true.
-        <ls_buffer>-changed = abap_true.
-
-        fill_head_admin_fields( EXPORTING iv_during_create = abap_false
-                                CHANGING  cs_header        = <ls_buffer> ).
-
-        APPEND VALUE #( msg      = lo_util->new_message(
-                                       iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                       iv_number   = `005`
-                                       iv_severity = zpru_if_agent_message=>sc_severity-success )
-                        run_uuid = <ls_delete>-run_uuid ) TO cs_reported-header.
-
-        LOOP AT zpru_cl_axc_buffer=>query_buffer ASSIGNING FIELD-SYMBOL(<ls_query_del>)
-             WHERE instance-run_uuid = <ls_delete>-run_uuid.
-          <ls_query_del>-changed = abap_true.
-          <ls_query_del>-deleted = abap_true.
-
-          LOOP AT zpru_cl_axc_buffer=>step_buffer ASSIGNING FIELD-SYMBOL(<ls_step_del>)
-               WHERE instance-query_uuid = <ls_query_del>-instance-query_uuid.
-            <ls_step_del>-changed = abap_true.
-            <ls_step_del>-deleted = abap_true.
-
-          ENDLOOP.
-        ENDLOOP.
-
-      ELSE.
-
-        APPEND VALUE #( run_uuid = <ls_delete>-run_uuid
-                        delete   = abap_true
-                        fail     = zpru_if_agent_frw=>cs_fail_cause-not_found )
-               TO cs_failed-header.
-
-        APPEND VALUE #( run_uuid = <ls_delete>-run_uuid
-                        delete   = abap_true
-                        msg      = lo_util->new_message(
-                                       iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                       iv_number   = `003`
-                                       iv_severity = zpru_if_agent_message=>sc_severity-error ) )
-               TO cs_reported-header.
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
   METHOD zpru_if_axc_service~lock.
   ENDMETHOD.
 
@@ -1173,7 +1082,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
       <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
-      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
+*      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
 
     LOOP AT ls_mapped_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_mapped_header>).
@@ -1242,7 +1151,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
       <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
-      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
+*      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
   ENDMETHOD.
 
@@ -1285,7 +1194,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
       <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
-      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
+*      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
   ENDMETHOD.
 
