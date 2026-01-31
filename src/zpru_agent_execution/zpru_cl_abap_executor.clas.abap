@@ -12,7 +12,7 @@ CLASS zpru_cl_abap_executor DEFINITION
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
                 io_input                TYPE REF TO data
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
-                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider   OPTIONAL
+                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider OPTIONAL
       EXPORTING eo_output               TYPE REF TO data
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
@@ -29,47 +29,26 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
     DATA lr_input                TYPE REF TO data.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
-    DATA lv_output_json          TYPE zpru_if_agent_frw=>ts_json.
-    DATA lo_popping_agent TYPE REF TO zpru_if_unit_agent.
 
     CLEAR: et_additional_steps,
            et_additional_tools.
     ev_error_flag = abap_false.
 
-    CREATE OBJECT lo_tool_schema_provider TYPE (is_tool_master_data-tool_schema_provider).
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
+    preprocess_tool_execution( EXPORTING io_request              = io_request
+                                         is_tool_master_data     = is_tool_master_data
+                                         is_execution_step       = is_execution_step
+                               IMPORTING ev_error_flag           = ev_error_flag
+                                         er_output               = lr_output
+                                         er_input                = lr_input
+                                         eo_tool_schema_provider = lo_tool_schema_provider
+                                         eo_tool_info_provider   = lo_tool_info_provider
+                                         eo_structure_output     = DATA(lo_structure_output)
+                                         eo_structure_input      = DATA(lo_structure_input)
+                                         eo_util                 = lo_util ).
+
+    IF ev_error_flag = abap_true.
       RETURN.
     ENDIF.
-
-    CREATE OBJECT lo_tool_info_provider TYPE (is_tool_master_data-tool_info_provider).
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
-      RETURN.
-    ENDIF.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
-    DATA(lo_structure_input) = lo_tool_schema_provider->input_rtts_schema( is_tool_master_data = is_tool_master_data
-                                                                           is_execution_step   = is_execution_step  ).
-
-    CREATE DATA lr_input TYPE HANDLE lo_structure_input.
-
-    lo_util->convert_to_abap(
-      EXPORTING
-        ir_string = io_request->get_data( )->*
-      CHANGING
-        cr_abap   = lr_input->* ).
-
-    DATA(lo_structure_output) = lo_tool_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
-                                                                             is_execution_step   = is_execution_step  ).
-
-    CREATE DATA lr_output TYPE HANDLE lo_structure_output.
 
     execute_code_int( EXPORTING io_controller           = io_controller
                                 io_input                = lr_input
@@ -84,44 +63,24 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
     ENDIF.
 
     IF lt_additional_step IS NOT INITIAL.
-      prepare_additional_steps(
-        EXPORTING
-          is_current_step    = is_execution_step
-          it_step_4_validate = lt_additional_step
-          io_controller      = io_controller
-        IMPORTING
-          et_additional_steps = et_additional_steps
-          et_additional_tools = et_additional_tools ).
+      prepare_additional_steps( EXPORTING is_current_step     = is_execution_step
+                                          it_step_4_validate  = lt_additional_step
+                                          io_controller       = io_controller
+                                IMPORTING et_additional_steps = et_additional_steps
+                                          et_additional_tools = et_additional_tools ).
     ENDIF.
 
-    lo_util->convert_to_string( EXPORTING ir_abap   = lr_output
-                                CHANGING  cr_string = lv_output_json ).
-
-    eo_response->set_data( NEW zpru_if_agent_frw=>ts_json( lv_output_json ) ).
-
-    ASSIGN io_controller->mt_run_context[ execution_step-step_uuid = is_execution_step-step_uuid ] TO FIELD-SYMBOL(<ls_current_run_context>).
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
-      RETURN.
-    ENDIF.
-
-    DATA(ls_input_json_schema) = lo_tool_schema_provider->input_json_schema(
-      EXPORTING
-        is_tool_master_data = is_tool_master_data
-        is_execution_step   = is_execution_step ).
-
-    DATA(ls_output_json_schema) = lo_tool_schema_provider->output_json_schema(
-      EXPORTING
-        is_tool_master_data = is_tool_master_data
-        is_execution_step   = is_execution_step ).
-
-    <ls_current_run_context>-abap_input_schema  = lo_structure_input.
-    <ls_current_run_context>-json_input_schema  = ls_input_json_schema.
-    <ls_current_run_context>-abap_output_schema = lo_structure_output.
-    <ls_current_run_context>-json_output_schema = ls_output_json_schema.
-    <ls_current_run_context>-abap_response      = lr_output.
-    <ls_current_run_context>-json_response      = lv_output_json.
-    <ls_current_run_context>-abap_request       = lr_input.
-    <ls_current_run_context>-json_request       = io_request->get_data( )->*.
+    postprocess_tool_execution( EXPORTING io_util                 = lo_util
+                                          ir_output               = lr_output
+                                          ir_input                = lr_input
+                                          io_controller           = io_controller
+                                          is_tool_master_data     = is_tool_master_data
+                                          is_execution_step       = is_execution_step
+                                          io_tool_schema_provider = lo_tool_schema_provider
+                                          io_structure_output     = lo_structure_output
+                                          io_structure_input      = lo_structure_input
+                                          io_request              = io_request
+                                IMPORTING eo_response             = eo_response
+                                          ev_error_flag           = ev_error_flag ).
   ENDMETHOD.
 ENDCLASS.
