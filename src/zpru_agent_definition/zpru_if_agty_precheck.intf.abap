@@ -27,3 +27,4 @@ INTERFACE zpru_if_agty_precheck
     EXPORTING et_entities    TYPE zpru_if_agty_crud=>tt_agty_read_k
     CHANGING  cs_reported    TYPE zpru_if_agent_frw=>ts_agty_bndl_reported
               cs_failed      TYPE zpru_if_agent_frw=>ts_agty_bndl_failed.
+ENDINTERFACE.

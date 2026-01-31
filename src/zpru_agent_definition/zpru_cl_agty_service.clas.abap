@@ -60,99 +60,175 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
 
   METHOD zpru_if_agty_service~create_agent_type.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_agty_bndl_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_agty_bndl_failed.
-    DATA lo_util     TYPE REF TO zpru_if_agent_util.
+*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_agty_bndl_reported.
+*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_agty_bndl_failed.
+*    DATA lo_util     TYPE REF TO zpru_if_agent_util.
+*
+*    TRY.
+*        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+*                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
+*      CATCH zpru_cx_agent_core.
+*        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+*    ENDTRY.
+*
+*    precheck_create_agent_type( EXPORTING it_agty_create_imp = it_agty_create_imp
+*                                IMPORTING et_entities        = DATA(lt_entities)
+*                                CHANGING  cs_reported        = ls_reported
+*                                          cs_failed          = ls_failed ).
+*
+*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+*
+*    IF    lt_entities       <> it_agty_create_imp
+*       OR ls_failed-agent_type IS NOT INITIAL.
+*      RETURN.
+*    ENDIF.
+*
+*    DATA lt_create_in TYPE TABLE FOR CREATE zr_pru_agent_type\\zrpruagenttype.
+*
+*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
+*
+*      APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
+*      <ls_create_in>-agenttype        = <ls_create>-agent_type.
+*      <ls_create_in>-shortmemvolume   = COND #( WHEN <ls_create>-control-short_mem_volume = abap_true
+*                                                 THEN <ls_create>-short_mem_volume ).
+*      <ls_create_in>-%control-shortmemvolume = COND #( WHEN <ls_create>-control-short_mem_volume = abap_true
+*                                                       THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-discardstrategy  = COND #( WHEN <ls_create>-control-discard_strategy = abap_true
+*                                                 THEN <ls_create>-discard_strategy ).
+*      <ls_create_in>-%control-discardstrategy = COND #( WHEN <ls_create>-control-discard_strategy = abap_true
+*                                                        THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-summarystrategy  = COND #( WHEN <ls_create>-control-summary_strategy = abap_true
+*                                                 THEN <ls_create>-summary_strategy ).
+*      <ls_create_in>-%control-summarystrategy = COND #( WHEN <ls_create>-control-summary_strategy = abap_true
+*                                                        THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-maxnumbloop     = COND #( WHEN <ls_create>-control-max_numb_loop = abap_true
+*                                                 THEN <ls_create>-max_numb_loop ).
+*      <ls_create_in>-%control-maxnumbloop = COND #( WHEN <ls_create>-control-max_numb_loop = abap_true
+*                                                    THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-createdby        = COND #( WHEN <ls_create>-control-created_by = abap_true
+*                                                 THEN <ls_create>-created_by ).
+*      <ls_create_in>-%control-createdby = COND #( WHEN <ls_create>-control-created_by = abap_true
+*                                                  THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-createdat        = COND #( WHEN <ls_create>-control-created_at = abap_true
+*                                                 THEN <ls_create>-created_at ).
+*      <ls_create_in>-%control-createdat = COND #( WHEN <ls_create>-control-created_at = abap_true
+*                                                  THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-changedby        = COND #( WHEN <ls_create>-control-changed_by <> if_abap_behv=>mk-off
+*                                                 THEN <ls_create>-changed_by ).
+*      <ls_create_in>-%control-changedby = COND #( WHEN <ls_create>-control-changed_by <> if_abap_behv=>mk-off
+*                                                  THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-lastchanged      = COND #( WHEN <ls_create>-control-last_changed = abap_true
+*                                                 THEN <ls_create>-last_changed ).
+*      <ls_create_in>-%control-lastchanged = COND #( WHEN <ls_create>-control-last_changed = abap_true
+*                                                    THEN if_abap_behv=>mk-on ).
+*      <ls_create_in>-locallastchanged = COND #( WHEN <ls_create>-control-local_last_changed = abap_true
+*                                                 THEN <ls_create>-local_last_changed ).
+*      <ls_create_in>-%control-locallastchanged = COND #( WHEN <ls_create>-control-local_last_changed = abap_true
+*                                                         THEN if_abap_behv=>mk-on ).
+*    ENDLOOP.
+*
+*
+*    MODIFY ENTITIES OF zr_pru_agent_type
+*    ENTITY zrpruagenttype
+*    CREATE AUTO FILL CID WITH lt_create_in
+*    MAPPED DATA(ls_cr_mapped)
+*    REPORTED DATA(ls_cr_reported)
+*    FAILED DATA(ls_cr_failed).
+*
+*    LOOP AT ls_cr_failed-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
+*      APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
+*      <ls_failed_target>-agent_type = <ls_failed_agenttype>-agenttype.
+**   <LS_FAILED_TARGET>-fail = <LS_FAILED_agenttype>-%fail.
+*      <ls_failed_target>-create = <ls_failed_agenttype>-%create.
+*    ENDLOOP.
+*
+*    LOOP AT ls_cr_REPORTED-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
+*      APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
+*      <ls_failed_target>-agent_type = <ls_failed_agenttype>-agenttype.
+**   <LS_FAILED_TARGET>-fail = <LS_FAILED_agenttype>-%fail.
+*      <ls_failed_target>-create = <ls_failed_agenttype>-%create.
+*    ENDLOOP.
 
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
 
-    precheck_create_agent_type( EXPORTING it_agty_create_imp = it_agty_create_imp
-                                IMPORTING et_entities        = DATA(lt_entities)
-                                CHANGING  cs_reported        = ls_reported
-                                          cs_failed          = ls_failed ).
 
-    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-    cs_reported = CORRESPONDING #( DEEP ls_reported ).
 
-    IF    lt_entities       <> it_agty_create_imp
-       OR ls_failed-agent_type IS NOT INITIAL.
-      RETURN.
-    ENDIF.
+
+
+
+
+
+
 
 *    zpru_cl_adf_buffer=>prep_agent_buffer( VALUE #( FOR <ls_k>
 *                                                    IN     lt_entities
 *                                                    ( agent_uuid = <ls_k>-agent_uuid ) ) ).
 
-    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
-
-      IF    NOT line_exists( gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type ] )
-         OR     line_exists( gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type
-                                             deleted             = abap_true ] ).
-
-        ASSIGN gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type
-                               deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-        IF sy-subrc = 0.
-          DELETE gt_agty_buffer
-                 WHERE     instance-agent_type = <ls_buffer>-instance-agent_type
-                       AND deleted             = abap_true.
-        ENDIF.
-
-        APPEND VALUE #(
-            instance-agent_type       = <ls_create>-agent_type
-            instance-short_mem_volume = COND #( WHEN <ls_create>-control-short_mem_volume = abap_true
-                                                THEN <ls_create>-short_mem_volume )
-            instance-discard_strategy = COND #( WHEN <ls_create>-control-discard_strategy = abap_true
-                                                THEN <ls_create>-discard_strategy )
-            instance-summary_strategy = COND #( WHEN <ls_create>-control-summary_strategy = abap_true
-                                                THEN <ls_create>-summary_strategy )
-            instance-max_numb_loop    = COND #( WHEN <ls_create>-control-max_numb_loop = abap_true
-                                                THEN <ls_create>-max_numb_loop )
-            instance-created_by       = COND #( WHEN <ls_create>-control-created_by = abap_true
-                                                THEN <ls_create>-created_by )
-            instance-created_at       = COND #( WHEN <ls_create>-control-created_at = abap_true
-                                                THEN <ls_create>-created_at )
-            instance-changed_by       = COND #( WHEN <ls_create>-control-changed_by <> if_abap_behv=>mk-off
-                                                THEN <ls_create>-changed_by )
-            instance-last_changed     = COND #( WHEN <ls_create>-control-last_changed = abap_true
-                                                THEN <ls_create>-last_changed )
-            instance-local_last_changed = COND #( WHEN <ls_create>-control-local_last_changed = abap_true
-                                                THEN <ls_create>-local_last_changed )
-            changed                         = abap_true
-            deleted                         = abap_false ) TO gt_agty_buffer ASSIGNING FIELD-SYMBOL(<ls_just_added>).
-
-        fill_agty_admin_fields( EXPORTING iv_during_create = abap_true
-                                CHANGING  cs_agty          = <ls_just_added> ).
-
-        INSERT VALUE #( agent_type = <ls_create>-agent_type ) INTO TABLE cs_mapped-agent_type.
-
-        APPEND VALUE #( msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                         iv_number   = `001`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-success
-                                         iv_v1       = <ls_create>-agent_type )
-                        agent_type = <ls_create>-agent_type ) TO cs_reported-agent_type.
-
-      ELSE.
-        APPEND VALUE #( agent_type = <ls_create>-agent_type
-                        create     = abap_true
-                        fail       = zpru_if_agent_frw=>cs_fail_cause-conflict )
-               TO cs_failed-agent_type.
-
-        APPEND VALUE #( agent_type = <ls_create>-agent_type
-                        create     = abap_true
-                        msg        = lo_util->new_message(
-                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                         iv_number   = `002`
-                                         iv_severity = zpru_if_agent_message=>sc_severity-error
-                                         iv_v1       = <ls_create>-agent_type ) )
-               TO cs_reported-agent_type.
-      ENDIF.
-    ENDLOOP.
+*     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
+*
+*    IF    NOT line_exists( gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type ] )
+*       OR     line_exists( gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type
+*                                           deleted             = abap_true ] ).
+*
+*      ASSIGN gt_agty_buffer[ instance-agent_type = <ls_create>-agent_type
+*                             deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
+*      IF sy-subrc = 0.
+*        DELETE gt_agty_buffer
+*               WHERE     instance-agent_type = <ls_buffer>-instance-agent_type
+*                     AND deleted             = abap_true.
+*      ENDIF.
+*
+*      APPEND VALUE #(
+*          instance-agent_type       = <ls_create>-agent_type
+*          instance-short_mem_volume = COND #( WHEN <ls_create>-control-short_mem_volume = abap_true
+*                                              THEN <ls_create>-short_mem_volume )
+*          instance-discard_strategy = COND #( WHEN <ls_create>-control-discard_strategy = abap_true
+*                                              THEN <ls_create>-discard_strategy )
+*          instance-summary_strategy = COND #( WHEN <ls_create>-control-summary_strategy = abap_true
+*                                              THEN <ls_create>-summary_strategy )
+*          instance-max_numb_loop    = COND #( WHEN <ls_create>-control-max_numb_loop = abap_true
+*                                              THEN <ls_create>-max_numb_loop )
+*          instance-created_by       = COND #( WHEN <ls_create>-control-created_by = abap_true
+*                                              THEN <ls_create>-created_by )
+*          instance-created_at       = COND #( WHEN <ls_create>-control-created_at = abap_true
+*                                              THEN <ls_create>-created_at )
+*          instance-changed_by       = COND #( WHEN <ls_create>-control-changed_by <> if_abap_behv=>mk-off
+*                                              THEN <ls_create>-changed_by )
+*          instance-last_changed     = COND #( WHEN <ls_create>-control-last_changed = abap_true
+*                                              THEN <ls_create>-last_changed )
+*          instance-local_last_changed = COND #( WHEN <ls_create>-control-local_last_changed = abap_true
+*                                              THEN <ls_create>-local_last_changed )
+*          changed                         = abap_true
+*          deleted                         = abap_false ) TO gt_agty_buffer ASSIGNING FIELD-SYMBOL(<ls_just_added>).
+*
+*      fill_agty_admin_fields( EXPORTING iv_during_create = abap_true
+*                              CHANGING  cs_agty          = <ls_just_added> ).
+*
+*      INSERT VALUE #( agent_type = <ls_create>-agent_type ) INTO TABLE cs_mapped-agent_type.
+*
+*      APPEND VALUE #( msg        = lo_util->new_message(
+*                                       iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+*                                       iv_number   = `001`
+*                                       iv_severity = zpru_if_agent_message=>sc_severity-success
+*                                       iv_v1       = <ls_create>-agent_type )
+*                      agent_type = <ls_create>-agent_type ) TO cs_reported-agent_type.
+*
+*    ELSE.
+*      APPEND VALUE #( agent_type = <ls_create>-agent_type
+*                      create     = abap_true
+*                      fail       = zpru_if_agent_frw=>cs_fail_cause-conflict )
+*             TO cs_failed-agent_type.
+*
+*      APPEND VALUE #( agent_type = <ls_create>-agent_type
+*                      create     = abap_true
+*                      msg        = lo_util->new_message(
+*                                       iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
+*                                       iv_number   = `002`
+*                                       iv_severity = zpru_if_agent_message=>sc_severity-error
+*                                       iv_v1       = <ls_create>-agent_type ) )
+*             TO cs_reported-agent_type.
+*    ENDIF.
+*  ENDLOOP.
   ENDMETHOD.
 
 
