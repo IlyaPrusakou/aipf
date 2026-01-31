@@ -75,8 +75,7 @@ CLASS zpru_cl_api_agent DEFINITION
                 cs_adf_failed       TYPE zpru_if_agent_frw=>ts_adf_failed
       RAISING   zpru_cx_agent_core.
 
-  PRIVATE SECTION.
-    METHODS execute_tool_logic
+  METHODS execute_tool_logic
       IMPORTING
         io_controller       TYPE REF TO zpru_if_agent_controller
         io_input            TYPE REF TO zpru_if_payload
@@ -129,6 +128,9 @@ CLASS zpru_cl_api_agent DEFINITION
         iv_count            TYPE i
       RETURNING
         VALUE(rs_message)   TYPE zpru_if_short_memory_provider=>ts_message.
+
+  PRIVATE SECTION.
+
 ENDCLASS.
 
 
@@ -2297,6 +2299,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       eo_final_response = lo_last_output.
     ENDIF.
   ENDMETHOD.
+
   METHOD execute_tool_logic.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
     DATA lo_executor      TYPE REF TO zpru_if_tool_executor.
