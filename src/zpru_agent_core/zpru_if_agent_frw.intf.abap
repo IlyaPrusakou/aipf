@@ -149,6 +149,48 @@ INTERFACE zpru_if_agent_frw
            agent_type TYPE tt_agty_mapped,
          END OF ts_agty_bndl_mapped.
 
+  " AGSRV (Agent Service) types
+  TYPES: BEGIN OF ts_agsrv_reported,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+           msg     TYPE REF TO zpru_if_agent_message,
+           create  TYPE abap_boolean,
+           update  TYPE abap_boolean,
+           delete  TYPE abap_boolean,
+         END OF ts_agsrv_reported.
+
+  TYPES tt_agsrv_reported TYPE STANDARD TABLE OF ts_agsrv_reported WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_failed,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+           fail    TYPE i,
+           create  TYPE abap_boolean,
+           update  TYPE abap_boolean,
+           delete  TYPE abap_boolean,
+         END OF ts_agsrv_failed.
+
+  TYPES tt_agsrv_failed TYPE STANDARD TABLE OF ts_agsrv_failed WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_mapped,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+         END OF ts_agsrv_mapped.
+
+  TYPES tt_agsrv_mapped TYPE STANDARD TABLE OF ts_agsrv_mapped WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_reported,
+           agsrv TYPE tt_agsrv_reported,
+         END OF ts_agsrv_bndl_reported.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_failed,
+           agsrv TYPE tt_agsrv_failed,
+         END OF ts_agsrv_bndl_failed.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_mapped,
+           agsrv TYPE tt_agsrv_mapped,
+         END OF ts_agsrv_bndl_mapped.
+
   " AXC (Agent eXecution Context) types
   TYPES: BEGIN OF ts_header_reported,
            run_uuid TYPE sysuuid_x16,
