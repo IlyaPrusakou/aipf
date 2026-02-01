@@ -81,6 +81,8 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 * use agent type lopp_numb to control number of miniloops
 
+* make conversion of my message class into rap message class
+
   ENDMETHOD.
 
 ENDCLASS.

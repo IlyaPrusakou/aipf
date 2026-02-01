@@ -2,15 +2,15 @@ INTERFACE zpru_if_agent_frw
   PUBLIC.
 
   CONSTANTS: BEGIN OF cs_context,
-               standard                      TYPE  char100 VALUE 'STANDARD',
-               st_persistence_message        TYPE  char100 VALUE 'STANDARD_PERSISTENCE_MESSAGE',
-               st_persistence_summarize      TYPE  char100 VALUE 'STANDARD_PERSISTENCE_SUMMARIZE',
-               st_summarize                  TYPE  char100 VALUE 'STANDARD_SUMMARIZE',
-               st_discard_strategy_delete    TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_DELETE',
-               st_discard_strategy_summarize TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SUMMARIZE',
-               st_discard_strategy_save      TYPE  char100 VALUE 'STANDARD_DISCARD_STRATEGY_SAVE',
-               st_agent_execution            type char100 value 'STANDARD_AGENT_EXECUTION',
-               st_agent_DEFINITION            type char100 value 'STANDARD_AGENT_DEFINITION',
+               standard                      TYPE char100 VALUE 'STANDARD',
+               st_persistence_message        TYPE char100 VALUE 'STANDARD_PERSISTENCE_MESSAGE',
+               st_persistence_summarize      TYPE char100 VALUE 'STANDARD_PERSISTENCE_SUMMARIZE',
+               st_summarize                  TYPE char100 VALUE 'STANDARD_SUMMARIZE',
+               st_discard_strategy_delete    TYPE char100 VALUE 'STANDARD_DISCARD_STRATEGY_DELETE',
+               st_discard_strategy_summarize TYPE char100 VALUE 'STANDARD_DISCARD_STRATEGY_SUMMARIZE',
+               st_discard_strategy_save      TYPE char100 VALUE 'STANDARD_DISCARD_STRATEGY_SAVE',
+               st_agent_execution            TYPE char100 VALUE 'STANDARD_AGENT_EXECUTION',
+               st_agent_DEFINITION           TYPE char100 VALUE 'STANDARD_AGENT_DEFINITION',
              END OF cs_context.
 
   CONSTANTS:
@@ -148,6 +148,48 @@ INTERFACE zpru_if_agent_frw
   TYPES: BEGIN OF ts_agty_bndl_mapped,
            agent_type TYPE tt_agty_mapped,
          END OF ts_agty_bndl_mapped.
+
+  " AGSRV (Agent Service) types
+  TYPES: BEGIN OF ts_agsrv_reported,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+           msg     TYPE REF TO zpru_if_agent_message,
+           create  TYPE abap_boolean,
+           update  TYPE abap_boolean,
+           delete  TYPE abap_boolean,
+         END OF ts_agsrv_reported.
+
+  TYPES tt_agsrv_reported TYPE STANDARD TABLE OF ts_agsrv_reported WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_failed,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+           fail    TYPE i,
+           create  TYPE abap_boolean,
+           update  TYPE abap_boolean,
+           delete  TYPE abap_boolean,
+         END OF ts_agsrv_failed.
+
+  TYPES tt_agsrv_failed TYPE STANDARD TABLE OF ts_agsrv_failed WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_mapped,
+           service TYPE zpru_de_seoclname,
+           context TYPE char100,
+         END OF ts_agsrv_mapped.
+
+  TYPES tt_agsrv_mapped TYPE STANDARD TABLE OF ts_agsrv_mapped WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_reported,
+           agsrv TYPE tt_agsrv_reported,
+         END OF ts_agsrv_bndl_reported.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_failed,
+           agsrv TYPE tt_agsrv_failed,
+         END OF ts_agsrv_bndl_failed.
+
+  TYPES: BEGIN OF ts_agsrv_bndl_mapped,
+           agsrv TYPE tt_agsrv_mapped,
+         END OF ts_agsrv_bndl_mapped.
 
   " AXC (Agent eXecution Context) types
   TYPES: BEGIN OF ts_header_reported,
