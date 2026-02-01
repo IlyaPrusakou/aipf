@@ -3,7 +3,8 @@ INTERFACE zpru_if_long_memory_provider
 
   INTERFACES zpru_if_agent_frw.
 
-  METHODS retrieve_message.
+  METHODS retrieve_message
+    RETURNING VALUE(et_mem_msg) TYPE zpru_tt_db_mem_msg.
 
   METHODS save_messages
     IMPORTING
@@ -20,7 +21,8 @@ INTERFACE zpru_if_long_memory_provider
       ev_error  TYPE abap_boolean.
 
 
-  METHODS retrieve_summary.
+  METHODS retrieve_summary
+    RETURNING VALUE(et_mem_sum) TYPE zpru_tt_db_mem_sum.
 
   METHODS summarize_conversation
     IMPORTING

@@ -1,0 +1,6 @@
+@EndUserText.label: 'ZC_PRU_MEM_MSG'
+@MappingRole: true
+define role ZC_PRU_MEM_MSG {
+  grant select on ZC_PRU_MEM_MSG
+  where INHERITING CONDITIONS FROM ENTITY ZR_PRU_MEM_MSG REPLACING { ROOT WITH _BaseEntity };
+}

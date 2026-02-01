@@ -1,0 +1,42 @@
+managed implementation in class ZBP_R_PRU_MEM_MSG unique;
+strict ( 2 );
+extensible;
+define behavior for ZR_PRU_MEM_MSG alias ZrPruMemMsg
+persistent table ZPRU_MEM_MSG
+extensible
+lock master
+authorization master( global )
+{
+  field ( mandatory : create )
+   MessageUUID;
+
+  field ( readonly : update )
+   MessageUUID;
+
+
+  create;
+  update;
+  delete;
+
+  mapping for ZPRU_MEM_MSG corresponding extensible
+  {
+    MessageUUID = message_uuid;
+    Content = content;
+    MessageType = message_type;
+    MessageCid = message_cid;
+    Stage = stage;
+    SubStage = sub_stage;
+    Namespace = namespace;
+    UserName = user_name;
+    AgentUUID = agent_uuid;
+    RunUUID = run_uuid;
+    QueryUUID = query_uuid;
+    StepUUID = step_uuid;
+    MessageTime = message_time;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    ChangedBy = changed_by;
+    ChangedAt = changed_at;
+  }
+
+}

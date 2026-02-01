@@ -27,7 +27,7 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~get_history.
-*    rt_history = mt_agent_message.
+    rt_history = mt_agent_message.
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~save_message.
@@ -105,6 +105,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
         discard_messages( EXPORTING io_input  = lo_discard_input
                           IMPORTING eo_output = lo_discard_output ).
+
+        eo_output = lo_discard_output.
 
         IF lr_sort_number_r IS NOT INITIAL.
           DELETE mt_agent_message WHERE sort_number IN lr_sort_number_r.

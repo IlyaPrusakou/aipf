@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_PRU_MEM_MSG'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_PRU_MEM_MSG'
+  }
+}
+define service ZAPI_PRU_MEM_MSG_O4 provider contracts odata_v4_webapi {
+  expose ZC_PRU_MEM_MSG;
+}
