@@ -1,20 +1,14 @@
 CLASS zpru_cl_agsrv_precheck DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+  PUBLIC FINAL
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
-
-    INTERFACES zpru_if_agent_frw .
-    INTERFACES zpru_if_agsrv_precheck .
-  PROTECTED SECTION.
-  PRIVATE SECTION.
+    INTERFACES zpru_if_agent_frw.
+    INTERFACES zpru_if_agsrv_precheck.
 ENDCLASS.
 
 
-
 CLASS zpru_cl_agsrv_precheck IMPLEMENTATION.
-
   METHOD zpru_if_agsrv_precheck~precheck_create_agent_service.
     DATA ls_line TYPE zpru_if_agsrv_crud=>ts_agsrv_create_imp.
     DATA lo_util TYPE REF TO zpru_if_agent_util.
@@ -43,9 +37,9 @@ CLASS zpru_cl_agsrv_precheck IMPLEMENTATION.
         <ls_reported>-context = ls_line-context.
         <ls_reported>-create  = abap_true.
         <ls_reported>-msg     = lo_util->new_message(
-                                     iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
-                                     iv_number   = `001`
-                                     iv_severity = zpru_if_agent_message=>sc_severity-error ).
+                                    iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition
+                                    iv_number   = `001`
+                                    iv_severity = zpru_if_agent_message=>sc_severity-error ).
         CONTINUE.
       ENDIF.
 
@@ -109,5 +103,4 @@ CLASS zpru_cl_agsrv_precheck IMPLEMENTATION.
       APPEND ls_line TO et_entities.
     ENDLOOP.
   ENDMETHOD.
-
 ENDCLASS.

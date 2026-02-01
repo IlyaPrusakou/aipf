@@ -21,6 +21,16 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     lt_agent_serv = VALUE #( created_by = ''
                              created_at = '0.0000000'
                              changed_by = ''
+                             ( service            = 'ZPRU_IF_AGSRV_SERVICE'
+                               context            = 'STANDARD'
+                               class              = 'ZPRU_CL_AGSRV_SERVICE'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
+                             ( service            = 'ZPRU_IF_AGSRV_PRECHECK'
+                               context            = 'STANDARD'
+                               class              = 'ZPRU_CL_AGSRV_PRECHECK'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
                              ( service            = 'ZPRU_IF_ADF_VALIDATOR'
                                context            = 'STANDARD'
                                class              = 'ZPRU_CL_ADF_VALIDATOR'
