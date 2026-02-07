@@ -333,7 +333,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                          CHANGING  cs_adf_reported           = cs_adf_reported
                                    cs_adf_failed             = cs_adf_failed ).
 
-    DATA(lo_controller) = initialize_run_controller( ls_agent-agent_uuid ).
+    DATA(lo_controller) = initialize_run_controller( ls_agent-agentuuid ).
 
     process_decision_engine( EXPORTING is_agent                  = ls_agent
                                        it_agent_tools            = lt_agent_tools
@@ -362,7 +362,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    create_execution_header( EXPORTING iv_agent_uuid       = ls_agent-agent_uuid
+    create_execution_header( EXPORTING iv_agent_uuid       = ls_agent-agentuuid
                                        io_axc_service      = lo_axc_service
                              IMPORTING es_execution_header = DATA(ls_execution_header)
                              CHANGING  cs_axc_reported     = cs_axc_reported
@@ -435,7 +435,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                               CHANGING  cs_reported = cs_adf_reported
                                         cs_failed   = cs_adf_failed ).
 
-    prepare_memory_provider( EXPORTING iv_agent_uuid   = es_agent-agent_uuid
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = es_agent-agentuuid
                              IMPORTING eo_short_memory = DATA(lo_short_memory)
                              CHANGING  cs_reported     = cs_adf_reported
                                        cs_failed       = cs_adf_failed ).
@@ -642,7 +642,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     CHANGING  cs_reported   = cs_reported
                                               cs_failed     = cs_failed ).
 
-    CREATE OBJECT mo_short_memory TYPE (ls_agent-short_memory_provider).
+    CREATE OBJECT mo_short_memory TYPE (ls_agent-shortmemoryprovider).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
@@ -650,7 +650,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lo_controller) = get_controller( ).
     lo_controller->mo_short_memory = mo_short_memory.
 
-    CREATE OBJECT mo_long_memory TYPE (ls_agent-long_memory_provider).
+    CREATE OBJECT mo_long_memory TYPE (ls_agent-longmemoryprovider).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
@@ -672,7 +672,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                zpru_disc_strat AS disc ON disc~discard_strategy = type~discard_strategy
                  LEFT OUTER JOIN
                    zpru_summ_strat AS summ ON summ~summary_strategy = type~summary_strategy
-      WHERE type~agent_type = @ls_agent-agent_type
+      WHERE type~agent_type = @ls_agent-agenttype
       INTO @DATA(ls_agent_config).
     IF sy-subrc <> 0.
       RETURN.
@@ -734,7 +734,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agent_uuid
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agentuuid
                              IMPORTING eo_short_memory = lo_short_memory
                              CHANGING  cs_reported     = cs_adf_reported
                                        cs_failed       = cs_adf_failed ).
@@ -753,7 +753,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_count) = 1.
     LOOP AT it_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
 
-      ASSIGN it_agent_tools[ tool_uuid = <ls_execution_step>-tool_uuid ] TO FIELD-SYMBOL(<ls_tool_master_data>).
+      ASSIGN it_agent_tools[ tooluuid = <ls_execution_step>-tool_uuid ] TO FIELD-SYMBOL(<ls_tool_master_data>).
       IF sy-subrc <> 0.
         CONTINUE.
       ENDIF.
@@ -1045,16 +1045,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( ( agent_uuid                   = es_agent-agent_uuid
-                                                                   control-tool_uuid            = abap_true
-                                                                   control-agent_uuid           = abap_true
-                                                                   control-tool_name            = abap_true
-                                                                   control-tool_provider        = abap_true
-                                                                   control-step_type            = abap_true
-                                                                   control-tool_schema_provider = abap_true
-                                                                   control-tool_info_provider   = abap_true
-                                                                   control-is_borrowed          = abap_true
-                                                                   control-is_transient         = abap_true    ) )
+    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( ( agentuuid                  = es_agent-agentuuid
+                                                                   control-tooluuid           = abap_true
+                                                                   control-agentuuid          = abap_true
+                                                                   control-toolname           = abap_true
+                                                                   control-toolprovider       = abap_true
+                                                                   control-steptype           = abap_true
+                                                                   control-toolschemaprovider = abap_true
+                                                                   control-toolinfoprovider   = abap_true
+                                                                   control-isborrowed         = abap_true
+                                                                   control-istransient        = abap_true    ) )
                               IMPORTING et_tool       = DATA(lt_agent_tools)
                               CHANGING  cs_reported   = cs_adf_reported
                                         cs_failed     = cs_adf_failed ).
@@ -1103,7 +1103,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                          CHANGING  cs_adf_reported           = cs_adf_reported
                                    cs_adf_failed             = cs_adf_failed ).
 
-    DATA(lo_controller) = initialize_run_controller( ls_agent-agent_uuid ).
+    DATA(lo_controller) = initialize_run_controller( ls_agent-agentuuid ).
 
     process_decision_engine( EXPORTING is_agent                  = ls_agent
                                        it_agent_tools            = lt_agent_tools
@@ -1212,7 +1212,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agent_uuid
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agentuuid
                              IMPORTING eo_short_memory = lo_short_memory
                              CHANGING  cs_reported     = cs_adf_reported
                                        cs_failed       = cs_adf_failed ).
@@ -1258,10 +1258,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     IF lo_controller->mv_max_number_of_loops IS INITIAL.
-      lo_agty_service->read_agent_type(
-        EXPORTING it_agty_read_k = VALUE #( ( agent_type            = is_agent-agent_type
-                                              control-max_numb_loop = abap_true ) )
-        IMPORTING et_agty        = DATA(lt_agty) ).
+      lo_agty_service->read_agent_type( EXPORTING it_agty_read_k = VALUE #( ( agent_type            = is_agent-agenttype
+                                                                              control-max_numb_loop = abap_true ) )
+                                        IMPORTING et_agty        = DATA(lt_agty) ).
 
       DATA(lv_number_of_loops) = VALUE #( lt_agty[ 1 ]-max_numb_loop OPTIONAL ).
       IF lv_number_of_loops IS INITIAL.
@@ -1281,7 +1280,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_count) = 1.
     LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_step>).
 
-      ASSIGN it_additional_tools[ tool_uuid = <ls_additional_step>-tool_uuid ] TO FIELD-SYMBOL(<ls_additional_tool>).
+      ASSIGN it_additional_tools[ tooluuid = <ls_additional_step>-tool_uuid ] TO FIELD-SYMBOL(<ls_additional_tool>).
       IF sy-subrc <> 0.
         CONTINUE.
       ENDIF.
@@ -1459,11 +1458,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
     DATA lo_executor      TYPE REF TO zpru_if_tool_executor.
 
-    CREATE OBJECT lo_tool_provider TYPE (is_tool_master_data-tool_provider).
+    CREATE OBJECT lo_tool_provider TYPE (is_tool_master_data-toolprovider).
     lo_executor = lo_tool_provider->get_tool( is_tool_master_data = is_tool_master_data
                                               is_execution_step   = is_execution_step ).
 
-    CASE is_tool_master_data-step_type.
+    CASE is_tool_master_data-steptype.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
         CAST zpru_if_abap_executor( lo_executor )->execute_code( EXPORTING io_controller       = io_controller
                                                                            io_request          = io_input
@@ -1599,7 +1598,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     <ls_query_2_upd>-control-execution_status = abap_true.
     <ls_query_2_upd>-control-end_timestamp    = abap_true.
 
-    CREATE OBJECT lo_decision_provider TYPE (is_agent-decision_provider).
+    CREATE OBJECT lo_decision_provider TYPE (is_agent-decisionprovider).
 
     lo_decision_provider->prepare_final_response( EXPORTING iv_run_uuid       = is_execution_query-run_uuid
                                                             iv_query_uuid     = is_execution_query-query_uuid
@@ -1631,9 +1630,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         ( message_cid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_FINAL|
           stage        = 'PROCESS_EXECUTION_STEPS'
           sub_stage    = |FINAL_RESPONSE|
-          namespace    = |{ sy-uname }.{ is_agent-agent_name }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
+          namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
           user_name    = sy-uname
-          agent_uuid   = is_agent-agent_uuid
+          agent_uuid   = is_agent-agentuuid
           run_uuid     = is_execution_query-run_uuid
           query_uuid   = is_execution_query-query_uuid
           message_time = lv_now
@@ -1715,9 +1714,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         message_cid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
         stage        = 'PROCESS_EXECUTION_STEPS'
         sub_stage    = |STEP_{ is_execution_step-execution_seq }|
-        namespace    = |{ sy-uname }.{ is_agent-agent_name }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
+        namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
         user_name    = sy-uname
-        agent_uuid   = is_agent-agent_uuid
+        agent_uuid   = is_agent-agentuuid
         run_uuid     = is_execution_step-run_uuid
         query_uuid   = is_execution_step-query_uuid
         step_uuid    = is_execution_step-step_uuid
@@ -1726,8 +1725,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                        | "QUERY_NUMBER" : "{ is_execution_query-query_number }", | &&
                        | "STEP_NUMBER" : "{ is_execution_step-step_number }", | &&
                        | "EXECUTION_SEQ" : "{ is_execution_step-execution_seq }", | &&
-                       | "TOOL_NAME" : "{ is_tool_master_data-tool_name }", | &&
-                       | "STEP_TYPE" : "{ is_tool_master_data-step_type }", | &&
+                       | "TOOL_NAME" : "{ is_tool_master_data-toolname }", | &&
+                       | "STEP_TYPE" : "{ is_tool_master_data-steptype }", | &&
                        | "INPUT_PROMPT" : { lv_input_tool_prompt_message }, | &&
                        | "OUTPUT_PROMPT" : { lv_output_tool_prompt_message }, | &&
                        | "ERROR" : "{ iv_error_flag }"  \}|
@@ -1747,38 +1746,38 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( ( agent_uuid                   = es_agent-agent_uuid
-                                                                   control-tool_uuid            = abap_true
-                                                                   control-agent_uuid           = abap_true
-                                                                   control-tool_name            = abap_true
-                                                                   control-tool_provider        = abap_true
-                                                                   control-step_type            = abap_true
-                                                                   control-tool_schema_provider = abap_true
-                                                                   control-tool_info_provider   = abap_true
-                                                                   control-is_borrowed          = abap_true
-                                                                   control-is_transient         = abap_true    ) )
+    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( ( agentuuid                  = es_agent-agentuuid
+                                                                   control-tooluuid           = abap_true
+                                                                   control-agentuuid          = abap_true
+                                                                   control-toolname           = abap_true
+                                                                   control-toolprovider       = abap_true
+                                                                   control-steptype           = abap_true
+                                                                   control-toolschemaprovider = abap_true
+                                                                   control-toolinfoprovider   = abap_true
+                                                                   control-isborrowed         = abap_true
+                                                                   control-istransient        = abap_true    ) )
                               IMPORTING et_tool       = et_agent_tools
                               CHANGING  cs_reported   = cs_adf_reported
                                         cs_failed     = cs_adf_failed ).
 
-    CREATE OBJECT eo_decision_provider TYPE (es_agent-decision_provider).
+    CREATE OBJECT eo_decision_provider TYPE (es_agent-decisionprovider).
 
-    prepare_memory_provider( EXPORTING iv_agent_uuid   = es_agent-agent_uuid
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = es_agent-agentuuid
                              IMPORTING eo_short_memory = eo_short_memory
                              CHANGING  cs_reported     = cs_adf_reported
                                        cs_failed       = cs_adf_failed ).
 
-    get_long_memory( EXPORTING iv_agent_uuid  = es_agent-agent_uuid
+    get_long_memory( EXPORTING iv_agent_uuid  = es_agent-agentuuid
                      IMPORTING eo_long_memory = eo_long_memory
                      CHANGING  cs_reported    = cs_adf_reported
                                cs_failed      = cs_adf_failed ).
 
-    IF es_agent-agent_info_provider IS NOT INITIAL.
-      CREATE OBJECT eo_agent_info_provider TYPE (es_agent-agent_info_provider).
+    IF es_agent-agentinfoprovider IS NOT INITIAL.
+      CREATE OBJECT eo_agent_info_provider TYPE (es_agent-agentinfoprovider).
     ENDIF.
 
-    IF es_agent-system_prompt_provider IS NOT INITIAL.
-      CREATE OBJECT eo_system_prompt_provider TYPE (es_agent-system_prompt_provider).
+    IF es_agent-systempromptprovider IS NOT INITIAL.
+      CREATE OBJECT eo_system_prompt_provider TYPE (es_agent-systempromptprovider).
     ENDIF.
   ENDMETHOD.
 
@@ -1831,12 +1830,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
                                       stage        = iv_stage
                                       sub_stage    = 'BEFORE_DECISION'
-                                      namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                                      namespace    = |{ sy-uname }.{ is_agent-agentname }|
                                       user_name    = sy-uname
-                                      agent_uuid   = is_agent-agent_uuid
+                                      agent_uuid   = is_agent-agentuuid
                                       message_time = lv_now
-                                      content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
-                                                     | "DECISION_PROVIDER" : "{ is_agent-decision_provider }", | &&
+                                      content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                                     | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                                      | "QUERY" : { iv_input_query }, | &&
                                                      | "SYSTEM PROMPT" : { lv_system_prompt }, | &&
                                                      | "AGENT INFO" : "{ lv_agent_info }" \}|
@@ -1888,12 +1887,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lt_message_in = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
                                stage        = iv_stage
                                sub_stage    = 'AFTER_DECISION'
-                               namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                               namespace    = |{ sy-uname }.{ is_agent-agentname }|
                                user_name    = sy-uname
-                               agent_uuid   = is_agent-agent_uuid
+                               agent_uuid   = is_agent-agentuuid
                                message_time = lv_now
-                               content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
-                                              | "DECISION_PROVIDER" : "{ is_agent-decision_provider }", | &&
+                               content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                              | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                               | "QUERY" : { iv_input_query }, | &&
                                               | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
                                               | "LANGUAGE" : "{ ev_langu }", | &&
@@ -1923,8 +1922,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_count) = iv_count.
 
     LOOP AT ct_execution_plan ASSIGNING FIELD-SYMBOL(<ls_tool>).
-      ASSIGN it_agent_tools[ agent_uuid = <ls_tool>-agent_uuid
-                             tool_name  = <ls_tool>-tool_name ] TO FIELD-SYMBOL(<ls_tool_master_data>).
+      ASSIGN it_agent_tools[ agentuuid = <ls_tool>-agentuuid
+                             toolname  = <ls_tool>-toolname ] TO FIELD-SYMBOL(<ls_tool_master_data>).
       IF sy-subrc <> 0.
         RETURN.
       ENDIF.
@@ -1941,7 +1940,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                 iv_step_number_base = lv_step_number_base ).
       <ls_execution_step>-query_uuid      = is_execution_query-query_uuid.
       <ls_execution_step>-run_uuid        = is_execution_header-run_uuid.
-      <ls_execution_step>-tool_uuid       = <ls_tool_master_data>-tool_uuid.
+      <ls_execution_step>-tool_uuid       = <ls_tool_master_data>-tooluuid.
       <ls_execution_step>-execution_seq   = <ls_tool>-sequence.
       <ls_execution_step>-step_status     = zpru_if_axc_type_and_constant=>sc_step_status-new.
       <ls_execution_step>-start_timestamp = lv_now.
@@ -1967,9 +1966,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ lv_count }|
           stage        = iv_stage
           sub_stage    = 'STEP_ANALYSIS'
-          namespace    = |{ sy-uname }.{ is_agent-agent_name }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
+          namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-run_id }.{ is_execution_query-query_number }|
           user_name    = sy-uname
-          agent_uuid   = is_agent-agent_uuid
+          agent_uuid   = is_agent-agentuuid
           run_uuid     = is_execution_header-run_uuid
           query_uuid   = is_execution_query-query_uuid
           step_uuid    = <ls_execution_step>-step_uuid
@@ -2043,21 +2042,21 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              IMPORTING et_agent_k    = et_agent_k ).
 
     eo_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN et_agent_k
-                                                                 ( agent_uuid                     = <ls_k>-agent_uuid
-                                                                   control-agent_uuid             = abap_true
-                                                                   control-agent_name             = abap_true
-                                                                   control-agent_type             = abap_true
-                                                                   control-decision_provider      = abap_true
-                                                                   control-short_memory_provider  = abap_true
-                                                                   control-long_memory_provider   = abap_true
-                                                                   control-agent_info_provider    = abap_true
-                                                                   control-system_prompt_provider = abap_true
-                                                                   control-status                 = abap_true
-                                                                   control-created_by             = abap_true
-                                                                   control-created_at             = abap_true
-                                                                   control-changed_by             = abap_true
-                                                                   control-last_changed           = abap_true
-                                                                   control-local_last_changed     = abap_true ) )
+                                                                 ( agentuuid                    = <ls_k>-agentuuid
+                                                                   control-agentuuid            = abap_true
+                                                                   control-agentname            = abap_true
+                                                                   control-agenttype            = abap_true
+                                                                   control-decisionprovider     = abap_true
+                                                                   control-shortmemoryprovider  = abap_true
+                                                                   control-longmemoryprovider   = abap_true
+                                                                   control-agentinfoprovider    = abap_true
+                                                                   control-systempromptprovider = abap_true
+                                                                   control-status               = abap_true
+                                                                   control-createdby            = abap_true
+                                                                   control-createdat            = abap_true
+                                                                   control-changedby            = abap_true
+                                                                   control-lastchanged          = abap_true
+                                                                   control-locallastchanged     = abap_true ) )
                             IMPORTING et_agent        = DATA(lt_agent)
                             CHANGING  cs_reported     = cs_reported
                                       cs_failed       = cs_failed ).
@@ -2075,29 +2074,29 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     io_service->update_agent(
-      EXPORTING it_agent_update_imp = VALUE #( ( agent_uuid = is_agent-agent_uuid
-                                                 status     = zpru_if_adf_type_and_constant=>cs_agent_status-active
-                                                 control    = VALUE #( status = abap_true ) ) )
+      EXPORTING it_agent_update_imp = VALUE #( ( agentuuid = is_agent-agentuuid
+                                                 status    = zpru_if_adf_type_and_constant=>cs_agent_status-active
+                                                 control   = VALUE #( status = abap_true ) ) )
       CHANGING  cs_reported         = cs_reported
                 cs_failed           = cs_failed ).
 
-    IF line_exists( cs_failed-agent[ agent_uuid = is_agent-agent_uuid ] ).
+    IF line_exists( cs_failed-agent[ agentuuid = is_agent-agentuuid ] ).
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
   ENDMETHOD.
 
   METHOD identify_available_tools.
     io_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( FOR <ls_k2> IN it_agent_k
-                                                             ( agent_uuid                   = <ls_k2>-agent_uuid
-                                                               control-tool_uuid            = abap_true
-                                                               control-agent_uuid           = abap_true
-                                                               control-tool_name            = abap_true
-                                                               control-tool_provider        = abap_true
-                                                               control-step_type            = abap_true
-                                                               control-tool_schema_provider = abap_true
-                                                               control-tool_info_provider   = abap_true
-                                                               control-is_borrowed          = abap_true
-                                                               control-is_transient         = abap_true    ) )
+                                                             ( agentuuid                  = <ls_k2>-agentuuid
+                                                               control-tooluuid           = abap_true
+                                                               control-agentuuid          = abap_true
+                                                               control-toolname           = abap_true
+                                                               control-toolprovider       = abap_true
+                                                               control-steptype           = abap_true
+                                                               control-toolschemaprovider = abap_true
+                                                               control-toolinfoprovider   = abap_true
+                                                               control-isborrowed         = abap_true
+                                                               control-istransient        = abap_true    ) )
                           IMPORTING et_tool       = et_tools
                           CHANGING  cs_reported   = cs_reported
                                     cs_failed     = cs_failed ).
@@ -2119,13 +2118,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                  ( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
                                    stage        = 'INITIALIZE'
                                    sub_stage    = 'INITIALIZE_AGENT'
-                                   namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                                   namespace    = |{ sy-uname }.{ is_agent-agentname }|
                                    user_name    = sy-uname
-                                   agent_uuid   = is_agent-agent_uuid
+                                   agent_uuid   = is_agent-agentuuid
                                    message_time = lv_now
-                                   content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
-                                                  |"DECISION_PROVIDER" : "{ is_agent-decision_provider }",| &&
-                                                  |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-system_prompt_provider }" \}|
+                                   content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                                  |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
+                                                  |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }" \}|
                                    message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     lv_count += 1.
@@ -2134,12 +2133,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_message> = VALUE #( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
                               stage        = 'INITIALIZE'
                               sub_stage    = 'INITIALIZE_TOOL'
-                              namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                              namespace    = |{ sy-uname }.{ is_agent-agentname }|
                               user_name    = sy-uname
-                              agent_uuid   = is_agent-agent_uuid
+                              agent_uuid   = is_agent-agentuuid
                               message_time = lv_now
-                              content      = |\{ "TOOL_NAME" : "{ <ls_tool>-tool_name }", | &&
-                                             |"TOOL_PROVIDER" : "{ <ls_tool>-tool_provider }" \}|
+                              content      = |\{ "TOOL_NAME" : "{ <ls_tool>-toolname }", | &&
+                                             |"TOOL_PROVIDER" : "{ <ls_tool>-toolprovider }" \}|
                               message_type = zpru_if_short_memory_provider=>cs_msg_type-info ).
 
       lv_count += 1.
@@ -2157,21 +2156,21 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    eo_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = iv_agent_uuid
-                                                                   control-agent_uuid             = abap_true
-                                                                   control-agent_name             = abap_true
-                                                                   control-agent_type             = abap_true
-                                                                   control-decision_provider      = abap_true
-                                                                   control-short_memory_provider  = abap_true
-                                                                   control-long_memory_provider   = abap_true
-                                                                   control-agent_info_provider    = abap_true
-                                                                   control-system_prompt_provider = abap_true
-                                                                   control-status                 = abap_true
-                                                                   control-created_by             = abap_true
-                                                                   control-created_at             = abap_true
-                                                                   control-changed_by             = abap_true
-                                                                   control-last_changed           = abap_true
-                                                                   control-local_last_changed     = abap_true  ) )
+    eo_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agentuuid                    = iv_agent_uuid
+                                                                   control-agentuuid            = abap_true
+                                                                   control-agentname            = abap_true
+                                                                   control-agenttype            = abap_true
+                                                                   control-decisionprovider     = abap_true
+                                                                   control-shortmemoryprovider  = abap_true
+                                                                   control-longmemoryprovider   = abap_true
+                                                                   control-agentinfoprovider    = abap_true
+                                                                   control-systempromptprovider = abap_true
+                                                                   control-status               = abap_true
+                                                                   control-createdby            = abap_true
+                                                                   control-createdat            = abap_true
+                                                                   control-changedby            = abap_true
+                                                                   control-lastchanged          = abap_true
+                                                                   control-locallastchanged     = abap_true  ) )
                             IMPORTING et_agent        = DATA(lt_agent)
                             CHANGING  cs_reported     = cs_reported
                                       cs_failed       = cs_failed ).
@@ -2207,13 +2206,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lt_message = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
                             stage        = 'SET_INPUT_QUERY'
                             sub_stage    = 'SET_INPUT_QUERY'
-                            namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                            namespace    = |{ sy-uname }.{ is_agent-agentname }|
                             user_name    = sy-uname
-                            agent_uuid   = is_agent-agent_uuid
+                            agent_uuid   = is_agent-agentuuid
                             message_time = lv_now
-                            content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
-                                           |"DECISION_PROVIDER" : "{ is_agent-decision_provider }",| &&
-                                           |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-system_prompt_provider }", | &&
+                            content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                           |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
+                                           |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
                                            |"INPUT_QUERY" : { mv_input_query } \}|
                             message_type = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
@@ -2327,13 +2326,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_3|
           stage        = iv_stage
           sub_stage    = 'AFTER_QUERY_CREATION'
-          namespace    = |{ sy-uname }.{ is_agent-agent_name }.{ is_execution_header-run_id }|
+          namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-run_id }|
           user_name    = sy-uname
-          agent_uuid   = is_agent-agent_uuid
+          agent_uuid   = is_agent-agentuuid
           run_uuid     = is_execution_header-run_uuid
           query_uuid   = is_execution_query-query_uuid
           message_time = lv_now
-          content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
+          content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                          | "RUN_ID" : "{ is_execution_header-run_id }", | &&
                          | "QUERY_NUMBER" : "{ is_execution_query-query_number }", | &&
                          | "LANGUAGE" : "{ is_execution_query-language }", | &&

@@ -4,8 +4,8 @@ INTERFACE zpru_if_decision_provider
 
 
   TYPES: BEGIN OF ts_execution_plan,
-           agent_uuid TYPE sysuuid_x16,
-           tool_name  TYPE char100,
+           agentuuid TYPE sysuuid_x16,
+           toolname  TYPE char100,
            sequence   TYPE i,
          END OF ts_execution_plan.
 

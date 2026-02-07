@@ -408,14 +408,14 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
     lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
-    lo_long_memory->retrieve_message( ).
+*    lo_long_memory->retrieve_message( ). " qqq add new parameters
   ENDMETHOD.
 
   METHOD zpru_if_long_memory_provider~retrieve_summary.
     DATA lo_long_memory TYPE REF TO zpru_if_long_memory_provider.
 
     lo_long_memory = zpru_cl_dummy_agent_logic=>get_long_memory( ).
-    lo_long_memory->retrieve_summary( ).
+*    lo_long_memory->retrieve_summary( ). " qqq add new parameters
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~save_message.

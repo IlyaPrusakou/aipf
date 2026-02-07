@@ -83,6 +83,11 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 * make conversion of my message class into rap message class
 
+* isolate zpru_cl_test_data as it is used data base tables
+
+* add new parameters into minifyed implmentation for retreive messages
+
+
   ENDMETHOD.
 
 ENDCLASS.

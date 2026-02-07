@@ -37,22 +37,22 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
   METHOD zpru_if_agsrv_service~query_agent_service.
     CLEAR et_agsrv_k.
 
-    SELECT service, context FROM zpru_agent_serv
-      WHERE service            IN @it_service
-        AND context            IN @it_context
-        AND class              IN @it_class
-        AND created_by         IN @it_created_by
-        AND created_at         IN @it_created_at
-        AND changed_by         IN @it_changed_by
-        AND last_changed       IN @it_last_changed
-        AND local_last_changed IN @it_local_last_changed
+    SELECT Service, Context FROM zi_pru_agent_serv
+      WHERE Service          IN @it_service
+        AND Context          IN @it_context
+        AND Class            IN @it_class
+        AND CreatedBy        IN @it_created_by
+        AND CreatedAt        IN @it_created_at
+        AND ChangedBy        IN @it_changed_by
+        AND LastChanged      IN @it_last_changed
+        AND LocalLastChanged IN @it_local_last_changed
       INTO TABLE @et_agsrv_k.
   ENDMETHOD.
 
   METHOD zpru_if_agsrv_service~read_agent_service.
     DATA ls_reported TYPE zpru_if_agent_frw=>ts_agsrv_bndl_reported.
     DATA ls_failed   TYPE zpru_if_agent_frw=>ts_agsrv_bndl_failed.
-    DATA ls_out      TYPE zpru_agent_serv.
+    DATA ls_out      TYPE zpru_s_agent_serv.
     DATA lt_read_in  TYPE TABLE FOR READ IMPORT zr_pru_agent_serv\\zrpruagentserv.
 
     CLEAR et_agsrv.
@@ -79,12 +79,12 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
         ( service  = <ls_req>-service
           context  = <ls_req>-context
           %control = VALUE #(
-              Class            = COND #( WHEN <ls_req>-control-class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_req>-control-created_by = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_req>-control-created_at = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_req>-control-changed_by = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_req>-control-last_changed = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_req>-control-local_last_changed = abap_true THEN if_abap_behv=>mk-on ) ) ) ).
+              Class            = COND #( WHEN <ls_req>-control-Class = abap_true THEN if_abap_behv=>mk-on )
+              CreatedBy        = COND #( WHEN <ls_req>-control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              CreatedAt        = COND #( WHEN <ls_req>-control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              ChangedBy        = COND #( WHEN <ls_req>-control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              LastChanged      = COND #( WHEN <ls_req>-control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              LocalLastChanged = COND #( WHEN <ls_req>-control-LocalLastChanged = abap_true THEN if_abap_behv=>mk-on ) ) ) ).
 
     READ ENTITIES OF zr_pru_agent_serv
          ENTITY zrpruagentserv
@@ -108,14 +108,14 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       CLEAR ls_out.
-      ls_out-service            = <ls_res>-Service.
-      ls_out-context            = <ls_res>-Context.
-      ls_out-class              = <ls_res>-Class.
-      ls_out-created_by         = <ls_res>-CreatedBy.
-      ls_out-created_at         = <ls_res>-CreatedAt.
-      ls_out-changed_by         = <ls_res>-ChangedBy.
-      ls_out-last_changed       = <ls_res>-LastChanged.
-      ls_out-local_last_changed = <ls_res>-LocalLastChanged.
+      ls_out-Service          = <ls_res>-Service.
+      ls_out-Context          = <ls_res>-Context.
+      ls_out-Class            = <ls_res>-Class.
+      ls_out-CreatedBy        = <ls_res>-CreatedBy.
+      ls_out-CreatedAt        = <ls_res>-CreatedAt.
+      ls_out-ChangedBy        = <ls_res>-ChangedBy.
+      ls_out-LastChanged      = <ls_res>-LastChanged.
+      ls_out-LocalLastChanged = <ls_res>-LocalLastChanged.
       APPEND ls_out TO et_agsrv.
     ENDLOOP.
   ENDMETHOD.
@@ -140,23 +140,23 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     lt_create_in = VALUE #(
         FOR <ls_create> IN lt_entities
-        ( Service          = <ls_create>-service
-          Context          = <ls_create>-context
-          Class            = <ls_create>-class
-          CreatedBy        = <ls_create>-created_by
-          CreatedAt        = <ls_create>-created_at
-          ChangedBy        = <ls_create>-changed_by
-          LastChanged      = <ls_create>-last_changed
-          LocalLastChanged = <ls_create>-local_last_changed
+        ( Service          = <ls_create>-Service
+          Context          = <ls_create>-Context
+          Class            = <ls_create>-Class
+          CreatedBy        = <ls_create>-CreatedBy
+          CreatedAt        = <ls_create>-CreatedAt
+          ChangedBy        = <ls_create>-ChangedBy
+          LastChanged      = <ls_create>-LastChanged
+          LocalLastChanged = <ls_create>-LocalLastChanged
           %control         = VALUE #(
               Service          = if_abap_behv=>mk-on
               Context          = if_abap_behv=>mk-on
-              Class            = COND #( WHEN <ls_create>-control-class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_create>-control-created_by = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_create>-control-created_at = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_create>-control-changed_by = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_create>-control-last_changed = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_create>-control-local_last_changed = abap_true
+              Class            = COND #( WHEN <ls_create>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
+              CreatedBy        = COND #( WHEN <ls_create>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              CreatedAt        = COND #( WHEN <ls_create>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              ChangedBy        = COND #( WHEN <ls_create>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              LastChanged      = COND #( WHEN <ls_create>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              LocalLastChanged = COND #( WHEN <ls_create>-Control-LocalLastChanged = abap_true
                                          THEN if_abap_behv=>mk-on ) ) ) ).
 
     MODIFY ENTITIES OF zr_pru_agent_serv
@@ -208,21 +208,21 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     lt_update_in = VALUE #(
         FOR <ls_update> IN lt_entities
-        ( Service          = <ls_update>-service
-          Context          = <ls_update>-context
-          Class            = <ls_update>-class
-          CreatedBy        = <ls_update>-created_by
-          CreatedAt        = <ls_update>-created_at
-          ChangedBy        = <ls_update>-changed_by
-          LastChanged      = <ls_update>-last_changed
-          LocalLastChanged = <ls_update>-local_last_changed
+        ( Service          = <ls_update>-Service
+          Context          = <ls_update>-Context
+          Class            = <ls_update>-Class
+          CreatedBy        = <ls_update>-CreatedBy
+          CreatedAt        = <ls_update>-CreatedAt
+          ChangedBy        = <ls_update>-ChangedBy
+          LastChanged      = <ls_update>-LastChanged
+          LocalLastChanged = <ls_update>-LocalLastChanged
           %control         = VALUE #(
-              Class            = COND #( WHEN <ls_update>-control-class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_update>-control-created_by = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_update>-control-created_at = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_update>-control-changed_by = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_update>-control-last_changed = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_update>-control-local_last_changed = abap_true
+              Class            = COND #( WHEN <ls_update>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
+              CreatedBy        = COND #( WHEN <ls_update>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              CreatedAt        = COND #( WHEN <ls_update>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              ChangedBy        = COND #( WHEN <ls_update>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              LastChanged      = COND #( WHEN <ls_update>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              LocalLastChanged = COND #( WHEN <ls_update>-Control-LocalLastChanged = abap_true
                                          THEN if_abap_behv=>mk-on ) ) ) ).
 
     MODIFY ENTITIES OF zr_pru_agent_serv

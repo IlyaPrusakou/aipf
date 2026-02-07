@@ -41,56 +41,56 @@ INTERFACE zpru_if_agent_frw
 
   " ADF (Agent Definition) types
   TYPES: BEGIN OF ts_agent_reported,
-           agent_uuid TYPE sysuuid_x16,
-           msg        TYPE REF TO zpru_if_agent_message,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           agentuuid TYPE sysuuid_x16,
+           msg       TYPE REF TO zpru_if_agent_message,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_agent_reported.
 
   TYPES tt_agent_reported TYPE STANDARD TABLE OF ts_agent_reported WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_tool_reported,
-           agent_uuid TYPE sysuuid_x16,
-           tool_uuid  TYPE sysuuid_x16,
-           msg        TYPE REF TO zpru_if_agent_message,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           agentuuid TYPE sysuuid_x16,
+           tooluuid  TYPE sysuuid_x16,
+           msg       TYPE REF TO zpru_if_agent_message,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_tool_reported.
 
   TYPES tt_tool_reported TYPE STANDARD TABLE OF ts_tool_reported WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_agent_failed,
-           agent_uuid TYPE sysuuid_x16,
-           fail       TYPE i,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           agentuuid TYPE sysuuid_x16,
+           fail      TYPE i,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_agent_failed.
 
   TYPES tt_agent_failed TYPE STANDARD TABLE OF ts_agent_failed WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_tool_failed,
-           agent_uuid TYPE sysuuid_x16,
-           tool_uuid  TYPE sysuuid_x16,
-           fail       TYPE i,
-           create     TYPE abap_boolean,
-           update     TYPE abap_boolean,
-           delete     TYPE abap_boolean,
+           agentuuid TYPE sysuuid_x16,
+           tooluuid  TYPE sysuuid_x16,
+           fail      TYPE i,
+           create    TYPE abap_boolean,
+           update    TYPE abap_boolean,
+           delete    TYPE abap_boolean,
          END OF ts_tool_failed.
 
   TYPES tt_tool_failed TYPE STANDARD TABLE OF ts_tool_failed WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_agent_mapped,
-           agent_uuid TYPE sysuuid_x16,
+           agentuuid TYPE sysuuid_x16,
          END OF ts_agent_mapped.
 
   TYPES tt_agent_mapped TYPE STANDARD TABLE OF ts_agent_mapped WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_tool_mapped,
-           agent_uuid TYPE sysuuid_x16,
-           tool_uuid  TYPE sysuuid_x16,
+           agentuuid TYPE sysuuid_x16,
+           tooluuid  TYPE sysuuid_x16,
          END OF ts_tool_mapped.
 
   TYPES tt_tool_mapped TYPE STANDARD TABLE OF ts_tool_mapped WITH EMPTY KEY.

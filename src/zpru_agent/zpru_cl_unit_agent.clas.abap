@@ -26,9 +26,9 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                             et_tools      = DATA(lt_tools) ).
 
         lo_api_agent->set_input_query( iv_input_query = iv_input_query
-                                       iv_agent_uuid  = ls_agent-agent_uuid ).
+                                       iv_agent_uuid  = ls_agent-agentuuid ).
 
-        lo_api_agent->build_execution( EXPORTING iv_agent_uuid       = ls_agent-agent_uuid
+        lo_api_agent->build_execution( EXPORTING iv_agent_uuid       = ls_agent-agentuuid
                                        IMPORTING ev_built_run_uuid   = DATA(lv_built_run_uuid)
                                                  ev_built_query_uuid = DATA(lv_built_query_uuid)  ).
 

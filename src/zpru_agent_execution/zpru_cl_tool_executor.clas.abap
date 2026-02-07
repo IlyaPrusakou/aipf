@@ -92,28 +92,28 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     ENDTRY.
 
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_a> IN it_step_4_validate
-                                                                     ( agent_uuid         = <ls_a>-agentuuid
-                                                                       control-agent_uuid = abap_true ) )
+                                                                     ( agentuuid         = <ls_a>-agentuuid
+                                                                       control-agentuuid = abap_true ) )
                                 IMPORTING et_agent        = DATA(lt_existing_agent) ).
 
-    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid         = io_controller->mv_agent_uuid
-                                                                       control-agent_name = abap_true  ) )
+    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agentuuid         = io_controller->mv_agent_uuid
+                                                                       control-agentname = abap_true  ) )
                                 IMPORTING et_agent        = DATA(lt_current_agent) ).
 
     DATA(ls_current_agent) = VALUE #( lt_current_agent[ 1 ] OPTIONAL ).
 
     lo_adf_service->read_tool( EXPORTING it_tool_read_k = VALUE #( FOR <ls_a2> IN it_step_4_validate
-                                                                   ( agent_uuid                   = <ls_a2>-agentuuid
-                                                                     tool_uuid                    = <ls_a2>-tooluuid
-                                                                     control-agent_uuid           = abap_true
-                                                                     control-tool_uuid            = abap_true
-                                                                     control-tool_name            = abap_true
-                                                                     control-tool_provider        = abap_true
-                                                                     control-step_type            = abap_true
-                                                                     control-tool_schema_provider = abap_true
-                                                                     control-tool_info_provider   = abap_true
-                                                                     control-is_borrowed          = abap_true
-                                                                     control-is_transient         = abap_true  ) )
+                                                                   ( agentuuid                  = <ls_a2>-agentuuid
+                                                                     tooluuid                   = <ls_a2>-tooluuid
+                                                                     control-agentuuid          = abap_true
+                                                                     control-tooluuid           = abap_true
+                                                                     control-toolname           = abap_true
+                                                                     control-toolprovider       = abap_true
+                                                                     control-steptype           = abap_true
+                                                                     control-toolschemaprovider = abap_true
+                                                                     control-toolinfoprovider   = abap_true
+                                                                     control-isborrowed         = abap_true
+                                                                     control-istransient        = abap_true  ) )
                                IMPORTING et_tool        = DATA(lt_existing_tool) ).
 
     lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( run_uuid       = is_current_step-run_uuid
@@ -188,8 +188,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       ENDIF.
 
       TRY.
-          ASSIGN lt_existing_agent[ agent_uuid = <ls_step_4_validate>-agentuuid ] TO FIELD-SYMBOL(<ls_existing_agent>).
-          ASSIGN lt_existing_tool[ tool_uuid = <ls_step_4_validate>-tooluuid ] TO FIELD-SYMBOL(<ls_existing_tool>).
+          ASSIGN lt_existing_agent[ agentuuid = <ls_step_4_validate>-agentuuid ] TO FIELD-SYMBOL(<ls_existing_agent>).
+          ASSIGN lt_existing_tool[ tooluuid = <ls_step_4_validate>-tooluuid ] TO FIELD-SYMBOL(<ls_existing_tool>).
 
           IF    (     <ls_existing_agent> IS ASSIGNED
                   AND <ls_existing_tool>  IS NOT ASSIGNED )
@@ -203,37 +203,37 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           APPEND INITIAL LINE TO et_additional_tools ASSIGNING FIELD-SYMBOL(<ls_additional_tool>).
 
           IF <ls_existing_tool> IS ASSIGNED.
-            <ls_additional_tool>-tool_uuid            = <ls_existing_tool>-tool_uuid.
-            <ls_additional_tool>-tool_name            = <ls_existing_tool>-tool_name.
-            <ls_additional_tool>-tool_provider        = <ls_existing_tool>-tool_provider.
-            <ls_additional_tool>-step_type            = <ls_existing_tool>-step_type.
-            <ls_additional_tool>-tool_schema_provider = <ls_existing_tool>-tool_schema_provider.
-            <ls_additional_tool>-tool_info_provider   = <ls_existing_tool>-tool_info_provider.
+            <ls_additional_tool>-tooluuid           = <ls_existing_tool>-tooluuid.
+            <ls_additional_tool>-toolname           = <ls_existing_tool>-toolname.
+            <ls_additional_tool>-toolprovider       = <ls_existing_tool>-toolprovider.
+            <ls_additional_tool>-steptype           = <ls_existing_tool>-steptype.
+            <ls_additional_tool>-toolschemaprovider = <ls_existing_tool>-toolschemaprovider.
+            <ls_additional_tool>-toolinfoprovider   = <ls_existing_tool>-toolinfoprovider.
           ELSE.
             DATA(lv_temp_tool_uuid) = cl_system_uuid=>create_uuid_x16_static( ).
-            <ls_additional_tool>-tool_uuid            = lv_temp_tool_uuid.
-            <ls_additional_tool>-tool_name            = <ls_step_4_validate>-toolname.
-            <ls_additional_tool>-tool_provider        = <ls_step_4_validate>-toolprovider.
-            <ls_additional_tool>-step_type            = <ls_step_4_validate>-steptype.
-            <ls_additional_tool>-tool_schema_provider = <ls_step_4_validate>-toolschemaprovider.
-            <ls_additional_tool>-tool_info_provider   = <ls_step_4_validate>-toolinfoprovider.
+            <ls_additional_tool>-tooluuid           = lv_temp_tool_uuid.
+            <ls_additional_tool>-toolname           = <ls_step_4_validate>-toolname.
+            <ls_additional_tool>-toolprovider       = <ls_step_4_validate>-toolprovider.
+            <ls_additional_tool>-steptype           = <ls_step_4_validate>-steptype.
+            <ls_additional_tool>-toolschemaprovider = <ls_step_4_validate>-toolschemaprovider.
+            <ls_additional_tool>-toolinfoprovider   = <ls_step_4_validate>-toolinfoprovider.
           ENDIF.
 
           IF <ls_existing_agent> IS ASSIGNED.
-            <ls_additional_tool>-agent_uuid = <ls_existing_agent>-agent_uuid.
+            <ls_additional_tool>-agentuuid = <ls_existing_agent>-agentuuid.
           ELSE.
             DATA(lv_temp_agent_uuid) = cl_system_uuid=>create_uuid_x16_static( ).
-            <ls_additional_tool>-agent_uuid = lv_temp_agent_uuid.
+            <ls_additional_tool>-agentuuid = lv_temp_agent_uuid.
           ENDIF.
 
           IF     <ls_existing_agent> IS NOT ASSIGNED
              AND <ls_existing_tool>  IS NOT ASSIGNED.
-            <ls_additional_tool>-is_transient = abap_true.
+            <ls_additional_tool>-istransient = abap_true.
           ENDIF.
 
           IF     <ls_existing_agent> IS ASSIGNED
              AND <ls_existing_tool>  IS ASSIGNED.
-            <ls_additional_tool>-is_borrowed = abap_true.
+            <ls_additional_tool>-isborrowed = abap_true.
           ENDIF.
 
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
@@ -244,7 +244,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                                   iv_query_uuid = is_current_step-query_uuid ).
           <ls_additional_steps>-query_uuid  = is_current_step-query_uuid.
           <ls_additional_steps>-run_uuid    = is_current_step-run_uuid.
-          <ls_additional_steps>-tool_uuid   = <ls_additional_tool>-tool_uuid.
+          <ls_additional_steps>-tool_uuid   = <ls_additional_tool>-tooluuid.
 
           CLEAR: lv_temp_tool_uuid,
                  lv_temp_agent_uuid.
@@ -277,11 +277,11 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           ( message_cid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-step_uuid }|
             stage        = 'VALIDATE_ADDITIONAL_STEPS'
             sub_stage    = 'AFTER VALIDATION'
-            namespace    = |{ sy-uname }.{ ls_current_agent-agent_name }.{ ls_current_run-run_id }.{ ls_current_query-query_number }|
+            namespace    = |{ sy-uname }.{ ls_current_agent-agentname }.{ ls_current_run-run_id }.{ ls_current_query-query_number }|
             user_name    = sy-uname
-            agent_uuid   = ls_current_agent-agent_uuid
+            agent_uuid   = ls_current_agent-agentuuid
             message_time = lv_now
-            content      = |\{ "AGENT_NAME" : "{ ls_current_agent-agent_name }", | &&
+            content      = |\{ "AGENT_NAME" : "{ ls_current_agent-agentname }", | &&
                            | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
             message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
       TRY.
@@ -301,7 +301,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     ev_error_flag = abap_false.
 
-    CREATE OBJECT lo_tool_schema_provider TYPE (is_tool_master_data-tool_schema_provider).
+    CREATE OBJECT lo_tool_schema_provider TYPE (is_tool_master_data-toolschemaprovider).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
       RETURN.
@@ -309,7 +309,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     eo_tool_schema_provider = lo_tool_schema_provider.
 
-    CREATE OBJECT lo_tool_info_provider TYPE (is_tool_master_data-tool_info_provider).
+    CREATE OBJECT lo_tool_info_provider TYPE (is_tool_master_data-toolinfoprovider).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
       RETURN.

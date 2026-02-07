@@ -3,7 +3,7 @@
 {
 "FROM":
 [
-"ZI_PRU_AGENT_SERV"
+"ZPRU_AGENT_SERV"
 ],
 "ASSOCIATED":
 [],
