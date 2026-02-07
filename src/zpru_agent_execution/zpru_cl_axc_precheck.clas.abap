@@ -27,9 +27,9 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
       ls_line = <ls_create>.
 
-      IF ls_line-run_uuid IS INITIAL.
+      IF ls_line-runuuid IS INITIAL.
         TRY.
-            ls_line-run_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+            ls_line-runuuid = cl_system_uuid=>create_uuid_x16_static( ).
           CATCH cx_uuid_error.
             RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -39,13 +39,13 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
                            CHANGING  cs_data    = ls_line
                                      cs_control = ls_line-control ).
 
-      IF ls_line-agent_uuid IS INITIAL.
-        APPEND VALUE #( run_uuid = ls_line-run_uuid
+      IF ls_line-agentuuid IS INITIAL.
+        APPEND VALUE #( runuuid = ls_line-runuuid
                         create   = abap_true
                         fail     = zpru_if_agent_frw=>cs_fail_cause-dependency )
                TO cs_failed-header.
 
-        APPEND VALUE #( run_uuid = ls_line-run_uuid
+        APPEND VALUE #( runuuid = ls_line-runuuid
                         create   = abap_true
                         msg      = lo_util->new_message(
                                        iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
@@ -116,9 +116,9 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
     LOOP AT it_axc_query_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-query_uuid IS INITIAL.
+      IF ls_line-queryuuid IS INITIAL.
         TRY.
-            ls_line-query_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+            ls_line-queryuuid = cl_system_uuid=>create_uuid_x16_static( ).
           CATCH cx_uuid_error.
             RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -128,13 +128,13 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
                            CHANGING  cs_data    = ls_line
                                      cs_control = ls_line-control ).
 
-      IF ls_line-run_uuid IS INITIAL.
-        APPEND VALUE #( query_uuid = ls_line-query_uuid
+      IF ls_line-runuuid IS INITIAL.
+        APPEND VALUE #( queryuuid = ls_line-queryuuid
                         create     = abap_true
                         fail       = zpru_if_agent_frw=>cs_fail_cause-dependency )
                TO cs_failed-query.
 
-        APPEND VALUE #( query_uuid = ls_line-query_uuid
+        APPEND VALUE #( queryuuid = ls_line-queryuuid
                         create     = abap_true
                         msg        = lo_util->new_message(
                                          iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
@@ -214,9 +214,9 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
     LOOP AT it_axc_step_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-step_uuid IS INITIAL.
+      IF ls_line-stepuuid IS INITIAL.
         TRY.
-            ls_line-step_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+            ls_line-stepuuid = cl_system_uuid=>create_uuid_x16_static( ).
           CATCH cx_uuid_error.
             RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
         ENDTRY.
@@ -226,13 +226,13 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
                            CHANGING  cs_data    = ls_line
                                      cs_control = ls_line-control ).
 
-      IF ls_line-query_uuid IS INITIAL.
-        APPEND VALUE #( step_uuid = ls_line-step_uuid
+      IF ls_line-queryuuid IS INITIAL.
+        APPEND VALUE #( stepuuid = ls_line-stepuuid
                         create    = abap_true
                         fail      = zpru_if_agent_frw=>cs_fail_cause-dependency )
                TO cs_failed-step.
 
-        APPEND VALUE #( step_uuid = ls_line-step_uuid
+        APPEND VALUE #( stepuuid = ls_line-stepuuid
                         create    = abap_true
                         msg       = lo_util->new_message(
                                         iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution

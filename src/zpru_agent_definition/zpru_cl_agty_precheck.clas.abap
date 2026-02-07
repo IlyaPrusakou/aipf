@@ -30,14 +30,14 @@ CLASS zpru_cl_agty_precheck IMPLEMENTATION.
     LOOP AT it_agty_create_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
 
-      IF ls_line-agent_type IS INITIAL.
+      IF ls_line-agenttype IS INITIAL.
         APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
-        <ls_agent_failed>-agent_type = ls_line-agent_type.
+        <ls_agent_failed>-agenttype = ls_line-agenttype.
         <ls_agent_failed>-fail       = zpru_if_agent_frw=>cs_fail_cause-unspecific.
         <ls_agent_failed>-create     = abap_true.
 
         APPEND INITIAL LINE TO cs_reported-agent_type ASSIGNING FIELD-SYMBOL(<ls_agent_reported>).
-        <ls_agent_reported>-agent_type = ls_line-agent_type.
+        <ls_agent_reported>-agenttype = ls_line-agenttype.
         <ls_agent_reported>-create     = abap_true.
         <ls_agent_reported>-msg        = lo_util->new_message(
                                              iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition

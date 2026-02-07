@@ -2,7 +2,7 @@ INTERFACE zpru_if_adf_service
   PUBLIC.
 
   TYPES tt_agent_name             TYPE RANGE OF char100.
-  TYPES tt_agent_TYPE             TYPE RANGE OF ZPRU_DE_AGENT_TYPE.
+  TYPES tt_agent_TYPE             TYPE RANGE OF zpru_de_agent_type.
   TYPES tt_decision_provider      TYPE RANGE OF char30.
   TYPES tt_short_memory_provider  TYPE RANGE OF char30.
   TYPES tt_long_memory_provider   TYPE RANGE OF char30.
@@ -95,8 +95,8 @@ INTERFACE zpru_if_adf_service
   METHODS validate
     IMPORTING it_check_decision_provider_v TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
               IT_check_SHORT_MEMORY_V      TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
-              it_check_long_memory_v      TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k optional
-              it_check_agent_info_v       TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k optional
+              it_check_long_memory_v       TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
+              it_check_agent_info_v        TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
     CHANGING  cs_reported                  TYPE zpru_if_agent_frw=>ts_adf_reported             OPTIONAL
               cs_failed                    TYPE zpru_if_agent_frw=>ts_adf_failed               OPTIONAL.
 

@@ -3,13 +3,10 @@
 {
 "FROM":
 [
-"ZI_PRU_AXC_QUERY"
+"ZPRU_AGENT_TYPE"
 ],
 "ASSOCIATED":
-[
-"ZR_PRU_AXC_HEAD",
-"ZR_PRU_AXC_STEP"
-],
+[],
 "BASE":
 [],
 "ANNO_REF":

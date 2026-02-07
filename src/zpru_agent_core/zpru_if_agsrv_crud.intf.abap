@@ -8,11 +8,11 @@ INTERFACE zpru_if_agsrv_crud
            service            TYPE abap_boolean,
            context            TYPE abap_boolean,
            class              TYPE abap_boolean,
-           created_by         TYPE abap_boolean,
-           created_at         TYPE abap_boolean,
-           changed_by         TYPE abap_boolean,
-           last_changed       TYPE abap_boolean,
-           local_last_changed TYPE abap_boolean,
+           createdby         TYPE abap_boolean,
+           createdat         TYPE abap_boolean,
+           changedby         TYPE abap_boolean,
+           lastchanged       TYPE abap_boolean,
+           locallastchanged TYPE abap_boolean,
          END OF ts_agsrv_control.
 
   TYPES: BEGIN OF ts_agsrv_k,
@@ -22,18 +22,18 @@ INTERFACE zpru_if_agsrv_crud
 
   TYPES tt_agsrv_k TYPE STANDARD TABLE OF ts_agsrv_k WITH EMPTY KEY.
 
-  TYPES ts_agsrv        TYPE zpru_agent_serv.
+  TYPES ts_agsrv        TYPE zpru_s_agent_serv.
   TYPES tt_agsrv        TYPE STANDARD TABLE OF ts_agsrv WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_agsrv_create_imp.
-           INCLUDE TYPE zpru_agent_serv.
+           INCLUDE TYPE zpru_s_agent_serv.
   TYPES:   control TYPE ts_agsrv_control.
   TYPES: END OF ts_agsrv_create_imp.
 
   TYPES tt_agsrv_create_imp TYPE STANDARD TABLE OF ts_agsrv_create_imp WITH EMPTY KEY.
 
   TYPES: BEGIN OF ts_agsrv_update_imp.
-           INCLUDE TYPE zpru_agent_serv.
+           INCLUDE TYPE zpru_s_agent_serv.
   TYPES:   control TYPE ts_agsrv_control.
   TYPES: END OF ts_agsrv_update_imp.
 

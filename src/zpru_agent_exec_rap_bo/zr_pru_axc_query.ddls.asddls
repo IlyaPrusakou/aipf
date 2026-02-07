@@ -2,20 +2,20 @@
 @EndUserText.label: 'Agent Execution Query'
 @Metadata.ignorePropagatedAnnotations: true
 define view entity ZR_PRU_AXC_QUERY
-  as select from zpru_axc_query
+  as select from ZI_PRU_AXC_QUERY
   association              to parent ZR_PRU_AXC_HEAD as _executionheader on $projection.RunUuid = _executionheader.RunUUID
   composition of exact one to many ZR_PRU_AXC_STEP   as _executionstep
 {
-  key query_uuid       as QueryUuid,
-      query_number     as QueryNumber,
-      run_uuid         as RunUuid,
-      language         as Language,
-      execution_status as ExecutionStatus,
-      start_timestamp  as StartTimestamp,
-      end_timestamp    as EndTimestamp,
-      input_prompt     as InputPrompt,
-      decision_log     as DecisionLog,
-      output_response  as OutputResponse,
+  key QueryUuid       as QueryUuid,
+      QueryNumber     as QueryNumber,
+      RunUuid         as RunUuid,
+      Language        as Language,
+      ExecutionStatus as ExecutionStatus,
+      StartTimestamp  as StartTimestamp,
+      EndTimestamp    as EndTimestamp,
+      InputPrompt     as InputPrompt,
+      DecisionLog     as DecisionLog,
+      OutputResponse  as OutputResponse,
       _executionheader,
       _executionstep
 }

@@ -25,18 +25,18 @@ CLASS lcl_decision_provider IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
-    <ls_execution_plan>-agent_uuid = is_agent-agent_uuid.
-    <ls_execution_plan>-tool_name  = 'DUMMY_CODE'.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_CODE'.
     <ls_execution_plan>-sequence   = 1.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agent_uuid = is_agent-agent_uuid.
-    <ls_execution_plan>-tool_name  = 'DUMMY_KNOWLEDGE'.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_KNOWLEDGE'.
     <ls_execution_plan>-sequence   = 2.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agent_uuid = is_agent-agent_uuid.
-    <ls_execution_plan>-tool_name  = 'NESTED_AGENT'.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'NESTED_AGENT'.
     <ls_execution_plan>-sequence   = 3.
 
     eo_execution_plan->set_data( ir_data = NEW zpru_if_decision_provider=>tt_execution_plan( lt_execution_plan ) ).
@@ -1151,7 +1151,7 @@ CLASS lcl_tool_provider IMPLEMENTATION.
   METHOD zpru_if_tool_provider~get_tool.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_tool = abap_true.
 
-    CASE is_tool_master_data-tool_name.
+    CASE is_tool_master_data-toolname.
 
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
         ro_executor = NEW lcl_nested_agent( ).
@@ -1246,7 +1246,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
 
   METHOD zpru_if_tool_schema_provider~input_json_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
-    CASE is_tool_master_data-tool_name.
+    CASE is_tool_master_data-toolname.
       WHEN 'DUMMY_CODE'.
 *        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
       WHEN 'DUMMY_KNOWLEDGE'.
@@ -1259,7 +1259,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
 
   METHOD zpru_if_tool_schema_provider~input_rtts_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
-    CASE is_tool_master_data-tool_name.
+    CASE is_tool_master_data-toolname.
       WHEN 'DUMMY_CODE'.
 *        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
       WHEN 'DUMMY_KNOWLEDGE'.
@@ -1272,7 +1272,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
 
   METHOD zpru_if_tool_schema_provider~output_json_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
-    CASE is_tool_master_data-tool_name.
+    CASE is_tool_master_data-toolname.
       WHEN 'DUMMY_CODE'.
 *        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
       WHEN 'DUMMY_KNOWLEDGE'.
@@ -1285,7 +1285,7 @@ CLASS lcl_schema_provider IMPLEMENTATION.
 
   METHOD zpru_if_tool_schema_provider~output_rtts_schema.
     zpru_cl_dummy_agent_logic=>ms_method_registr-get_input_schema = abap_true.
-    CASE is_tool_master_data-tool_name.
+    CASE is_tool_master_data-toolname.
       WHEN 'DUMMY_CODE'.
 *        lv_input_schema = |SIMPLE_TOOL_SCHEMA|.
       WHEN 'DUMMY_KNOWLEDGE'.
