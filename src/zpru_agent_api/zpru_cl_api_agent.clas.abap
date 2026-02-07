@@ -158,6 +158,15 @@ CLASS zpru_cl_api_agent DEFINITION
                 cs_axc_mapped       TYPE zpru_if_agent_frw=>ts_axc_mapped OPTIONAL     " qqq
       RAISING   zpru_cx_agent_core.
 
+    METHODS resequence_steps
+      IMPORTING it_additional_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
+                is_execution_header TYPE zpru_axc_head
+                is_execution_query  TYPE zpru_if_axc_type_and_constant=>ts_axc_query
+                iv_output_prompt    TYPE string
+      CHANGING  ct_step_before      TYPE zpru_if_axc_type_and_constant=>tt_axc_step
+                ct_step_after       TYPE zpru_if_axc_type_and_constant=>tt_axc_step
+                ct_step_update_imp  TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp.
+
   PRIVATE SECTION.
 
 ENDCLASS.
@@ -1409,59 +1418,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lt_step_after) = lo_controller->mt_execution_steps.
     DELETE lt_step_after WHERE execution_seq <= is_current_step-execution_seq.
 
-    DATA(lv_count_before) = VALUE #( lt_step_before[ lines( lt_step_before ) ]-execution_seq OPTIONAL ).
-    DATA(lv_first_iteration) = abap_true.
-    LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_add_exec_step>).
-      lv_count_before += 1.
-
-      GET TIME STAMP FIELD DATA(lv_now).
-
-      APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
-      <ls_step_2_upd>-step_uuid       = <ls_step_2_upd>-step_uuid.
-      <ls_step_2_upd>-step_number     = <ls_step_2_upd>-step_number.
-      <ls_step_2_upd>-query_uuid      = is_execution_query-query_uuid.
-      <ls_step_2_upd>-run_uuid        = is_execution_header-run_uuid.
-      <ls_step_2_upd>-tool_uuid       = <ls_add_exec_step>-tool_uuid.
-      <ls_step_2_upd>-execution_seq   = lv_count_before.
-      <ls_step_2_upd>-step_status     = zpru_if_axc_type_and_constant=>sc_step_status-new.
-      <ls_step_2_upd>-start_timestamp = lv_now.
-
-      IF lv_first_iteration = abap_true.
-        <ls_step_2_upd>-input_prompt = iv_output_prompt.
-      ENDIF.
-
-      <ls_step_2_upd>-control-step_uuid       = abap_true.
-      <ls_step_2_upd>-control-step_number     = abap_true.
-      <ls_step_2_upd>-control-query_uuid      = abap_true.
-      <ls_step_2_upd>-control-run_uuid        = abap_true.
-      <ls_step_2_upd>-control-tool_uuid       = abap_true.
-      <ls_step_2_upd>-control-execution_seq   = abap_true.
-      <ls_step_2_upd>-control-step_status     = abap_true.
-      <ls_step_2_upd>-control-start_timestamp = abap_true.
-      IF lv_first_iteration = abap_true.
-        <ls_step_2_upd>-control-input_prompt = abap_true.
-      ENDIF.
-
-      APPEND INITIAL LINE TO lt_step_before ASSIGNING FIELD-SYMBOL(<ls_step_before>).
-      <ls_step_before> = CORRESPONDING #( <ls_step_2_upd> ).
-
-      lv_first_iteration = abap_false.
-    ENDLOOP.
-
-    LOOP AT lt_step_after ASSIGNING FIELD-SYMBOL(<ls_step_after>).
-      lv_count_before += 1.
-
-      APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING <ls_step_2_upd>.
-      <ls_step_2_upd>-step_uuid     = <ls_step_after>-step_uuid.
-      <ls_step_2_upd>-query_uuid    = is_execution_query-query_uuid.
-      <ls_step_2_upd>-run_uuid      = is_execution_header-run_uuid.
-      <ls_step_2_upd>-execution_seq = lv_count_before.
-      <ls_step_2_upd>-control-execution_seq = abap_true.
-
-      APPEND INITIAL LINE TO lt_step_before ASSIGNING <ls_step_before>.
-      <ls_step_before> = CORRESPONDING #( <ls_step_2_upd> ).
-
-    ENDLOOP.
+    resequence_steps( EXPORTING it_additional_steps = it_additional_steps
+                               is_execution_header = is_execution_header
+                               is_execution_query  = is_execution_query
+                               iv_output_prompt    = iv_output_prompt
+                     CHANGING  ct_step_before      = lt_step_before
+                               ct_step_after       = lt_step_after
+                               ct_step_update_imp  = lt_step_update_imp ).
 
     IF lt_step_update_imp IS NOT INITIAL.
       lo_axc_service->update_step( EXPORTING it_step_update_imp = lt_step_update_imp
@@ -1874,6 +1837,63 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           message_type = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
     io_short_memory->save_message( it_message = lt_message ).
+  ENDMETHOD.
+
+  METHOD resequence_steps.
+    DATA(lv_count_before) = VALUE #( ct_step_before[ lines( ct_step_before ) ]-execution_seq OPTIONAL ).
+    DATA(lv_first_iteration) = abap_true.
+
+    LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_add_exec_step>).
+      lv_count_before += 1.
+
+      GET TIME STAMP FIELD DATA(lv_now).
+
+      APPEND INITIAL LINE TO ct_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
+      <ls_step_2_upd>-step_uuid       = <ls_add_exec_step>-step_uuid.
+      <ls_step_2_upd>-step_number     = <ls_add_exec_step>-step_number.
+      <ls_step_2_upd>-query_uuid      = is_execution_query-query_uuid.
+      <ls_step_2_upd>-run_uuid        = is_execution_header-run_uuid.
+      <ls_step_2_upd>-tool_uuid       = <ls_add_exec_step>-tool_uuid.
+      <ls_step_2_upd>-execution_seq   = lv_count_before.
+      <ls_step_2_upd>-step_status     = zpru_if_axc_type_and_constant=>sc_step_status-new.
+      <ls_step_2_upd>-start_timestamp = lv_now.
+
+      IF lv_first_iteration = abap_true.
+        <ls_step_2_upd>-input_prompt = iv_output_prompt.
+      ENDIF.
+
+      <ls_step_2_upd>-control-step_uuid       = abap_true.
+      <ls_step_2_upd>-control-step_number     = abap_true.
+      <ls_step_2_upd>-control-query_uuid      = abap_true.
+      <ls_step_2_upd>-control-run_uuid        = abap_true.
+      <ls_step_2_upd>-control-tool_uuid       = abap_true.
+      <ls_step_2_upd>-control-execution_seq   = abap_true.
+      <ls_step_2_upd>-control-step_status     = abap_true.
+      <ls_step_2_upd>-control-start_timestamp = abap_true.
+      IF lv_first_iteration = abap_true.
+        <ls_step_2_upd>-control-input_prompt = abap_true.
+      ENDIF.
+
+      APPEND INITIAL LINE TO ct_step_before ASSIGNING FIELD-SYMBOL(<ls_step_before>).
+      <ls_step_before> = CORRESPONDING #( <ls_step_2_upd> ).
+
+      lv_first_iteration = abap_false.
+    ENDLOOP.
+
+    LOOP AT ct_step_after ASSIGNING FIELD-SYMBOL(<ls_step_after>).
+      lv_count_before += 1.
+
+      APPEND INITIAL LINE TO ct_step_update_imp ASSIGNING <ls_step_2_upd>.
+      <ls_step_2_upd>-step_uuid     = <ls_step_after>-step_uuid.
+      <ls_step_2_upd>-query_uuid    = is_execution_query-query_uuid.
+      <ls_step_2_upd>-run_uuid      = is_execution_header-run_uuid.
+      <ls_step_2_upd>-execution_seq = lv_count_before.
+      <ls_step_2_upd>-control-execution_seq = abap_true.
+
+      APPEND INITIAL LINE TO ct_step_before ASSIGNING <ls_step_before>.
+      <ls_step_before> = CORRESPONDING #( <ls_step_2_upd> ).
+
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD log_step_execution.
