@@ -167,6 +167,47 @@ CLASS zpru_cl_api_agent DEFINITION
                 ct_step_after       TYPE zpru_if_axc_type_and_constant=>tt_axc_step
                 ct_step_update_imp  TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp.
 
+    METHODS clear_internal_state.
+
+    METHODS assign_controller_context
+      IMPORTING io_parent_controller TYPE REF TO zpru_if_agent_controller OPTIONAL.
+
+    METHODS fetch_agent_configuration
+      IMPORTING iv_agent_name TYPE zpru_agent_name
+      EXPORTING es_agent      TYPE zpru_if_adf_type_and_constant=>ts_agent
+                eo_service    TYPE REF TO zpru_if_adf_service
+                et_agent_k    TYPE zpru_if_adf_type_and_constant=>tt_agent_k
+      CHANGING  cs_reported   TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed     TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS ensure_agent_is_active
+      IMPORTING is_agent    TYPE zpru_if_adf_type_and_constant=>ts_agent
+                io_service  TYPE REF TO zpru_if_adf_service
+      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS identify_available_tools
+      IMPORTING it_agent_k  TYPE zpru_if_adf_type_and_constant=>tt_agent_k
+                io_service  TYPE REF TO zpru_if_adf_service
+      EXPORTING et_tools    TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+      CHANGING  cs_reported TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed   TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS prepare_memory_provider
+      IMPORTING iv_agent_uuid   TYPE sysuuid_x16
+      EXPORTING eo_short_memory TYPE REF TO zpru_if_short_memory_provider
+      CHANGING  cs_reported     TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed       TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS record_initialization_event
+      IMPORTING is_agent        TYPE zpru_if_adf_type_and_constant=>ts_agent
+                it_tools        TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+                io_short_memory TYPE REF TO zpru_if_short_memory_provider.
+
   PRIVATE SECTION.
 
 ENDCLASS.
@@ -362,9 +403,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~initialize.
-    DATA lo_adf_service  TYPE REF TO zpru_if_adf_service.
-    DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
-    DATA lt_message      TYPE zpru_if_short_memory_provider=>tt_message.
 
     CLEAR: es_agent,
            et_tools.
@@ -373,127 +411,36 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    CLEAR: mv_output_response,
-           mv_output_response_prev,
-           mv_input_query,
-           mo_controller,
-           mo_long_memory,
-           mo_short_memory.
+    clear_internal_state( ).
 
-    DATA(lo_controller) = get_controller( ).
+    assign_controller_context( io_parent_controller ).
 
-    IF io_parent_controller IS BOUND.
-      lo_controller->mo_parent_controller = io_parent_controller.
-    ENDIF.
+    fetch_agent_configuration( EXPORTING iv_agent_name = iv_agent_name
+                               IMPORTING es_agent      = es_agent
+                                         eo_service    = DATA(lo_adf_service)
+                                         et_agent_k    = DATA(lt_agent_k)
+                               CHANGING  cs_reported   = cs_adf_reported
+                                         cs_failed     = cs_adf_failed ).
 
-    TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
-                              iv_service = `ZPRU_IF_ADF_SERVICE`
-                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDTRY.
+    ensure_agent_is_active( EXPORTING is_agent    = es_agent
+                                      io_service  = lo_adf_service
+                            CHANGING  cs_reported = cs_adf_reported
+                                      cs_failed   = cs_adf_failed ).
 
-    lo_adf_service->query_agent( EXPORTING it_agent_name = VALUE #( ( sign   = zpru_if_agent_frw=>cs_sign-include
-                                                                      option = zpru_if_agent_frw=>cs_option-equal
-                                                                      low    = iv_agent_name ) )
-                                 IMPORTING et_agent_k    = DATA(lt_agent_k) ).
+    identify_available_tools( EXPORTING it_agent_k  = lt_agent_k
+                                        io_service  = lo_adf_service
+                              IMPORTING et_tools    = et_tools
+                              CHANGING  cs_reported = cs_adf_reported
+                                        cs_failed   = cs_adf_failed ).
 
-    lo_adf_service->read_agent(
-      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN lt_agent_k
-                                           ( agent_uuid                     = <ls_k>-agent_uuid
-                                             control-agent_uuid             = abap_true
-                                             control-agent_name             = abap_true
-                                             control-agent_type             = abap_true
-                                             control-decision_provider      = abap_true
-                                             control-short_memory_provider  = abap_true
-                                             control-long_memory_provider   = abap_true
-                                             control-agent_info_provider    = abap_true
-                                             control-system_prompt_provider = abap_true
-                                             control-status                 = abap_true
-                                             control-created_by             = abap_true
-                                             control-created_at             = abap_true
-                                             control-changed_by             = abap_true
-                                             control-last_changed           = abap_true
-                                             control-local_last_changed     = abap_true ) )
-      IMPORTING et_agent        = DATA(lt_agent)
-      CHANGING  cs_reported     = cs_adf_reported
-                cs_failed       = cs_adf_failed ).
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = es_agent-agent_uuid
+                             IMPORTING eo_short_memory = DATA(lo_short_memory)
+                             CHANGING  cs_reported     = cs_adf_reported
+                                       cs_failed       = cs_adf_failed ).
 
-    es_agent = VALUE #( lt_agent[ 1 ] OPTIONAL ).
-
-    IF es_agent IS INITIAL OR es_agent-status = zpru_if_adf_type_and_constant=>cs_agent_status-inactive.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
-
-    IF es_agent-status = zpru_if_adf_type_and_constant=>cs_agent_status-new.
-      lo_adf_service->update_agent(
-        EXPORTING it_agent_update_imp = VALUE #( ( agent_uuid = es_agent-agent_uuid
-                                                   status     = zpru_if_adf_type_and_constant=>cs_agent_status-active
-                                                   control    = VALUE #( status = abap_true ) ) )
-        CHANGING  cs_reported         = cs_adf_reported
-                  cs_failed           = cs_adf_failed ).
-
-      IF line_exists( cs_adf_failed-agent[ agent_uuid = es_agent-agent_uuid ] ).
-        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-      ENDIF.
-    ENDIF.
-
-    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( FOR <ls_k2> IN lt_agent_k
-                                                                 ( agent_uuid                   = <ls_k2>-agent_uuid
-                                                                   control-tool_uuid            = abap_true
-                                                                   control-agent_uuid           = abap_true
-                                                                   control-tool_name            = abap_true
-                                                                   control-tool_provider        = abap_true
-                                                                   control-step_type            = abap_true
-                                                                   control-tool_schema_provider = abap_true
-                                                                   control-tool_info_provider   = abap_true
-                                                                   control-is_borrowed          = abap_true
-                                                                   control-is_transient         = abap_true    ) )
-                              IMPORTING et_tool       = et_tools
-                              CHANGING  cs_reported   = cs_adf_reported
-                                        cs_failed     = cs_adf_failed ).
-
-    get_short_memory( EXPORTING iv_agent_uuid   = es_agent-agent_uuid
-                      IMPORTING eo_short_memory = lo_short_memory
-                      CHANGING  cs_reported     = cs_adf_reported
-                                cs_failed       = cs_adf_failed ).
-
-    GET TIME STAMP FIELD DATA(lv_now).
-
-    DATA(lv_count) = 1.
-
-    lt_message = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
-                            stage        = 'INITIALIZE'
-                            sub_stage    = 'INITIALIZE_AGENT'
-                            namespace    = |{ sy-uname }.{ es_agent-agent_name }|
-                            user_name    = sy-uname
-                            agent_uuid   = es_agent-agent_uuid
-                            message_time = lv_now
-                            content      = |\{ "AGENT_NAME" : "{ es_agent-agent_name }", | &&
-                                           |"DECISION_PROVIDER" : "{ es_agent-decision_provider }",| &&
-                                           |"SYSTEM_PROMPT_PROVIDER" : "{ es_agent-system_prompt_provider }" \}|
-                            message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
-
-    lv_count += 1.
-    LOOP AT et_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
-      APPEND INITIAL LINE TO lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
-      <ls_message> = VALUE #( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
-                              stage        = 'INITIALIZE'
-                              sub_stage    = 'INITIALIZE_TOOL'
-                              namespace    = |{ sy-uname }.{ es_agent-agent_name }|
-                              user_name    = sy-uname
-                              agent_uuid   = es_agent-agent_uuid
-                              message_time = lv_now
-                              content      = |\{ "TOOL_NAME" : "{ <ls_tool>-tool_name }", | &&
-                                             |"TOOL_PROVIDER" : "{ <ls_tool>-tool_provider }" \}|
-                              message_type = zpru_if_short_memory_provider=>cs_msg_type-info ).
-
-      lv_count += 1.
-
-    ENDLOOP.
-
-    lo_short_memory->save_message( lt_message ).
+    record_initialization_event( is_agent        = es_agent
+                                 it_tools        = et_tools
+                                 io_short_memory = lo_short_memory ).
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun.
@@ -2231,4 +2178,140 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                         cs_failed       = cs_axc_failed
                                         cs_mapped       = cs_axc_mapped ).
   ENDMETHOD.
+  METHOD clear_internal_state.
+    CLEAR: mv_output_response,
+           mv_output_response_prev,
+           mv_input_query,
+           mo_controller,
+           mo_long_memory,
+           mo_short_memory.
+  ENDMETHOD.
+
+  METHOD assign_controller_context.
+    DATA(lo_controller) = get_controller( ).
+
+    IF io_parent_controller IS BOUND.
+      lo_controller->mo_parent_controller = io_parent_controller.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD fetch_agent_configuration.
+    TRY.
+        eo_service ?= zpru_cl_agent_service_mngr=>get_service(
+                               iv_service = `ZPRU_IF_ADF_SERVICE`
+                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDTRY.
+
+    eo_service->query_agent( EXPORTING it_agent_name = VALUE #( ( sign   = zpru_if_agent_frw=>cs_sign-include
+                                                                      option = zpru_if_agent_frw=>cs_option-equal
+                                                                      low    = iv_agent_name ) )
+                                 IMPORTING et_agent_k    = et_agent_k ).
+
+    eo_service->read_agent(
+      EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN et_agent_k
+                                           ( agent_uuid                     = <ls_k>-agent_uuid
+                                             control-agent_uuid             = abap_true
+                                             control-agent_name             = abap_true
+                                             control-agent_type             = abap_true
+                                             control-decision_provider      = abap_true
+                                             control-short_memory_provider  = abap_true
+                                             control-long_memory_provider   = abap_true
+                                             control-agent_info_provider    = abap_true
+                                             control-system_prompt_provider = abap_true
+                                             control-status                 = abap_true
+                                             control-created_by             = abap_true
+                                             control-created_at             = abap_true
+                                             control-changed_by             = abap_true
+                                             control-last_changed           = abap_true
+                                             control-local_last_changed     = abap_true ) )
+      IMPORTING et_agent        = DATA(lt_agent)
+      CHANGING  cs_reported     = cs_reported
+                cs_failed       = cs_failed ).
+
+    es_agent = VALUE #( lt_agent[ 1 ] OPTIONAL ).
+  ENDMETHOD.
+
+  METHOD ensure_agent_is_active.
+    IF is_agent IS INITIAL OR is_agent-status = zpru_if_adf_type_and_constant=>cs_agent_status-inactive.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    IF is_agent-status = zpru_if_adf_type_and_constant=>cs_agent_status-new.
+      io_service->update_agent(
+        EXPORTING it_agent_update_imp = VALUE #( ( agent_uuid = is_agent-agent_uuid
+                                                   status     = zpru_if_adf_type_and_constant=>cs_agent_status-active
+                                                   control    = VALUE #( status = abap_true ) ) )
+        CHANGING  cs_reported         = cs_reported
+                  cs_failed           = cs_failed ).
+
+      IF line_exists( cs_failed-agent[ agent_uuid = is_agent-agent_uuid ] ).
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD identify_available_tools.
+    io_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( FOR <ls_k2> IN it_agent_k
+                                                                  ( agent_uuid                   = <ls_k2>-agent_uuid
+                                                                    control-tool_uuid            = abap_true
+                                                                    control-agent_uuid           = abap_true
+                                                                    control-tool_name            = abap_true
+                                                                    control-tool_provider        = abap_true
+                                                                    control-step_type            = abap_true
+                                                                    control-tool_schema_provider = abap_true
+                                                                    control-tool_info_provider   = abap_true
+                                                                    control-is_borrowed          = abap_true
+                                                                    control-is_transient         = abap_true    ) )
+                               IMPORTING et_tool       = et_tools
+                               CHANGING  cs_reported   = cs_reported
+                                         cs_failed     = cs_failed ).
+  ENDMETHOD.
+
+  METHOD prepare_memory_provider.
+    get_short_memory( EXPORTING iv_agent_uuid   = iv_agent_uuid
+                      IMPORTING eo_short_memory = eo_short_memory
+                      CHANGING  cs_reported     = cs_reported
+                                cs_failed       = cs_failed ).
+  ENDMETHOD.
+
+  METHOD record_initialization_event.
+    GET TIME STAMP FIELD DATA(lv_now).
+
+    DATA(lv_count) = 1.
+
+    DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message( ( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+                             stage        = 'INITIALIZE'
+                             sub_stage    = 'INITIALIZE_AGENT'
+                             namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                             user_name    = sy-uname
+                             agent_uuid   = is_agent-agent_uuid
+                             message_time = lv_now
+                             content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
+                                            |"DECISION_PROVIDER" : "{ is_agent-decision_provider }",| &&
+                                            |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-system_prompt_provider }" \}|
+                             message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+
+    lv_count += 1.
+    LOOP AT it_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
+      APPEND INITIAL LINE TO lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
+      <ls_message> = VALUE #( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+                              stage        = 'INITIALIZE'
+                              sub_stage    = 'INITIALIZE_TOOL'
+                              namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                              user_name    = sy-uname
+                              agent_uuid   = is_agent-agent_uuid
+                              message_time = lv_now
+                              content      = |\{ "TOOL_NAME" : "{ <ls_tool>-tool_name }", | &&
+                                             |"TOOL_PROVIDER" : "{ <ls_tool>-tool_provider }" \}|
+                              message_type = zpru_if_short_memory_provider=>cs_msg_type-info ).
+
+      lv_count += 1.
+
+    ENDLOOP.
+
+    io_short_memory->save_message( lt_message ).
+  ENDMETHOD.
+
 ENDCLASS.
