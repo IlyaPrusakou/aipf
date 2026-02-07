@@ -327,6 +327,45 @@ INTERFACE zpru_if_agent_frw
            mmsg TYPE tt_mmsg_mapped,
          END OF ts_mmsg_bndl_mapped.
 
+  " MSUM (Memory Summary) types
+  TYPES: BEGIN OF ts_msum_reported,
+           summary_uuid TYPE sysuuid_x16,
+           msg          TYPE REF TO zpru_if_agent_message,
+           create       TYPE abap_boolean,
+           update       TYPE abap_boolean,
+           delete       TYPE abap_boolean,
+         END OF ts_msum_reported.
+
+  TYPES tt_msum_reported TYPE STANDARD TABLE OF ts_msum_reported WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_msum_failed,
+           summary_uuid TYPE sysuuid_x16,
+           fail         TYPE i,
+           create       TYPE abap_boolean,
+           update       TYPE abap_boolean,
+           delete       TYPE abap_boolean,
+         END OF ts_msum_failed.
+
+  TYPES tt_msum_failed TYPE STANDARD TABLE OF ts_msum_failed WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_msum_mapped,
+           summary_uuid TYPE sysuuid_x16,
+         END OF ts_msum_mapped.
+
+  TYPES tt_msum_mapped TYPE STANDARD TABLE OF ts_msum_mapped WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_msum_bndl_reported,
+           msum TYPE tt_msum_reported,
+         END OF ts_msum_bndl_reported.
+
+  TYPES: BEGIN OF ts_msum_bndl_failed,
+           msum TYPE tt_msum_failed,
+         END OF ts_msum_bndl_failed.
+
+  TYPES: BEGIN OF ts_msum_bndl_mapped,
+           msum TYPE tt_msum_mapped,
+         END OF ts_msum_bndl_mapped.
+
   TYPES ts_json       TYPE string.
   TYPES tt_agent_tool TYPE STANDARD TABLE OF zpru_agent_tool WITH EMPTY KEY.
 
