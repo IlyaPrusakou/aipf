@@ -1,0 +1,6 @@
+@EndUserText.label: 'ZC_PRU_MEM_SUM'
+@MappingRole: true
+define role ZC_PRU_MEM_SUM {
+  grant select on ZC_PRU_MEM_SUM
+  where INHERITING CONDITIONS FROM ENTITY ZR_PRU_MEM_SUM REPLACING { ROOT WITH _BaseEntity };
+}

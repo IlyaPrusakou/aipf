@@ -1,0 +1,12 @@
+projection implementation in class ZBP_C_PRU_MEM_SUM unique;
+strict ( 2 );
+extensible;
+use side effects;
+define behavior for ZC_PRU_MEM_SUM alias ZcPruMemSum
+extensible
+{
+  use create;
+  use update;
+  use delete;
+
+}

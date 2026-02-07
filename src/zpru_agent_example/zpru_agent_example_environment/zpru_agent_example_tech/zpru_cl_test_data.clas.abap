@@ -21,6 +21,16 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     lt_agent_serv = VALUE #( created_by = ''
                              created_at = '0.0000000'
                              changed_by = ''
+                             ( service            = 'ZPRU_IF_MSUM_SERVICE'
+                               context            = 'STANDARD_PERSISTENCE_MESSAGE'
+                               class              = 'ZPRU_CL_MSUM_SERVICE'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
+                             ( service            = 'ZPRU_IF_MSUM_PRECHECK'
+                               context            = 'STANDARD_PERSISTENCE_MESSAGE'
+                               class              = 'ZPRU_CL_MSUM_PRECHECK'
+                               last_changed       = '20260125095408.0057390'
+                               local_last_changed = '20260125095408.0057390' )
                              ( service            = 'ZPRU_IF_MMSG_SERVICE'
                                context            = 'STANDARD_PERSISTENCE_MESSAGE'
                                class              = 'ZPRU_CL_MMSG_SERVICE'

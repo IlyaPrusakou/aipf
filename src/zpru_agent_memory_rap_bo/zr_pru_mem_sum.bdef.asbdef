@@ -1,0 +1,41 @@
+managed implementation in class ZBP_R_PRU_MEM_SUM unique;
+strict ( 2 );
+extensible;
+define behavior for ZR_PRU_MEM_SUM alias ZrPruMemSum
+persistent table ZPRU_MEM_SUM
+extensible
+lock master
+authorization master( global )
+{
+  field ( mandatory : create )
+   SummaryUUID;
+
+  field ( readonly : update )
+   SummaryUUID;
+
+
+  create;
+  update;
+  delete;
+
+  mapping for ZPRU_MEM_SUM corresponding extensible
+  {
+    SummaryUUID = summary_uuid;
+    Content = content;
+    SummaryCid = summary_cid;
+    Stage = stage;
+    SubStage = sub_stage;
+    Namespace = namespace;
+    UserName = user_name;
+    AgentUUID = agent_uuid;
+    RunUUID = run_uuid;
+    QueryUUID = query_uuid;
+    StepUUID = step_uuid;
+    MessageTime = message_time;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    ChangedBy = changed_by;
+    ChangedAt = changed_at;
+  }
+
+}

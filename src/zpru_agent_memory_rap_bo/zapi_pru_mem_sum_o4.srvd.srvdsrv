@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_PRU_MEM_SUM'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_PRU_MEM_SUM'
+  }
+}
+define service ZAPI_PRU_MEM_SUM_O4 provider contracts odata_v4_webapi {
+  expose ZC_PRU_MEM_SUM;
+}
