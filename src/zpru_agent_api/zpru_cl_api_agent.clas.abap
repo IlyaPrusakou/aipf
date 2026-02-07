@@ -208,6 +208,24 @@ CLASS zpru_cl_api_agent DEFINITION
                 it_tools        TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
+    METHODS fetch_agent_definition_by_uuid
+      IMPORTING iv_agent_uuid TYPE sysuuid_x16
+      EXPORTING es_agent      TYPE zpru_if_adf_type_and_constant=>ts_agent
+                eo_service    TYPE REF TO zpru_if_adf_service
+      CHANGING  cs_reported   TYPE zpru_if_agent_frw=>ts_adf_reported
+                cs_failed     TYPE zpru_if_agent_frw=>ts_adf_failed
+      RAISING   zpru_cx_agent_core.
+
+    METHODS update_query_internal_state
+      IMPORTING iv_input_query TYPE string.
+
+    METHODS append_query_to_controller
+      IMPORTING iv_input_query TYPE string.
+
+    METHODS record_query_event
+      IMPORTING is_agent        TYPE zpru_if_adf_type_and_constant=>ts_agent
+                io_short_memory TYPE REF TO zpru_if_short_memory_provider.
+
   PRIVATE SECTION.
 
 ENDCLASS.
@@ -592,75 +610,33 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~set_input_query.
-    DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
-    DATA lt_message      TYPE zpru_if_short_memory_provider=>tt_message.
-    DATA lo_adf_service  TYPE REF TO zpru_if_adf_service.
-
     IF    iv_input_query IS INITIAL
        OR iv_agent_uuid  IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    TRY.
-        lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service(
-                              iv_service = `ZPRU_IF_ADF_SERVICE`
-                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDTRY.
+    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
+                                    IMPORTING es_agent      = DATA(ls_agent)
+                                              eo_service    = DATA(lo_adf_service)
+                                    CHANGING  cs_reported   = cs_adf_reported
+                                              cs_failed     = cs_adf_failed ).
 
-    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = iv_agent_uuid
-                                                                       control-agent_uuid             = abap_true
-                                                                       control-agent_name             = abap_true
-                                                                       control-agent_type             = abap_true
-                                                                       control-decision_provider      = abap_true
-                                                                       control-system_prompt_provider = abap_true
-                                                                       control-status                 = abap_true  ) )
-                                IMPORTING et_agent        = DATA(lt_agent)
-                                CHANGING  cs_reported     = cs_adf_reported
-                                          cs_failed       = cs_adf_failed ).
+    ensure_agent_is_active( EXPORTING is_agent    = ls_agent
+                                      io_service  = lo_adf_service
+                            CHANGING  cs_reported = cs_adf_reported
+                                      cs_failed   = cs_adf_failed ).
 
-    ASSIGN lt_agent[ 1 ] TO FIELD-SYMBOL(<ls_agent>).
-    IF sy-subrc <> 0.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
+    update_query_internal_state( iv_input_query ).
 
-    IF <ls_agent>-status <> zpru_if_adf_type_and_constant=>cs_agent_status-active.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
+    append_query_to_controller( iv_input_query ).
 
-    GET TIME STAMP FIELD DATA(lv_now).
-    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
-    CLEAR: mv_output_response,
-           mv_output_response_prev.
+    prepare_memory_provider( EXPORTING iv_agent_uuid   = iv_agent_uuid
+                             IMPORTING eo_short_memory = DATA(lo_short_memory)
+                             CHANGING  cs_reported     = cs_adf_reported
+                                       cs_failed       = cs_adf_failed ).
 
-    DATA(lo_controller) = get_controller( ).
-    DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
-    APPEND INITIAL LINE TO lo_controller->mt_input_output ASSIGNING FIELD-SYMBOL(<ls_input_output>).
-    <ls_input_output>-number      = lv_last_number + 1.
-    <ls_input_output>-input_query = mv_input_query.
-
-    get_short_memory( EXPORTING iv_agent_uuid   = iv_agent_uuid
-                      IMPORTING eo_short_memory = lo_short_memory
-                      CHANGING  cs_reported     = cs_adf_reported
-                                cs_failed       = cs_adf_failed ).
-
-    GET TIME STAMP FIELD lv_now.
-
-    lt_message = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
-                            stage        = 'SET_INPUT_QUERY'
-                            sub_stage    = 'SET_INPUT_QUERY'
-                            namespace    = |{ sy-uname }.{ <ls_agent>-agent_name }|
-                            user_name    = sy-uname
-                            agent_uuid   = <ls_agent>-agent_uuid
-                            message_time = lv_now
-                            content      = |\{ "AGENT_NAME" : "{ <ls_agent>-agent_name }", | &&
-                                           |"DECISION_PROVIDER" : "{ <ls_agent>-decision_provider }",| &&
-                                           |"SYSTEM_PROMPT_PROVIDER" : "{ <ls_agent>-system_prompt_provider }", | &&
-                                           |"INPUT_QUERY" : { mv_input_query } \}|
-                            message_type = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
-
-    lo_short_memory->save_message( lt_message ).
+    record_query_event( is_agent        = ls_agent
+                        io_short_memory = lo_short_memory ).
   ENDMETHOD.
 
   METHOD get_short_memory.
@@ -2314,4 +2290,68 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     io_short_memory->save_message( lt_message ).
   ENDMETHOD.
+
+  METHOD fetch_agent_definition_by_uuid.
+    TRY.
+        eo_service ?= zpru_cl_agent_service_mngr=>get_service(
+                               iv_service = `ZPRU_IF_ADF_SERVICE`
+                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      CATCH zpru_cx_agent_core.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDTRY.
+
+    eo_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agent_uuid                     = iv_agent_uuid
+                                                                   control-agent_uuid             = abap_true
+                                                                   control-agent_name             = abap_true
+                                                                   control-agent_type             = abap_true
+                                                                   control-decision_provider      = abap_true
+                                                                   control-system_prompt_provider = abap_true
+                                                                   control-status                 = abap_true  ) )
+                            IMPORTING et_agent        = DATA(lt_agent)
+                            CHANGING  cs_reported     = cs_reported
+                                      cs_failed       = cs_failed ).
+
+    ASSIGN lt_agent[ 1 ] TO FIELD-SYMBOL(<ls_agent>).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    es_agent = <ls_agent>.
+  ENDMETHOD.
+
+  METHOD update_query_internal_state.
+    GET TIME STAMP FIELD DATA(lv_now).
+    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
+    CLEAR: mv_output_response,
+           mv_output_response_prev.
+  ENDMETHOD.
+
+  METHOD append_query_to_controller.
+    DATA(lo_controller) = get_controller( ).
+    DATA(lv_last_number) = lines( lo_controller->mt_input_output ).
+    APPEND INITIAL LINE TO lo_controller->mt_input_output ASSIGNING FIELD-SYMBOL(<ls_input_output>).
+    <ls_input_output>-number      = lv_last_number + 1.
+    <ls_input_output>-input_query = mv_input_query.
+  ENDMETHOD.
+
+  METHOD record_query_event.
+    DATA lt_message TYPE zpru_if_short_memory_provider=>tt_message.
+    GET TIME STAMP FIELD DATA(lv_now).
+
+    lt_message = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
+                            stage        = 'SET_INPUT_QUERY'
+                            sub_stage    = 'SET_INPUT_QUERY'
+                            namespace    = |{ sy-uname }.{ is_agent-agent_name }|
+                            user_name    = sy-uname
+                            agent_uuid   = is_agent-agent_uuid
+                            message_time = lv_now
+                            content      = |\{ "AGENT_NAME" : "{ is_agent-agent_name }", | &&
+                                           |"DECISION_PROVIDER" : "{ is_agent-decision_provider }",| &&
+                                           |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-system_prompt_provider }", | &&
+                                           |"INPUT_QUERY" : { mv_input_query } \}|
+                            message_type = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
+
+    io_short_memory->save_message( lt_message ).
+  ENDMETHOD.
+
 ENDCLASS.
