@@ -640,7 +640,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_short_memory.
-    DATA lo_adf_service      TYPE REF TO zpru_if_adf_service.
     DATA lo_discard_strategy TYPE REF TO zpru_if_discard_strategy.
     DATA lo_summary_strategy TYPE REF TO zpru_if_summarization.
 
@@ -655,6 +654,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
                                     IMPORTING es_agent      = DATA(ls_agent)
+                                    " TODO: variable is assigned but never used (ABAP cleaner)
                                               eo_service    = DATA(lo_adf_service)
                                     CHANGING  cs_reported   = cs_reported
                                               cs_failed     = cs_failed ).
@@ -667,7 +667,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lo_controller) = get_controller( ).
     lo_controller->mo_short_memory = mo_short_memory.
 
-    CREATE OBJECT mo_long_memory TYPE (<ls_agent>-long_memory_provider).
+    CREATE OBJECT mo_long_memory TYPE (ls_agent-long_memory_provider).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
@@ -689,7 +689,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                zpru_disc_strat AS disc ON disc~discard_strategy = type~discard_strategy
                  LEFT OUTER JOIN
                    zpru_summ_strat AS summ ON summ~summary_strategy = type~summary_strategy
-      WHERE type~agent_type = @<ls_agent>-agent_type
+      WHERE type~agent_type = @ls_agent-agent_type
       INTO @DATA(ls_agent_config).
     IF sy-subrc <> 0.
       RETURN.
@@ -752,9 +752,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agent_uuid
-                      IMPORTING eo_short_memory = lo_short_memory
-                      CHANGING  cs_reported     = cs_adf_reported
-                                cs_failed       = cs_adf_failed ).
+                             IMPORTING eo_short_memory = lo_short_memory
+                             CHANGING  cs_reported     = cs_adf_reported
+                                       cs_failed       = cs_adf_failed ).
 
     DATA(lo_controller) = get_controller( ).
     CLEAR lo_controller->mt_run_context.
@@ -1234,7 +1234,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     prepare_memory_provider( EXPORTING iv_agent_uuid   = iv_agent_uuid
-                             IMPORTING eo_short_memory = lo_short_memory
+                             IMPORTING eo_short_memory = DATA(lo_short_memory)
                              CHANGING  cs_reported     = cs_reported
                                        cs_failed       = cs_failed ).
 
@@ -1285,9 +1285,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     prepare_memory_provider( EXPORTING iv_agent_uuid   = is_agent-agent_uuid
-                      IMPORTING eo_short_memory = lo_short_memory
-                      CHANGING  cs_reported     = cs_adf_reported
-                                cs_failed       = cs_adf_failed ).
+                             IMPORTING eo_short_memory = lo_short_memory
+                             CHANGING  cs_reported     = cs_adf_reported
+                                       cs_failed       = cs_adf_failed ).
 
     DATA(lo_controller) = get_controller( ).
 
