@@ -71,7 +71,7 @@ annotate view ZC_PRU_AGENT_TYPE with
   @UI.selectionField: [ {
     position: 40
   } ]
-  AIPF7MaxNumberOfLoop;
+  AIPF7MaximumNumberOfLoop;
 
   @UI.identification: [ {
     position: 50

@@ -34,10 +34,10 @@ authorization master ( global )
   mapping for zpru_agent_type corresponding extensible
     {
       AIPF7AgentType         = agenttype;
-      AIPF7ShortMemoryVolume = shortmemvolume;
+      AIPF7ShortMemoryVolume = ShortMemoryVolume;
       AIPF7DiscardStrategy   = discardstrategy;
       AIPF7SummaryStrategy   = summarystrategy;
-      AIPF7MaxNumberOfLoop   = maxnumbloop;
+      AIPF7MaximumNumberOfLoop   = MaximumNumberOfLoop;
       AIPF7CreatedBy         = createdby;
       AIPF7CreatedAt         = createdat;
       AIPF7ChangedBy         = changedby;

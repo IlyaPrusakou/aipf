@@ -59,42 +59,42 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
 
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
-      <ls_create_in>-agenttype      = <ls_create>-agenttype.
-      <ls_create_in>-shortmemvolume = COND #( WHEN <ls_create>-control-shortmemvolume = abap_true
-                                              THEN <ls_create>-shortmemvolume ).
-      <ls_create_in>-%control-shortmemvolume = COND #( WHEN <ls_create>-control-shortmemvolume = abap_true
+      <ls_create_in>-aipf7agenttype      = <ls_create>-agenttype.
+      <ls_create_in>-aipf7shortmemoryvolume = COND #( WHEN <ls_create>-control-shortmemoryvolume = abap_true
+                                              THEN <ls_create>-shortmemoryvolume ).
+      <ls_create_in>-%control-aipf7shortmemoryvolume = COND #( WHEN <ls_create>-control-shortmemoryvolume = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-discardstrategy = COND #( WHEN <ls_create>-control-discardstrategy = abap_true
+      <ls_create_in>-aipf7discardstrategy = COND #( WHEN <ls_create>-control-discardstrategy = abap_true
                                                THEN <ls_create>-discardstrategy ).
-      <ls_create_in>-%control-discardstrategy = COND #( WHEN <ls_create>-control-discardstrategy = abap_true
+      <ls_create_in>-%control-aipf7discardstrategy = COND #( WHEN <ls_create>-control-discardstrategy = abap_true
                                                         THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-summarystrategy = COND #( WHEN <ls_create>-control-summarystrategy = abap_true
+      <ls_create_in>-aipf7summarystrategy = COND #( WHEN <ls_create>-control-summarystrategy = abap_true
                                                THEN <ls_create>-summarystrategy ).
-      <ls_create_in>-%control-summarystrategy = COND #( WHEN <ls_create>-control-summarystrategy = abap_true
+      <ls_create_in>-%control-aipf7summarystrategy = COND #( WHEN <ls_create>-control-summarystrategy = abap_true
                                                         THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-maxnumbloop = COND #( WHEN <ls_create>-control-maxnumbloop = abap_true
-                                           THEN <ls_create>-maxnumbloop ).
-      <ls_create_in>-%control-maxnumbloop = COND #( WHEN <ls_create>-control-maxnumbloop = abap_true
+      <ls_create_in>-AIPF7MaximumNumberOfLoop = COND #( WHEN <ls_create>-control-MaximumNumberOfLoop = abap_true
+                                           THEN <ls_create>-MaximumNumberOfLoop ).
+      <ls_create_in>-%control-AIPF7MaximumNumberOfLoop = COND #( WHEN <ls_create>-control-MaximumNumberOfLoop = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-createdby = COND #( WHEN <ls_create>-control-createdby = abap_true
+      <ls_create_in>-aipf7createdby = COND #( WHEN <ls_create>-control-createdby = abap_true
                                          THEN <ls_create>-createdby ).
-      <ls_create_in>-%control-createdby = COND #( WHEN <ls_create>-control-createdby = abap_true
+      <ls_create_in>-%control-aipf7createdby = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-createdat = COND #( WHEN <ls_create>-control-createdat = abap_true
+      <ls_create_in>-aipf7createdat = COND #( WHEN <ls_create>-control-createdat = abap_true
                                          THEN <ls_create>-createdat ).
-      <ls_create_in>-%control-createdat = COND #( WHEN <ls_create>-control-createdat = abap_true
+      <ls_create_in>-%control-aipf7createdat = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
+      <ls_create_in>-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
                                          THEN <ls_create>-changedby ).
-      <ls_create_in>-%control-changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
+      <ls_create_in>-%control-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-lastchanged = COND #( WHEN <ls_create>-control-lastchanged = abap_true
+      <ls_create_in>-aipf7lastchanged = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                            THEN <ls_create>-lastchanged ).
-      <ls_create_in>-%control-lastchanged = COND #( WHEN <ls_create>-control-lastchanged = abap_true
+      <ls_create_in>-%control-aipf7lastchanged = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
+      <ls_create_in>-aipf7locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
                                                 THEN <ls_create>-locallastchanged ).
-      <ls_create_in>-%control-locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
+      <ls_create_in>-%control-aipf7locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -107,21 +107,21 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT ls_cr_failed-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
       APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-agenttype = <ls_failed_agenttype>-agenttype.
+      <ls_failed_target>-agenttype = <ls_failed_agenttype>-aipf7agenttype.
       <ls_failed_target>-fail      = CONV #( <ls_failed_agenttype>-%fail-cause ).
       <ls_failed_target>-create    = <ls_failed_agenttype>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_reported-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_reported_agenttype>).
       APPEND INITIAL LINE TO cs_reported-agent_type ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-agenttype = <ls_reported_agenttype>-agenttype.
+      <ls_reported_target>-agenttype = <ls_reported_agenttype>-aipf7agenttype.
 *      <ls_reported_target>-msg        =  <ls_reported_agenttype>-%msg.
       <ls_reported_target>-create    = <ls_reported_agenttype>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_mapped-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_mapped_agenttype>).
       APPEND INITIAL LINE TO cs_mapped-agent_type ASSIGNING FIELD-SYMBOL(<ls_mapped_target>).
-      <ls_mapped_target>-agenttype = <ls_mapped_agenttype>-agenttype.
+      <ls_mapped_target>-agenttype = <ls_mapped_agenttype>-aipf7agenttype.
     ENDLOOP.
   ENDMETHOD.
 
@@ -145,7 +145,7 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
       APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-agenttype = <ls_delete>-agenttype.
+      <ls_delete_in>-aipf7agenttype = <ls_delete>-agenttype.
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_agent_type
@@ -156,14 +156,14 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT ls_del_failed-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
       APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-agenttype = <ls_failed_agenttype>-agenttype.
+      <ls_failed_target>-agenttype = <ls_failed_agenttype>-aipf7agenttype.
       <ls_failed_target>-fail      = CONV #( <ls_failed_agenttype>-%fail-cause ).
       <ls_failed_target>-delete    = <ls_failed_agenttype>-%delete.
     ENDLOOP.
 
     LOOP AT ls_del_reported-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_reported_agenttype>).
       APPEND INITIAL LINE TO cs_reported-agent_type ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-agenttype = <ls_reported_agenttype>-agenttype.
+      <ls_reported_target>-agenttype = <ls_reported_agenttype>-aipf7agenttype.
       <ls_reported_target>-delete    = <ls_reported_agenttype>-%delete.
     ENDLOOP.
   ENDMETHOD.
@@ -177,16 +177,16 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
   METHOD zpru_if_agty_service~query_agent_type.
     CLEAR et_agty_k.
 
-    SELECT agenttype FROM zi_pru_agent_type
-      WHERE agenttype       IN @it_agent_type
-        AND shortmemvolume IN @it_short_mem_volume
-        AND discardstrategy IN @it_discard_strategy
-        AND summarystrategy IN @it_summary_strategy
-        AND maxnumbloop    IN @it_max_numb_loop
-        AND createdby       IN @it_created_by
-        AND createdat       IN @it_created_at
-        AND changedby       IN @it_changed_by
-        AND lastchanged     IN @it_last_changed
+    SELECT aipf7agenttype as agenttype FROM zi_pru_agent_type
+      WHERE aipf7agenttype       IN @it_agent_type
+        AND aipf7shortmemoryvolume IN @it_short_mem_volume
+        AND aipf7discardstrategy IN @it_discard_strategy
+        AND aipf7summarystrategy IN @it_summary_strategy
+        AND AIPF7MaximumNumberOfLoop    IN @it_max_numb_loop
+        AND aipf7createdby       IN @it_created_by
+        AND aipf7createdat       IN @it_created_at
+        AND aipf7changedby       IN @it_changed_by
+        AND aipf7lastchanged     IN @it_last_changed
       INTO TABLE @et_agty_k.
   ENDMETHOD.
 
@@ -217,25 +217,25 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_req>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-agenttype = <ls_req>-agenttype.
+      <ls_read_in>-aipf7agenttype = <ls_req>-agenttype.
 
-      <ls_read_in>-%control-shortmemvolume   = COND #( WHEN <ls_req>-control-shortmemvolume = abap_true
+      <ls_read_in>-%control-aipf7shortmemoryvolume   = COND #( WHEN <ls_req>-control-shortmemoryvolume = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-discardstrategy  = COND #( WHEN <ls_req>-control-discardstrategy = abap_true
+      <ls_read_in>-%control-aipf7discardstrategy  = COND #( WHEN <ls_req>-control-discardstrategy = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-summarystrategy  = COND #( WHEN <ls_req>-control-summarystrategy = abap_true
+      <ls_read_in>-%control-aipf7summarystrategy  = COND #( WHEN <ls_req>-control-summarystrategy = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-maxnumbloop      = COND #( WHEN <ls_req>-control-maxnumbloop = abap_true
+      <ls_read_in>-%control-AIPF7MaximumNumberOfLoop      = COND #( WHEN <ls_req>-control-MaximumNumberOfLoop = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-createdby        = COND #( WHEN <ls_req>-control-createdby = abap_true
+      <ls_read_in>-%control-aipf7createdby        = COND #( WHEN <ls_req>-control-createdby = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-createdat        = COND #( WHEN <ls_req>-control-createdat = abap_true
+      <ls_read_in>-%control-aipf7createdat        = COND #( WHEN <ls_req>-control-createdat = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-changedby        = COND #( WHEN <ls_req>-control-changedby = abap_true
+      <ls_read_in>-%control-aipf7changedby        = COND #( WHEN <ls_req>-control-changedby = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-lastchanged      = COND #( WHEN <ls_req>-control-lastchanged = abap_true
+      <ls_read_in>-%control-aipf7lastchanged      = COND #( WHEN <ls_req>-control-lastchanged = abap_true
                                                        THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-locallastchanged = COND #( WHEN <ls_req>-control-locallastchanged = abap_true
+      <ls_read_in>-%control-aipf7locallastchanged = COND #( WHEN <ls_req>-control-locallastchanged = abap_true
                                                        THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -248,28 +248,28 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT ls_rd_failed-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
       APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-agenttype = <ls_failed_agenttype>-agenttype.
+      <ls_failed_target>-agenttype = <ls_failed_agenttype>-aipf7agenttype.
       <ls_failed_target>-fail      = CONV #( <ls_failed_agenttype>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_rd_reported-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_reported_agenttype>).
       APPEND INITIAL LINE TO cs_reported-agent_type ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-agenttype = <ls_reported_agenttype>-agenttype.
+      <ls_reported_target>-agenttype = <ls_reported_agenttype>-aipf7agenttype.
 *      <ls_reported_target>-msg        =  <ls_reported_agenttype>-%msg.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       CLEAR ls_out.
-      ls_out-agenttype        = <ls_res>-agenttype.
-      ls_out-shortmemvolume   = <ls_res>-shortmemvolume.
-      ls_out-discardstrategy  = <ls_res>-discardstrategy.
-      ls_out-summarystrategy  = <ls_res>-summarystrategy.
-      ls_out-maxnumbloop      = <ls_res>-maxnumbloop.
-      ls_out-createdby        = <ls_res>-createdby.
-      ls_out-createdat        = <ls_res>-createdat.
-      ls_out-changedby        = <ls_res>-changedby.
-      ls_out-lastchanged      = <ls_res>-lastchanged.
-      ls_out-locallastchanged = <ls_res>-locallastchanged.
+      ls_out-agenttype        = <ls_res>-aipf7agenttype.
+      ls_out-shortmemoryvolume   = <ls_res>-aipf7shortmemoryvolume.
+      ls_out-discardstrategy  = <ls_res>-aipf7discardstrategy.
+      ls_out-summarystrategy  = <ls_res>-aipf7summarystrategy.
+      ls_out-MaximumNumberOfLoop      = <ls_res>-AIPF7MaximumNumberOfLoop.
+      ls_out-createdby        = <ls_res>-aipf7createdby.
+      ls_out-createdat        = <ls_res>-aipf7createdat.
+      ls_out-changedby        = <ls_res>-aipf7changedby.
+      ls_out-lastchanged      = <ls_res>-aipf7lastchanged.
+      ls_out-locallastchanged = <ls_res>-aipf7locallastchanged.
       APPEND ls_out TO et_agty.
     ENDLOOP.
   ENDMETHOD.
@@ -294,51 +294,51 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
       APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-agenttype      = <ls_update>-agenttype.
+      <ls_update_in>-aipf7agenttype      = <ls_update>-agenttype.
 
-      <ls_update_in>-shortmemvolume = COND #( WHEN <ls_update>-control-shortmemvolume = abap_true
-                                              THEN <ls_update>-shortmemvolume ).
-      <ls_update_in>-%control-shortmemvolume = COND #( WHEN <ls_update>-control-shortmemvolume = abap_true
+      <ls_update_in>-aipf7shortmemoryvolume = COND #( WHEN <ls_update>-control-shortmemoryvolume = abap_true
+                                              THEN <ls_update>-shortmemoryvolume ).
+      <ls_update_in>-%control-aipf7shortmemoryvolume = COND #( WHEN <ls_update>-control-shortmemoryvolume = abap_true
                                                        THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-discardstrategy = COND #( WHEN <ls_update>-control-discardstrategy = abap_true
+      <ls_update_in>-aipf7discardstrategy = COND #( WHEN <ls_update>-control-discardstrategy = abap_true
                                                THEN <ls_update>-discardstrategy ).
-      <ls_update_in>-%control-discardstrategy = COND #( WHEN <ls_update>-control-discardstrategy = abap_true
+      <ls_update_in>-%control-aipf7discardstrategy = COND #( WHEN <ls_update>-control-discardstrategy = abap_true
                                                         THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-summarystrategy = COND #( WHEN <ls_update>-control-summarystrategy = abap_true
+      <ls_update_in>-aipf7summarystrategy = COND #( WHEN <ls_update>-control-summarystrategy = abap_true
                                                THEN <ls_update>-summarystrategy ).
-      <ls_update_in>-%control-summarystrategy = COND #( WHEN <ls_update>-control-summarystrategy = abap_true
+      <ls_update_in>-%control-aipf7summarystrategy = COND #( WHEN <ls_update>-control-summarystrategy = abap_true
                                                         THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-maxnumbloop = COND #( WHEN <ls_update>-control-maxnumbloop = abap_true
-                                           THEN <ls_update>-maxnumbloop ).
-      <ls_update_in>-%control-maxnumbloop = COND #( WHEN <ls_update>-control-maxnumbloop = abap_true
+      <ls_update_in>-AIPF7MaximumNumberOfLoop = COND #( WHEN <ls_update>-control-MaximumNumberOfLoop = abap_true
+                                           THEN <ls_update>-MaximumNumberOfLoop ).
+      <ls_update_in>-%control-AIPF7MaximumNumberOfLoop = COND #( WHEN <ls_update>-control-MaximumNumberOfLoop = abap_true
                                                     THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-createdby = COND #( WHEN <ls_update>-control-createdby = abap_true
+      <ls_update_in>-aipf7createdby = COND #( WHEN <ls_update>-control-createdby = abap_true
                                          THEN <ls_update>-createdby ).
-      <ls_update_in>-%control-createdby = COND #( WHEN <ls_update>-control-createdby = abap_true
+      <ls_update_in>-%control-aipf7createdby = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-createdat = COND #( WHEN <ls_update>-control-createdat = abap_true
+      <ls_update_in>-aipf7createdat = COND #( WHEN <ls_update>-control-createdat = abap_true
                                          THEN <ls_update>-createdat ).
-      <ls_update_in>-%control-createdat = COND #( WHEN <ls_update>-control-createdat = abap_true
+      <ls_update_in>-%control-aipf7createdat = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-changedby = COND #( WHEN <ls_update>-control-changedby <> if_abap_behv=>mk-off
+      <ls_update_in>-aipf7changedby = COND #( WHEN <ls_update>-control-changedby <> if_abap_behv=>mk-off
                                          THEN <ls_update>-changedby ).
-      <ls_update_in>-%control-changedby = COND #( WHEN <ls_update>-control-changedby <> if_abap_behv=>mk-off
+      <ls_update_in>-%control-aipf7changedby = COND #( WHEN <ls_update>-control-changedby <> if_abap_behv=>mk-off
                                                   THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-lastchanged = COND #( WHEN <ls_update>-control-lastchanged = abap_true
+      <ls_update_in>-aipf7lastchanged = COND #( WHEN <ls_update>-control-lastchanged = abap_true
                                            THEN <ls_update>-lastchanged ).
-      <ls_update_in>-%control-lastchanged = COND #( WHEN <ls_update>-control-lastchanged = abap_true
+      <ls_update_in>-%control-aipf7lastchanged = COND #( WHEN <ls_update>-control-lastchanged = abap_true
                                                     THEN if_abap_behv=>mk-on ).
 
-      <ls_update_in>-locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
+      <ls_update_in>-aipf7locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
                                                 THEN <ls_update>-locallastchanged ).
-      <ls_update_in>-%control-locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
+      <ls_update_in>-%control-aipf7locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -350,14 +350,14 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
 
     LOOP AT ls_up_failed-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_failed_agenttype>).
       APPEND INITIAL LINE TO cs_failed-agent_type ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-agenttype = <ls_failed_agenttype>-agenttype.
+      <ls_failed_target>-agenttype = <ls_failed_agenttype>-aipf7agenttype.
       <ls_failed_target>-fail      = CONV #( <ls_failed_agenttype>-%fail-cause ).
       <ls_failed_target>-update    = <ls_failed_agenttype>-%update.
     ENDLOOP.
 
     LOOP AT ls_up_reported-zrpruagenttype ASSIGNING FIELD-SYMBOL(<ls_reported_agenttype>).
       APPEND INITIAL LINE TO cs_reported-agent_type ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-agenttype = <ls_reported_agenttype>-agenttype.
+      <ls_reported_target>-agenttype = <ls_reported_agenttype>-aipf7agenttype.
       <ls_reported_target>-update    = <ls_reported_agenttype>-%update.
     ENDLOOP.
   ENDMETHOD.

@@ -54,8 +54,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     LOOP AT it_message ASSIGNING FIELD-SYMBOL(<ls_message>).
 
-      IF <ls_message>-messagetime IS INITIAL.
-        <ls_message>-messagetime = lv_now.
+      IF <ls_message>-messageDATEtime IS INITIAL.
+        <ls_message>-messageDATEtime = lv_now.
       ENDIF.
 
       IF <ls_message>-messagetype IS INITIAL.

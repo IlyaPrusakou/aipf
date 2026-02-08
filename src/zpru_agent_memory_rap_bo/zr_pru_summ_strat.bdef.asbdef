@@ -6,19 +6,19 @@ define behavior for ZR_PRU_SUMM_STRAT alias ZrPruSummStrat
 persistent table ZPRU_SUMM_STRAT
 extensible
 draft table ZPRU_SUMM_STRT_D
-etag master LocalLastChanged
-lock master total etag LastChanged
+etag master  AIPF7LocalLastChanged
+lock master total etag  AIPF7LastChanged
 authorization master( global )
 {
   field ( mandatory : create )
-   SummaryStrategy;
+    AIPF7SummaryStrategy;
 
   field ( readonly )
-   LastChanged,
-   LocalLastChanged;
+    AIPF7LastChanged,
+    AIPF7LocalLastChanged;
 
   field ( readonly : update )
-   SummaryStrategy;
+    AIPF7SummaryStrategy;
 
 
   create;
@@ -33,13 +33,13 @@ authorization master( global )
 
   mapping for ZPRU_SUMM_STRAT corresponding extensible
   {
-    SummaryStrategy = summarystrategy;
-    StrategyProvider = strategyprovider;
-    CreatedBy = createdby;
-    CreatedAt = createdat;
-    ChangedBy = changedby;
-    LastChanged = lastchanged;
-    LocalLastChanged = locallastchanged;
+     AIPF7SummaryStrategy = summarystrategy;
+     AIPF7SummaryProvider = SummaryProvider;
+     AIPF7CreatedBy = createdby;
+     AIPF7CreatedAt = createdat;
+    AIPF7ChangedBy = changedby;
+     AIPF7LastChanged = lastchanged;
+     AIPF7LocalLastChanged = locallastchanged;
   }
 
 }

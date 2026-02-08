@@ -13,12 +13,12 @@ define view entity ZI_PRU_AXC_STEP
       queryuuid      as AIPF7QueryUuid,
       runuuid        as AIPF7RunUuid,
       tooluuid       as AIPF7ToolUuid,
-      executionseq   as AIPF7StepSequence,
+      StepSequence   as AIPF7StepSequence,
       stepstatus     as AIPF7StepStatus,
-      starttimestamp as AIPF7StepStartDateTime,
-      endtimestamp   as AIPF7StepEndDateTime,
-      inputprompt    as AIPF7StepInputPrompt,
-      outputprompt   as AIPF7StepOutputResponse,
+      StepStartDateTime as AIPF7StepStartDateTime,
+      StepEndDateTime   as AIPF7StepEndDateTime,
+      StepInputPrompt    as AIPF7StepInputPrompt,
+      StepOutputResponse   as AIPF7StepOutputResponse,
       _executionquery,
       _executionheader
 

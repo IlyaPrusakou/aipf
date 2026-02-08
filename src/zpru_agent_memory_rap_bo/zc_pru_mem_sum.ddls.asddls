@@ -1,32 +1,32 @@
 @Metadata.allowExtensions: true
 @Metadata.ignorePropagatedAnnotations: true
-@Endusertext: {
-  Label: '###GENERATED Core Data Service Entity'
+@EndUserText: {
+  label: '###GENERATED Core Data Service Entity'
 }
-@Objectmodel: {
-  Sapobjectnodetype.Name: 'ZPRU_MEM_SUM'
+@ObjectModel: {
+  sapObjectNodeType.name: 'ZPRU_MEM_SUM'
 }
 @AccessControl.authorizationCheck: #MANDATORY
 define root view entity ZC_PRU_MEM_SUM
-  provider contract TRANSACTIONAL_QUERY
+  provider contract transactional_query
   as projection on ZR_PRU_MEM_SUM
-  association [1..1] to ZR_PRU_MEM_SUM as _BaseEntity on $projection.SUMMARYUUID = _BaseEntity.SUMMARYUUID
+  association [1..1] to ZR_PRU_MEM_SUM as _BaseEntity on $projection.AIPF7SummaryUUID = _BaseEntity.AIPF7SummaryUUID
 {
-  key SummaryUUID,
-  Content,
-  SummaryCid,
-  Stage,
-  SubStage,
-  Namespace,
-  UserName,
-  AgentUUID,
-  RunUUID,
-  QueryUUID,
-  StepUUID,
-  MessageTime,
-  CreatedBy,
-  CreatedAt,
-  ChangedBy,
-  ChangedAt,
-  _BaseEntity
+  key AIPF7SummaryUUID,
+      AIPF7Content,
+      AIPF7SummaryContentid,
+      AIPF7Stage,
+      AIPF7SubStage,
+      AIPF7Namespace,
+      AIPF7UserName,
+      AIPF7AgentUUID,
+      AIPF7RunUUID,
+      AIPF7QueryUUID,
+      AIPF7StepUUID,
+      AIPF7MessageDateTime,
+      AIPF7CreatedBy,
+      AIPF7CreatedAt,
+      AIPF7ChangedBy,
+      AIPF7ChangedAt,
+      _BaseEntity
 }

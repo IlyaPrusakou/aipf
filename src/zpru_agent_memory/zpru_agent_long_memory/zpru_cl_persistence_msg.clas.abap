@@ -33,7 +33,7 @@ CLASS zpru_cl_persistence_msg IMPLEMENTATION.
                                                                           ( messageuuid         = <ls_in>-messageuuid
                                                                             content             = <ls_in>-content
                                                                             messagetype         = <ls_in>-messagetype
-                                                                            messagecid          = <ls_in>-messagecid
+                                                                            messagecONTENTid          = <ls_in>-messagecONTENTid
                                                                             stage               = <ls_in>-stage
                                                                             substage            = <ls_in>-substage
                                                                             namespace           = <ls_in>-namespace
@@ -42,7 +42,7 @@ CLASS zpru_cl_persistence_msg IMPLEMENTATION.
                                                                             runuuid             = <ls_in>-runuuid
                                                                             queryuuid           = <ls_in>-queryuuid
                                                                             stepuuid            = <ls_in>-stepuuid
-                                                                            messagetime         = <ls_in>-messagetime
+                                                                            messageDATEtime         = <ls_in>-messageDATEtime
                                                                             createdby           = <ls_in>-createdby
                                                                             createdat           = <ls_in>-createdat
                                                                             changedby           = <ls_in>-changedby
@@ -50,7 +50,7 @@ CLASS zpru_cl_persistence_msg IMPLEMENTATION.
                                                                             control-messageuuid = abap_true
                                                                             control-content     = abap_true
                                                                             control-messagetype = abap_true
-                                                                            control-messagecid  = abap_true
+                                                                            control-messagecONTENTid  = abap_true
                                                                             control-stage       = abap_true
                                                                             control-substage    = abap_true
                                                                             control-namespace   = abap_true
@@ -59,7 +59,7 @@ CLASS zpru_cl_persistence_msg IMPLEMENTATION.
                                                                             control-runuuid     = abap_true
                                                                             control-queryuuid   = abap_true
                                                                             control-stepuuid    = abap_true
-                                                                            control-messagetime = abap_true
+                                                                            control-messageDATEtime = abap_true
                                                                             control-createdby   = abap_true
                                                                             control-createdat   = abap_true
                                                                             control-changedby   = abap_true

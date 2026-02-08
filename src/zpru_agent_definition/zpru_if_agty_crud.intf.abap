@@ -6,10 +6,10 @@ INTERFACE zpru_if_agty_crud
 
   TYPES: BEGIN OF ts_agty_control,
            agenttype         TYPE abap_boolean,
-           shortmemvolume   TYPE abap_boolean,
+           ShortMemoryVolume   TYPE abap_boolean,
            discardstrategy   TYPE abap_boolean,
            summarystrategy   TYPE abap_boolean,
-           maxnumbloop      TYPE abap_boolean,
+           MaximumNumberOfLoop      TYPE abap_boolean,
            createdby         TYPE abap_boolean,
            createdat         TYPE abap_boolean,
            changedby         TYPE abap_boolean,

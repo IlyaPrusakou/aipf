@@ -28,7 +28,7 @@ INTERFACE zpru_if_adf_type_and_constant
            longmemoryprovider    TYPE abap_boolean,
            agentinfoprovider     TYPE abap_boolean,
            systempromptprovider TYPE abap_boolean,
-           status                TYPE abap_boolean,
+           agentstatus                TYPE abap_boolean,
            createdby             TYPE abap_boolean,
            createdat             TYPE abap_boolean,
            changedby             TYPE abap_boolean,
@@ -89,8 +89,8 @@ INTERFACE zpru_if_adf_type_and_constant
            steptype           TYPE abap_boolean,
            toolschemaprovider TYPE abap_boolean,
            toolinfoprovider   TYPE abap_boolean,
-           isborrowed         TYPE abap_boolean,
-           istransient        TYPE abap_boolean,
+           toolisborrowed         TYPE abap_boolean,
+           toolistransient        TYPE abap_boolean,
          END OF ts_tool_control.
 
   TYPES: BEGIN OF ts_rba_tool_k,

@@ -112,8 +112,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                                                      control-steptype           = abap_true
                                                                      control-toolschemaprovider = abap_true
                                                                      control-toolinfoprovider   = abap_true
-                                                                     control-isborrowed         = abap_true
-                                                                     control-istransient        = abap_true  ) )
+                                                                     control-TOOLisborrowed         = abap_true
+                                                                     control-TOOListransient        = abap_true  ) )
                                IMPORTING et_tool        = DATA(lt_existing_tool) ).
 
     lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( runuuid       = is_current_step-runuuid
@@ -228,12 +228,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
           IF     <ls_existing_agent> IS NOT ASSIGNED
              AND <ls_existing_tool>  IS NOT ASSIGNED.
-            <ls_additional_tool>-istransient = abap_true.
+            <ls_additional_tool>-TOOListransient = abap_true.
           ENDIF.
 
           IF     <ls_existing_agent> IS ASSIGNED
              AND <ls_existing_tool>  IS ASSIGNED.
-            <ls_additional_tool>-isborrowed = abap_true.
+            <ls_additional_tool>-TOOLisborrowed = abap_true.
           ENDIF.
 
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
@@ -274,13 +274,13 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                             |Wrong combination of agent { ls_last_step-agentuuid } and tool { ls_last_step-tooluuid }| ).
 
       lt_message_in = VALUE #(
-          ( messagecid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
+          ( messagecONTENTid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
             stage        = 'VALIDATE_ADDITIONAL_STEPS'
             substage    = 'AFTER VALIDATION'
             namespace    = |{ sy-uname }.{ ls_current_agent-agentname }.{ ls_current_run-runid }.{ ls_current_query-querynumber }|
             username    = sy-uname
             agentuuid   = ls_current_agent-agentuuid
-            messagetime = lv_now
+            messageDATEtime = lv_now
             content      = |\{ "AGENT_NAME" : "{ ls_current_agent-agentname }", | &&
                            | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
             messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).

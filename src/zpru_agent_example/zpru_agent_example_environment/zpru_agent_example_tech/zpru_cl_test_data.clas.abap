@@ -204,7 +204,7 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     ENDTRY.
 
     lt_agent = VALUE #( agenttype = 'AGTYP1'
-                        status     = 'N'
+                        AGENTstatus     = 'N'
                         createdby = ''
                         createdat = '0.0000000'
                         changedby = ''
@@ -309,10 +309,10 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
 
 
     lt_agent_type = VALUE #( ( agenttype         = 'AGTYP1'
-                               shortmemvolume   = '8'
+                               shortmemORYvolume   = '8'
                                discardstrategy   = 'SUM1'
                                summarystrategy   = 'SUM1'
-                               maxnumbloop      = '3'
+                               MaximumNumberOfLoop      = '3'
                                createdby         = ''
                                createdat         = '0.0000000'
                                changedby         = ''
@@ -323,20 +323,20 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
                              createdat = '0.0000000'
                              changedby = ''
                              ( discardstrategy   = 'SAV1'
-                               strategyprovider  = 'ZPRU_CL_DISCARD_SAVE'
+                               discardprovider  = 'ZPRU_CL_DISCARD_SAVE'
                                lastchanged       = '20251228160900.9861430'
                                locallastchanged = '20251228160900.9861430'  )
                              ( discardstrategy   = 'SUM1'
-                               strategyprovider  = 'ZPRU_CL_DISCARD_SUMMARIZE'
+                               discardprovider  = 'ZPRU_CL_DISCARD_SUMMARIZE'
                                lastchanged       = '20251228160923.7645650'
                                locallastchanged = '20251228160923.7645650'  )
                              ( discardstrategy   = 'DEL1'
-                               strategyprovider  = 'ZPRU_CL_DISCARD_DELETE'
+                               discardprovider  = 'ZPRU_CL_DISCARD_DELETE'
                                lastchanged       = '20251228160933.6209440'
                                locallastchanged = '20251228160933.6209440'  ) ).
 
     lt_zpru_summ_strat = VALUE #( ( summarystrategy   = 'SUM1'
-                                    strategyprovider  = 'ZPRU_CL_SUMMARIZE_SIMPLE'
+                                    summaryprovider  = 'ZPRU_CL_SUMMARIZE_SIMPLE'
                                     createdby         = ''
                                     createdat         = '0.0000000'
                                     changedby         = ''

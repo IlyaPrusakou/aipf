@@ -7,10 +7,10 @@ define view entity ZI_PRU_AGENT_TYPE
   as select from zpru_agent_type
 {
   key agenttype        as AIPF7AgentType,
-      shortmemvolume   as AIPF7ShortMemoryVolume,
+      ShortMemoryVolume   as AIPF7ShortMemoryVolume,
       discardstrategy  as AIPF7DiscardStrategy,
       summarystrategy  as AIPF7SummaryStrategy,
-      maxnumbloop      as AIPF7MaxNumberOfLoop,
+      MaximumNumberOfLoop      as AIPF7MaximumNumberOfLoop,
       createdby        as AIPF7CreatedBy,
       createdat        as AIPF7CreatedAt,
       changedby        as AIPF7ChangedBy,

@@ -36,8 +36,8 @@ authorization master ( global )
       AIPF7RunID            = runid;
       AIPF7AgentUUID        = agentuuid;
       AIPF7UserID           = userid;
-      AIPF7RunStartDateTime   = starttimestamp;
-      AIPF7RunEndDateTime     = endtimestamp;
+      AIPF7RunStartDateTime   = RunStartDateTime;
+      AIPF7RunEndDateTime     = RunEndDateTime;
       AIPF7CreatedBy        = createdby;
       AIPF7CreatedAt        = createdat;
       AIPF7ChangedBy        = changedby;
@@ -71,13 +71,13 @@ authorization dependent by _executionheader
       AIPF7QueryUuid       = queryuuid;
       AIPF7QueryNumber     = querynumber;
       AIPF7RunUuid         = runuuid;
-      AIPF7QueryLanguage        = language;
-      AIPF7QueryStatus = executionstatus;
-      AIPF7QueryStartDateTime  = starttimestamp;
-      AIPF7QueryEndDateTime    = endtimestamp;
-      AIPF7QueryInputPrompt     = inputprompt;
-      AIPF7QueryDecisionLog     = decisionlog;
-      AIPF7QueryOutputResponse  = outputresponse;
+      AIPF7QueryLanguage        = QueryLanguage;
+      AIPF7QueryStatus = QueryStatus;
+      AIPF7QueryStartDateTime  = QueryStartDateTime;
+      AIPF7QueryEndDateTime    = QueryEndDateTime;
+      AIPF7QueryInputPrompt     = QueryInputPrompt;
+      AIPF7QueryDecisionLog     = QueryDecisionLog;
+      AIPF7QueryOutputResponse  = QueryOutputResponse;
     }
 
 }
@@ -108,12 +108,12 @@ authorization dependent by _executionheader
       AIPF7QueryUuid      = queryuuid;
       AIPF7RunUuid        = runuuid;
       AIPF7ToolUuid       = tooluuid;
-      AIPF7StepSequence   = executionseq;
+      AIPF7StepSequence   = StepSequence;
       AIPF7StepStatus     = stepstatus;
-      AIPF7StepStartDateTime = starttimestamp;
-      AIPF7StepEndDateTime   = endtimestamp;
-      AIPF7StepInputPrompt    = inputprompt;
-      AIPF7StepOutputResponse   = outputprompt;
+      AIPF7StepStartDateTime = StepStartDateTime;
+      AIPF7StepEndDateTime   = StepEndDateTime;
+      AIPF7StepInputPrompt    = StepInputPrompt;
+      AIPF7StepOutputResponse   = StepOutputResponse;
     }
 
 

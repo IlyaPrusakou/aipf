@@ -16,7 +16,7 @@ define root view entity ZC_PRU_AGENT_TYPE
       AIPF7ShortMemoryVolume,
       AIPF7DiscardStrategy,
       AIPF7SummaryStrategy,
-      AIPF7MaxNumberOfLoop,
+      AIPF7MaximumNumberOfLoop,
       AIPF7CreatedBy,
       AIPF7CreatedAt,
       AIPF7ChangedBy,

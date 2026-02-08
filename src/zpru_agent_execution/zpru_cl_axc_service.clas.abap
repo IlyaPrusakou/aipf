@@ -273,17 +273,17 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-stepuuid = <ls_read>-stepuuid.
-      <ls_read_in>-%control-runuuid        = <ls_read>-control-runuuid.
-      <ls_read_in>-%control-queryuuid      = <ls_read>-control-queryuuid.
-      <ls_read_in>-%control-stepnumber     = <ls_read>-control-stepnumber.
-      <ls_read_in>-%control-tooluuid       = <ls_read>-control-tooluuid.
-      <ls_read_in>-%control-executionseq   = <ls_read>-control-executionseq.
-      <ls_read_in>-%control-stepstatus     = <ls_read>-control-stepstatus.
-      <ls_read_in>-%control-starttimestamp = <ls_read>-control-starttimestamp.
-      <ls_read_in>-%control-endtimestamp   = <ls_read>-control-endtimestamp.
-      <ls_read_in>-%control-inputprompt    = <ls_read>-control-inputprompt.
-      <ls_read_in>-%control-outputprompt   = <ls_read>-control-outputprompt.
+      <ls_read_in>-aipf7stepuuid = <ls_read>-stepuuid.
+      <ls_read_in>-%control-aipf7runuuid        = <ls_read>-control-runuuid.
+      <ls_read_in>-%control-aipf7queryuuid      = <ls_read>-control-queryuuid.
+      <ls_read_in>-%control-aipf7stepnumber     = <ls_read>-control-stepnumber.
+      <ls_read_in>-%control-aipf7tooluuid       = <ls_read>-control-tooluuid.
+      <ls_read_in>-%control-aipf7stepsequence   = <ls_read>-control-stepsequence.
+      <ls_read_in>-%control-aipf7stepstatus     = <ls_read>-control-stepstatus.
+      <ls_read_in>-%control-aipf7stepstartdatetime = <ls_read>-control-stepstartdatetime.
+      <ls_read_in>-%control-aipf7stependdatetime   = <ls_read>-control-stependdatetime.
+      <ls_read_in>-%control-aipf7stepinputprompt    = <ls_read>-control-stepinputprompt.
+      <ls_read_in>-%control-aipf7stepoutputresponse   = <ls_read>-control-stepoutputresponse.
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_axc_head
@@ -295,29 +295,29 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_failed_step>).
       APPEND INITIAL LINE TO cs_failed-step ASSIGNING FIELD-SYMBOL(<ls_failed_step_target>).
-      <ls_failed_step_target>-stepuuid = <ls_failed_step>-stepuuid.
+      <ls_failed_step_target>-stepuuid = <ls_failed_step>-aipf7stepuuid.
       <ls_failed_step_target>-fail     = CONV #( <ls_failed_step>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionstep ASSIGNING FIELD-SYMBOL(<ls_reported_step>).
       APPEND INITIAL LINE TO cs_reported-step ASSIGNING FIELD-SYMBOL(<ls_reported_step_target>).
-      <ls_reported_step_target>-stepuuid = <ls_reported_step>-stepuuid.
+      <ls_reported_step_target>-stepuuid = <ls_reported_step>-aipf7stepuuid.
 *      <ls_reported_step_target>-msg       = <ls_reported_step>-%msg.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       APPEND INITIAL LINE TO et_axc_step ASSIGNING FIELD-SYMBOL(<ls_out>).
-      <ls_out>-stepuuid       = <ls_res>-stepuuid.
-      <ls_out>-queryuuid      = <ls_res>-queryuuid.
-      <ls_out>-runuuid        = <ls_res>-runuuid.
-      <ls_out>-tooluuid       = <ls_res>-tooluuid.
-      <ls_out>-stepnumber     = <ls_res>-stepnumber.
-      <ls_out>-executionseq   = <ls_res>-executionseq.
-      <ls_out>-starttimestamp = <ls_res>-starttimestamp.
-      <ls_out>-endtimestamp   = <ls_res>-endtimestamp.
-      <ls_out>-stepstatus     = <ls_res>-stepstatus.
-      <ls_out>-inputprompt    = <ls_res>-inputprompt.
-      <ls_out>-outputprompt   = <ls_res>-outputprompt.
+      <ls_out>-stepuuid       = <ls_res>-aipf7stepuuid.
+      <ls_out>-queryuuid      = <ls_res>-aipf7queryuuid.
+      <ls_out>-runuuid        = <ls_res>-aipf7runuuid.
+      <ls_out>-tooluuid       = <ls_res>-aipf7tooluuid.
+      <ls_out>-stepnumber     = <ls_res>-aipf7stepnumber.
+      <ls_out>-stepsequence   = <ls_res>-aipf7stepsequence.
+      <ls_out>-stepstartdatetime = <ls_res>-aipf7stepstartdatetime.
+      <ls_out>-stependdatetime   = <ls_res>-aipf7stependdatetime.
+      <ls_out>-stepstatus     = <ls_res>-aipf7stepstatus.
+      <ls_out>-stepinputprompt    = <ls_res>-aipf7stepinputprompt.
+      <ls_out>-stepoutputresponse   = <ls_res>-aipf7stepoutputresponse.
     ENDLOOP.
   ENDMETHOD.
 
@@ -508,13 +508,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
                                             control = VALUE #( runuuid         = abap_true
                                                                querynumber     = abap_true
                                                                queryuuid       = abap_true
-                                                               language        = abap_true
-                                                               executionstatus = abap_true
-                                                               starttimestamp  = abap_true
-                                                               endtimestamp    = abap_true
-                                                               inputprompt     = abap_true
-                                                               decisionlog     = abap_true
-                                                               outputresponse  = abap_true )  ) )
+                                                               querylanguage        = abap_true
+                                                               querystatus = abap_true
+                                                               querystartdatetime  = abap_true
+                                                               queryenddatetime    = abap_true
+                                                               queryinputprompt     = abap_true
+                                                               querydecisionlog     = abap_true
+                                                               queryoutputresponse  = abap_true )  ) )
       IMPORTING et_axc_query   = DATA(lt_query_candidates)
       CHANGING  cs_reported    = cs_reported
                 cs_failed      = cs_failed ).
@@ -523,9 +523,9 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
       DATA(lt_query_copy) = lt_query_candidates.
       DELETE lt_query_copy WHERE runuuid <> <ls_axc_head_k>-runuuid.
-      DELETE lt_query_copy WHERE executionstatus <> zpru_if_axc_type_and_constant=>sc_query_status-new.
+      DELETE lt_query_copy WHERE querystatus <> zpru_if_axc_type_and_constant=>sc_query_status-new.
 
-      SORT lt_query_copy BY starttimestamp ASCENDING.
+      SORT lt_query_copy BY querystartdatetime ASCENDING.
 
       APPEND INITIAL LINE TO et_axc_head_query_link ASSIGNING FIELD-SYMBOL(<ls_axc_head_query_link>).
       <ls_axc_head_query_link>-runuuid   = <ls_axc_head_k>-runuuid.
@@ -558,42 +558,42 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
       APPEND INITIAL LINE TO lt_cba_in ASSIGNING FIELD-SYMBOL(<ls_cba_in>).
-      <ls_cba_in>-runuuid = <ls_create>-runuuid.
+      <ls_cba_in>-aipf7runuuid = <ls_create>-runuuid.
       APPEND INITIAL LINE TO <ls_cba_in>-%target ASSIGNING FIELD-SYMBOL(<ls_target>).
       <ls_target>-%cid            = |CID_{ sy-index }_{ <ls_create>-queryuuid }|.
-      <ls_target>-queryuuid       = <ls_create>-queryuuid.
-      <ls_target>-runuuid         = <ls_create>-runuuid.
-      <ls_target>-querynumber     = COND #( WHEN <ls_create>-control-querynumber = abap_true
+      <ls_target>-aipf7queryuuid       = <ls_create>-queryuuid.
+      <ls_target>-aipf7runuuid         = <ls_create>-runuuid.
+      <ls_target>-aipf7querynumber     = COND #( WHEN <ls_create>-control-querynumber = abap_true
                                             THEN <ls_create>-querynumber ).
-      <ls_target>-language        = COND #( WHEN <ls_create>-control-language = abap_true THEN <ls_create>-language ).
-      <ls_target>-executionstatus = COND #( WHEN <ls_create>-control-executionstatus = abap_true
-                                            THEN <ls_create>-executionstatus ).
-      <ls_target>-starttimestamp  = COND #( WHEN <ls_create>-control-starttimestamp = abap_true
-                                            THEN <ls_create>-starttimestamp ).
-      <ls_target>-endtimestamp    = COND #( WHEN <ls_create>-control-endtimestamp = abap_true
-                                            THEN <ls_create>-endtimestamp ).
-      <ls_target>-inputprompt     = COND #( WHEN <ls_create>-control-inputprompt = abap_true
-                                            THEN <ls_create>-inputprompt ).
-      <ls_target>-decisionlog     = COND #( WHEN <ls_create>-control-decisionlog = abap_true
-                                            THEN <ls_create>-decisionlog ).
-      <ls_target>-outputresponse  = COND #( WHEN <ls_create>-control-outputresponse = abap_true
-                                            THEN <ls_create>-outputresponse ).
+      <ls_target>-aipf7querylanguage        = COND #( WHEN <ls_create>-control-querylanguage = abap_true THEN <ls_create>-querylanguage ).
+      <ls_target>-aipf7querystatus = COND #( WHEN <ls_create>-control-querystatus = abap_true
+                                            THEN <ls_create>-querystatus ).
+      <ls_target>-aipf7querystartdatetime  = COND #( WHEN <ls_create>-control-querystartdatetime = abap_true
+                                            THEN <ls_create>-querystartdatetime ).
+      <ls_target>-aipf7queryenddatetime    = COND #( WHEN <ls_create>-control-queryenddatetime = abap_true
+                                            THEN <ls_create>-queryenddatetime ).
+      <ls_target>-aipf7queryinputprompt     = COND #( WHEN <ls_create>-control-queryinputprompt = abap_true
+                                            THEN <ls_create>-queryinputprompt ).
+      <ls_target>-aipf7querydecisionlog     = COND #( WHEN <ls_create>-control-querydecisionlog = abap_true
+                                            THEN <ls_create>-querydecisionlog ).
+      <ls_target>-aipf7queryoutputresponse  = COND #( WHEN <ls_create>-control-queryoutputresponse = abap_true
+                                            THEN <ls_create>-queryoutputresponse ).
 
-      <ls_target>-%control-querynumber     = COND #( WHEN <ls_create>-control-querynumber = abap_true
+      <ls_target>-%control-aipf7querynumber     = COND #( WHEN <ls_create>-control-querynumber = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-language        = COND #( WHEN <ls_create>-control-language = abap_true
+      <ls_target>-%control-aipf7querylanguage        = COND #( WHEN <ls_create>-control-querylanguage  = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-executionstatus = COND #( WHEN <ls_create>-control-executionstatus = abap_true
+      <ls_target>-%control-aipf7querystatus = COND #( WHEN <ls_create>-control-querystatus = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-starttimestamp  = COND #( WHEN <ls_create>-control-starttimestamp = abap_true
+      <ls_target>-%control-aipf7querystartdatetime  = COND #( WHEN <ls_create>-control-querystartdatetime = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-endtimestamp    = COND #( WHEN <ls_create>-control-endtimestamp = abap_true
+      <ls_target>-%control-aipf7queryenddatetime    = COND #( WHEN <ls_create>-control-queryenddatetime = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-inputprompt     = COND #( WHEN <ls_create>-control-inputprompt = abap_true
+      <ls_target>-%control-aipf7queryinputprompt     = COND #( WHEN <ls_create>-control-queryinputprompt  = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-decisionlog     = COND #( WHEN <ls_create>-control-decisionlog = abap_true
+      <ls_target>-%control-aipf7querydecisionlog     = COND #( WHEN <ls_create>-control-querydecisionlog = abap_true
                                                      THEN if_abap_behv=>mk-on ).
-      <ls_target>-%control-outputresponse  = COND #( WHEN <ls_create>-control-outputresponse = abap_true
+      <ls_target>-%control-aipf7queryoutputresponse  = COND #( WHEN <ls_create>-control-queryoutputresponse = abap_true
                                                      THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -606,19 +606,19 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
       APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-      <ls_failed_query_target>-queryuuid = <ls_failed_query>-queryuuid.
+      <ls_failed_query_target>-queryuuid = <ls_failed_query>-aipf7queryuuid.
       <ls_failed_query_target>-fail      = CONV #( <ls_failed_query>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
       APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-      <ls_reported_query_target>-queryuuid = <ls_reported_query>-queryuuid.
+      <ls_reported_query_target>-queryuuid = <ls_reported_query>-aipf7queryuuid.
 *      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
     ENDLOOP.
 
     LOOP AT ls_mapped_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_mapped_query>).
       APPEND INITIAL LINE TO cs_mapped-query ASSIGNING FIELD-SYMBOL(<ls_mapped_query_target>).
-      <ls_mapped_query_target>-queryuuid = <ls_mapped_query>-queryuuid.
+      <ls_mapped_query_target>-queryuuid = <ls_mapped_query>-aipf7queryuuid.
     ENDLOOP.
   ENDMETHOD.
 
@@ -626,69 +626,69 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~rba_query.
-*    DATA lt_rba_in TYPE TABLE FOR READ BY \_executionquery zr_pru_axc_head.
-*
-*    IF it_rba_query_k IS INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    precheck_rba_query( EXPORTING it_rba_query_k = it_rba_query_k
-*                        IMPORTING et_entities    = DATA(lt_entities)
-*                        CHANGING  cs_reported    = cs_reported
-*                                  cs_failed      = cs_failed ).
-*
-*    IF lt_entities IS INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
-*      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
-*      <ls_rba_in>-runuuid = <ls_read>-run_uuid.
-*      <ls_rba_in>-%control-runuuid         = <ls_read>-control-run_uuid.
-*      <ls_rba_in>-%control-querynumber     = <ls_read>-control-query_number.
-*      <ls_rba_in>-%control-queryuuid       = <ls_read>-control-query_uuid.
-*      <ls_rba_in>-%control-language        = <ls_read>-control-language.
-*      <ls_rba_in>-%control-executionstatus = <ls_read>-control-execution_status.
-*      <ls_rba_in>-%control-starttimestamp  = <ls_read>-control-start_timestamp.
-*      <ls_rba_in>-%control-endtimestamp    = <ls_read>-control-end_timestamp.
-*      <ls_rba_in>-%control-inputprompt     = <ls_read>-control-input_prompt.
-*      <ls_rba_in>-%control-decisionlog     = <ls_read>-control-decision_log.
-*      <ls_rba_in>-%control-outputresponse  = <ls_read>-control-output_response.
-*    ENDLOOP.
-*
-*    READ ENTITIES OF zr_pru_axc_head
-*         ENTITY executionHeader
-*         BY \_executionquery
-*         FROM lt_rba_in
-*         RESULT DATA(lt_result)
-*         FAILED DATA(ls_failed_eml)
-*         REPORTED DATA(ls_reported_eml).
-*
-*    LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
-*      APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
-*      <ls_failed_header_target>-run_uuid = <ls_failed_header>-runuuid.
-*      <ls_failed_header_target>-fail     = CONV #( <ls_failed_header>-%fail-cause ).
-*    ENDLOOP.
-*
-*    LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
-*      APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-*      <ls_reported_header_target>-run_uuid = <ls_reported_header>-runuuid.
-**      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
-*    ENDLOOP.
-*
-*    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
-*      APPEND INITIAL LINE TO et_axc_query ASSIGNING FIELD-SYMBOL(<ls_out>).
-*      <ls_out>-query_uuid       = <ls_res>-queryuuid.
-*      <ls_out>-run_uuid         = <ls_res>-runuuid.
-*      <ls_out>-query_number     = <ls_res>-querynumber.
-*      <ls_out>-language         = <ls_res>-language.
-*      <ls_out>-execution_status = <ls_res>-executionstatus.
-*      <ls_out>-start_timestamp  = <ls_res>-starttimestamp.
-*      <ls_out>-end_timestamp    = <ls_res>-endtimestamp.
-*      <ls_out>-input_prompt     = <ls_res>-inputprompt.
-*      <ls_out>-decision_log     = <ls_res>-decisionlog.
-*      <ls_out>-output_response  = <ls_res>-outputresponse.
-*    ENDLOOP.
+    DATA lt_rba_in TYPE TABLE FOR READ IMPORT zr_pru_axc_head\_executionquery.
+
+    IF it_rba_query_k IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    precheck_rba_query( EXPORTING it_rba_query_k = it_rba_query_k
+                        IMPORTING et_entities    = DATA(lt_entities)
+                        CHANGING  cs_reported    = cs_reported
+                                  cs_failed      = cs_failed ).
+
+    IF lt_entities IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
+      APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
+      <ls_rba_in>-aipf7runuuid = <ls_read>-runuuid.
+      <ls_rba_in>-%control-aipf7runuuid         = <ls_read>-control-runuuid.
+      <ls_rba_in>-%control-aipf7querynumber     = <ls_read>-control-querynumber.
+      <ls_rba_in>-%control-aipf7queryuuid       = <ls_read>-control-queryuuid.
+      <ls_rba_in>-%control-aipf7querylanguage       = <ls_read>-control-querylanguage.
+      <ls_rba_in>-%control-aipf7querystatus = <ls_read>-control-querystatus.
+      <ls_rba_in>-%control-aipf7querystartdatetime  = <ls_read>-control-querystartdatetime.
+      <ls_rba_in>-%control-aipf7queryenddatetime   = <ls_read>-control-queryenddatetime.
+      <ls_rba_in>-%control-aipf7queryinputprompt    = <ls_read>-control-queryinputprompt.
+      <ls_rba_in>-%control-aipf7querydecisionlog     = <ls_read>-control-querydecisionlog.
+      <ls_rba_in>-%control-aipf7queryoutputresponse  = <ls_read>-control-queryoutputresponse.
+    ENDLOOP.
+
+    READ ENTITIES OF zr_pru_axc_head
+         ENTITY executionheader
+         BY \_executionquery
+         FROM lt_rba_in
+         RESULT DATA(lt_result)
+         FAILED DATA(ls_failed_eml)
+         REPORTED DATA(ls_reported_eml).
+
+    LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
+      APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
+      <ls_failed_header_target>-runuuid = <ls_failed_header>-aipf7runuuid.
+      <ls_failed_header_target>-fail     = CONV #( <ls_failed_header>-%fail-cause ).
+    ENDLOOP.
+
+    LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
+      APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
+      <ls_reported_header_target>-runuuid = <ls_reported_header>-aipf7runuuid.
+*      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
+    ENDLOOP.
+
+    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
+      APPEND INITIAL LINE TO et_axc_query ASSIGNING FIELD-SYMBOL(<ls_out>).
+      <ls_out>-queryuuid       = <ls_res>-aipf7queryuuid.
+      <ls_out>-runuuid         = <ls_res>-aipf7runuuid.
+      <ls_out>-querynumber     = <ls_res>-aipf7querynumber.
+      <ls_out>-querylanguage         = <ls_res>-aipf7querylanguage.
+      <ls_out>-querystatus = <ls_res>-aipf7querystatus.
+      <ls_out>-querystartdatetime  = <ls_res>-aipf7querystartdatetime.
+      <ls_out>-queryenddatetime    = <ls_res>-aipf7queryenddatetime.
+      <ls_out>-queryinputprompt     = <ls_res>-aipf7queryinputprompt.
+      <ls_out>-querydecisionlog     = <ls_res>-aipf7querydecisionlog.
+      <ls_out>-queryoutputresponse  = <ls_res>-aipf7queryoutputresponse.
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~read_query.
@@ -709,16 +709,16 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-queryuuid = <ls_read>-queryuuid.
-      <ls_read_in>-%control-runuuid         = <ls_read>-control-runuuid.
-      <ls_read_in>-%control-querynumber     = <ls_read>-control-querynumber.
-      <ls_read_in>-%control-language        = <ls_read>-control-language.
-      <ls_read_in>-%control-executionstatus = <ls_read>-control-executionstatus.
-      <ls_read_in>-%control-starttimestamp  = <ls_read>-control-starttimestamp.
-      <ls_read_in>-%control-endtimestamp    = <ls_read>-control-endtimestamp.
-      <ls_read_in>-%control-inputprompt     = <ls_read>-control-inputprompt.
-      <ls_read_in>-%control-decisionlog     = <ls_read>-control-decisionlog.
-      <ls_read_in>-%control-outputresponse  = <ls_read>-control-outputresponse.
+      <ls_read_in>-aipf7queryuuid = <ls_read>-queryuuid.
+      <ls_read_in>-%control-aipf7runuuid         = <ls_read>-control-runuuid.
+      <ls_read_in>-%control-aipf7querynumber     = <ls_read>-control-querynumber.
+      <ls_read_in>-%control-aipf7querylanguage        = <ls_read>-control-querylanguage.
+      <ls_read_in>-%control-aipf7querystatus = <ls_read>-control-querystatus.
+      <ls_read_in>-%control-aipf7querystartdatetime  = <ls_read>-control-querystartdatetime.
+      <ls_read_in>-%control-aipf7queryenddatetime    = <ls_read>-control-queryenddatetime.
+      <ls_read_in>-%control-aipf7queryinputprompt     = <ls_read>-control-queryinputprompt.
+      <ls_read_in>-%control-aipf7querydecisionlog     = <ls_read>-control-querydecisionlog.
+      <ls_read_in>-%control-aipf7queryoutputresponse  = <ls_read>-control-queryoutputresponse .
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_axc_head
@@ -730,139 +730,139 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
       APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-      <ls_failed_query_target>-queryuuid = <ls_failed_query>-queryuuid.
+      <ls_failed_query_target>-queryuuid = <ls_failed_query>-aipf7queryuuid.
       <ls_failed_query_target>-fail      = CONV #( <ls_failed_query>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
       APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-      <ls_reported_query_target>-queryuuid = <ls_reported_query>-queryuuid.
+      <ls_reported_query_target>-queryuuid = <ls_reported_query>-aipf7queryuuid.
 *      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       APPEND INITIAL LINE TO et_axc_query ASSIGNING FIELD-SYMBOL(<ls_out>).
-      <ls_out>-queryuuid       = <ls_res>-queryuuid.
-      <ls_out>-runuuid         = <ls_res>-runuuid.
-      <ls_out>-querynumber     = <ls_res>-querynumber.
-      <ls_out>-language        = <ls_res>-language.
-      <ls_out>-executionstatus = <ls_res>-executionstatus.
-      <ls_out>-starttimestamp  = <ls_res>-starttimestamp.
-      <ls_out>-endtimestamp    = <ls_res>-endtimestamp.
-      <ls_out>-inputprompt     = <ls_res>-inputprompt.
-      <ls_out>-decisionlog     = <ls_res>-decisionlog.
-      <ls_out>-outputresponse  = <ls_res>-outputresponse.
+      <ls_out>-queryuuid       = <ls_res>-aipf7queryuuid.
+      <ls_out>-runuuid         = <ls_res>-aipf7runuuid.
+      <ls_out>-querynumber     = <ls_res>-aipf7querynumber.
+      <ls_out>-querylanguage        = <ls_res>-aipf7querylanguage.
+      <ls_out>-querystatus = <ls_res>-aipf7querystatus.
+      <ls_out>-querystartdatetime  = <ls_res>-aipf7querystartdatetime.
+      <ls_out>-queryenddatetime    = <ls_res>-aipf7queryenddatetime.
+      <ls_out>-queryinputprompt     = <ls_res>-aipf7queryinputprompt.
+      <ls_out>-querydecisionlog     = <ls_res>-aipf7querydecisionlog.
+      <ls_out>-queryoutputresponse  = <ls_res>-aipf7queryoutputresponse.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~update_query.
-*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-*    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\_executionquery.
-*
-*    IF it_query_update_imp IS INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    precheck_update_query( EXPORTING it_query_update_imp = it_query_update_imp
-*                            IMPORTING et_entities        = DATA(lt_entities)
-*                            CHANGING  cs_reported        = ls_reported
-*                                      cs_failed          = ls_failed ).
-*
-*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-*
-*    IF    lt_entities       <> it_query_update_imp
-*       OR ls_failed-query   IS NOT INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
-*      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-*      <ls_update_in>-queryuuid       = <ls_update>-query_uuid.
-*      <ls_update_in>-runuuid         = <ls_update>-run_uuid.
-*      <ls_update_in>-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN <ls_update>-query_number ).
-*      <ls_update_in>-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN <ls_update>-language ).
-*      <ls_update_in>-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN <ls_update>-execution_status ).
-*      <ls_update_in>-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN <ls_update>-start_timestamp ).
-*      <ls_update_in>-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN <ls_update>-end_timestamp ).
-*      <ls_update_in>-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN <ls_update>-input_prompt ).
-*      <ls_update_in>-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN <ls_update>-decision_log ).
-*      <ls_update_in>-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN <ls_update>-output_response ).
-*
-*      <ls_update_in>-%control-querynumber     = COND #( WHEN <ls_update>-control-query_number     = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-language        = COND #( WHEN <ls_update>-control-language         = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-executionstatus = COND #( WHEN <ls_update>-control-execution_status = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-starttimestamp  = COND #( WHEN <ls_update>-control-start_timestamp  = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-endtimestamp    = COND #( WHEN <ls_update>-control-end_timestamp    = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-inputprompt     = COND #( WHEN <ls_update>-control-input_prompt     = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-decisionlog     = COND #( WHEN <ls_update>-control-decision_log     = abap_true THEN if_abap_behv=>mk-on ).
-*      <ls_update_in>-%control-outputresponse  = COND #( WHEN <ls_update>-control-output_response  = abap_true THEN if_abap_behv=>mk-on ).
-*    ENDLOOP.
-*
-*    MODIFY ENTITIES OF zr_pru_axc_head
-*           ENTITY executionQuery
-*           UPDATE FROM lt_update_in
-*           FAILED DATA(ls_failed_eml)
-*           REPORTED DATA(ls_reported_eml).
-*
-*    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
-*      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-*      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
-*      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
-*    ENDLOOP.
-*
-*    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
-*      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-*      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
-**      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
-*    ENDLOOP.
+    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+    DATA lt_update_in TYPE TABLE FOR UPDATE zr_pru_axc_head\\executionquery.
+
+    IF it_query_update_imp IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    precheck_update_query( EXPORTING it_query_update_imp = it_query_update_imp
+                            IMPORTING et_entities        = DATA(lt_entities)
+                            CHANGING  cs_reported        = ls_reported
+                                      cs_failed          = ls_failed ).
+
+    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+
+    IF    lt_entities       <> it_query_update_imp
+       OR ls_failed-query   IS NOT INITIAL.
+      RETURN.
+    ENDIF.
+
+    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
+      APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
+      <ls_update_in>-aipf7queryuuid       = <ls_update>-queryuuid.
+      <ls_update_in>-aipf7runuuid         = <ls_update>-runuuid.
+      <ls_update_in>-aipf7querynumber     = COND #( WHEN <ls_update>-control-querynumber     = abap_true THEN <ls_update>-querynumber ).
+      <ls_update_in>-aipf7querylanguage        = COND #( WHEN <ls_update>-control-querylanguage         = abap_true THEN <ls_update>-querylanguage ).
+      <ls_update_in>-aipf7querystatus = COND #( WHEN <ls_update>-control-querystatus = abap_true THEN <ls_update>-querystatus ).
+      <ls_update_in>-aipf7querystartdatetime  = COND #( WHEN <ls_update>-control-querystartdatetime  = abap_true THEN <ls_update>-querystartdatetime ).
+      <ls_update_in>-aipf7queryenddatetime    = COND #( WHEN <ls_update>-control-queryenddatetime    = abap_true THEN <ls_update>-queryenddatetime ).
+      <ls_update_in>-aipf7queryinputprompt     = COND #( WHEN <ls_update>-control-queryinputprompt     = abap_true THEN <ls_update>-queryinputprompt ).
+      <ls_update_in>-aipf7querydecisionlog     = COND #( WHEN <ls_update>-control-querydecisionlog     = abap_true THEN <ls_update>-querydecisionlog ).
+      <ls_update_in>-aipf7queryoutputresponse  = COND #( WHEN <ls_update>-control-queryoutputresponse  = abap_true THEN <ls_update>-queryoutputresponse ).
+
+      <ls_update_in>-%control-aipf7querynumber     = COND #( WHEN <ls_update>-control-querynumber     = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7querylanguage        = COND #( WHEN <ls_update>-control-querylanguage         = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7querystatus = COND #( WHEN <ls_update>-control-querystatus = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7querystartdatetime  = COND #( WHEN <ls_update>-control-querystartdatetime  = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7queryenddatetime    = COND #( WHEN <ls_update>-control-queryenddatetime    = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7queryinputprompt     = COND #( WHEN <ls_update>-control-queryinputprompt     = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7querydecisionlog     = COND #( WHEN <ls_update>-control-querydecisionlog     = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-%control-aipf7queryoutputresponse  = COND #( WHEN <ls_update>-control-queryoutputresponse  = abap_true THEN if_abap_behv=>mk-on ).
+    ENDLOOP.
+
+    MODIFY ENTITIES OF zr_pru_axc_head
+           ENTITY executionquery
+           UPDATE FROM lt_update_in
+           FAILED DATA(ls_failed_eml)
+           REPORTED DATA(ls_reported_eml).
+
+    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
+      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
+      <ls_failed_query_target>-queryuuid = <ls_failed_query>-aipf7queryuuid.
+      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
+    ENDLOOP.
+
+    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
+      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
+      <ls_reported_query_target>-queryuuid = <ls_reported_query>-aipf7queryuuid.
+*      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~delete_query.
-*    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
-*    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
-*    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\_executionquery.
-*
-*    IF it_query_delete_imp IS INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    precheck_delete_query( EXPORTING it_query_delete_imp = it_query_delete_imp
-*                           IMPORTING et_entities         = DATA(lt_entities)
-*                           CHANGING  cs_reported         = ls_reported
-*                                     cs_failed           = ls_failed ).
-*
-*    cs_failed = CORRESPONDING #( DEEP ls_failed ).
-*    cs_reported = CORRESPONDING #( DEEP ls_reported ).
-*
-*    IF    lt_entities       <> it_query_delete_imp
-*       OR ls_failed-query   IS NOT INITIAL.
-*      RETURN.
-*    ENDIF.
-*
-*    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
-*      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-*      <ls_delete_in>-queryuuid = <ls_delete>-query_uuid.
-*    ENDLOOP.
-*
-*    MODIFY ENTITIES OF zr_pru_axc_head
-*           ENTITY executionQuery
-*           DELETE FROM lt_delete_in
-*           FAILED DATA(ls_failed_eml)
-*           REPORTED DATA(ls_reported_eml).
-*
-*    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
-*      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
-*      <ls_failed_query_target>-query_uuid = <ls_failed_query>-queryuuid.
-*      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
-*    ENDLOOP.
-*
-*    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
-*      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
-*      <ls_reported_query_target>-query_uuid = <ls_reported_query>-queryuuid.
-**      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
-*    ENDLOOP.
+    DATA ls_reported TYPE zpru_if_agent_frw=>ts_axc_reported.
+    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_axc_failed.
+    DATA lt_delete_in TYPE TABLE FOR DELETE zr_pru_axc_head\\executionquery.
+
+    IF it_query_delete_imp IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    precheck_delete_query( EXPORTING it_query_delete_imp = it_query_delete_imp
+                           IMPORTING et_entities         = DATA(lt_entities)
+                           CHANGING  cs_reported         = ls_reported
+                                     cs_failed           = ls_failed ).
+
+    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+    cs_reported = CORRESPONDING #( DEEP ls_reported ).
+
+    IF    lt_entities       <> it_query_delete_imp
+       OR ls_failed-query   IS NOT INITIAL.
+      RETURN.
+    ENDIF.
+
+    LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
+      APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
+      <ls_delete_in>-aipf7queryuuid = <ls_delete>-queryuuid.
+    ENDLOOP.
+
+    MODIFY ENTITIES OF zr_pru_axc_head
+           ENTITY executionquery
+           DELETE FROM lt_delete_in
+           FAILED DATA(ls_failed_eml)
+           REPORTED DATA(ls_reported_eml).
+
+    LOOP AT ls_failed_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_failed_query>).
+      APPEND INITIAL LINE TO cs_failed-query ASSIGNING FIELD-SYMBOL(<ls_failed_query_target>).
+      <ls_failed_query_target>-queryuuid = <ls_failed_query>-aipf7queryuuid.
+      <ls_failed_query_target>-fail       = CONV #( <ls_failed_query>-%fail-cause ).
+    ENDLOOP.
+
+    LOOP AT ls_reported_eml-executionquery ASSIGNING FIELD-SYMBOL(<ls_reported_query>).
+      APPEND INITIAL LINE TO cs_reported-query ASSIGNING FIELD-SYMBOL(<ls_reported_query_target>).
+      <ls_reported_query_target>-queryuuid = <ls_reported_query>-aipf7queryuuid.
+*      <ls_reported_query_target>-msg        = <ls_reported_query>-%msg.
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_axc_service~read_header.
@@ -885,17 +885,17 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-runuuid = <ls_read>-runuuid.
-      <ls_read_in>-%control-runid            = <ls_read>-control-runid.
-      <ls_read_in>-%control-agentuuid        = <ls_read>-control-agentuuid.
-      <ls_read_in>-%control-userid           = <ls_read>-control-userid.
-      <ls_read_in>-%control-starttimestamp   = <ls_read>-control-starttimestamp.
-      <ls_read_in>-%control-endtimestamp     = <ls_read>-control-endtimestamp.
-      <ls_read_in>-%control-createdby        = <ls_read>-control-createdby.
-      <ls_read_in>-%control-createdat        = <ls_read>-control-createdat.
-      <ls_read_in>-%control-changedby        = <ls_read>-control-changedby.
-      <ls_read_in>-%control-lastchanged      = <ls_read>-control-lastchanged.
-      <ls_read_in>-%control-locallastchanged = <ls_read>-control-locallastchanged.
+      <ls_read_in>-aipf7runuuid = <ls_read>-runuuid.
+      <ls_read_in>-%control-aipf7runid            = <ls_read>-control-runid.
+      <ls_read_in>-%control-aipf7agentuuid        = <ls_read>-control-agentuuid.
+      <ls_read_in>-%control-aipf7userid           = <ls_read>-control-userid.
+      <ls_read_in>-%control-aipf7runstartdatetime   = <ls_read>-control-runstartdatetime.
+      <ls_read_in>-%control-aipf7runenddatetime     = <ls_read>-control-runenddatetime.
+      <ls_read_in>-%control-aipf7createdby        = <ls_read>-control-createdby.
+      <ls_read_in>-%control-aipf7createdat        = <ls_read>-control-createdat.
+      <ls_read_in>-%control-aipf7changedby        = <ls_read>-control-changedby.
+      <ls_read_in>-%control-aipf7lastchanged      = <ls_read>-control-lastchanged.
+      <ls_read_in>-%control-aipf7locallastchanged = <ls_read>-control-locallastchanged.
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_axc_head
@@ -907,29 +907,29 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
       APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
-      <ls_failed_header_target>-runuuid = <ls_failed_header>-runuuid.
+      <ls_failed_header_target>-runuuid = <ls_failed_header>-aipf7runuuid.
       <ls_failed_header_target>-fail    = CONV #( <ls_failed_header>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-      <ls_reported_header_target>-runuuid = <ls_reported_header>-runuuid.
+      <ls_reported_header_target>-runuuid = <ls_reported_header>-aipf7runuuid.
 *      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       APPEND INITIAL LINE TO et_axc_head ASSIGNING FIELD-SYMBOL(<ls_out>).
-      <ls_out>-runuuid          = <ls_res>-runuuid.
-      <ls_out>-runid            = <ls_res>-runid.
-      <ls_out>-agentuuid        = <ls_res>-agentuuid.
-      <ls_out>-userid           = <ls_res>-userid.
-      <ls_out>-starttimestamp   = <ls_res>-starttimestamp.
-      <ls_out>-endtimestamp     = <ls_res>-endtimestamp.
-      <ls_out>-createdby        = <ls_res>-createdby.
-      <ls_out>-createdat        = <ls_res>-createdat.
-      <ls_out>-changedby        = <ls_res>-changedby.
-      <ls_out>-lastchanged      = <ls_res>-lastchanged.
-      <ls_out>-locallastchanged = <ls_res>-locallastchanged.
+      <ls_out>-runuuid          = <ls_res>-aipf7runuuid.
+      <ls_out>-runid            = <ls_res>-aipf7runid.
+      <ls_out>-agentuuid        = <ls_res>-aipf7agentuuid.
+      <ls_out>-userid           = <ls_res>-aipf7userid.
+      <ls_out>-runstartdatetime   = <ls_res>-aipf7runstartdatetime.
+      <ls_out>-runenddatetime     = <ls_res>-aipf7runenddatetime.
+      <ls_out>-createdby        = <ls_res>-aipf7createdby.
+      <ls_out>-createdat        = <ls_res>-aipf7createdat.
+      <ls_out>-changedby        = <ls_res>-aipf7changedby.
+      <ls_out>-lastchanged      = <ls_res>-aipf7lastchanged.
+      <ls_out>-locallastchanged = <ls_res>-aipf7locallastchanged.
     ENDLOOP.
   ENDMETHOD.
 
@@ -953,45 +953,45 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
-      <ls_create_in>-runuuid          = <ls_create>-runuuid.
-      <ls_create_in>-runid            = COND #( WHEN <ls_create>-control-runid = abap_true THEN <ls_create>-runid ).
-      <ls_create_in>-agentuuid        = COND #( WHEN <ls_create>-control-agentuuid = abap_true
+      <ls_create_in>-aipf7runuuid          = <ls_create>-runuuid.
+      <ls_create_in>-aipf7runid            = COND #( WHEN <ls_create>-control-runid = abap_true THEN <ls_create>-runid ).
+      <ls_create_in>-aipf7agentuuid        = COND #( WHEN <ls_create>-control-agentuuid = abap_true
                                                 THEN <ls_create>-agentuuid ).
-      <ls_create_in>-userid           = COND #( WHEN <ls_create>-control-userid = abap_true THEN <ls_create>-userid ).
-      <ls_create_in>-starttimestamp   = COND #( WHEN <ls_create>-control-starttimestamp = abap_true
-                                                THEN <ls_create>-starttimestamp ).
-      <ls_create_in>-endtimestamp     = COND #( WHEN <ls_create>-control-endtimestamp = abap_true
-                                                THEN <ls_create>-endtimestamp ).
-      <ls_create_in>-createdby        = COND #( WHEN <ls_create>-control-createdby = abap_true
+      <ls_create_in>-aipf7userid           = COND #( WHEN <ls_create>-control-userid = abap_true THEN <ls_create>-userid ).
+      <ls_create_in>-aipf7runstartdatetime   = COND #( WHEN <ls_create>-control-runstartdatetime = abap_true
+                                                THEN <ls_create>-runstartdatetime ).
+      <ls_create_in>-aipf7runenddatetime     = COND #( WHEN <ls_create>-control-runenddatetime = abap_true
+                                                THEN <ls_create>-runenddatetime ).
+      <ls_create_in>-aipf7createdby        = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                 THEN <ls_create>-createdby ).
-      <ls_create_in>-createdat        = COND #( WHEN <ls_create>-control-createdat = abap_true
+      <ls_create_in>-aipf7createdat        = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                 THEN <ls_create>-createdat ).
-      <ls_create_in>-changedby        = COND #( WHEN <ls_create>-control-changedby = abap_true
+      <ls_create_in>-aipf7changedby        = COND #( WHEN <ls_create>-control-changedby = abap_true
                                                 THEN <ls_create>-changedby ).
-      <ls_create_in>-lastchanged      = COND #( WHEN <ls_create>-control-lastchanged = abap_true
+      <ls_create_in>-aipf7lastchanged      = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                                 THEN <ls_create>-lastchanged ).
-      <ls_create_in>-locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
+      <ls_create_in>-aipf7locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
                                                 THEN <ls_create>-locallastchanged ).
 
-      <ls_create_in>-%control-runid            = COND #( WHEN <ls_create>-control-runid = abap_true
+      <ls_create_in>-%control-aipf7runid            = COND #( WHEN <ls_create>-control-runid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-agentuuid        = COND #( WHEN <ls_create>-control-agentuuid = abap_true
+      <ls_create_in>-%control-aipf7agentuuid        = COND #( WHEN <ls_create>-control-agentuuid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-userid           = COND #( WHEN <ls_create>-control-userid = abap_true
+      <ls_create_in>-%control-aipf7userid           = COND #( WHEN <ls_create>-control-userid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-starttimestamp   = COND #( WHEN <ls_create>-control-starttimestamp = abap_true
+      <ls_create_in>-%control-aipf7runstartdatetime   = COND #( WHEN <ls_create>-control-runstartdatetime = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-endtimestamp     = COND #( WHEN <ls_create>-control-endtimestamp = abap_true
+      <ls_create_in>-%control-aipf7runenddatetime     = COND #( WHEN <ls_create>-control-runenddatetime = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-createdby        = COND #( WHEN <ls_create>-control-createdby = abap_true
+      <ls_create_in>-%control-aipf7createdby        = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-createdat        = COND #( WHEN <ls_create>-control-createdat = abap_true
+      <ls_create_in>-%control-aipf7createdat        = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-changedby        = COND #( WHEN <ls_create>-control-changedby = abap_true
+      <ls_create_in>-%control-aipf7changedby        = COND #( WHEN <ls_create>-control-changedby = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-lastchanged      = COND #( WHEN <ls_create>-control-lastchanged = abap_true
+      <ls_create_in>-%control-aipf7lastchanged      = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-%control-locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
+      <ls_create_in>-%control-aipf7locallastchanged = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -1004,19 +1004,19 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
       APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-runuuid = <ls_failed_header>-runuuid.
+      <ls_failed_target>-runuuid = <ls_failed_header>-aipf7runuuid.
       <ls_failed_target>-fail    = CONV #( <ls_failed_header>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-      <ls_reported_header_target>-runuuid = <ls_reported_header>-runuuid.
+      <ls_reported_header_target>-runuuid = <ls_reported_header>-aipf7runuuid.
 *      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
 
     LOOP AT ls_mapped_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_mapped_header>).
       APPEND INITIAL LINE TO cs_mapped-header ASSIGNING FIELD-SYMBOL(<ls_mapped_header_target>).
-      <ls_mapped_header_target>-runuuid = <ls_mapped_header>-runuuid.
+      <ls_mapped_header_target>-runuuid = <ls_mapped_header>-aipf7runuuid.
     ENDLOOP.
   ENDMETHOD.
 
@@ -1040,45 +1040,45 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
       APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-runuuid          = <ls_update>-runuuid.
-      <ls_update_in>-runid            = COND #( WHEN <ls_update>-control-runid = abap_true THEN <ls_update>-runid ).
-      <ls_update_in>-agentuuid        = COND #( WHEN <ls_update>-control-agentuuid = abap_true
+      <ls_update_in>-aipf7runuuid          = <ls_update>-runuuid.
+      <ls_update_in>-aipf7runid            = COND #( WHEN <ls_update>-control-runid = abap_true THEN <ls_update>-runid ).
+      <ls_update_in>-aipf7agentuuid        = COND #( WHEN <ls_update>-control-agentuuid = abap_true
                                                 THEN <ls_update>-agentuuid ).
-      <ls_update_in>-userid           = COND #( WHEN <ls_update>-control-userid = abap_true THEN <ls_update>-userid ).
-      <ls_update_in>-starttimestamp   = COND #( WHEN <ls_update>-control-starttimestamp = abap_true
-                                                THEN <ls_update>-starttimestamp ).
-      <ls_update_in>-endtimestamp     = COND #( WHEN <ls_update>-control-endtimestamp = abap_true
-                                                THEN <ls_update>-endtimestamp ).
-      <ls_update_in>-createdby        = COND #( WHEN <ls_update>-control-createdby = abap_true
+      <ls_update_in>-aipf7userid           = COND #( WHEN <ls_update>-control-userid = abap_true THEN <ls_update>-userid ).
+      <ls_update_in>-aipf7runstartdatetime   = COND #( WHEN <ls_update>-control-runstartdatetime = abap_true
+                                                THEN <ls_update>-runstartdatetime ).
+      <ls_update_in>-aipf7runenddatetime     = COND #( WHEN <ls_update>-control-runenddatetime = abap_true
+                                                THEN <ls_update>-runenddatetime ).
+      <ls_update_in>-aipf7createdby        = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                 THEN <ls_update>-createdby ).
-      <ls_update_in>-createdat        = COND #( WHEN <ls_update>-control-createdat = abap_true
+      <ls_update_in>-aipf7createdat        = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                 THEN <ls_update>-createdat ).
-      <ls_update_in>-changedby        = COND #( WHEN <ls_update>-control-changedby = abap_true
+      <ls_update_in>-aipf7changedby        = COND #( WHEN <ls_update>-control-changedby = abap_true
                                                 THEN <ls_update>-changedby ).
-      <ls_update_in>-lastchanged      = COND #( WHEN <ls_update>-control-lastchanged = abap_true
+      <ls_update_in>-aipf7lastchanged      = COND #( WHEN <ls_update>-control-lastchanged = abap_true
                                                 THEN <ls_update>-lastchanged ).
-      <ls_update_in>-locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
+      <ls_update_in>-aipf7locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
                                                 THEN <ls_update>-locallastchanged ).
 
-      <ls_update_in>-%control-runid            = COND #( WHEN <ls_update>-control-runid = abap_true
+      <ls_update_in>-%control-aipf7runid            = COND #( WHEN <ls_update>-control-runid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-agentuuid        = COND #( WHEN <ls_update>-control-agentuuid = abap_true
+      <ls_update_in>-%control-aipf7agentuuid        = COND #( WHEN <ls_update>-control-agentuuid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-userid           = COND #( WHEN <ls_update>-control-userid = abap_true
+      <ls_update_in>-%control-aipf7userid           = COND #( WHEN <ls_update>-control-userid = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-starttimestamp   = COND #( WHEN <ls_update>-control-starttimestamp = abap_true
+      <ls_update_in>-%control-aipf7runstartdatetime   = COND #( WHEN <ls_update>-control-runstartdatetime = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-endtimestamp     = COND #( WHEN <ls_update>-control-endtimestamp = abap_true
+      <ls_update_in>-%control-aipf7runenddatetime     = COND #( WHEN <ls_update>-control-runenddatetime = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-createdby        = COND #( WHEN <ls_update>-control-createdby = abap_true
+      <ls_update_in>-%control-aipf7createdby        = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-createdat        = COND #( WHEN <ls_update>-control-createdat = abap_true
+      <ls_update_in>-%control-aipf7createdat        = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-changedby        = COND #( WHEN <ls_update>-control-changedby = abap_true
+      <ls_update_in>-%control-aipf7changedby        = COND #( WHEN <ls_update>-control-changedby = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-lastchanged      = COND #( WHEN <ls_update>-control-lastchanged = abap_true
+      <ls_update_in>-%control-aipf7lastchanged      = COND #( WHEN <ls_update>-control-lastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-%control-locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
+      <ls_update_in>-%control-aipf7locallastchanged = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
                                                          THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -1090,13 +1090,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
       APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
-      <ls_failed_header_target>-runuuid = <ls_failed_header>-runuuid.
+      <ls_failed_header_target>-runuuid = <ls_failed_header>-aipf7runuuid.
       <ls_failed_header_target>-fail    = CONV #( <ls_failed_header>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-      <ls_reported_header_target>-runuuid = <ls_reported_header>-runuuid.
+      <ls_reported_header_target>-runuuid = <ls_reported_header>-aipf7runuuid.
 *      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
   ENDMETHOD.
@@ -1121,7 +1121,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
       APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-runuuid = <ls_delete>-runuuid.
+      <ls_delete_in>-aipf7runuuid = <ls_delete>-runuuid.
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_axc_head
@@ -1132,13 +1132,13 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
 
     LOOP AT ls_failed_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_failed_header>).
       APPEND INITIAL LINE TO cs_failed-header ASSIGNING FIELD-SYMBOL(<ls_failed_header_target>).
-      <ls_failed_header_target>-runuuid = <ls_failed_header>-runuuid.
+      <ls_failed_header_target>-runuuid = <ls_failed_header>-aipf7runuuid.
       <ls_failed_header_target>-fail    = CONV #( <ls_failed_header>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_reported_eml-executionheader ASSIGNING FIELD-SYMBOL(<ls_reported_header>).
       APPEND INITIAL LINE TO cs_reported-header ASSIGNING FIELD-SYMBOL(<ls_reported_header_target>).
-      <ls_reported_header_target>-runuuid = <ls_reported_header>-runuuid.
+      <ls_reported_header_target>-runuuid = <ls_reported_header>-aipf7runuuid.
 *      <ls_reported_header_target>-msg      = <ls_reported_header>-%msg.
     ENDLOOP.
   ENDMETHOD.
@@ -1391,7 +1391,7 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT SINGLE MAX( runid ) FROM zi_pru_axc_head
+    SELECT SINGLE MAX( aipf7runid ) FROM zi_pru_axc_head
       INTO @DATA(lv_last_db_run_id).
 
     DATA(lt_head_buffer) = zpru_cl_axc_buffer=>header_buffer.

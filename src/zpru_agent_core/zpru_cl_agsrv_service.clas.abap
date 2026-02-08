@@ -37,15 +37,15 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
   METHOD zpru_if_agsrv_service~query_agent_service.
     CLEAR et_agsrv_k.
 
-    SELECT Service, Context FROM zi_pru_agent_serv
-      WHERE Service          IN @it_service
-        AND Context          IN @it_context
-        AND Class            IN @it_class
-        AND CreatedBy        IN @it_created_by
-        AND CreatedAt        IN @it_created_at
-        AND ChangedBy        IN @it_changed_by
-        AND LastChanged      IN @it_last_changed
-        AND LocalLastChanged IN @it_local_last_changed
+    SELECT aipf7Service as Service, aipf7Context as Context FROM zi_pru_agent_serv
+      WHERE aipf7Service          IN @it_service
+        AND aipf7Context          IN @it_context
+        AND aipf7Class            IN @it_class
+        AND aipf7CreatedBy        IN @it_created_by
+        AND aipf7CreatedAt        IN @it_created_at
+        AND aipf7ChangedBy        IN @it_changed_by
+        AND aipf7LastChanged      IN @it_last_changed
+        AND aipf7LocalLastChanged IN @it_local_last_changed
       INTO TABLE @et_agsrv_k.
   ENDMETHOD.
 
@@ -76,15 +76,15 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     lt_read_in = VALUE #(
         FOR <ls_req> IN lt_entities
-        ( service  = <ls_req>-service
-          context  = <ls_req>-context
+        ( aipf7service  = <ls_req>-service
+          aipf7context  = <ls_req>-context
           %control = VALUE #(
-              Class            = COND #( WHEN <ls_req>-control-Class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_req>-control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_req>-control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_req>-control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_req>-control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_req>-control-LocalLastChanged = abap_true THEN if_abap_behv=>mk-on ) ) ) ).
+              aipf7Class            = COND #( WHEN <ls_req>-control-Class = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedBy        = COND #( WHEN <ls_req>-control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedAt        = COND #( WHEN <ls_req>-control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              aipf7ChangedBy        = COND #( WHEN <ls_req>-control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LastChanged      = COND #( WHEN <ls_req>-control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LocalLastChanged = COND #( WHEN <ls_req>-control-LocalLastChanged = abap_true THEN if_abap_behv=>mk-on ) ) ) ).
 
     READ ENTITIES OF zr_pru_agent_serv
          ENTITY zrpruagentserv
@@ -95,27 +95,27 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     LOOP AT ls_rd_failed-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_failed_res>).
       APPEND INITIAL LINE TO cs_failed-agsrv ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-service = <ls_failed_res>-service.
-      <ls_failed_target>-context = <ls_failed_res>-context.
+      <ls_failed_target>-service = <ls_failed_res>-aipf7service.
+      <ls_failed_target>-context = <ls_failed_res>-aipf7context.
       <ls_failed_target>-fail    = CONV #( <ls_failed_res>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_rd_reported-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_reported_res>).
       APPEND INITIAL LINE TO cs_reported-agsrv ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-service = <ls_reported_res>-service.
-      <ls_reported_target>-context = <ls_reported_res>-context.
+      <ls_reported_target>-service = <ls_reported_res>-aipf7service.
+      <ls_reported_target>-context = <ls_reported_res>-aipf7context.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       CLEAR ls_out.
-      ls_out-Service          = <ls_res>-Service.
-      ls_out-Context          = <ls_res>-Context.
-      ls_out-Class            = <ls_res>-Class.
-      ls_out-CreatedBy        = <ls_res>-CreatedBy.
-      ls_out-CreatedAt        = <ls_res>-CreatedAt.
-      ls_out-ChangedBy        = <ls_res>-ChangedBy.
-      ls_out-LastChanged      = <ls_res>-LastChanged.
-      ls_out-LocalLastChanged = <ls_res>-LocalLastChanged.
+      ls_out-Service          = <ls_res>-aipf7Service.
+      ls_out-Context          = <ls_res>-aipf7Context.
+      ls_out-Class            = <ls_res>-aipf7Class.
+      ls_out-CreatedBy        = <ls_res>-aipf7CreatedBy.
+      ls_out-CreatedAt        = <ls_res>-aipf7CreatedAt.
+      ls_out-ChangedBy        = <ls_res>-aipf7ChangedBy.
+      ls_out-LastChanged      = <ls_res>-aipf7LastChanged.
+      ls_out-LocalLastChanged = <ls_res>-aipf7LocalLastChanged.
       APPEND ls_out TO et_agsrv.
     ENDLOOP.
   ENDMETHOD.
@@ -140,23 +140,23 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     lt_create_in = VALUE #(
         FOR <ls_create> IN lt_entities
-        ( Service          = <ls_create>-Service
-          Context          = <ls_create>-Context
-          Class            = <ls_create>-Class
-          CreatedBy        = <ls_create>-CreatedBy
-          CreatedAt        = <ls_create>-CreatedAt
-          ChangedBy        = <ls_create>-ChangedBy
-          LastChanged      = <ls_create>-LastChanged
-          LocalLastChanged = <ls_create>-LocalLastChanged
+        ( aipf7Service          = <ls_create>-Service
+          aipf7Context          = <ls_create>-Context
+          aipf7Class            = <ls_create>-Class
+          aipf7CreatedBy        = <ls_create>-CreatedBy
+          aipf7CreatedAt        = <ls_create>-CreatedAt
+          aipf7ChangedBy        = <ls_create>-ChangedBy
+          aipf7LastChanged      = <ls_create>-LastChanged
+          aipf7LocalLastChanged = <ls_create>-LocalLastChanged
           %control         = VALUE #(
-              Service          = if_abap_behv=>mk-on
-              Context          = if_abap_behv=>mk-on
-              Class            = COND #( WHEN <ls_create>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_create>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_create>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_create>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_create>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_create>-Control-LocalLastChanged = abap_true
+              aipf7Service          = if_abap_behv=>mk-on
+              aipf7Context          = if_abap_behv=>mk-on
+              aipf7Class            = COND #( WHEN <ls_create>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedBy        = COND #( WHEN <ls_create>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedAt        = COND #( WHEN <ls_create>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              aipf7ChangedBy        = COND #( WHEN <ls_create>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LastChanged      = COND #( WHEN <ls_create>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LocalLastChanged = COND #( WHEN <ls_create>-Control-LocalLastChanged = abap_true
                                          THEN if_abap_behv=>mk-on ) ) ) ).
 
     MODIFY ENTITIES OF zr_pru_agent_serv
@@ -168,23 +168,23 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     LOOP AT ls_failed_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_failed_item>).
       APPEND INITIAL LINE TO cs_failed-agsrv ASSIGNING FIELD-SYMBOL(<ls_failed_out>).
-      <ls_failed_out>-service = <ls_failed_item>-service.
-      <ls_failed_out>-context = <ls_failed_item>-context.
+      <ls_failed_out>-service = <ls_failed_item>-aipf7service.
+      <ls_failed_out>-context = <ls_failed_item>-aipf7context.
       <ls_failed_out>-fail    = CONV #( <ls_failed_item>-%fail-cause ).
       <ls_failed_out>-create  = <ls_failed_item>-%create.
     ENDLOOP.
 
     LOOP AT ls_reported_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_reported_item>).
       APPEND INITIAL LINE TO cs_reported-agsrv ASSIGNING FIELD-SYMBOL(<ls_reported_out>).
-      <ls_reported_out>-service = <ls_reported_item>-service.
-      <ls_reported_out>-context = <ls_reported_item>-context.
+      <ls_reported_out>-service = <ls_reported_item>-aipf7service.
+      <ls_reported_out>-context = <ls_reported_item>-aipf7context.
       <ls_reported_out>-create  = <ls_reported_item>-%create.
     ENDLOOP.
 
     LOOP AT ls_mapped_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_mapped_item>).
       APPEND INITIAL LINE TO cs_mapped-agsrv ASSIGNING FIELD-SYMBOL(<ls_mapped_out>).
-      <ls_mapped_out>-service = <ls_mapped_item>-service.
-      <ls_mapped_out>-context = <ls_mapped_item>-context.
+      <ls_mapped_out>-service = <ls_mapped_item>-aipf7service.
+      <ls_mapped_out>-context = <ls_mapped_item>-aipf7context.
     ENDLOOP.
   ENDMETHOD.
 
@@ -208,21 +208,21 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     lt_update_in = VALUE #(
         FOR <ls_update> IN lt_entities
-        ( Service          = <ls_update>-Service
-          Context          = <ls_update>-Context
-          Class            = <ls_update>-Class
-          CreatedBy        = <ls_update>-CreatedBy
-          CreatedAt        = <ls_update>-CreatedAt
-          ChangedBy        = <ls_update>-ChangedBy
-          LastChanged      = <ls_update>-LastChanged
-          LocalLastChanged = <ls_update>-LocalLastChanged
+        ( aipf7Service          = <ls_update>-Service
+          aipf7Context          = <ls_update>-Context
+          aipf7Class            = <ls_update>-Class
+          aipf7CreatedBy        = <ls_update>-CreatedBy
+          aipf7CreatedAt        = <ls_update>-CreatedAt
+          aipf7ChangedBy        = <ls_update>-ChangedBy
+          aipf7LastChanged      = <ls_update>-LastChanged
+          aipf7LocalLastChanged = <ls_update>-LocalLastChanged
           %control         = VALUE #(
-              Class            = COND #( WHEN <ls_update>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
-              CreatedBy        = COND #( WHEN <ls_update>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
-              CreatedAt        = COND #( WHEN <ls_update>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
-              ChangedBy        = COND #( WHEN <ls_update>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
-              LastChanged      = COND #( WHEN <ls_update>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
-              LocalLastChanged = COND #( WHEN <ls_update>-Control-LocalLastChanged = abap_true
+              aipf7Class            = COND #( WHEN <ls_update>-Control-Class = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedBy        = COND #( WHEN <ls_update>-Control-CreatedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7CreatedAt        = COND #( WHEN <ls_update>-Control-CreatedAt = abap_true THEN if_abap_behv=>mk-on )
+              aipf7ChangedBy        = COND #( WHEN <ls_update>-Control-ChangedBy = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LastChanged      = COND #( WHEN <ls_update>-Control-LastChanged = abap_true THEN if_abap_behv=>mk-on )
+              aipf7LocalLastChanged = COND #( WHEN <ls_update>-Control-LocalLastChanged = abap_true
                                          THEN if_abap_behv=>mk-on ) ) ) ).
 
     MODIFY ENTITIES OF zr_pru_agent_serv
@@ -233,16 +233,16 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     LOOP AT ls_failed_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_failed_item>).
       APPEND INITIAL LINE TO cs_failed-agsrv ASSIGNING FIELD-SYMBOL(<ls_failed_out>).
-      <ls_failed_out>-service = <ls_failed_item>-service.
-      <ls_failed_out>-context = <ls_failed_item>-context.
+      <ls_failed_out>-service = <ls_failed_item>-aipf7service.
+      <ls_failed_out>-context = <ls_failed_item>-aipf7context.
       <ls_failed_out>-fail    = CONV #( <ls_failed_item>-%fail-cause ).
       <ls_failed_out>-update  = <ls_failed_item>-%update.
     ENDLOOP.
 
     LOOP AT ls_reported_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_reported_item>).
       APPEND INITIAL LINE TO cs_reported-agsrv ASSIGNING FIELD-SYMBOL(<ls_reported_out>).
-      <ls_reported_out>-service = <ls_reported_item>-service.
-      <ls_reported_out>-context = <ls_reported_item>-context.
+      <ls_reported_out>-service = <ls_reported_item>-aipf7service.
+      <ls_reported_out>-context = <ls_reported_item>-aipf7context.
       <ls_reported_out>-update  = <ls_reported_item>-%update.
     ENDLOOP.
   ENDMETHOD.
@@ -266,8 +266,8 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
     ENDIF.
 
     lt_delete_in = VALUE #( FOR <ls_delete> IN lt_entities
-                            ( service = <ls_delete>-service
-                              context = <ls_delete>-context ) ).
+                            ( aipf7service = <ls_delete>-service
+                              aipf7context = <ls_delete>-context ) ).
 
     MODIFY ENTITIES OF zr_pru_agent_serv
            ENTITY zrpruagentserv
@@ -277,16 +277,16 @@ CLASS zpru_cl_agsrv_service IMPLEMENTATION.
 
     LOOP AT ls_failed_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_failed_item>).
       APPEND INITIAL LINE TO cs_failed-agsrv ASSIGNING FIELD-SYMBOL(<ls_failed_out>).
-      <ls_failed_out>-service = <ls_failed_item>-service.
-      <ls_failed_out>-context = <ls_failed_item>-context.
+      <ls_failed_out>-service = <ls_failed_item>-aipf7service.
+      <ls_failed_out>-context = <ls_failed_item>-aipf7context.
       <ls_failed_out>-fail    = CONV #( <ls_failed_item>-%fail-cause ).
       <ls_failed_out>-delete  = <ls_failed_item>-%delete.
     ENDLOOP.
 
     LOOP AT ls_reported_res-zrpruagentserv ASSIGNING FIELD-SYMBOL(<ls_reported_item>).
       APPEND INITIAL LINE TO cs_reported-agsrv ASSIGNING FIELD-SYMBOL(<ls_reported_out>).
-      <ls_reported_out>-service = <ls_reported_item>-service.
-      <ls_reported_out>-context = <ls_reported_item>-context.
+      <ls_reported_out>-service = <ls_reported_item>-aipf7service.
+      <ls_reported_out>-context = <ls_reported_item>-aipf7context.
       <ls_reported_out>-delete  = <ls_reported_item>-%delete.
     ENDLOOP.
   ENDMETHOD.

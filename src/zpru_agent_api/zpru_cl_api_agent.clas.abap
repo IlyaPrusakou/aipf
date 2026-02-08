@@ -464,8 +464,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -506,7 +506,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -516,7 +516,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     LOOP AT lt_execution_steps TRANSPORTING NO FIELDS
-         WHERE executionseq < <ls_step_2_start>-executionseq.
+         WHERE stepsequence < <ls_step_2_start>-stepsequence.
       EXIT.
     ENDLOOP.
     IF sy-subrc <> 0.
@@ -528,16 +528,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     LOOP AT lt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_step_2_exec>)
-         WHERE executionseq >= <ls_step_2_start>-executionseq.
+         WHERE stepsequence >= <ls_step_2_start>-stepsequence.
       APPEND INITIAL LINE TO lt_valid_steps ASSIGNING FIELD-SYMBOL(<ls_valid_step>).
       <ls_valid_step> = <ls_step_2_exec>.
 
-      CLEAR <ls_valid_step>-inputprompt.
-      CLEAR <ls_valid_step>-outputprompt.
+      CLEAR <ls_valid_step>-stepinputprompt.
+      CLEAR <ls_valid_step>-stepoutputresponse.
 
       IF     iv_new_step_prompt       IS NOT INITIAL
          AND <ls_valid_step>-stepuuid  = iv_starting_step_uuid.
-        <ls_valid_step>-inputprompt = iv_new_step_prompt.
+        <ls_valid_step>-stepinputprompt = iv_new_step_prompt.
       ENDIF.
 
     ENDLOOP.
@@ -577,8 +577,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -671,17 +671,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     lo_agty_service->read_agent_type(
-      EXPORTING it_agty_read_k = VALUE #( ( agenttype                = ls_agent-agenttype
-                                            control-agenttype        = abap_true
-                                            control-shortmemvolume   = abap_true
-                                            control-discardstrategy  = abap_true
-                                            control-summarystrategy  = abap_true
-                                            control-maxnumbloop      = abap_true
-                                            control-createdby        = abap_true
-                                            control-createdat        = abap_true
-                                            control-changedby        = abap_true
-                                            control-lastchanged      = abap_true
-                                            control-locallastchanged = abap_true ) )
+      EXPORTING it_agty_read_k = VALUE #( ( agenttype                 = ls_agent-agenttype
+                                            control-agenttype         = abap_true
+                                            control-shortmemoryvolume = abap_true
+                                            control-discardstrategy   = abap_true
+                                            control-summarystrategy   = abap_true
+                                            control-maximumnumberofloop   = abap_true
+                                            control-createdby         = abap_true
+                                            control-createdat         = abap_true
+                                            control-changedby         = abap_true
+                                            control-lastchanged       = abap_true
+                                            control-locallastchanged  = abap_true ) )
       IMPORTING et_agty        = DATA(lt_agent_type) ).
 
     DATA(ls_agent_type) = VALUE #( lt_agent_type[ 1 ] OPTIONAL ).
@@ -697,9 +697,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       WHERE summ~summarystrategy = @ls_agent_type-summarystrategy
       INTO @DATA(ls_summ_strat).
 
-    mo_short_memory->set_mem_volume( iv_mem_volume = ls_agent_type-shortmemvolume ).
+    mo_short_memory->set_mem_volume( iv_mem_volume = ls_agent_type-shortmemoryvolume ).
 
-    CREATE OBJECT lo_discard_strategy TYPE (ls_disc_strat-strategyprovider).
+    CREATE OBJECT lo_discard_strategy TYPE (ls_disc_strat-discardprovider).
     IF sy-subrc = 0.
       mo_short_memory->set_discard_strategy( io_discard_strategy = lo_discard_strategy ).
     ELSE.
@@ -715,7 +715,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       mo_short_memory->set_discard_strategy( io_discard_strategy = lo_discard_strategy ).
     ENDIF.
 
-    CREATE OBJECT lo_summary_strategy TYPE (ls_summ_strat-strategyprovider).
+    CREATE OBJECT lo_summary_strategy TYPE (ls_summ_strat-summaryprovider).
     IF sy-subrc = 0.
       mo_long_memory->set_summarization( io_summarization = lo_summary_strategy ).
     ELSE.
@@ -789,7 +789,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             RAISE EXCEPTION NEW zpru_cx_agent_core( ).
         ENDTRY.
 
-        lo_input->set_data( ir_data = REF #( <ls_execution_step>-inputprompt ) ).
+        lo_input->set_data( ir_data = REF #( <ls_execution_step>-stepinputprompt ) ).
       ELSE.
         IF lv_output_prompt IS NOT INITIAL.
           lo_input->set_data( ir_data = REF #( lv_output_prompt ) ).
@@ -849,50 +849,50 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       IF lv_error_flag = abap_true.
         APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
-        <ls_step_2_upd>-stepuuid     = <ls_execution_step>-stepuuid.
-        <ls_step_2_upd>-queryuuid    = <ls_execution_step>-queryuuid.
-        <ls_step_2_upd>-runuuid      = <ls_execution_step>-runuuid.
-        <ls_step_2_upd>-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-error.
-        <ls_step_2_upd>-endtimestamp = lv_now.
-        <ls_step_2_upd>-inputprompt  = lv_input_prompt.
-        <ls_step_2_upd>-outputprompt = lv_output_prompt.
-        <ls_step_2_upd>-control-stepstatus   = abap_true.
-        <ls_step_2_upd>-control-endtimestamp = abap_true.
-        <ls_step_2_upd>-control-inputprompt  = abap_true.
-        <ls_step_2_upd>-control-outputprompt = abap_true.
+        <ls_step_2_upd>-stepuuid           = <ls_execution_step>-stepuuid.
+        <ls_step_2_upd>-queryuuid          = <ls_execution_step>-queryuuid.
+        <ls_step_2_upd>-runuuid            = <ls_execution_step>-runuuid.
+        <ls_step_2_upd>-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-error.
+        <ls_step_2_upd>-stependdatetime    = lv_now.
+        <ls_step_2_upd>-stepinputprompt    = lv_input_prompt.
+        <ls_step_2_upd>-stepoutputresponse = lv_output_prompt.
+        <ls_step_2_upd>-control-stepstatus         = abap_true.
+        <ls_step_2_upd>-control-stependdatetime    = abap_true.
+        <ls_step_2_upd>-control-stepinputprompt    = abap_true.
+        <ls_step_2_upd>-control-stepoutputresponse = abap_true.
 
-        <ls_run_context>-execution_step-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-error.
-        <ls_run_context>-execution_step-endtimestamp = lv_now.
-        <ls_run_context>-execution_step-inputprompt  = lv_input_prompt.
-        <ls_run_context>-execution_step-outputprompt = lv_output_prompt.
+        <ls_run_context>-execution_step-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-error.
+        <ls_run_context>-execution_step-stependdatetime    = lv_now.
+        <ls_run_context>-execution_step-stepinputprompt    = lv_input_prompt.
+        <ls_run_context>-execution_step-stepoutputresponse = lv_output_prompt.
 
         APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
-        <ls_query_2_upd>-queryuuid       = is_execution_query-queryuuid.
-        <ls_query_2_upd>-runuuid         = is_execution_query-runuuid.
-        <ls_query_2_upd>-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
-        <ls_query_2_upd>-endtimestamp    = lv_now.
-        <ls_query_2_upd>-control-executionstatus = abap_true.
-        <ls_query_2_upd>-control-endtimestamp    = abap_true.
+        <ls_query_2_upd>-queryuuid        = is_execution_query-queryuuid.
+        <ls_query_2_upd>-runuuid          = is_execution_query-runuuid.
+        <ls_query_2_upd>-querystatus      = zpru_if_axc_type_and_constant=>sc_query_status-error.
+        <ls_query_2_upd>-queryenddatetime = lv_now.
+        <ls_query_2_upd>-control-querystatus      = abap_true.
+        <ls_query_2_upd>-control-queryenddatetime = abap_true.
         EXIT.
       ENDIF.
 
       APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING <ls_step_2_upd>.
-      <ls_step_2_upd>-stepuuid     = <ls_execution_step>-stepuuid.
-      <ls_step_2_upd>-queryuuid    = <ls_execution_step>-queryuuid.
-      <ls_step_2_upd>-runuuid      = <ls_execution_step>-runuuid.
-      <ls_step_2_upd>-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-complete.
-      <ls_step_2_upd>-endtimestamp = lv_now.
-      <ls_step_2_upd>-inputprompt  = lv_input_prompt.
-      <ls_step_2_upd>-outputprompt = lv_output_prompt.
-      <ls_step_2_upd>-control-stepstatus   = abap_true.
-      <ls_step_2_upd>-control-endtimestamp = abap_true.
-      <ls_step_2_upd>-control-inputprompt  = abap_true.
-      <ls_step_2_upd>-control-outputprompt = abap_true.
+      <ls_step_2_upd>-stepuuid           = <ls_execution_step>-stepuuid.
+      <ls_step_2_upd>-queryuuid          = <ls_execution_step>-queryuuid.
+      <ls_step_2_upd>-runuuid            = <ls_execution_step>-runuuid.
+      <ls_step_2_upd>-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      <ls_step_2_upd>-stependdatetime    = lv_now.
+      <ls_step_2_upd>-stepinputprompt    = lv_input_prompt.
+      <ls_step_2_upd>-stepoutputresponse = lv_output_prompt.
+      <ls_step_2_upd>-control-stepstatus         = abap_true.
+      <ls_step_2_upd>-control-stependdatetime    = abap_true.
+      <ls_step_2_upd>-control-stepinputprompt    = abap_true.
+      <ls_step_2_upd>-control-stepoutputresponse = abap_true.
 
-      <ls_run_context>-execution_step-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-complete.
-      <ls_run_context>-execution_step-endtimestamp = lv_now.
-      <ls_run_context>-execution_step-inputprompt  = lv_input_prompt.
-      <ls_run_context>-execution_step-outputprompt = lv_output_prompt.
+      <ls_run_context>-execution_step-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      <ls_run_context>-execution_step-stependdatetime    = lv_now.
+      <ls_run_context>-execution_step-stepinputprompt    = lv_input_prompt.
+      <ls_run_context>-execution_step-stepoutputresponse = lv_output_prompt.
 
       IF lo_controller->mv_stop_agent = abap_true.
         EXIT.
@@ -976,8 +976,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                            runid            = abap_true
                                                                            agentuuid        = abap_true
                                                                            userid           = abap_true
-                                                                           starttimestamp   = abap_true
-                                                                           endtimestamp     = abap_true
+                                                                           runstartdatetime = abap_true
+                                                                           runenddatetime   = abap_true
                                                                            createdby        = abap_true
                                                                            createdat        = abap_true
                                                                            changedby        = abap_true
@@ -1009,16 +1009,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_axc_service->read_query( EXPORTING it_query_read_k = VALUE #( ( queryuuid = lv_query_to_run
                                                                        control   = VALUE #(
-                                                                           runuuid         = abap_true
-                                                                           querynumber     = abap_true
-                                                                           queryuuid       = abap_true
-                                                                           language        = abap_true
-                                                                           executionstatus = abap_true
-                                                                           starttimestamp  = abap_true
-                                                                           endtimestamp    = abap_true
-                                                                           inputprompt     = abap_true
-                                                                           decisionlog     = abap_true
-                                                                           outputresponse  = abap_true ) ) )
+                                                                           runuuid             = abap_true
+                                                                           querynumber         = abap_true
+                                                                           queryuuid           = abap_true
+                                                                           querylanguage       = abap_true
+                                                                           querystatus         = abap_true
+                                                                           querystartdatetime  = abap_true
+                                                                           queryenddatetime    = abap_true
+                                                                           queryinputprompt    = abap_true
+                                                                           querydecisionlog    = abap_true
+                                                                           queryoutputresponse = abap_true ) ) )
                                 IMPORTING et_axc_query    = DATA(lt_axc_query)
                                 CHANGING  cs_reported     = cs_axc_reported
                                           cs_failed       = cs_axc_failed ).
@@ -1031,21 +1031,22 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ls_execution_query = <ls_execution_query>.
     es_execution_query = ls_execution_query.
 
-    lo_axc_service->rba_step( EXPORTING it_rba_step_k = VALUE #( ( queryuuid = ls_execution_query-queryuuid
-                                                                   control   = VALUE #( stepuuid       = abap_true
-                                                                                        stepnumber     = abap_true
-                                                                                        queryuuid      = abap_true
-                                                                                        runuuid        = abap_true
-                                                                                        tooluuid       = abap_true
-                                                                                        executionseq   = abap_true
-                                                                                        stepstatus     = abap_true
-                                                                                        starttimestamp = abap_true
-                                                                                        endtimestamp   = abap_true
-                                                                                        inputprompt    = abap_true
-                                                                                        outputprompt   = abap_true ) ) )
-                              IMPORTING et_axc_step   = DATA(lt_execution_steps)
-                              CHANGING  cs_reported   = cs_axc_reported
-                                        cs_failed     = cs_axc_failed ).
+    lo_axc_service->rba_step(
+      EXPORTING it_rba_step_k = VALUE #( ( queryuuid = ls_execution_query-queryuuid
+                                           control   = VALUE #( stepuuid           = abap_true
+                                                                stepnumber         = abap_true
+                                                                queryuuid          = abap_true
+                                                                runuuid            = abap_true
+                                                                tooluuid           = abap_true
+                                                                stepsequence       = abap_true
+                                                                stepstatus         = abap_true
+                                                                stepstartdatetime  = abap_true
+                                                                stependdatetime    = abap_true
+                                                                stepinputprompt    = abap_true
+                                                                stepoutputresponse = abap_true ) ) )
+      IMPORTING et_axc_step   = DATA(lt_execution_steps)
+      CHANGING  cs_reported   = cs_axc_reported
+                cs_failed     = cs_axc_failed ).
 
     IF    ls_execution_header IS INITIAL
        OR ls_execution_query  IS INITIAL
@@ -1059,7 +1060,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     CHANGING  cs_reported   = cs_adf_reported
                                               cs_failed     = cs_adf_failed ).
 
-    IF es_agent-status <> zpru_if_adf_type_and_constant=>cs_agent_status-active.
+    IF es_agent-agentstatus <> zpru_if_adf_type_and_constant=>cs_agent_status-active.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1071,8 +1072,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-steptype           = abap_true
                                                                    control-toolschemaprovider = abap_true
                                                                    control-toolinfoprovider   = abap_true
-                                                                   control-isborrowed         = abap_true
-                                                                   control-istransient        = abap_true    ) )
+                                                                   control-toolisborrowed     = abap_true
+                                                                   control-toolistransient    = abap_true    ) )
                               IMPORTING et_tool       = DATA(lt_agent_tools)
                               CHANGING  cs_reported   = cs_adf_reported
                                         cs_failed     = cs_adf_failed ).
@@ -1238,9 +1239,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lo_controller) = get_controller( ).
 
     DATA(lt_step_before) = lo_controller->mt_execution_steps.
-    DELETE lt_step_before WHERE executionseq > is_current_step-executionseq.
+    DELETE lt_step_before WHERE stepsequence > is_current_step-stepsequence.
     DATA(lt_step_after) = lo_controller->mt_execution_steps.
-    DELETE lt_step_after WHERE executionseq <= is_current_step-executionseq.
+    DELETE lt_step_after WHERE stepsequence <= is_current_step-stepsequence.
 
     resequence_steps( EXPORTING it_additional_steps = it_additional_steps
                                 is_execution_header = is_execution_header
@@ -1276,11 +1277,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDTRY.
 
     IF lo_controller->mv_max_number_of_loops IS INITIAL.
-      lo_agty_service->read_agent_type( EXPORTING it_agty_read_k = VALUE #( ( agenttype           = is_agent-agenttype
-                                                                              control-maxnumbloop = abap_true ) )
-                                        IMPORTING et_agty        = DATA(lt_agty) ).
+      lo_agty_service->read_agent_type(
+        EXPORTING it_agty_read_k = VALUE #( ( agenttype               = is_agent-agenttype
+                                              control-maximumnumberofloop = abap_true ) )
+        IMPORTING et_agty        = DATA(lt_agty) ).
 
-      DATA(lv_number_of_loops) = VALUE #( lt_agty[ 1 ]-maxnumbloop OPTIONAL ).
+      DATA(lv_number_of_loops) = VALUE #( lt_agty[ 1 ]-maximumnumberofloop OPTIONAL ).
       IF lv_number_of_loops IS INITIAL.
         lv_number_of_loops = 4.
       ENDIF.
@@ -1383,51 +1385,51 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       IF lv_error_flag = abap_true.
         APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
-        <ls_step_2_upd>-stepuuid     = <ls_additional_step>-stepuuid.
-        <ls_step_2_upd>-queryuuid    = <ls_additional_step>-queryuuid.
-        <ls_step_2_upd>-runuuid      = <ls_additional_step>-runuuid.
-        <ls_step_2_upd>-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-error.
-        <ls_step_2_upd>-endtimestamp = lv_now.
-        <ls_step_2_upd>-inputprompt  = lv_input_prompt.
-        <ls_step_2_upd>-outputprompt = lv_output_prompt.
-        <ls_step_2_upd>-control-stepstatus   = abap_true.
-        <ls_step_2_upd>-control-endtimestamp = abap_true.
-        <ls_step_2_upd>-control-inputprompt  = abap_true.
-        <ls_step_2_upd>-control-outputprompt = abap_true.
+        <ls_step_2_upd>-stepuuid           = <ls_additional_step>-stepuuid.
+        <ls_step_2_upd>-queryuuid          = <ls_additional_step>-queryuuid.
+        <ls_step_2_upd>-runuuid            = <ls_additional_step>-runuuid.
+        <ls_step_2_upd>-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-error.
+        <ls_step_2_upd>-stependdatetime    = lv_now.
+        <ls_step_2_upd>-stepinputprompt    = lv_input_prompt.
+        <ls_step_2_upd>-stepoutputresponse = lv_output_prompt.
+        <ls_step_2_upd>-control-stepstatus         = abap_true.
+        <ls_step_2_upd>-control-stependdatetime    = abap_true.
+        <ls_step_2_upd>-control-stepinputprompt    = abap_true.
+        <ls_step_2_upd>-control-stepoutputresponse = abap_true.
 
-        <ls_run_context>-execution_step-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-error.
-        <ls_run_context>-execution_step-endtimestamp = lv_now.
-        <ls_run_context>-execution_step-inputprompt  = lv_input_prompt.
-        <ls_run_context>-execution_step-outputprompt = lv_output_prompt.
+        <ls_run_context>-execution_step-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-error.
+        <ls_run_context>-execution_step-stependdatetime    = lv_now.
+        <ls_run_context>-execution_step-stepinputprompt    = lv_input_prompt.
+        <ls_run_context>-execution_step-stepoutputresponse = lv_output_prompt.
 
         APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
-        <ls_query_2_upd>-queryuuid       = is_execution_query-queryuuid.
-        <ls_query_2_upd>-runuuid         = is_execution_query-runuuid.
-        <ls_query_2_upd>-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
-        <ls_query_2_upd>-endtimestamp    = lv_now.
-        <ls_query_2_upd>-control-executionstatus = abap_true.
-        <ls_query_2_upd>-control-endtimestamp    = abap_true.
+        <ls_query_2_upd>-queryuuid        = is_execution_query-queryuuid.
+        <ls_query_2_upd>-runuuid          = is_execution_query-runuuid.
+        <ls_query_2_upd>-querystatus      = zpru_if_axc_type_and_constant=>sc_query_status-error.
+        <ls_query_2_upd>-queryenddatetime = lv_now.
+        <ls_query_2_upd>-control-querystatus      = abap_true.
+        <ls_query_2_upd>-control-queryenddatetime = abap_true.
 
         EXIT.
       ENDIF.
 
       APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING <ls_step_2_upd>.
-      <ls_step_2_upd>-stepuuid     = <ls_additional_step>-stepuuid.
-      <ls_step_2_upd>-queryuuid    = <ls_additional_step>-queryuuid.
-      <ls_step_2_upd>-runuuid      = <ls_additional_step>-runuuid.
-      <ls_step_2_upd>-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-complete.
-      <ls_step_2_upd>-endtimestamp = lv_now.
-      <ls_step_2_upd>-inputprompt  = lv_input_prompt.
-      <ls_step_2_upd>-outputprompt = lv_output_prompt.
-      <ls_step_2_upd>-control-stepstatus   = abap_true.
-      <ls_step_2_upd>-control-endtimestamp = abap_true.
-      <ls_step_2_upd>-control-inputprompt  = abap_true.
-      <ls_step_2_upd>-control-outputprompt = abap_true.
+      <ls_step_2_upd>-stepuuid           = <ls_additional_step>-stepuuid.
+      <ls_step_2_upd>-queryuuid          = <ls_additional_step>-queryuuid.
+      <ls_step_2_upd>-runuuid            = <ls_additional_step>-runuuid.
+      <ls_step_2_upd>-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      <ls_step_2_upd>-stependdatetime    = lv_now.
+      <ls_step_2_upd>-stepinputprompt    = lv_input_prompt.
+      <ls_step_2_upd>-stepoutputresponse = lv_output_prompt.
+      <ls_step_2_upd>-control-stepstatus         = abap_true.
+      <ls_step_2_upd>-control-stependdatetime    = abap_true.
+      <ls_step_2_upd>-control-stepinputprompt    = abap_true.
+      <ls_step_2_upd>-control-stepoutputresponse = abap_true.
 
-      <ls_run_context>-execution_step-stepstatus   = zpru_if_axc_type_and_constant=>sc_step_status-complete.
-      <ls_run_context>-execution_step-endtimestamp = lv_now.
-      <ls_run_context>-execution_step-inputprompt  = lv_input_prompt.
-      <ls_run_context>-execution_step-outputprompt = lv_output_prompt.
+      <ls_run_context>-execution_step-stepstatus         = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      <ls_run_context>-execution_step-stependdatetime    = lv_now.
+      <ls_run_context>-execution_step-stepinputprompt    = lv_input_prompt.
+      <ls_run_context>-execution_step-stepoutputresponse = lv_output_prompt.
 
       IF lo_controller->mv_stop_agent = abap_true.
         EXIT.
@@ -1609,12 +1611,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
-    <ls_query_2_upd>-queryuuid       = is_execution_query-queryuuid.
-    <ls_query_2_upd>-runuuid         = is_execution_query-runuuid.
-    <ls_query_2_upd>-executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
-    <ls_query_2_upd>-endtimestamp    = lv_now.
-    <ls_query_2_upd>-control-executionstatus = abap_true.
-    <ls_query_2_upd>-control-endtimestamp    = abap_true.
+    <ls_query_2_upd>-queryuuid        = is_execution_query-queryuuid.
+    <ls_query_2_upd>-runuuid          = is_execution_query-runuuid.
+    <ls_query_2_upd>-querystatus      = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    <ls_query_2_upd>-queryenddatetime = lv_now.
+    <ls_query_2_upd>-control-querystatus      = abap_true.
+    <ls_query_2_upd>-control-queryenddatetime = abap_true.
 
     CREATE OBJECT lo_decision_provider TYPE (is_agent-decisionprovider).
 
@@ -1627,8 +1629,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                             cs_adf_reported   = cs_adf_reported
                                                             cs_adf_failed     = cs_adf_failed   ).
     IF eo_final_response IS BOUND.
-      <ls_query_2_upd>-outputresponse = eo_final_response->get_data( )->*.
-      <ls_query_2_upd>-control-outputresponse = abap_true.
+      <ls_query_2_upd>-queryoutputresponse = eo_final_response->get_data( )->*.
+      <ls_query_2_upd>-control-queryoutputresponse = abap_true.
     ENDIF.
 
     lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
@@ -1636,7 +1638,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                             cs_failed           = cs_axc_failed ).
 
     DATA(lv_final_response_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FINAL_RESPONSE", "TIMESTAMP" : "{ lv_now }",| &&
-                                      | "CONTENT" : "{ <ls_query_2_upd>-outputresponse }" \}|.
+                                      | "CONTENT" : "{ <ls_query_2_upd>-queryoutputresponse }" \}|.
 
     DATA(lv_last_number) = lines( io_controller->mt_input_output ).
     ASSIGN io_controller->mt_input_output[ number = lv_last_number ] TO FIELD-SYMBOL(<ls_input_output>).
@@ -1645,25 +1647,25 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message(
-        ( messagecid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_FINAL|
-          stage        = 'PROCESS_EXECUTION_STEPS'
-          substage    = |FINAL_RESPONSE|
-          namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-          username    = sy-uname
-          agentuuid   = is_agent-agentuuid
-          runuuid     = is_execution_query-runuuid
-          queryuuid   = is_execution_query-queryuuid
-          messagetime = lv_now
-          content      = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
-                         | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
-                         | "FINAL_RESPONSE" : { lv_final_response_message }  \}|
-          messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
+        ( messagecontentid = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_FINAL|
+          stage            = 'PROCESS_EXECUTION_STEPS'
+          substage         = |FINAL_RESPONSE|
+          namespace        = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
+          username         = sy-uname
+          agentuuid        = is_agent-agentuuid
+          runuuid          = is_execution_query-runuuid
+          queryuuid        = is_execution_query-queryuuid
+          messagedatetime  = lv_now
+          content          = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
+                             | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
+                             | "FINAL_RESPONSE" : { lv_final_response_message }  \}|
+          messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
     io_short_memory->save_message( it_message = lt_message ).
   ENDMETHOD.
 
   METHOD resequence_steps.
-    DATA(lv_count_before) = VALUE #( ct_step_before[ lines( ct_step_before ) ]-executionseq OPTIONAL ).
+    DATA(lv_count_before) = VALUE #( ct_step_before[ lines( ct_step_before ) ]-stepsequence OPTIONAL ).
     DATA(lv_first_iteration) = abap_true.
 
     LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_add_exec_step>).
@@ -1672,29 +1674,29 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       GET TIME STAMP FIELD DATA(lv_now).
 
       APPEND INITIAL LINE TO ct_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
-      <ls_step_2_upd>-stepuuid       = <ls_add_exec_step>-stepuuid.
-      <ls_step_2_upd>-stepnumber     = <ls_add_exec_step>-stepnumber.
-      <ls_step_2_upd>-queryuuid      = is_execution_query-queryuuid.
-      <ls_step_2_upd>-runuuid        = is_execution_header-runuuid.
-      <ls_step_2_upd>-tooluuid       = <ls_add_exec_step>-tooluuid.
-      <ls_step_2_upd>-executionseq   = lv_count_before.
-      <ls_step_2_upd>-stepstatus     = zpru_if_axc_type_and_constant=>sc_step_status-new.
-      <ls_step_2_upd>-starttimestamp = lv_now.
+      <ls_step_2_upd>-stepuuid          = <ls_add_exec_step>-stepuuid.
+      <ls_step_2_upd>-stepnumber        = <ls_add_exec_step>-stepnumber.
+      <ls_step_2_upd>-queryuuid         = is_execution_query-queryuuid.
+      <ls_step_2_upd>-runuuid           = is_execution_header-runuuid.
+      <ls_step_2_upd>-tooluuid          = <ls_add_exec_step>-tooluuid.
+      <ls_step_2_upd>-stepsequence      = lv_count_before.
+      <ls_step_2_upd>-stepstatus        = zpru_if_axc_type_and_constant=>sc_step_status-new.
+      <ls_step_2_upd>-stepstartdatetime = lv_now.
 
       IF lv_first_iteration = abap_true.
-        <ls_step_2_upd>-inputprompt = iv_output_prompt.
+        <ls_step_2_upd>-stepinputprompt = iv_output_prompt.
       ENDIF.
 
-      <ls_step_2_upd>-control-stepuuid       = abap_true.
-      <ls_step_2_upd>-control-stepnumber     = abap_true.
-      <ls_step_2_upd>-control-queryuuid      = abap_true.
-      <ls_step_2_upd>-control-runuuid        = abap_true.
-      <ls_step_2_upd>-control-tooluuid       = abap_true.
-      <ls_step_2_upd>-control-executionseq   = abap_true.
-      <ls_step_2_upd>-control-stepstatus     = abap_true.
-      <ls_step_2_upd>-control-starttimestamp = abap_true.
+      <ls_step_2_upd>-control-stepuuid          = abap_true.
+      <ls_step_2_upd>-control-stepnumber        = abap_true.
+      <ls_step_2_upd>-control-queryuuid         = abap_true.
+      <ls_step_2_upd>-control-runuuid           = abap_true.
+      <ls_step_2_upd>-control-tooluuid          = abap_true.
+      <ls_step_2_upd>-control-stepsequence      = abap_true.
+      <ls_step_2_upd>-control-stepstatus        = abap_true.
+      <ls_step_2_upd>-control-stepstartdatetime = abap_true.
       IF lv_first_iteration = abap_true.
-        <ls_step_2_upd>-control-inputprompt = abap_true.
+        <ls_step_2_upd>-control-stepinputprompt = abap_true.
       ENDIF.
 
       APPEND INITIAL LINE TO ct_step_before ASSIGNING FIELD-SYMBOL(<ls_step_before>).
@@ -1710,8 +1712,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_step_2_upd>-stepuuid     = <ls_step_after>-stepuuid.
       <ls_step_2_upd>-queryuuid    = is_execution_query-queryuuid.
       <ls_step_2_upd>-runuuid      = is_execution_header-runuuid.
-      <ls_step_2_upd>-executionseq = lv_count_before.
-      <ls_step_2_upd>-control-executionseq = abap_true.
+      <ls_step_2_upd>-stepsequence = lv_count_before.
+      <ls_step_2_upd>-control-stepsequence = abap_true.
 
       APPEND INITIAL LINE TO ct_step_before ASSIGNING <ls_step_before>.
       <ls_step_before> = CORRESPONDING #( <ls_step_2_upd> ).
@@ -1729,26 +1731,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                           | "CONTENT" : "{ iv_output_prompt }" \}|.
 
     rs_message = VALUE #(
-        messagecid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
-        stage        = 'PROCESS_EXECUTION_STEPS'
-        substage    = |STEP_{ is_execution_step-executionseq }|
-        namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-        username    = sy-uname
-        agentuuid   = is_agent-agentuuid
-        runuuid     = is_execution_step-runuuid
-        queryuuid   = is_execution_step-queryuuid
-        stepuuid    = is_execution_step-stepuuid
-        messagetime = lv_now
-        content      = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
-                       | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
-                       | "STEP_NUMBER" : "{ is_execution_step-stepnumber }", | &&
-                       | "EXECUTION_SEQ" : "{ is_execution_step-executionseq }", | &&
-                       | "TOOL_NAME" : "{ is_tool_master_data-toolname }", | &&
-                       | "STEP_TYPE" : "{ is_tool_master_data-steptype }", | &&
-                       | "INPUT_PROMPT" : { lv_input_tool_prompt_message }, | &&
-                       | "OUTPUT_PROMPT" : { lv_output_tool_prompt_message }, | &&
-                       | "ERROR" : "{ iv_error_flag }"  \}|
-        messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
+        messagecontentid = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
+        stage            = 'PROCESS_EXECUTION_STEPS'
+        substage         = |STEP_{ is_execution_step-stepsequence }|
+        namespace        = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
+        username         = sy-uname
+        agentuuid        = is_agent-agentuuid
+        runuuid          = is_execution_step-runuuid
+        queryuuid        = is_execution_step-queryuuid
+        stepuuid         = is_execution_step-stepuuid
+        messagedatetime  = lv_now
+        content          = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
+                           | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
+                           | "STEP_NUMBER" : "{ is_execution_step-stepnumber }", | &&
+                           | "EXECUTION_SEQ" : "{ is_execution_step-stepsequence }", | &&
+                           | "TOOL_NAME" : "{ is_tool_master_data-toolname }", | &&
+                           | "STEP_TYPE" : "{ is_tool_master_data-steptype }", | &&
+                           | "INPUT_PROMPT" : { lv_input_tool_prompt_message }, | &&
+                           | "OUTPUT_PROMPT" : { lv_output_tool_prompt_message }, | &&
+                           | "ERROR" : "{ iv_error_flag }"  \}|
+        messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
   ENDMETHOD.
 
   METHOD setup_agent_context.
@@ -1760,7 +1762,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     CHANGING  cs_reported   = cs_adf_reported
                                               cs_failed     = cs_adf_failed ).
 
-    IF es_agent-status <> zpru_if_adf_type_and_constant=>cs_agent_status-active.
+    IF es_agent-agentstatus <> zpru_if_adf_type_and_constant=>cs_agent_status-active.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1772,8 +1774,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-steptype           = abap_true
                                                                    control-toolschemaprovider = abap_true
                                                                    control-toolinfoprovider   = abap_true
-                                                                   control-isborrowed         = abap_true
-                                                                   control-istransient        = abap_true    ) )
+                                                                   control-toolisborrowed     = abap_true
+                                                                   control-toolistransient    = abap_true    ) )
                               IMPORTING et_tool       = et_agent_tools
                               CHANGING  cs_reported   = cs_adf_reported
                                         cs_failed     = cs_adf_failed ).
@@ -1845,19 +1847,19 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              | "CONTENT" : "{ io_agent_info_provider->get_agent_info( ) }" \}|.
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                    ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
-                                      stage        = iv_stage
-                                      substage    = 'BEFORE_DECISION'
-                                      namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                                      username    = sy-uname
-                                      agentuuid   = is_agent-agentuuid
-                                      messagetime = lv_now
-                                      content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                                     | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
-                                                     | "QUERY" : { iv_input_query }, | &&
-                                                     | "SYSTEM PROMPT" : { lv_system_prompt }, | &&
-                                                     | "AGENT INFO" : "{ lv_agent_info }" \}|
-                                      messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+                                    ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
+                                      stage            = iv_stage
+                                      substage         = 'BEFORE_DECISION'
+                                      namespace        = |{ sy-uname }.{ is_agent-agentname }|
+                                      username         = sy-uname
+                                      agentuuid        = is_agent-agentuuid
+                                      messagedatetime  = lv_now
+                                      content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                                         | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
+                                                         | "QUERY" : { iv_input_query }, | &&
+                                                         | "SYSTEM PROMPT" : { lv_system_prompt }, | &&
+                                                         | "AGENT INFO" : "{ lv_agent_info }" \}|
+                                      messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
 
@@ -1902,20 +1904,20 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_first_tool_input_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
                                    | "CONTENT" : "{ ev_first_tool_input }" \}|.
 
-    lt_message_in = VALUE #( ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
-                               stage        = iv_stage
-                               substage    = 'AFTER_DECISION'
-                               namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                               username    = sy-uname
-                               agentuuid   = is_agent-agentuuid
-                               messagetime = lv_now
-                               content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                              | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
-                                              | "QUERY" : { iv_input_query }, | &&
-                                              | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
-                                              | "LANGUAGE" : "{ ev_langu }", | &&
-                                              | "DECISION LOG" : { lv_decision_log_message } \}|
-                               messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+    lt_message_in = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
+                               stage            = iv_stage
+                               substage         = 'AFTER_DECISION'
+                               namespace        = |{ sy-uname }.{ is_agent-agentname }|
+                               username         = sy-uname
+                               agentuuid        = is_agent-agentuuid
+                               messagedatetime  = lv_now
+                               content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                                  | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
+                                                  | "QUERY" : { iv_input_query }, | &&
+                                                  | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
+                                                  | "LANGUAGE" : "{ ev_langu }", | &&
+                                                  | "DECISION LOG" : { lv_decision_log_message } \}|
+                               messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.
@@ -1953,46 +1955,46 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       ENDTRY.
 
-      <ls_execution_step>-stepnumber     = lo_axc_service->generate_step_number(
-                                               iv_query_uuid       = is_execution_query-queryuuid
-                                               iv_step_number_base = lv_step_number_base ).
-      <ls_execution_step>-queryuuid      = is_execution_query-queryuuid.
-      <ls_execution_step>-runuuid        = is_execution_header-runuuid.
-      <ls_execution_step>-tooluuid       = <ls_tool_master_data>-tooluuid.
-      <ls_execution_step>-executionseq   = <ls_tool>-sequence.
-      <ls_execution_step>-stepstatus     = zpru_if_axc_type_and_constant=>sc_step_status-new.
-      <ls_execution_step>-starttimestamp = lv_now.
+      <ls_execution_step>-stepnumber        = lo_axc_service->generate_step_number(
+                                                  iv_query_uuid       = is_execution_query-queryuuid
+                                                  iv_step_number_base = lv_step_number_base ).
+      <ls_execution_step>-queryuuid         = is_execution_query-queryuuid.
+      <ls_execution_step>-runuuid           = is_execution_header-runuuid.
+      <ls_execution_step>-tooluuid          = <ls_tool_master_data>-tooluuid.
+      <ls_execution_step>-stepsequence      = <ls_tool>-sequence.
+      <ls_execution_step>-stepstatus        = zpru_if_axc_type_and_constant=>sc_step_status-new.
+      <ls_execution_step>-stepstartdatetime = lv_now.
 
       IF <ls_tool>-sequence = lv_min_seq.
-        <ls_execution_step>-inputprompt = iv_first_tool_input.
+        <ls_execution_step>-stepinputprompt = iv_first_tool_input.
       ENDIF.
 
       DATA(lv_tool_prompt_message) = ||.
-      IF <ls_execution_step>-inputprompt IS NOT INITIAL.
+      IF <ls_execution_step>-stepinputprompt IS NOT INITIAL.
         lv_tool_prompt_message = |\{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                       | "CONTENT" : "{ <ls_execution_step>-inputprompt }" \}|.
+                                       | "CONTENT" : "{ <ls_execution_step>-stepinputprompt }" \}|.
       ENDIF.
 
       DATA(lv_content_json) = |\{ "STEP_NUMBER" : "{ <ls_execution_step>-stepnumber }", | &&
                               | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                               | "RUN_ID" : "{ is_execution_header-runid }", | &&
-                              | "EXECUTION_SEQUENCE" : "{ <ls_execution_step>-executionseq }", | &&
+                              | "EXECUTION_SEQUENCE" : "{ <ls_execution_step>-stepsequence }", | &&
                               | "INPUT_PROMPT" : { lv_tool_prompt_message } \}|.
 
       APPEND INITIAL LINE TO lt_message_in ASSIGNING FIELD-SYMBOL(<ls_message>).
       <ls_message> = VALUE #(
-          messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ lv_count }|
-          stage        = iv_stage
-          substage    = 'STEP_ANALYSIS'
-          namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-          username    = sy-uname
-          agentuuid   = is_agent-agentuuid
-          runuuid     = is_execution_header-runuuid
-          queryuuid   = is_execution_query-queryuuid
-          stepuuid    = <ls_execution_step>-stepuuid
-          messagetime = lv_now
-          content      = lv_content_json
-          messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_input ).
+          messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ lv_count }|
+          stage            = iv_stage
+          substage         = 'STEP_ANALYSIS'
+          namespace        = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
+          username         = sy-uname
+          agentuuid        = is_agent-agentuuid
+          runuuid          = is_execution_header-runuuid
+          queryuuid        = is_execution_query-queryuuid
+          stepuuid         = <ls_execution_step>-stepuuid
+          messagedatetime  = lv_now
+          content          = lv_content_json
+          messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_input ).
 
       lv_count += 1.
       lv_step_number_base = <ls_execution_step>-stepnumber.
@@ -2001,29 +2003,29 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     io_short_memory->save_message( lt_message_in ).
 
     lo_axc_service->cba_step( EXPORTING it_axc_step_imp = VALUE #( FOR <ls_s> IN et_execution_steps
-                                                                   ( stepuuid       = <ls_s>-stepuuid
-                                                                     stepnumber     = <ls_s>-stepnumber
-                                                                     queryuuid      = <ls_s>-queryuuid
-                                                                     runuuid        = <ls_s>-runuuid
-                                                                     tooluuid       = <ls_s>-tooluuid
-                                                                     executionseq   = <ls_s>-executionseq
-                                                                     stepstatus     = <ls_s>-stepstatus
-                                                                     starttimestamp = <ls_s>-starttimestamp
-                                                                     endtimestamp   = <ls_s>-endtimestamp
-                                                                     inputprompt    = <ls_s>-inputprompt
-                                                                     outputprompt   = <ls_s>-outputprompt
-                                                                     control        = VALUE #(
-                                                                         stepuuid       = abap_true
-                                                                         stepnumber     = abap_true
-                                                                         queryuuid      = abap_true
-                                                                         runuuid        = abap_true
-                                                                         tooluuid       = abap_true
-                                                                         executionseq   = abap_true
-                                                                         stepstatus     = abap_true
-                                                                         starttimestamp = abap_true
-                                                                         endtimestamp   = abap_true
-                                                                         inputprompt    = abap_true
-                                                                         outputprompt   = abap_true ) ) )
+                                                                   ( stepuuid           = <ls_s>-stepuuid
+                                                                     stepnumber         = <ls_s>-stepnumber
+                                                                     queryuuid          = <ls_s>-queryuuid
+                                                                     runuuid            = <ls_s>-runuuid
+                                                                     tooluuid           = <ls_s>-tooluuid
+                                                                     stepsequence       = <ls_s>-stepsequence
+                                                                     stepstatus         = <ls_s>-stepstatus
+                                                                     stepstartdatetime  = <ls_s>-stepstartdatetime
+                                                                     stependdatetime    = <ls_s>-stependdatetime
+                                                                     stepinputprompt    = <ls_s>-stepinputprompt
+                                                                     stepoutputresponse = <ls_s>-stepoutputresponse
+                                                                     control            = VALUE #(
+                                                                         stepuuid           = abap_true
+                                                                         stepnumber         = abap_true
+                                                                         queryuuid          = abap_true
+                                                                         runuuid            = abap_true
+                                                                         tooluuid           = abap_true
+                                                                         stepsequence       = abap_true
+                                                                         stepstatus         = abap_true
+                                                                         stepstartdatetime  = abap_true
+                                                                         stependdatetime    = abap_true
+                                                                         stepinputprompt    = abap_true
+                                                                         stepoutputresponse = abap_true ) ) )
                               CHANGING  cs_reported     = cs_axc_reported
                                         cs_failed       = cs_axc_failed
                                         cs_mapped       = cs_axc_mapped ).
@@ -2069,7 +2071,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-longmemoryprovider   = abap_true
                                                                    control-agentinfoprovider    = abap_true
                                                                    control-systempromptprovider = abap_true
-                                                                   control-status               = abap_true
+                                                                   control-agentstatus          = abap_true
                                                                    control-createdby            = abap_true
                                                                    control-createdat            = abap_true
                                                                    control-changedby            = abap_true
@@ -2083,18 +2085,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD ensure_agent_is_active.
-    IF is_agent IS INITIAL OR is_agent-status = zpru_if_adf_type_and_constant=>cs_agent_status-inactive.
+    IF is_agent IS INITIAL OR is_agent-agentstatus = zpru_if_adf_type_and_constant=>cs_agent_status-inactive.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF is_agent-status <> zpru_if_adf_type_and_constant=>cs_agent_status-new.
+    IF is_agent-agentstatus <> zpru_if_adf_type_and_constant=>cs_agent_status-new.
       RETURN.
     ENDIF.
 
     io_service->update_agent(
-      EXPORTING it_agent_update_imp = VALUE #( ( agentuuid = is_agent-agentuuid
-                                                 status    = zpru_if_adf_type_and_constant=>cs_agent_status-active
-                                                 control   = VALUE #( status = abap_true ) ) )
+      EXPORTING it_agent_update_imp = VALUE #( ( agentuuid   = is_agent-agentuuid
+                                                 agentstatus = zpru_if_adf_type_and_constant=>cs_agent_status-active
+                                                 control     = VALUE #( agentstatus = abap_true ) ) )
       CHANGING  cs_reported         = cs_reported
                 cs_failed           = cs_failed ).
 
@@ -2113,8 +2115,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                control-steptype           = abap_true
                                                                control-toolschemaprovider = abap_true
                                                                control-toolinfoprovider   = abap_true
-                                                               control-isborrowed         = abap_true
-                                                               control-istransient        = abap_true    ) )
+                                                               control-toolisborrowed     = abap_true
+                                                               control-toolistransient    = abap_true    ) )
                           IMPORTING et_tool       = et_tools
                           CHANGING  cs_reported   = cs_reported
                                     cs_failed     = cs_failed ).
@@ -2133,31 +2135,31 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_count) = 1.
 
     DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                 ( messagecid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
-                                   stage        = 'INITIALIZE'
-                                   substage    = 'INITIALIZE_AGENT'
-                                   namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                                   username    = sy-uname
-                                   agentuuid   = is_agent-agentuuid
-                                   messagetime = lv_now
-                                   content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                                  |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
-                                                  |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }" \}|
-                                   messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+        ( messagecontentid = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+          stage            = 'INITIALIZE'
+          substage         = 'INITIALIZE_AGENT'
+          namespace        = |{ sy-uname }.{ is_agent-agentname }|
+          username         = sy-uname
+          agentuuid        = is_agent-agentuuid
+          messagedatetime  = lv_now
+          content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                             |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
+                             |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }" \}|
+          messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     lv_count += 1.
     LOOP AT it_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
       APPEND INITIAL LINE TO lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
-      <ls_message> = VALUE #( messagecid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
-                              stage        = 'INITIALIZE'
-                              substage    = 'INITIALIZE_TOOL'
-                              namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                              username    = sy-uname
-                              agentuuid   = is_agent-agentuuid
-                              messagetime = lv_now
-                              content      = |\{ "TOOL_NAME" : "{ <ls_tool>-toolname }", | &&
-                                             |"TOOL_PROVIDER" : "{ <ls_tool>-toolprovider }" \}|
-                              messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ).
+      <ls_message> = VALUE #( messagecontentid = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+                              stage            = 'INITIALIZE'
+                              substage         = 'INITIALIZE_TOOL'
+                              namespace        = |{ sy-uname }.{ is_agent-agentname }|
+                              username         = sy-uname
+                              agentuuid        = is_agent-agentuuid
+                              messagedatetime  = lv_now
+                              content          = |\{ "TOOL_NAME" : "{ <ls_tool>-toolname }", | &&
+                                                 |"TOOL_PROVIDER" : "{ <ls_tool>-toolprovider }" \}|
+                              messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ).
 
       lv_count += 1.
 
@@ -2183,7 +2185,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-longmemoryprovider   = abap_true
                                                                    control-agentinfoprovider    = abap_true
                                                                    control-systempromptprovider = abap_true
-                                                                   control-status               = abap_true
+                                                                   control-agentstatus          = abap_true
                                                                    control-createdby            = abap_true
                                                                    control-createdat            = abap_true
                                                                    control-changedby            = abap_true
@@ -2221,18 +2223,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
-    lt_message = VALUE #( ( messagecid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
-                            stage        = 'SET_INPUT_QUERY'
-                            substage    = 'SET_INPUT_QUERY'
-                            namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                            username    = sy-uname
-                            agentuuid   = is_agent-agentuuid
-                            messagetime = lv_now
-                            content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                           |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
-                                           |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
-                                           |"INPUT_QUERY" : { mv_input_query } \}|
-                            messagetype = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
+    lt_message = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
+                            stage            = 'SET_INPUT_QUERY'
+                            substage         = 'SET_INPUT_QUERY'
+                            namespace        = |{ sy-uname }.{ is_agent-agentname }|
+                            username         = sy-uname
+                            agentuuid        = is_agent-agentuuid
+                            messagedatetime  = lv_now
+                            content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                                               |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
+                                               |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
+                                               |"INPUT_QUERY" : { mv_input_query } \}|
+                            messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
     io_short_memory->save_message( lt_message ).
   ENDMETHOD.
@@ -2245,27 +2247,27 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD create_execution_header.
     GET TIME STAMP FIELD DATA(lv_now).
     TRY.
-        es_execution_header = VALUE #( runuuid           = cl_system_uuid=>create_uuid_x16_static( )
-                                       runid             = io_axc_service->generate_run_id( )
-                                       agentuuid         = iv_agent_uuid
-                                       userid            = sy-uname
-                                       starttimestamp    = lv_now
-                                       createdby         = sy-uname
-                                       createdat         = lv_now
-                                       changedby         = sy-uname
-                                       lastchanged       = lv_now
+        es_execution_header = VALUE #( runuuid          = cl_system_uuid=>create_uuid_x16_static( )
+                                       runid            = io_axc_service->generate_run_id( )
+                                       agentuuid        = iv_agent_uuid
+                                       userid           = sy-uname
+                                       runstartdatetime = lv_now
+                                       createdby        = sy-uname
+                                       createdat        = lv_now
+                                       changedby        = sy-uname
+                                       lastchanged      = lv_now
                                        locallastchanged = lv_now
-                                       control            = VALUE #( runuuid          = abap_true
-                                                                     runid            = abap_true
-                                                                     agentuuid        = abap_true
-                                                                     userid           = abap_true
-                                                                     starttimestamp   = abap_true
-                                                                     endtimestamp     = abap_true
-                                                                     createdby        = abap_true
-                                                                     createdat        = abap_true
-                                                                     changedby        = abap_true
-                                                                     lastchanged      = abap_true
-                                                                     locallastchanged = abap_true ) ).
+                                       control          = VALUE #( runuuid          = abap_true
+                                                                   runid            = abap_true
+                                                                   agentuuid        = abap_true
+                                                                   userid           = abap_true
+                                                                   runstartdatetime = abap_true
+                                                                   runenddatetime   = abap_true
+                                                                   createdby        = abap_true
+                                                                   createdat        = abap_true
+                                                                   changedby        = abap_true
+                                                                   lastchanged      = abap_true
+                                                                   locallastchanged = abap_true ) ).
 
         io_axc_service->create_header( EXPORTING it_head_create_imp = VALUE #( ( es_execution_header ) )
                                        CHANGING  cs_reported        = cs_axc_reported
@@ -2283,7 +2285,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                runid            = abap_true
                                                                agentuuid        = abap_true
                                                                userid           = abap_true
-                                                               starttimestamp   = abap_true
+                                                               runstartdatetime = abap_true
                                                                createdby        = abap_true
                                                                createdat        = abap_true
                                                                changedby        = abap_true
@@ -2307,26 +2309,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     TRY.
         es_execution_query = VALUE #(
-            queryuuid       = cl_system_uuid=>create_uuid_x16_static( )
-            querynumber     = io_axc_service->generate_query_number( iv_run_uuid = iv_run_uuid )
-            runuuid         = iv_run_uuid
-            language        = COND #( WHEN iv_langu IS NOT INITIAL THEN iv_langu ELSE sy-langu )
-            executionstatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-            starttimestamp  = lv_now
-            inputprompt     = io_utility->search_node_in_json( iv_json           = iv_input_query
-                                                               iv_field_2_search = 'CONTENT' )
-            decisionlog     = io_utility->search_node_in_json( iv_json           = ev_decision_log_msg
-                                                               iv_field_2_search = 'CONTENT' )
-            control         = VALUE #( queryuuid       = abap_true
-                                       querynumber     = abap_true
-                                       runuuid         = abap_true
-                                       language        = abap_true
-                                       executionstatus = abap_true
-                                       starttimestamp  = abap_true
-                                       endtimestamp    = abap_true
-                                       inputprompt     = abap_true
-                                       decisionlog     = abap_true
-                                       outputresponse  = abap_true ) ).
+            queryuuid          = cl_system_uuid=>create_uuid_x16_static( )
+            querynumber        = io_axc_service->generate_query_number( iv_run_uuid = iv_run_uuid )
+            runuuid            = iv_run_uuid
+            querylanguage      = COND #( WHEN iv_langu IS NOT INITIAL THEN iv_langu ELSE sy-langu )
+            querystatus        = zpru_if_axc_type_and_constant=>sc_query_status-new
+            querystartdatetime = lv_now
+            queryinputprompt   = io_utility->search_node_in_json( iv_json           = iv_input_query
+                                                                  iv_field_2_search = 'CONTENT' )
+            querydecisionlog   = io_utility->search_node_in_json( iv_json           = ev_decision_log_msg
+                                                                  iv_field_2_search = 'CONTENT' )
+            control            = VALUE #( queryuuid           = abap_true
+                                          querynumber         = abap_true
+                                          runuuid             = abap_true
+                                          querylanguage       = abap_true
+                                          querystatus         = abap_true
+                                          querystartdatetime  = abap_true
+                                          queryenddatetime    = abap_true
+                                          queryinputprompt    = abap_true
+                                          querydecisionlog    = abap_true
+                                          queryoutputresponse = abap_true ) ).
 
         io_axc_service->cba_query( EXPORTING it_axc_query_imp = VALUE #( ( es_execution_query ) )
                                    CHANGING  cs_reported      = cs_axc_reported
@@ -2341,22 +2343,22 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                    ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_3|
-                                      stage        = iv_stage
-                                      substage    = 'AFTER_QUERY_CREATION'
-                                      namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }|
-                                      username    = sy-uname
-                                      agentuuid   = is_agent-agentuuid
-                                      runuuid     = is_execution_header-runuuid
-                                      queryuuid   = is_execution_query-queryuuid
-                                      messagetime = lv_now
-                                      content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                                     | "RUN_ID" : "{ is_execution_header-runid }", | &&
-                                                     | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
-                                                     | "LANGUAGE" : "{ is_execution_query-language }", | &&
-                                                     | "QUERY" : { iv_input_query }, | &&
-                                                     | "DECISION LOG" : { iv_decision_log_msg } \}|
-                                      messagetype = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
+        ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_3|
+          stage            = iv_stage
+          substage         = 'AFTER_QUERY_CREATION'
+          namespace        = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }|
+          username         = sy-uname
+          agentuuid        = is_agent-agentuuid
+          runuuid          = is_execution_header-runuuid
+          queryuuid        = is_execution_query-queryuuid
+          messagedatetime  = lv_now
+          content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
+                             | "RUN_ID" : "{ is_execution_header-runid }", | &&
+                             | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
+                             | "LANGUAGE" : "{ is_execution_query-querylanguage }", | &&
+                             | "QUERY" : { iv_input_query }, | &&
+                             | "DECISION LOG" : { iv_decision_log_msg } \}|
+          messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.
 ENDCLASS.

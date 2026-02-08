@@ -260,19 +260,19 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     CLEAR: et_agent_k,
            et_tool_agent_link.
 
-    SELECT agentuuid FROM zi_pru_agent
-      WHERE agentname            IN @it_agent_name
-        AND agenttype            IN @it_agent_type
-        AND decisionprovider     IN @it_decision_provider
-        AND shortmemoryprovider  IN @it_short_memory_provider
-        AND longmemoryprovider   IN @it_long_memory_provider
-        AND agentinfoprovider    IN @it_agent_info_provider
-        AND systempromptprovider IN @it_system_prompt_provider
-        AND status               IN @it_status
-        AND createdby            IN @it_created_by
-        AND createdat            IN @it_created_at
-        AND changedby            IN @it_changed_by
-        AND lastchanged          IN @it_last_changed
+    SELECT aipf7agentuuid as agentuuid FROM zi_pru_agent
+      WHERE aipf7agentname            IN @it_agent_name
+        AND aipf7agenttype            IN @it_agent_type
+        AND aipf7decisionprovider     IN @it_decision_provider
+        AND aipf7shortmemoryprovider  IN @it_short_memory_provider
+        AND aipf7longmemoryprovider   IN @it_long_memory_provider
+        AND aipf7agentinfoprovider    IN @it_agent_info_provider
+        AND aipf7systempromptprovider IN @it_system_prompt_provider
+        AND aipf7agentstatus               IN @it_status
+        AND aipf7createdby            IN @it_created_by
+        AND aipf7createdat            IN @it_created_at
+        AND aipf7changedby            IN @it_changed_by
+        AND aipf7lastchanged          IN @it_last_changed
       INTO TABLE @et_agent_k.
 
     IF et_agent_k IS INITIAL.
@@ -280,9 +280,9 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     ENDIF.
 
     IF et_tool_agent_link IS SUPPLIED.
-      SELECT agentuuid, tooluuid FROM zi_pru_agent_tool
+      SELECT aipf7agentuuid as agentuuid, aipf7tooluuid as tooluuid FROM zi_pru_agent_tool
         FOR ALL ENTRIES IN @et_agent_k
-        WHERE agentuuid = @et_agent_k-agentuuid
+        WHERE aipf7agentuuid = @et_agent_k-agentuuid
         INTO TABLE @et_tool_agent_link.
     ENDIF.
   ENDMETHOD.
@@ -345,8 +345,8 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                       THEN <ls_create>-agentinfoprovider )
             instance-systempromptprovider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true
                                                       THEN <ls_create>-systempromptprovider )
-            instance-status                 = COND #( WHEN <ls_create>-control-status = abap_true
-                                                      THEN <ls_create>-status )
+            instance-agentstatus                 = COND #( WHEN <ls_create>-control-agentstatus = abap_true
+                                                      THEN <ls_create>-agentstatus )
             instance-createdby             = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                       THEN <ls_create>-createdby )
             instance-createdat             = COND #( WHEN <ls_create>-control-createdat = abap_true
@@ -430,8 +430,8 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                               THEN <ls_buffer>-instance-agentinfoprovider ).
         ls_out-systempromptprovider = COND #( WHEN <ls_read>-control-systempromptprovider = abap_true
                                               THEN <ls_buffer>-instance-systempromptprovider ).
-        ls_out-status               = COND #( WHEN <ls_read>-control-status = abap_true
-                                              THEN <ls_buffer>-instance-status ).
+        ls_out-agentstatus               = COND #( WHEN <ls_read>-control-agentstatus = abap_true
+                                              THEN <ls_buffer>-instance-agentstatus ).
         ls_out-createdby            = COND #( WHEN <ls_read>-control-createdby = abap_true
                                               THEN <ls_buffer>-instance-createdby ).
         ls_out-createdat            = COND #( WHEN <ls_read>-control-createdat = abap_true
@@ -502,9 +502,9 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         <ls_buffer>-instance-systempromptprovider = COND #( WHEN <ls_update>-control-systempromptprovider = abap_true
                                                               THEN <ls_update>-systempromptprovider
                                                               ELSE <ls_buffer>-instance-systempromptprovider ).
-        <ls_buffer>-instance-status                 = COND #( WHEN <ls_update>-control-status = abap_true
-                                                              THEN <ls_update>-status
-                                                              ELSE <ls_buffer>-instance-status ).
+        <ls_buffer>-instance-agentstatus                 = COND #( WHEN <ls_update>-control-agentstatus = abap_true
+                                                              THEN <ls_update>-agentstatus
+                                                              ELSE <ls_buffer>-instance-agentstatus ).
         <ls_buffer>-instance-createdby             = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                               THEN <ls_update>-createdby
                                                               ELSE <ls_buffer>-instance-createdby ).
@@ -676,10 +676,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                       THEN <ls_create>-toolschemaprovider )
               instance-toolinfoprovider   = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true
                                                       THEN <ls_create>-toolinfoprovider )
-              instance-isborrowed          = COND #( WHEN <ls_create>-control-isborrowed = abap_true
-                                                      THEN <ls_create>-isborrowed )
-              instance-istransient         = COND #( WHEN <ls_create>-control-istransient = abap_true
-                                                      THEN <ls_create>-istransient )
+              instance-toolisborrowed          = COND #( WHEN <ls_create>-control-toolisborrowed = abap_true
+                                                      THEN <ls_create>-toolisborrowed )
+              instance-toolistransient         = COND #( WHEN <ls_create>-control-toolistransient = abap_true
+                                                      THEN <ls_create>-toolistransient )
               changed                       = abap_true
               deleted                       = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
 
@@ -772,10 +772,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                             THEN <ls_t_buf>-instance-toolschemaprovider ).
         ls_out-toolinfoprovider   = COND #( WHEN <ls_h>-control-toolinfoprovider = abap_true
                                             THEN <ls_t_buf>-instance-toolinfoprovider ).
-        ls_out-isborrowed         = COND #( WHEN <ls_h>-control-isborrowed = abap_true
-                                            THEN <ls_t_buf>-instance-isborrowed ).
-        ls_out-istransient        = COND #( WHEN <ls_h>-control-istransient = abap_true
-                                            THEN <ls_t_buf>-instance-istransient ).
+        ls_out-toolisborrowed         = COND #( WHEN <ls_h>-control-toolisborrowed = abap_true
+                                            THEN <ls_t_buf>-instance-toolisborrowed ).
+        ls_out-toolistransient        = COND #( WHEN <ls_h>-control-toolistransient = abap_true
+                                            THEN <ls_t_buf>-instance-toolistransient ).
 
         APPEND ls_out TO et_tool.
       ENDLOOP.
@@ -841,10 +841,10 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                             THEN <ls_buffer>-instance-toolschemaprovider ).
         ls_out-toolinfoprovider   = COND #( WHEN <ls_read>-control-toolinfoprovider = abap_true
                                             THEN <ls_buffer>-instance-toolinfoprovider ).
-        ls_out-isborrowed         = COND #( WHEN <ls_read>-control-isborrowed = abap_true
-                                            THEN <ls_buffer>-instance-isborrowed ).
-        ls_out-istransient        = COND #( WHEN <ls_read>-control-istransient = abap_true
-                                            THEN <ls_buffer>-instance-istransient ).
+        ls_out-toolisborrowed         = COND #( WHEN <ls_read>-control-toolisborrowed = abap_true
+                                            THEN <ls_buffer>-instance-toolisborrowed ).
+        ls_out-toolistransient        = COND #( WHEN <ls_read>-control-toolistransient = abap_true
+                                            THEN <ls_buffer>-instance-toolistransient ).
 
         APPEND ls_out TO et_tool.
 
@@ -916,12 +916,12 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         <ls_buffer>-instance-toolinfoprovider   = COND #( WHEN <ls_update>-control-toolinfoprovider = abap_true
                                                             THEN <ls_update>-toolinfoprovider
                                                             ELSE <ls_buffer>-instance-toolinfoprovider ).
-        <ls_buffer>-instance-isborrowed          = COND #( WHEN <ls_update>-control-isborrowed = abap_true
-                                                            THEN <ls_update>-isborrowed
-                                                            ELSE <ls_buffer>-instance-isborrowed ).
-        <ls_buffer>-instance-istransient         = COND #( WHEN <ls_update>-control-istransient = abap_true
-                                                            THEN <ls_update>-istransient
-                                                            ELSE <ls_buffer>-instance-istransient ).
+        <ls_buffer>-instance-toolisborrowed          = COND #( WHEN <ls_update>-control-toolisborrowed = abap_true
+                                                            THEN <ls_update>-toolisborrowed
+                                                            ELSE <ls_buffer>-instance-toolisborrowed ).
+        <ls_buffer>-instance-toolistransient         = COND #( WHEN <ls_update>-control-toolistransient = abap_true
+                                                            THEN <ls_update>-toolistransient
+                                                            ELSE <ls_buffer>-instance-toolistransient ).
         <ls_buffer>-changed = abap_true.
 
       ELSE.

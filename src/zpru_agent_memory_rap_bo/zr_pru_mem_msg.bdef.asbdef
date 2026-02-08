@@ -2,41 +2,41 @@ managed implementation in class ZBP_R_PRU_MEM_MSG unique;
 strict ( 2 );
 extensible;
 define behavior for ZR_PRU_MEM_MSG alias ZrPruMemMsg
-persistent table ZPRU_MEM_MSG
+persistent table zpru_mem_msg
 extensible
 lock master
-authorization master( global )
+authorization master ( global )
 {
   field ( mandatory : create )
-   MessageUUID;
+  AIPF7MessageUUID;
 
   field ( readonly : update )
-   MessageUUID;
+  AIPF7MessageUUID;
 
 
   create;
   update;
   delete;
 
-  mapping for ZPRU_MEM_MSG corresponding extensible
-  {
-    MessageUUID = messageuuid;
-    Content = content;
-    MessageType = messagetype;
-    MessageCid = messagecid;
-    Stage = stage;
-    SubStage = substage;
-    Namespace = namespace;
-    UserName = username;
-    AgentUUID = agentuuid;
-    RunUUID = runuuid;
-    QueryUUID = queryuuid;
-    StepUUID = stepuuid;
-    MessageTime = messagetime;
-    CreatedBy = createdby;
-    CreatedAt = createdat;
-    ChangedBy = changedby;
-    ChangedAt = changedat;
-  }
+  mapping for zpru_mem_msg corresponding extensible
+    {
+      AIPF7MessageUUID      = messageuuid;
+      AIPF7Content          = content;
+      AIPF7MessageType      = messagetype;
+      AIPF7MessageContentId = MessageContentId;
+      AIPF7Stage            = stage;
+      AIPF7SubStage         = substage;
+      AIPF7Namespace        = namespace;
+      AIPF7UserName         = username;
+      AIPF7AgentUUID        = agentuuid;
+      AIPF7RunUUID          = runuuid;
+      AIPF7QueryUUID        = queryuuid;
+      AIPF7StepUUID         = stepuuid;
+      AIPF7MessageDateTime  = MessageDateTime;
+      AIPF7CreatedBy        = createdby;
+      AIPF7CreatedAt        = createdat;
+      AIPF7ChangedBy        = changedby;
+      AIPF7ChangedAt        = changedat;
+    }
 
 }

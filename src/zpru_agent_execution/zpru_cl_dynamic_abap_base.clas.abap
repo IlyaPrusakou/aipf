@@ -42,13 +42,13 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT logarea    AS logarea,
+    SELECT logICarea    AS logICarea,
            classname  AS classname,
            methodname AS methodname,
-           isstatic   AS isstatic
+           METHODisstatic   AS METHODisstatic
       FROM zpru_dyn_list
       FOR ALL ENTRIES IN @lt_invocation_payload
-      WHERE logarea    = @lt_invocation_payload-logarea
+      WHERE logICarea    = @lt_invocation_payload-logarea
         AND classname  = @lt_invocation_payload-classname
         AND methodname = @lt_invocation_payload-methodname
       INTO TABLE @DATA(lt_dynamic_methods).
@@ -56,24 +56,24 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT logarea      AS logarea,
+    SELECT logICarea      AS logICarea,
            classname    AS classname,
            methodname   AS methodname,
-           paramname    AS paramname,
-           paramorder   AS paramorder,
-           paramtype    AS paramtype,
-           rollname      AS rollname,
-           default_value AS defaultvalue
+           paramETERname    AS paramETERname,
+           paramETERorder   AS paramETERorder,
+           paramETERtype    AS paramETERtype,
+           DATAELEMENT      AS DATAELEMENT,
+           defaultvalue AS defaultvalue
       FROM zpru_dyn_list_pr
       FOR ALL ENTRIES IN @lt_dynamic_methods
-      WHERE logarea    = @lt_dynamic_methods-logarea
+      WHERE logICArea    = @lt_dynamic_methods-logICArea
         AND classname  = @lt_dynamic_methods-classname
         AND methodname = @lt_dynamic_methods-methodname
       INTO TABLE @DATA(lt_dynamic_params).
 
     LOOP AT lt_invocation_payload ASSIGNING FIELD-SYMBOL(<ls_invocation_payload>).
 
-      ASSIGN lt_dynamic_methods[ logarea    = <ls_invocation_payload>-logarea
+      ASSIGN lt_dynamic_methods[ logICarea    = <ls_invocation_payload>-logarea
                                  classname  = <ls_invocation_payload>-classname
                                  methodname = <ls_invocation_payload>-methodname ] TO FIELD-SYMBOL(<ls_dynamic_method>).
       IF sy-subrc <> 0.
@@ -81,20 +81,20 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
       ENDIF.
 
       CLEAR lt_params.
-      LOOP AT lt_dynamic_params ASSIGNING FIELD-SYMBOL(<ls_dynamic_param>) WHERE     logarea    = <ls_dynamic_method>-logarea
+      LOOP AT lt_dynamic_params ASSIGNING FIELD-SYMBOL(<ls_dynamic_param>) WHERE     logICarea    = <ls_dynamic_method>-logICarea
                                                                                  AND classname  = <ls_dynamic_method>-classname
                                                                                  AND methodname = <ls_dynamic_method>-methodname.
         CLEAR ls_param.
-        ls_param-name = <ls_dynamic_param>-paramname.
-        ls_param-kind = SWITCH #( <ls_dynamic_param>-paramtype
+        ls_param-name = <ls_dynamic_param>-paramETERname.
+        ls_param-kind = SWITCH #( <ls_dynamic_param>-paramETERtype
                                   WHEN 'I' THEN cl_abap_objectdescr=>exporting
                                   WHEN 'E' THEN cl_abap_objectdescr=>importing
                                   WHEN 'C' THEN cl_abap_objectdescr=>changing
                                   WHEN 'R' THEN cl_abap_objectdescr=>receiving ).
 
-        CREATE DATA ls_param-value TYPE (<ls_dynamic_param>-rollname).
+        CREATE DATA ls_param-value TYPE (<ls_dynamic_param>-dataelement).
 
-        ASSIGN <ls_invocation_payload>-parameters[ name = <ls_dynamic_param>-paramname ] TO FIELD-SYMBOL(<ls_parameter_metadata>).
+        ASSIGN <ls_invocation_payload>-parameters[ name = <ls_dynamic_param>-paramETERname ] TO FIELD-SYMBOL(<ls_parameter_metadata>).
         IF sy-subrc = 0.
           ASSIGN ls_param-value->* TO FIELD-SYMBOL(<ls_passing_value>).
           IF sy-subrc = 0.
@@ -113,7 +113,7 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
       ENDLOOP.
 
       TRY.
-          IF <ls_dynamic_method>-isstatic = abap_true.
+          IF <ls_dynamic_method>-METHODisstatic = abap_true.
             CALL METHOD (<ls_dynamic_method>-classname)=>(<ls_dynamic_method>-methodname)
               PARAMETER-TABLE lt_params.
           ELSE.
@@ -124,7 +124,7 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
           ENDIF.
 
           APPEND INITIAL LINE TO lt_invocation_result ASSIGNING FIELD-SYMBOL(<ls_result>).
-          <ls_result>-logarea    = <ls_dynamic_method>-logarea.
+          <ls_result>-logarea    = <ls_dynamic_method>-logICarea.
           <ls_result>-classname  = <ls_dynamic_method>-classname.
           <ls_result>-methodname = <ls_dynamic_method>-methodname.
 

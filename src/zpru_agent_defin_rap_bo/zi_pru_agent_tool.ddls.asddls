@@ -14,8 +14,8 @@ define view entity ZI_PRU_AGENT_TOOL
       steptype            as AIPF7StepType,
       toolschemaprovider  as AIPF7ToolSchemaProvider,
       toolinfoprovider    as AIPF7ToolInfoProvider,
-      isborrowed          as AIPF7ToolIsBorrowed,
-      istransient         as AIPF7ToolIsTransient
+      ToolIsBorrowed          as AIPF7ToolIsBorrowed,
+      ToolIsTransient         as AIPF7ToolIsTransient
       ,
       _agent
 }

@@ -41,7 +41,7 @@ authorization master ( global )
       AIPF7LongMemoryProvider   = longmemoryprovider;
       AIPF7AgentInfoProvider    = agentinfoprovider;
       AIPF7SystemPromptProvider = systempromptprovider;
-      AIPF7AgentStatus          = status;
+      AIPF7AgentStatus          = agentstatus;
       AIPF7CreatedBy            = createdby;
       AIPF7CreatedAt            = createdat;
       AIPF7ChangedBy            = changedby;
@@ -77,7 +77,7 @@ authorization dependent by _agent
       AIPF7StepType           = steptype;
       AIPF7ToolSchemaProvider = toolschemaprovider;
       AIPF7ToolInfoProvider   = toolinfoprovider;
-      AIPF7ToolIsBorrowed     = isborrowed;
-      AIPF7ToolIsTransient    = istransient;
+      AIPF7ToolIsBorrowed     = toolisborrowed;
+      AIPF7ToolIsTransient    = toolistransient;
     }
 }
