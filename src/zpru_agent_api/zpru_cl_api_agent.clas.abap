@@ -11,6 +11,7 @@ CLASS zpru_cl_api_agent DEFINITION
     DATA mo_short_memory         TYPE REF TO zpru_if_short_memory_provider.
     DATA mo_long_memory          TYPE REF TO zpru_if_long_memory_provider.
     DATA mv_input_query          TYPE zpru_if_agent_frw=>ts_json.
+    DATA ms_input_prompt TYPE zpru_s_prompt.
     DATA mv_output_response      TYPE zpru_if_agent_frw=>ts_json.
     DATA mv_output_response_prev TYPE zpru_if_agent_frw=>ts_json.
 
@@ -219,7 +220,7 @@ CLASS zpru_cl_api_agent DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS update_query_internal_state
-      IMPORTING iv_input_query TYPE string.
+      IMPORTING is_input_query TYPE zpru_s_prompt.
 
     METHODS append_query_to_controller
       RAISING zpru_cx_agent_core.
@@ -273,6 +274,22 @@ CLASS zpru_cl_api_agent DEFINITION
                 iv_decision_log_msg TYPE string
                 iv_stage            TYPE string
                 io_short_memory     TYPE REF TO zpru_if_short_memory_provider
+      RAISING   zpru_cx_agent_core.
+
+    METHODS prepare_controller_4_return
+      EXPORTING
+                eo_executed_controller TYPE REF TO zpru_if_agent_controller
+      RAISING   zpru_cx_agent_core.
+
+    METHODS attach_run_2_controller
+      IMPORTING is_execution_header TYPE zpru_s_axc_head
+                is_execution_query  TYPE zpru_if_axc_type_and_constant=>ts_axc_query
+                io_controller       TYPE REF TO zpru_if_agent_controller
+      RAISING   zpru_cx_agent_core.
+
+
+    METHODS detach_run_from_controller
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
       RAISING   zpru_cx_agent_core.
 
   PRIVATE SECTION.
@@ -405,7 +422,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ev_built_query_uuid = ls_execution_query-queryuuid.
   ENDMETHOD.
 
-  METHOD zpru_if_api_agent~initialize.
+  METHOD zpru_if_api_agent~setup_agent.
     CLEAR: es_agent,
            et_tools.
 
@@ -469,6 +486,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    attach_run_2_controller( is_execution_header = ls_execution_header
+                             is_execution_query  = ls_execution_query
+                             io_controller       = get_controller( ) ).
+
     process_execution_steps( EXPORTING is_agent            = ls_agent
                                        is_execution_header = ls_execution_header
                                        is_execution_query  = ls_execution_query
@@ -479,6 +500,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        cs_axc_failed       = cs_axc_failed
                                        cs_adf_reported     = cs_adf_reported
                                        cs_adf_failed       = cs_adf_failed ).
+
+    detach_run_from_controller( io_controller =  get_controller( ) ).
+
+    prepare_controller_4_return( IMPORTING eo_executed_controller = eo_executed_controller ).
+
+
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~rerun_from_step.
@@ -546,6 +573,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    attach_run_2_controller( is_execution_header = ls_execution_header
+                             is_execution_query  = ls_execution_query
+                             io_controller       = get_controller( ) ).
+
     process_execution_steps( EXPORTING is_agent            = ls_agent
                                        is_execution_header = ls_execution_header
                                        is_execution_query  = ls_execution_query
@@ -556,6 +587,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        cs_axc_failed       = cs_axc_failed
                                        cs_adf_reported     = cs_adf_reported
                                        cs_adf_failed       = cs_adf_failed ).
+
+    detach_run_from_controller( io_controller =  get_controller( ) ).
+
+    prepare_controller_4_return( IMPORTING eo_executed_controller = eo_executed_controller ).
+
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~run.
@@ -582,6 +618,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    attach_run_2_controller( is_execution_header = ls_execution_header
+                             is_execution_query  = ls_execution_query
+                             io_controller       = get_controller( ) ).
+
     process_execution_steps( EXPORTING is_agent            = ls_agent
                                        is_execution_header = ls_execution_header
                                        is_execution_query  = ls_execution_query
@@ -592,10 +632,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        cs_axc_failed       = cs_axc_failed
                                        cs_adf_reported     = cs_adf_reported
                                        cs_adf_failed       = cs_adf_failed ).
+
+    detach_run_from_controller( io_controller =  get_controller( ) ).
+
+    prepare_controller_4_return( IMPORTING eo_executed_controller = eo_executed_controller ).
+
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~set_input_query.
-    IF    iv_input_query IS INITIAL
+    IF    is_input_query IS INITIAL
        OR iv_agent_uuid  IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
@@ -611,7 +656,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                             CHANGING  cs_reported = cs_adf_reported
                                       cs_failed   = cs_adf_failed ).
 
-    update_query_internal_state( iv_input_query ).
+    update_query_internal_state( is_input_query ).
 
     append_query_to_controller( ).
 
@@ -1089,7 +1134,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     CLEAR ev_query_uuid.
 
     IF    iv_run_uuid    IS INITIAL
-       OR iv_input_query IS INITIAL.
+       OR is_input_query IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1124,10 +1169,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     DATA(lo_controller) = initialize_run_controller( ls_agent-agentuuid ).
 
+    IF io_parent_controller IS BOUND.
+      assign_controller_context( io_parent_controller ).
+    ENDIF.
+
+    update_query_internal_state( is_input_query = is_input_query ).
+
+    append_query_to_controller( ).
+
     process_decision_engine( EXPORTING is_agent                  = ls_agent
                                        it_agent_tools            = lt_agent_tools
                                        io_controller             = lo_controller
-                                       iv_input_query            = iv_input_query
+                                       iv_input_query            = is_input_query-string_content
                                        io_decision_provider      = lo_decision_provider
                                        io_system_prompt_provider = lo_system_prompt_provider
                                        io_short_memory           = lo_short_memory
@@ -1140,7 +1193,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        ev_decision_log           = DATA(lv_decision_log) ).
 
     create_execution_query( EXPORTING iv_run_uuid         = ls_execution_header-runuuid
-                                      iv_input_query      = iv_input_query
+                                      iv_input_query      = is_input_query-string_content
                                       iv_langu            = lv_langu
                                       iv_decision_log     = lv_decision_log
                                       io_axc_service      = lo_axc_service
@@ -1154,7 +1207,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     log_query_to_memory( is_agent            = ls_agent
                          is_execution_header = ls_execution_header
                          is_execution_query  = ls_execution_query
-                         iv_input_query      = iv_input_query
+                         iv_input_query      = is_input_query-string_content
                          iv_decision_log_msg = lv_decision_log_msg
                          iv_stage            = 'ADD_QUERY_2_RUN'
                          io_short_memory     = lo_short_memory ).
@@ -2205,7 +2258,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
   METHOD update_query_internal_state.
     GET TIME STAMP FIELD DATA(lv_now).
-    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ iv_input_query }"  \}|.
+    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ is_input_query-string_content }"  \}|.
+    ms_input_prompt = is_input_query.
     CLEAR: mv_output_response,
            mv_output_response_prev.
   ENDMETHOD.
@@ -2216,6 +2270,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     APPEND INITIAL LINE TO lo_controller->mt_input_output ASSIGNING FIELD-SYMBOL(<ls_input_output>).
     <ls_input_output>-number      = lv_last_number + 1.
     <ls_input_output>-input_query = mv_input_query.
+    <ls_input_output>-input_prompt = ms_input_prompt.
+    <ls_input_output>-current_controller = lo_controller.
+    <ls_input_output>-parent_controller = lo_controller->mo_parent_controller.
   ENDMETHOD.
 
   METHOD record_query_event.
@@ -2361,4 +2418,25 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.
+
+  METHOD prepare_controller_4_return.
+    eo_executed_controller = get_controller( ).
+  ENDMETHOD.
+
+  METHOD attach_run_2_controller.
+    io_controller->mv_run_uuid   =  is_execution_header-runuuid.
+    io_controller->mv_query_uuid = is_execution_query-queryuuid.
+  ENDMETHOD.
+
+  METHOD detach_run_from_controller.
+
+    APPEND INITIAL LINE TO io_controller->mt_run_history ASSIGNING FIELD-SYMBOL(<ls_run_history>).
+    <ls_run_history>-count = lines( io_controller->mt_run_history ) + 1.
+    <ls_run_history>-run_uuid = io_controller->mv_run_uuid.
+    <ls_run_history>-query_uuid = io_controller->mv_query_uuid.
+
+    CLEAR io_controller->mv_run_uuid.
+    CLEAR io_controller->mv_query_uuid.
+  ENDMETHOD.
+
 ENDCLASS.

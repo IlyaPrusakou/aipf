@@ -20,12 +20,12 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
     ENDTRY.
 
     TRY.
-        lo_api_agent->initialize( EXPORTING iv_agent_name = iv_agent_name
+        lo_api_agent->setup_agent( EXPORTING iv_agent_name = iv_agent_name
                                             io_parent_controller = io_parent_controller
                                   IMPORTING es_agent      = DATA(ls_agent)
                                             et_tools      = DATA(lt_tools) ).
 
-        lo_api_agent->set_input_query( iv_input_query = iv_input_query
+        lo_api_agent->set_input_query( is_input_query = is_prompt
                                        iv_agent_uuid  = ls_agent-agentuuid ).
 
         lo_api_agent->build_execution( EXPORTING iv_agent_uuid       = ls_agent-agentuuid

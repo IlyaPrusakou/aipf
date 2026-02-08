@@ -17,6 +17,7 @@ INHERITING FROM zpru_cl_tool_executor ABSTRACT
       EXPORTING eo_output               TYPE REF TO data
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
+                eo_nested_controller    TYPE REF TO zpru_if_agent_controller
       RAISING   zpru_cx_agent_core.
 
   PRIVATE SECTION.
@@ -62,11 +63,22 @@ CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
                                     io_tool_info_provider   = lo_tool_info_provider
                           IMPORTING eo_output               = lr_output
                                     ev_error_flag           = ev_error_flag
-                                    et_additional_step      = DATA(lt_additional_step) ).
+                                    et_additional_step      = DATA(lt_additional_step)
+                                    eo_nested_controller    = DATA(lo_nested_controler) ).
 
     IF ev_error_flag = abap_true.
       RETURN.
     ENDIF.
+
+    IF lo_nested_controler IS BOUND.
+
+      ASSIGN   io_controller->mt_input_output[ current_controller->mv_query_uuid = is_execution_step-queryuuid ] TO FIELD-SYMBOL(<ls_current_input_output>).
+      IF sy-subrc = 0.
+        APPEND INITIAL LINE TO <ls_current_input_output>-direct_children ASSIGNING FIELD-SYMBOL(<ls_child_controller>).
+        <ls_child_controller> = lo_nested_controler.
+      ENDIF.
+    ENDIF.
+
 
     IF lt_additional_step IS NOT INITIAL.
       prepare_additional_steps( EXPORTING is_current_step     = is_execution_step

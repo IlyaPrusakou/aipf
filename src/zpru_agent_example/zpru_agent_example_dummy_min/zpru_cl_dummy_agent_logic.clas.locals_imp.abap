@@ -242,12 +242,12 @@ ENDCLASS.
 
 
 CLASS lcl_abap_code_tool DEFINITION
-  CREATE PUBLIC inhERITING FROM zpru_cl_abap_executor.
+  CREATE PUBLIC INHERITING FROM zpru_cl_abap_executor.
 
   PUBLIC SECTION.
-  proTECTED SECTION.
-  methods execute_code_int reDEFINITION.
-  priVATE SECTION.
+  PROTECTED SECTION.
+    METHODS execute_code_int REDEFINITION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
@@ -535,10 +535,11 @@ CLASS lcl_nested_agent IMPLEMENTATION.
 
     lv_input_query = io_request->get_data( )->*.
 
-    lo_nested_agent->execute_agent( EXPORTING iv_agent_name        = 'NESTED_AGENT'
-                                              iv_input_query       = lv_input_query
-                                              io_parent_controller = io_controller
-                                    IMPORTING ev_final_response    = lv_final_response ).
+    lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
+                                              is_prompt              = VALUE #( string_content = lv_input_query )
+                                              io_parent_controller   = io_controller
+                                    IMPORTING ev_final_response      = lv_final_response
+                                              eo_executed_controller = DATA(lo_nested_controler) ).
 
     eo_response->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( lv_final_response ) ).
   ENDMETHOD.
@@ -971,7 +972,7 @@ ENDCLASS.
 
 CLASS lcl_ml_model_inference IMPLEMENTATION.
   METHOD zpru_if_ml_model_inference~get_machine_learning_inference.
-  " cl_aic_islm_embed_api_factory
+    " cl_aic_islm_embed_api_factory
   ENDMETHOD.
 ENDCLASS.
 
