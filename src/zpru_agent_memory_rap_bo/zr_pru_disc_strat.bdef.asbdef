@@ -3,22 +3,22 @@ strict ( 2 );
 with draft;
 extensible;
 define behavior for ZR_PRU_DISC_STRAT alias ZrPruDiscStrat
-persistent table ZPRU_DISC_STRAT
+persistent table zpru_disc_strat
 extensible
-draft table ZPRU_DISC_STRT_D
-etag master LocalLastChanged
-lock master total etag LastChanged
-authorization master( global )
+draft table zpru_disc_strt_d
+etag master AIPF7LocalLastChanged
+lock master total etag AIPF7LastChanged
+authorization master ( global )
 {
   field ( mandatory : create )
-   DiscardStrategy;
+  AIPF7DiscardStrategy;
 
   field ( readonly )
-   LastChanged,
-   LocalLastChanged;
+  AIPF7LastChanged,
+  AIPF7LocalLastChanged;
 
   field ( readonly : update )
-   DiscardStrategy;
+  AIPF7DiscardStrategy;
 
 
   create;
@@ -31,15 +31,15 @@ authorization master( global )
   draft action Resume;
   draft determine action Prepare;
 
-  mapping for ZPRU_DISC_STRAT corresponding extensible
-  {
-    DiscardStrategy = discardstrategy;
-    StrategyProvider = strategyprovider;
-    CreatedBy = createdby;
-    CreatedAt = createdat;
-    ChangedBy = changedby;
-    LastChanged = lastchanged;
-    LocalLastChanged = locallastchanged;
-  }
+  mapping for zpru_disc_strat corresponding extensible
+    {
+      AIPF7DiscardStrategy  = discardstrategy;
+      AIPF7DiscardProvider  = strategyprovider;
+      AIPF7CreatedBy        = createdby;
+      AIPF7CreatedAt        = createdat;
+      AIPF7ChangedBy        = changedby;
+      AIPF7LastChanged      = lastchanged;
+      AIPF7LocalLastChanged = locallastchanged;
+    }
 
 }

@@ -1,8 +1,8 @@
 @Metadata.layer: #CORE
 @UI.headerInfo.title.type: #STANDARD
-@UI.headerInfo.title.value: 'DiscardStrategy'
+@UI.headerInfo.title.value: 'AIPF7DiscardStrategy'
 @UI.headerInfo.description.type: #STANDARD
-@UI.headerInfo.description.value: 'DiscardStrategy'
+@UI.headerInfo.description.value: 'AIPF7DiscardStrategy'
 annotate view ZC_PRU_DISC_STRAT with
 {
   @UI.facet: [ {
@@ -21,7 +21,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 10 
   } ]
-  DiscardStrategy;
+  AIPF7DiscardStrategy;
     
   @EndUserText.label: 'StrategyProvider'
   @UI.identification: [ {
@@ -35,7 +35,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 30 
   } ]
-  StrategyProvider;
+  AIPF7DiscardProvider;
   
   @UI.identification: [ {
     position: 40 
@@ -46,7 +46,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 40 
   } ]
-  CreatedBy;
+  AIPF7CreatedBy;
   
   @UI.identification: [ {
     position: 50 
@@ -57,7 +57,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 50 
   } ]
-  CreatedAt;
+  AIPF7CreatedAt;
   
   @UI.identification: [ {
     position: 60 
@@ -68,7 +68,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 60 
   } ]
-  ChangedBy;
+  AIPF7ChangedBy;
   
   @UI.identification: [ {
     position: 70 
@@ -79,7 +79,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 70 
   } ]
-  LastChanged;
+  AIPF7LastChanged;
   
   @UI.identification: [ {
     position: 80 
@@ -90,7 +90,7 @@ annotate view ZC_PRU_DISC_STRAT with
   @UI.selectionField: [ {
     position: 80 
   } ]
-  LocalLastChanged;
+  AIPF7LocalLastChanged;
   
   @EndUserText.label: '_BaseEntity'
   @UI.identification: [ {

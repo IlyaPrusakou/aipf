@@ -5,21 +5,21 @@
 define root view entity ZR_PRU_MEM_MSG
   as select from zpru_mem_msg
 {
-  key messageuuid as MessageUUID,
-  content as Content,
-  messagetype as MessageType,
-  messagecid as MessageCid,
-  stage as Stage,
-  substage as SubStage,
-  namespace as Namespace,
-  username as UserName,
-  agentuuid as AgentUUID,
-  runuuid as RunUUID,
-  queryuuid as QueryUUID,
-  stepuuid as StepUUID,
-  messagetime as MessageTime,
-  createdby as CreatedBy,
-  createdat as CreatedAt,
-  changedby as ChangedBy,
-  changedat as ChangedAt
+  key messageuuid as AIPF7MessageUUID,
+      content     as AIPF7Content,
+      messagetype as AIPF7MessageType,
+      messagecid  as AIPF7MessageContentId,
+      stage       as AIPF7Stage,
+      substage    as AIPF7SubStage,
+      namespace   as AIPF7Namespace,
+      username    as AIPF7UserName,
+      agentuuid   as AIPF7AgentUUID,
+      runuuid     as AIPF7RunUUID,
+      queryuuid   as AIPF7QueryUUID,
+      stepuuid    as AIPF7StepUUID,
+      messagetime as AIPF7MessageDateTime,
+      createdby   as AIPF7CreatedBy,
+      createdat   as AIPF7CreatedAt,
+      changedby   as AIPF7ChangedBy,
+      changedat   as AIPF7ChangedAt
 }
