@@ -6,18 +6,18 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 **Disclaimer**: SAP, ABAP, BTP, and BOPF are trademarks or registered trademarks of SAP SE in Germany and other countries. AIPF is an independent open-source project and is not affiliated with, sponsored by, or endorsed by SAP SE.
 
-### 🧠 The "Why"
+### The "Why"
 Standard AI calls in ABAP are stateless—they send a prompt and get a response. **AIPF** adds the **Brain and Muscles**:
 * **Brain:** State management, long-term memory, and self-reflection loops.
 * **Muscles:** The ability to execute BAPIs, RAP Actions, and OData services autonomously.
 
-### 🛠 Key Features
+### Key Features
 * **Agentic Orchestration:** Define multi-step reasoning loops directly in ABAP.
 * **Clean Core Ready:** Built for S/4HANA Cloud using released APIs.
 * **Memory Management:** Persistence layer for conversation history and "thinking" states.
 * **Tool Integration:** Seamless binding between LLM reasoning and ABAP executable logic.
 
-### ☁️ Architecture: ABAP Cloud & SAP BTP
+### Architecture: ABAP Cloud & SAP BTP
 
 **AIPF** follows a **side-by-side extension pattern** and **clean core** design, bridging the gap between high-level AI reasoning and on-stack business execution:
 
@@ -25,7 +25,7 @@ Standard AI calls in ABAP are stateless—they send a prompt and get a response.
 * **Intelligence Layer**: Connects to **SAP BTP (Generative AI Hub)** to securely access Large Language Models (LLMs) such as GPT-4, Claude, or Mistral.
 * **Communication**: Leverages the **ABAP AI SDK** for secure, authenticated, and "Clean Core" compliant communication between the SAP backend and BTP AI services.
 
-### 📦 Installation
+### Installation
 1. Install [abapGit](https://abapgit.org/).
 2. Create a new Online Repo with the URL: `https://github.com/IlyaPrusakou/aipf`
 3. Pull the objects into the system.
@@ -53,7 +53,7 @@ flowchart TD
 
 ```
 
-### 👩‍💻 Developer Experience
+### Developer Experience
 
 AIPF is built specifically **for developers**. It does not provide a "generic" out-of-the-box agent; instead, it serves as a robust platform where you provide the implementation logic via framework-defined interfaces. 
 
@@ -67,7 +67,7 @@ To build your agent, you implement the following interfaces:
 
 ---
 
-### 🗄️ Persistence & Dynamic Execution
+### Persistence & Dynamic Execution
 
 Agent configurations and their assigned tools are stored in the framework's database tables. When the API method **`RUN`** is executed, the framework dynamically reads these configurations and invokes your interface implementations at runtime.
 
@@ -90,7 +90,7 @@ Agent configurations and their assigned tools are stored in the framework's data
 | **TOOL_PROVIDER** | `ZPRU_IF_TOOL_PROVIDER` | Class implementing the tool definition and execution. |
 
 
-### 🤖 Agent Types
+### Agent Types
 
 AIPF is designed to be model-agnostic. You can choose the "Intelligence Level" of your agent based on the complexity of the business task:
 
@@ -101,13 +101,13 @@ AIPF is designed to be model-agnostic. You can choose the "Intelligence Level" o
 | **LLM Agent** | **SAP AI Core** (Generative AI Hub) | Planning logic made using Large Language Models (LLMs) via SAP AI Core. |
 | **Decision Agent** | Hybrid: **LLM + ML + ABAP (BRF+, etc.)** | Complex logic combining multiple calls of LLM, ML models, and ABAP frameworks. |
 
-### 🛠 Implementation Details
+### Implementation Details
 
 * **IF-ELSE Agent:** Perfect for "Clean Core" legacy modernization where you want to wrap existing BRF+ or Condition Technique logic into an agentic interface.
 * **ML & LLM Agents:** Fully integrated with SAP AI Core, allowing you to swap models (e.g., moving from GPT-3.5 to GPT-4o) without changing your ABAP code.
 * **Decision Agent:** Acts as a meta-orchestrator. It can use an LLM to "think," an ML model to "calculate," and BRF+ to "verify" against corporate policy before executing a BAPI.
 
-### 🔄 Agent Composition
+### Agent Composition
 
 * **Nested Agents:** An agent can be assigned as a tool to another agent. This allows for specialized "sub-agents" to handle specific domains (e.g., an HR Agent calling a Payroll Agent as a tool).
 * **Composed Agents:** Multiple agents can be chained together to handle multi-stage workflows.
