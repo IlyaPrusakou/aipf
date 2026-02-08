@@ -1395,8 +1395,8 @@ CLASS zpru_cl_axc_service IMPLEMENTATION.
       INTO @DATA(lv_last_db_run_id).
 
     DATA(lt_head_buffer) = zpru_cl_axc_buffer=>header_buffer.
-    SORT lt_head_buffer BY instance-run_id DESCENDING.
-    DATA(lv_last_buf_run_id) = VALUE #( lt_head_buffer[ 1 ]-instance-run_id OPTIONAL ).
+    SORT lt_head_buffer BY instance-runid DESCENDING.
+    DATA(lv_last_buf_run_id) = VALUE #( lt_head_buffer[ 1 ]-instance-runid OPTIONAL ).
 
     IF lv_last_db_run_id IS INITIAL AND lv_last_buf_run_id IS INITIAL.
       lv_run_id_base = 1.

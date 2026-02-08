@@ -6,19 +6,19 @@ define behavior for ZR_PRU_AGENT_TYPE alias ZrPruAgentType
 persistent table zpru_agent_type
 extensible
 draft table zpru_agnt_type_d
-etag master LocalLastChanged
-lock master total etag LastChanged
+etag master AIPF7LocalLastChanged
+lock master total etag AIPF7LastChanged
 authorization master ( global )
 {
   field ( mandatory : create )
-  AgentType;
+  AIPF7AgentType;
 
   field ( readonly )
-  LastChanged,
-  LocalLastChanged;
+  AIPF7LastChanged,
+  AIPF7LocalLastChanged;
 
   field ( readonly : update )
-  AgentType;
+  AIPF7AgentType;
 
 
   create;
@@ -33,16 +33,16 @@ authorization master ( global )
 
   mapping for zpru_agent_type corresponding extensible
     {
-      AgentType        = agent_type;
-      ShortMemVolume   = short_mem_volume;
-      DiscardStrategy  = discard_strategy;
-      SummaryStrategy  = summary_strategy;
-      MaxNumbLoop      = max_numb_loop;
-      CreatedBy        = created_by;
-      CreatedAt        = created_at;
-      ChangedBy        = changed_by;
-      LastChanged      = last_changed;
-      LocalLastChanged = local_last_changed;
+      AIPF7AgentType         = agenttype;
+      AIPF7ShortMemoryVolume = shortmemvolume;
+      AIPF7DiscardStrategy   = discardstrategy;
+      AIPF7SummaryStrategy   = summarystrategy;
+      AIPF7MaxNumberOfLoop   = maxnumbloop;
+      AIPF7CreatedBy         = createdby;
+      AIPF7CreatedAt         = createdat;
+      AIPF7ChangedBy         = changedby;
+      AIPF7LastChanged       = lastchanged;
+      AIPF7LocalLastChanged  = locallastchanged;
     }
 
 }

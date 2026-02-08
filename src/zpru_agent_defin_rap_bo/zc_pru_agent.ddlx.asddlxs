@@ -1,7 +1,7 @@
 @Metadata.layer: #CORE
 
-@UI.headerInfo: { title: { type: #STANDARD, value: 'AgentUUID' },
-                  description: { type: #STANDARD, value: 'AgentUUID' } }
+@UI.headerInfo: { title: { type: #STANDARD, value: 'AIPF7AgentUUID' },
+                  description: { type: #STANDARD, value: 'AIPF7AgentUUID' } }
 
 annotate view ZC_PRU_AGENT with
 
@@ -20,80 +20,80 @@ annotate view ZC_PRU_AGENT with
   @UI.identification: [ { position: 10, label: 'AgentUUID' } ]
   @UI.lineItem: [ { position: 10, label: 'AgentUUID' } ]
   @UI.selectionField: [ { position: 10 } ]
-  AgentUUID;
+  AIPF7AgentUUID;
 
   @EndUserText.label: 'AgentType'
   @UI.identification: [ { position: 11, label: 'AgentType' } ]
   @UI.lineItem: [ { position: 11, label: 'AgentType' } ]
   @UI.selectionField: [ { position: 11 } ]
-  AgentType;
+  AIPF7AgentType;
 
   @EndUserText.label: 'AgentName'
   @UI.identification: [ { position: 20, label: 'AgentName' } ]
   @UI.lineItem: [ { position: 20, label: 'AgentName' } ]
   @UI.selectionField: [ { position: 20 } ]
-  AgentName;
+  AIPF7AgentName;
 
   @EndUserText.label: 'DecisionProvider'
   @UI.identification: [ { position: 30, label: 'DecisionProvider' } ]
   @UI.lineItem: [ { position: 30, label: 'DecisionProvider' } ]
   @UI.selectionField: [ { position: 30 } ]
-  DecisionProvider;
+  AIPF7DecisionProvider;
 
   @EndUserText.label: 'ShortMemoryProvider'
   @UI.identification: [ { position: 40, label: 'ShortMemoryProvider' } ]
   @UI.lineItem: [ { position: 40, label: 'ShortMemoryProvider' } ]
   @UI.selectionField: [ { position: 40 } ]
-  ShortMemoryProvider;
+  AIPF7ShortMemoryProvider;
 
   @EndUserText.label: 'LongMemoryProvider'
   @UI.identification: [ { position: 50, label: 'LongMemoryProvider' } ]
   @UI.lineItem: [ { position: 50, label: 'LongMemoryProvider' } ]
   @UI.selectionField: [ { position: 50 } ]
-  LongMemoryProvider;
+  AIPF7LongMemoryProvider;
 
   @EndUserText.label: 'AgentInfoProvider'
   @UI.identification: [ { position: 60, label: 'AgentInfoProvider' } ]
   @UI.lineItem: [ { position: 60, label: 'AgentInfoProvider' } ]
   @UI.selectionField: [ { position: 60 } ]
-  AgentInfoProvider;
+  AIPF7AgentInfoProvider;
 
   @EndUserText.label: 'SystemPromptProvider'
   @UI.identification: [ { position: 70, label: 'SystemPromptProvider' } ]
   @UI.lineItem: [ { position: 70, label: 'SystemPromptProvider' } ]
   @UI.selectionField: [ { position: 70 } ]
-  SystemPromptProvider;
+  AIPF7SystemPromptProvider;
 
   @EndUserText.label: 'Status'
   @UI.identification: [ { position: 80, label: 'Status' } ]
   @UI.lineItem: [ { position: 80, label: 'Status' } ]
   @UI.selectionField: [ { position: 80 } ]
-  Status;
+  AIPF7AgentStatus;
 
   @UI.identification: [ { position: 90 } ]
   @UI.lineItem: [ { position: 90 } ]
   @UI.selectionField: [ { position: 90 } ]
-  CreatedBy;
+  AIPF7CreatedBy;
 
   @UI.identification: [ { position: 100 } ]
   @UI.lineItem: [ { position: 100 } ]
   @UI.selectionField: [ { position: 100 } ]
-  CreatedAt;
+  AIPF7CreatedAt;
 
   @UI.identification: [ { position: 110 } ]
   @UI.lineItem: [ { position: 110 } ]
   @UI.selectionField: [ { position: 110 } ]
-  ChangedBy;
+  AIPF7ChangedBy;
 
   @UI.identification: [ { position: 120 } ]
   @UI.lineItem: [ { position: 120 } ]
   @UI.selectionField: [ { position: 120 } ]
-  LastChanged;
+  AIPF7LastChanged;
 
   @UI.identification: [ { position: 130 } ]
   @UI.lineItem: [ { position: 130 } ]
   @UI.selectionField: [ { position: 130 } ]
-  LocalLastChanged;
+  AIPF7LocalLastChanged;
 
   @EndUserText.label: '_BaseEntity'
   @UI.identification: [ { position: 140, label: '_BaseEntity' } ]

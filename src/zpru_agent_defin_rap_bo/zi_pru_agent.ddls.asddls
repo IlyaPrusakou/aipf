@@ -5,21 +5,22 @@
 @VDM.viewType: #BASIC
 define view entity ZI_PRU_AGENT
   as select from zpru_agent
-  association to many ZI_PRU_AGENT_TOOL as _tool on _tool.AgentUuid = $projection.AgentUuid
+  association to many ZI_PRU_AGENT_TOOL as _tool on _tool.AIPF7AgentUuid = $projection.AIPF7AgentUuid
 {
-  key agent_uuid             as AgentUuid,
-      agent_type             as AgentType,
-      agent_name             as AgentName,
-      decision_provider      as DecisionProvider,
-      short_memory_provider  as ShortMemoryProvider,
-      long_memory_provider   as LongMemoryProvider,
-      agent_info_provider    as AgentInfoProvider,
-      system_prompt_provider as SystemPromptProvider,
-      status                 as Status,
-      created_by             as CreatedBy,
-      created_at             as CreatedAt,
-      changed_by             as ChangedBy,
-      last_changed           as LastChanged,
-      local_last_changed     as LocalLastChanged,
+  key agentuuid            as AIPF7AgentUuid,
+      agenttype            as AIPF7AgentType,
+      agentname            as AIPF7AgentName,
+      decisionprovider     as AIPF7DecisionProvider,
+      shortmemoryprovider  as AIPF7ShortMemoryProvider,
+      longmemoryprovider   as AIPF7LongMemoryProvider,
+      agentinfoprovider    as AIPF7AgentInfoProvider,
+      systempromptprovider as AIPF7SystemPromptProvider,
+      status               as AIPF7AgentStatus,
+      createdby            as AIPF7CreatedBy,
+      createdat            as AIPF7CreatedAt,
+      changedby            as AIPF7ChangedBy,
+      lastchanged          as AIPF7LastChanged,
+      locallastchanged     as AIPF7LocalLastChanged
+      ,
       _tool
 }

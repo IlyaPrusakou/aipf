@@ -10,25 +10,25 @@
 define root view entity ZC_PRU_AXC_HEAD
   provider contract transactional_query
   as projection on ZR_PRU_AXC_HEAD
-  association [1..1] to ZR_PRU_AXC_HEAD as _BaseEntity on $projection.RunUUID = _BaseEntity.RunUUID
+  association [1..1] to ZR_PRU_AXC_HEAD as _BaseEntity on $projection.AIPF7RunUUID = _BaseEntity.AIPF7RunUUID
 {
-  key RunUUID,
-      RunID,
-      AgentUUID,
-      UserID,
-      StartTimestamp,
-      EndTimestamp,
-      CreatedBy,
-      CreatedAt,
-      ChangedBy,
+  key AIPF7RunUUID,
+      AIPF7RunID,
+      AIPF7AgentUUID,
+      AIPF7UserID,
+      AIPF7RunStartDateTime,
+      AIPF7RunEndDateTime,
+      AIPF7CreatedBy,
+      AIPF7CreatedAt,
+      AIPF7ChangedBy,
       @Semantics: {
         systemDateTime.lastChangedAt: true
       }
-      LastChanged,
+      AIPF7LastChanged,
       @Semantics: {
         systemDateTime.localInstanceLastChangedAt: true
       }
-      LocalLastChanged,
+      AIPF7LocalLastChanged,
       _executionquery : redirected to composition child ZC_PRU_AXC_QUERY,
       _executionstep  : redirected to ZC_PRU_AXC_STEP,
       _BaseEntity

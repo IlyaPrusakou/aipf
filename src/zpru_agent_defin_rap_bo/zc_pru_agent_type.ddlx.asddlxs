@@ -1,144 +1,144 @@
 @Metadata.layer: #CORE
 @UI.headerInfo.title.type: #STANDARD
-@UI.headerInfo.title.value: 'AgentType'
+@UI.headerInfo.title.value: 'AIPF7AgentType'
 @UI.headerInfo.description.type: #STANDARD
-@UI.headerInfo.description.value: 'AgentType'
+@UI.headerInfo.description.value: 'AIPF7AgentType'
 annotate view ZC_PRU_AGENT_TYPE with
 {
   @EndUserText.label: 'AgentType'
   @UI.facet: [ {
-    label: 'General Information', 
-    id: 'GeneralInfo', 
-    purpose: #STANDARD, 
-    position: 10 , 
+    label: 'General Information',
+    id: 'GeneralInfo',
+    purpose: #STANDARD,
+    position: 10 ,
     type: #IDENTIFICATION_REFERENCE
   } ]
   @UI.identification: [ {
-    position: 10 , 
+    position: 10 ,
     label: 'AgentType'
   } ]
   @UI.lineItem: [ {
-    position: 10 , 
+    position: 10 ,
     label: 'AgentType'
   } ]
   @UI.selectionField: [ {
-    position: 10 
+    position: 10
   } ]
-  AgentType;
-  
-    @UI.identification: [ {
-    position: 11 
-  } ]
-  @UI.lineItem: [ {
-    position: 11 
-  } ]
-  @UI.selectionField: [ {
-    position: 11 
-  } ]
-  ShortMemVolume;
-  
+  AIPF7AgentType;
+
   @UI.identification: [ {
-    position: 20 
+  position: 11
   } ]
   @UI.lineItem: [ {
-    position: 20 
+    position: 11
   } ]
   @UI.selectionField: [ {
-    position: 20 
+    position: 11
   } ]
-  DiscardStrategy;
-  
+  AIPF7ShortMemoryVolume;
+
   @UI.identification: [ {
-    position: 30 
+    position: 20
   } ]
   @UI.lineItem: [ {
-    position: 30 
+    position: 20
   } ]
   @UI.selectionField: [ {
-    position: 30 
+    position: 20
   } ]
-  SummaryStrategy;
-  
+  AIPF7DiscardStrategy;
+
+  @UI.identification: [ {
+    position: 30
+  } ]
+  @UI.lineItem: [ {
+    position: 30
+  } ]
+  @UI.selectionField: [ {
+    position: 30
+  } ]
+  AIPF7SummaryStrategy;
+
   @EndUserText.label: 'MaxNumbLoop'
   @UI.identification: [ {
-    position: 40 , 
+    position: 40 ,
     label: 'MaxNumbLoop'
   } ]
   @UI.lineItem: [ {
-    position: 40 , 
+    position: 40 ,
     label: 'MaxNumbLoop'
   } ]
   @UI.selectionField: [ {
-    position: 40 
+    position: 40
   } ]
-  MaxNumbLoop;
-  
+  AIPF7MaxNumberOfLoop;
+
   @UI.identification: [ {
-    position: 50 
+    position: 50
   } ]
   @UI.lineItem: [ {
-    position: 50 
+    position: 50
   } ]
   @UI.selectionField: [ {
-    position: 50 
+    position: 50
   } ]
-  CreatedBy;
-  
+  AIPF7CreatedBy;
+
   @UI.identification: [ {
-    position: 60 
+    position: 60
   } ]
   @UI.lineItem: [ {
-    position: 60 
+    position: 60
   } ]
   @UI.selectionField: [ {
-    position: 60 
+    position: 60
   } ]
-  CreatedAt;
-  
+  AIPF7CreatedAt;
+
   @UI.identification: [ {
-    position: 70 
+    position: 70
   } ]
   @UI.lineItem: [ {
-    position: 70 
+    position: 70
   } ]
   @UI.selectionField: [ {
-    position: 70 
+    position: 70
   } ]
-  ChangedBy;
-  
+  AIPF7ChangedBy;
+
   @UI.identification: [ {
-    position: 80 
+    position: 80
   } ]
   @UI.lineItem: [ {
-    position: 80 
+    position: 80
   } ]
   @UI.selectionField: [ {
-    position: 80 
+    position: 80
   } ]
-  LastChanged;
-  
+  AIPF7LastChanged;
+
   @UI.identification: [ {
-    position: 90 
+    position: 90
   } ]
   @UI.lineItem: [ {
-    position: 90 
+    position: 90
   } ]
   @UI.selectionField: [ {
-    position: 90 
+    position: 90
   } ]
-  LocalLastChanged;
-  
+  AIPF7LocalLastChanged;
+
   @EndUserText.label: '_BaseEntity'
   @UI.identification: [ {
-    position: 100 , 
+    position: 100 ,
     label: '_BaseEntity'
   } ]
   @UI.lineItem: [ {
-    position: 100 , 
+    position: 100 ,
     label: '_BaseEntity'
   } ]
   @UI.selectionField: [ {
-    position: 100 
+    position: 100
   } ]
   _BaseEntity;
 }

@@ -99,6 +99,10 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 *add messages into code
 
+*rename field executionseq normally in step table
+
+*rename paramname, paramtype and paramorder in table for dynamic tool normally
+
   ENDMETHOD.
 
 ENDCLASS.

@@ -17,59 +17,59 @@ annotate entity ZC_PRU_AXC_QUERY with
   @UI.identification: [ { position: 10, label: 'QueryUUID' } ]
   @UI.lineItem: [ { position: 10, label: 'QueryUUID' } ]
   @UI.selectionField: [ { position: 10 } ]
-  QueryUuid;
+  AIPF7QueryUuid;
 
   @EndUserText.label: 'QueryNumber'
   @UI.identification: [ { position: 11, label: 'QueryNumber' } ]
   @UI.lineItem: [ { position: 11, label: 'QueryNumber' } ]
   @UI.selectionField: [ { position: 11 } ]
-  QueryNumber;
+  AIPF7QueryNumber;
 
   @EndUserText.label: 'RunUUID'
   @UI.identification: [ { position: 20, label: 'RunUUID' } ]
   @UI.lineItem: [ { position: 20, label: 'RunUUID' } ]
   @UI.selectionField: [ { position: 20 } ]
-  RunUuid;
+  AIPF7RunUuid;
 
   @EndUserText.label: 'Language'
   @UI.identification: [ { position: 30, label: 'Language' } ]
   @UI.lineItem: [ { position: 30, label: 'Language' } ]
   @UI.selectionField: [ { position: 30 } ]
-  Language;
+  AIPF7QueryLanguage;
 
   @EndUserText.label: 'ExecutionStatus'
   @UI.identification: [ { position: 31, label: 'ExecutionStatus' } ]
   @UI.lineItem: [ { position: 31, label: 'ExecutionStatus' } ]
   @UI.selectionField: [ { position: 31 } ]
-  ExecutionStatus;
+  AIPF7QueryStatus;
 
   @EndUserText.label: 'StartTimestamp'
   @UI.identification: [ { position: 32, label: 'StartTimestamp' } ]
   @UI.lineItem: [ { position: 32, label: 'StartTimestamp' } ]
   @UI.selectionField: [ { position: 32 } ]
-  StartTimestamp;
+  AIPF7QueryStartDateTime;
 
   @EndUserText.label: 'EndTimestamp'
   @UI.identification: [ { position: 33, label: 'EndTimestamp' } ]
   @UI.lineItem: [ { position: 33, label: 'EndTimestamp' } ]
   @UI.selectionField: [ { position: 33 } ]
-  EndTimestamp;
+  AIPF7QueryEndDateTime;
 
   @EndUserText.label: 'InputPrompt'
   @UI.identification: [ { position: 40, label: 'InputPrompt' } ]
   @UI.lineItem: [ { position: 40, label: 'InputPrompt' } ]
   @UI.selectionField: [ { position: 40 } ]
-  InputPrompt;
+  AIPF7QueryInputPrompt;
 
   @EndUserText.label: 'DecisionLog'
   @UI.identification: [ { position: 50, label: 'InputPrompt' } ]
   @UI.lineItem: [ { position: 50, label: 'InputPrompt' } ]
   @UI.selectionField: [ { position: 50 } ]
-  DecisionLog;
+  AIPF7QueryDecisionLog;
 
   @EndUserText.label: 'OutputResponse'
   @UI.identification: [ { position: 60, label: 'OutputResponse' } ]
   @UI.lineItem: [ { position: 60, label: 'OutputResponse' } ]
   @UI.selectionField: [ { position: 60 } ]
-  OutputResponse;
+  AIPF7QueryOutputResponse;
 }

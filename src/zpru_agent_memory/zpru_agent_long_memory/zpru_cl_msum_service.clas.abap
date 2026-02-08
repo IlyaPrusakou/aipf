@@ -180,16 +180,16 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
   METHOD zpru_if_msum_service~query_msum.
     CLEAR et_msum_k.
 
-    SELECT summary_uuid FROM zpru_mem_sum
-      WHERE summary_uuid IN @it_summary_uuid
-        AND agent_uuid   IN @it_agent_uuid
-        AND run_uuid     IN @it_run_uuid
-        AND query_uuid   IN @it_query_uuid
-        AND step_uuid    IN @it_step_uuid
-        AND created_by   IN @it_created_by
-        AND created_at   IN @it_created_at
-        AND changed_by   IN @it_changed_by
-        AND changed_at   IN @it_changed_at
+    SELECT summaryuuid FROM zpru_mem_sum
+      WHERE summaryuuid IN @it_summary_uuid
+        AND agentuuid   IN @it_agent_uuid
+        AND runuuid     IN @it_run_uuid
+        AND queryuuid   IN @it_query_uuid
+        AND stepuuid    IN @it_step_uuid
+        AND createdby   IN @it_created_by
+        AND createdat   IN @it_created_at
+        AND changedby   IN @it_changed_by
+        AND changedat   IN @it_changed_at
       INTO TABLE @et_msum_k.
   ENDMETHOD.
 

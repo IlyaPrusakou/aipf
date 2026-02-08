@@ -12,65 +12,65 @@ annotate entity ZC_PRU_AXC_STEP with
   @UI.identification: [ { position: 10, label: 'StepUuid' } ]
   @UI.lineItem: [ { position: 10, label: 'StepUuid' } ]
   @UI.selectionField: [ { position: 10 } ]
-  StepUuid;
+  AIPF7StepUuid;
 
   @EndUserText.label: 'StepNumber'
   @UI.identification: [ { position: 11, label: 'StepNumber' } ]
   @UI.lineItem: [ { position: 11, label: 'StepNumber' } ]
   @UI.selectionField: [ { position: 11 } ]
-  StepNumber;
+  AIPF7StepNumber;
 
   @EndUserText.label: 'QueryUuid'
   @UI.identification: [ { position: 20, label: 'QueryUuid' } ]
   @UI.lineItem: [ { position: 20, label: 'QueryUuid' } ]
   @UI.selectionField: [ { position: 20 } ]
-  QueryUuid;
+  AIPF7QueryUuid;
 
   @EndUserText.label: 'RunUuid'
   @UI.identification: [ { position: 30, label: 'RunUuid' } ]
   @UI.lineItem: [ { position: 30, label: 'RunUuid' } ]
   @UI.selectionField: [ { position: 30 } ]
-  RunUuid;
+  AIPF7RunUuid;
 
   @EndUserText.label: 'ToolUuid'
   @UI.identification: [ { position: 40, label: 'ToolUuid' } ]
   @UI.lineItem: [ { position: 40, label: 'ToolUuid' } ]
   @UI.selectionField: [ { position: 40 } ]
-  ToolUuid;
+  AIPF7ToolUuid;
 
   @EndUserText.label: 'ExecutionSeq'
   @UI.identification: [ { position: 50, label: 'ExecutionSeq' } ]
   @UI.lineItem: [ { position: 50, label: 'ExecutionSeq' } ]
   @UI.selectionField: [ { position: 50 } ]
-  ExecutionSeq;
+  AIPF7StepSequence;
   
   @EndUserText.label: 'StepStatus'
   @UI.identification: [ { position: 60, label: 'StepStatus' } ]
   @UI.lineItem: [ { position: 60, label: 'StepStatus' } ]
   @UI.selectionField: [ { position: 60 } ]  
-  StepStatus;
+  AIPF7StepStatus;
   
   @EndUserText.label: 'StartTimestamp'
   @UI.identification: [ { position: 70, label: 'StartTimestamp' } ]
   @UI.lineItem: [ { position: 70, label: 'StartTimestamp' } ]
   @UI.selectionField: [ { position: 70 } ]
-  StartTimestamp;
+  AIPF7StepStartDateTime;
 
   @EndUserText.label: 'EndTimestamp'
   @UI.identification: [ { position: 80, label: 'EndTimestamp' } ]
   @UI.lineItem: [ { position: 80, label: 'EndTimestamp' } ]
   @UI.selectionField: [ { position: 80 } ]
-  EndTimestamp;
+  AIPF7StepEndDateTime;
 
   @EndUserText.label: 'InputPrompt'
   @UI.identification: [ { position: 90, label: 'InputPrompt' } ]
   @UI.lineItem: [ { position: 90, label: 'InputPrompt' } ]
   @UI.selectionField: [ { position: 90 } ]
-  InputPrompt;
+  AIPF7StepInputPrompt;
 
   @EndUserText.label: 'OutputPrompt'
   @UI.identification: [ { position: 100, label: 'OutputPrompt' } ]
   @UI.lineItem: [ { position: 100, label: 'OutputPrompt' } ]
   @UI.selectionField: [ { position: 100 } ]
-  OutputPrompt;
+  AIPF7StepOutputResponse;
 }

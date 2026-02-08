@@ -3,15 +3,15 @@
 @ObjectModel.sapObjectNodeType.name: 'ZPRU_SUMM_STRAT'
 @EndUserText.label: '###GENERATED Core Data Service Entity'
 define root view entity ZR_PRU_SUMM_STRAT
-  as select from ZPRU_SUMM_STRAT
+  as select from zpru_summ_strat
 {
-  key summary_strategy as SummaryStrategy,
-  strategy_provider as StrategyProvider,
-  created_by as CreatedBy,
-  created_at as CreatedAt,
-  changed_by as ChangedBy,
+  key summarystrategy as SummaryStrategy,
+  strategyprovider as StrategyProvider,
+  createdby as CreatedBy,
+  createdat as CreatedAt,
+  changedby as ChangedBy,
   @Semantics.systemDateTime.lastChangedAt: true
-  last_changed as LastChanged,
+  lastchanged as LastChanged,
   @Semantics.systemDateTime.localInstanceLastChangedAt: true
-  local_last_changed as LocalLastChanged
+  locallastchanged as LocalLastChanged
 }

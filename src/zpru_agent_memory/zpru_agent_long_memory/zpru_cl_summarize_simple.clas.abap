@@ -31,12 +31,12 @@ CLASS zpru_cl_summarize_simple IMPLEMENTATION.
     lo_utility->convert_to_string( EXPORTING ir_abap   = REF #(  lt_message )
                                    CHANGING  cr_string = lv_string ).
 
-    SORT lt_message BY message_time DESCENDING.
+    SORT lt_message BY messagetime DESCENDING.
     DATA(ls_last_message) = VALUE #( lt_message[ 1 ] OPTIONAL ).
 
     APPEND INITIAL LINE TO lt_summarization ASSIGNING FIELD-SYMBOL(<ls_sum>).
     <ls_sum> = CORRESPONDING #( ls_last_message EXCEPT content ).
-    <ls_sum>-summary_cid = ls_last_message-message_cid.
+    <ls_sum>-summarycid = ls_last_message-messagecid.
     <ls_sum>-content     = lv_string.
 
     IF lt_summarization IS NOT INITIAL.

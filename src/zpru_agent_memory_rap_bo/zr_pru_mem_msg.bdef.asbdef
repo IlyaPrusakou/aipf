@@ -20,23 +20,23 @@ authorization master( global )
 
   mapping for ZPRU_MEM_MSG corresponding extensible
   {
-    MessageUUID = message_uuid;
+    MessageUUID = messageuuid;
     Content = content;
-    MessageType = message_type;
-    MessageCid = message_cid;
+    MessageType = messagetype;
+    MessageCid = messagecid;
     Stage = stage;
-    SubStage = sub_stage;
+    SubStage = substage;
     Namespace = namespace;
-    UserName = user_name;
-    AgentUUID = agent_uuid;
-    RunUUID = run_uuid;
-    QueryUUID = query_uuid;
-    StepUUID = step_uuid;
-    MessageTime = message_time;
-    CreatedBy = created_by;
-    CreatedAt = created_at;
-    ChangedBy = changed_by;
-    ChangedAt = changed_at;
+    UserName = username;
+    AgentUUID = agentuuid;
+    RunUUID = runuuid;
+    QueryUUID = queryuuid;
+    StepUUID = stepuuid;
+    MessageTime = messagetime;
+    CreatedBy = createdby;
+    CreatedAt = createdat;
+    ChangedBy = changedby;
+    ChangedAt = changedat;
   }
 
 }

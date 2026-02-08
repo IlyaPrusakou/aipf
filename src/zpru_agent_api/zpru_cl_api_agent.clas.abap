@@ -690,16 +690,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     SELECT SINGLE * FROM zpru_disc_strat AS disc
-      WHERE disc~discard_strategy = @ls_agent_type-discardstrategy
+      WHERE disc~discardstrategy = @ls_agent_type-discardstrategy
       INTO @DATA(ls_disc_strat).
 
     SELECT SINGLE * FROM zpru_summ_strat AS summ
-      WHERE summ~summary_strategy = @ls_agent_type-summarystrategy
+      WHERE summ~summarystrategy = @ls_agent_type-summarystrategy
       INTO @DATA(ls_summ_strat).
 
     mo_short_memory->set_mem_volume( iv_mem_volume = ls_agent_type-shortmemvolume ).
 
-    CREATE OBJECT lo_discard_strategy TYPE (ls_disc_strat-strategy_provider).
+    CREATE OBJECT lo_discard_strategy TYPE (ls_disc_strat-strategyprovider).
     IF sy-subrc = 0.
       mo_short_memory->set_discard_strategy( io_discard_strategy = lo_discard_strategy ).
     ELSE.
@@ -715,7 +715,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       mo_short_memory->set_discard_strategy( io_discard_strategy = lo_discard_strategy ).
     ENDIF.
 
-    CREATE OBJECT lo_summary_strategy TYPE (ls_summ_strat-strategy_provider).
+    CREATE OBJECT lo_summary_strategy TYPE (ls_summ_strat-strategyprovider).
     IF sy-subrc = 0.
       mo_long_memory->set_summarization( io_summarization = lo_summary_strategy ).
     ELSE.
@@ -1645,19 +1645,19 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message(
-        ( message_cid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_FINAL|
+        ( messagecid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_FINAL|
           stage        = 'PROCESS_EXECUTION_STEPS'
-          sub_stage    = |FINAL_RESPONSE|
+          substage    = |FINAL_RESPONSE|
           namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-          user_name    = sy-uname
-          agent_uuid   = is_agent-agentuuid
-          run_uuid     = is_execution_query-runuuid
-          query_uuid   = is_execution_query-queryuuid
-          message_time = lv_now
+          username    = sy-uname
+          agentuuid   = is_agent-agentuuid
+          runuuid     = is_execution_query-runuuid
+          queryuuid   = is_execution_query-queryuuid
+          messagetime = lv_now
           content      = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
                          | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                          | "FINAL_RESPONSE" : { lv_final_response_message }  \}|
-          message_type = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
+          messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
     io_short_memory->save_message( it_message = lt_message ).
   ENDMETHOD.
@@ -1729,16 +1729,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                           | "CONTENT" : "{ iv_output_prompt }" \}|.
 
     rs_message = VALUE #(
-        message_cid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
+        messagecid  = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
         stage        = 'PROCESS_EXECUTION_STEPS'
-        sub_stage    = |STEP_{ is_execution_step-executionseq }|
+        substage    = |STEP_{ is_execution_step-executionseq }|
         namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-        user_name    = sy-uname
-        agent_uuid   = is_agent-agentuuid
-        run_uuid     = is_execution_step-runuuid
-        query_uuid   = is_execution_step-queryuuid
-        step_uuid    = is_execution_step-stepuuid
-        message_time = lv_now
+        username    = sy-uname
+        agentuuid   = is_agent-agentuuid
+        runuuid     = is_execution_step-runuuid
+        queryuuid   = is_execution_step-queryuuid
+        stepuuid    = is_execution_step-stepuuid
+        messagetime = lv_now
         content      = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
                        | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                        | "STEP_NUMBER" : "{ is_execution_step-stepnumber }", | &&
@@ -1748,7 +1748,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                        | "INPUT_PROMPT" : { lv_input_tool_prompt_message }, | &&
                        | "OUTPUT_PROMPT" : { lv_output_tool_prompt_message }, | &&
                        | "ERROR" : "{ iv_error_flag }"  \}|
-        message_type = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
+        messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
   ENDMETHOD.
 
   METHOD setup_agent_context.
@@ -1845,19 +1845,19 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              | "CONTENT" : "{ io_agent_info_provider->get_agent_info( ) }" \}|.
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                    ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
+                                    ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
                                       stage        = iv_stage
-                                      sub_stage    = 'BEFORE_DECISION'
+                                      substage    = 'BEFORE_DECISION'
                                       namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                                      user_name    = sy-uname
-                                      agent_uuid   = is_agent-agentuuid
-                                      message_time = lv_now
+                                      username    = sy-uname
+                                      agentuuid   = is_agent-agentuuid
+                                      messagetime = lv_now
                                       content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                      | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                                      | "QUERY" : { iv_input_query }, | &&
                                                      | "SYSTEM PROMPT" : { lv_system_prompt }, | &&
                                                      | "AGENT INFO" : "{ lv_agent_info }" \}|
-                                      message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+                                      messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
 
@@ -1902,20 +1902,20 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_first_tool_input_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
                                    | "CONTENT" : "{ ev_first_tool_input }" \}|.
 
-    lt_message_in = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
+    lt_message_in = VALUE #( ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
                                stage        = iv_stage
-                               sub_stage    = 'AFTER_DECISION'
+                               substage    = 'AFTER_DECISION'
                                namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                               user_name    = sy-uname
-                               agent_uuid   = is_agent-agentuuid
-                               message_time = lv_now
+                               username    = sy-uname
+                               agentuuid   = is_agent-agentuuid
+                               messagetime = lv_now
                                content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                               | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                               | "QUERY" : { iv_input_query }, | &&
                                               | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
                                               | "LANGUAGE" : "{ ev_langu }", | &&
                                               | "DECISION LOG" : { lv_decision_log_message } \}|
-                               message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+                               messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.
@@ -1981,18 +1981,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       APPEND INITIAL LINE TO lt_message_in ASSIGNING FIELD-SYMBOL(<ls_message>).
       <ls_message> = VALUE #(
-          message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ lv_count }|
+          messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ lv_count }|
           stage        = iv_stage
-          sub_stage    = 'STEP_ANALYSIS'
+          substage    = 'STEP_ANALYSIS'
           namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }.{ is_execution_query-querynumber }|
-          user_name    = sy-uname
-          agent_uuid   = is_agent-agentuuid
-          run_uuid     = is_execution_header-runuuid
-          query_uuid   = is_execution_query-queryuuid
-          step_uuid    = <ls_execution_step>-stepuuid
-          message_time = lv_now
+          username    = sy-uname
+          agentuuid   = is_agent-agentuuid
+          runuuid     = is_execution_header-runuuid
+          queryuuid   = is_execution_query-queryuuid
+          stepuuid    = <ls_execution_step>-stepuuid
+          messagetime = lv_now
           content      = lv_content_json
-          message_type = zpru_if_short_memory_provider=>cs_msg_type-step_input ).
+          messagetype = zpru_if_short_memory_provider=>cs_msg_type-step_input ).
 
       lv_count += 1.
       lv_step_number_base = <ls_execution_step>-stepnumber.
@@ -2133,31 +2133,31 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA(lv_count) = 1.
 
     DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                 ( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+                                 ( messagecid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
                                    stage        = 'INITIALIZE'
-                                   sub_stage    = 'INITIALIZE_AGENT'
+                                   substage    = 'INITIALIZE_AGENT'
                                    namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                                   user_name    = sy-uname
-                                   agent_uuid   = is_agent-agentuuid
-                                   message_time = lv_now
+                                   username    = sy-uname
+                                   agentuuid   = is_agent-agentuuid
+                                   messagetime = lv_now
                                    content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                   |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
                                                   |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }" \}|
-                                   message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+                                   messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     lv_count += 1.
     LOOP AT it_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
       APPEND INITIAL LINE TO lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
-      <ls_message> = VALUE #( message_cid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
+      <ls_message> = VALUE #( messagecid  = |{ lv_now }-{ sy-uname }-INITIALIZE_{ lv_count }|
                               stage        = 'INITIALIZE'
-                              sub_stage    = 'INITIALIZE_TOOL'
+                              substage    = 'INITIALIZE_TOOL'
                               namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                              user_name    = sy-uname
-                              agent_uuid   = is_agent-agentuuid
-                              message_time = lv_now
+                              username    = sy-uname
+                              agentuuid   = is_agent-agentuuid
+                              messagetime = lv_now
                               content      = |\{ "TOOL_NAME" : "{ <ls_tool>-toolname }", | &&
                                              |"TOOL_PROVIDER" : "{ <ls_tool>-toolprovider }" \}|
-                              message_type = zpru_if_short_memory_provider=>cs_msg_type-info ).
+                              messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ).
 
       lv_count += 1.
 
@@ -2221,18 +2221,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
-    lt_message = VALUE #( ( message_cid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
+    lt_message = VALUE #( ( messagecid  = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
                             stage        = 'SET_INPUT_QUERY'
-                            sub_stage    = 'SET_INPUT_QUERY'
+                            substage    = 'SET_INPUT_QUERY'
                             namespace    = |{ sy-uname }.{ is_agent-agentname }|
-                            user_name    = sy-uname
-                            agent_uuid   = is_agent-agentuuid
-                            message_time = lv_now
+                            username    = sy-uname
+                            agentuuid   = is_agent-agentuuid
+                            messagetime = lv_now
                             content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                            |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
                                            |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
                                            |"INPUT_QUERY" : { mv_input_query } \}|
-                            message_type = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
+                            messagetype = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
     io_short_memory->save_message( lt_message ).
   ENDMETHOD.
@@ -2341,22 +2341,22 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
-                                    ( message_cid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_3|
+                                    ( messagecid  = |{ lv_now }-{ sy-uname }-{ iv_stage }_3|
                                       stage        = iv_stage
-                                      sub_stage    = 'AFTER_QUERY_CREATION'
+                                      substage    = 'AFTER_QUERY_CREATION'
                                       namespace    = |{ sy-uname }.{ is_agent-agentname }.{ is_execution_header-runid }|
-                                      user_name    = sy-uname
-                                      agent_uuid   = is_agent-agentuuid
-                                      run_uuid     = is_execution_header-runuuid
-                                      query_uuid   = is_execution_query-queryuuid
-                                      message_time = lv_now
+                                      username    = sy-uname
+                                      agentuuid   = is_agent-agentuuid
+                                      runuuid     = is_execution_header-runuuid
+                                      queryuuid   = is_execution_query-queryuuid
+                                      messagetime = lv_now
                                       content      = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                      | "RUN_ID" : "{ is_execution_header-runid }", | &&
                                                      | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                                                      | "LANGUAGE" : "{ is_execution_query-language }", | &&
                                                      | "QUERY" : { iv_input_query }, | &&
                                                      | "DECISION LOG" : { iv_decision_log_msg } \}|
-                                      message_type = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
+                                      messagetype = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.
 ENDCLASS.

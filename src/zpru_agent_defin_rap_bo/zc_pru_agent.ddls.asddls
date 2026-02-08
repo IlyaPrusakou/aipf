@@ -10,28 +10,29 @@
 define root view entity ZC_PRU_AGENT
   provider contract transactional_query
   as projection on ZR_PRU_AGENT
-  association [1..1] to ZR_PRU_AGENT as _BaseEntity on $projection.AgentUUID = _BaseEntity.AgentUUID
+  association [1..1] to ZR_PRU_AGENT as _BaseEntity on $projection.AIPF7AgentUUID = _BaseEntity.AIPF7AgentUUID
 {
-  key AgentUUID,
-  AgentType,
-  AgentName,
-  DecisionProvider,
-  ShortMemoryProvider,
-  LongMemoryProvider,
-  AgentInfoProvider,
-  SystemPromptProvider,
-  Status,
-  CreatedBy,
-  CreatedAt,
-  ChangedBy,
-  @Semantics: {
-    systemDateTime.lastChangedAt: true
-  }
-  LastChanged,
-  @Semantics: {
-    systemDateTime.localInstanceLastChangedAt: true
-  }
-  LocalLastChanged,
-  _tool : redirected to composition child ZC_PRU_AGENT_TOOL,
-  _BaseEntity
+  key AIPF7AgentUUID,
+      AIPF7AgentType,
+      AIPF7AgentName,
+      AIPF7DecisionProvider,
+      AIPF7ShortMemoryProvider,
+      AIPF7LongMemoryProvider,
+      AIPF7AgentInfoProvider,
+      AIPF7SystemPromptProvider,
+      AIPF7AgentStatus,
+      AIPF7CreatedBy,
+      AIPF7CreatedAt,
+      AIPF7ChangedBy,
+      @Semantics: {
+        systemDateTime.lastChangedAt: true
+      }
+      AIPF7LastChanged,
+      @Semantics: {
+        systemDateTime.localInstanceLastChangedAt: true
+      }
+      AIPF7LocalLastChanged
+      ,
+      _tool : redirected to composition child ZC_PRU_AGENT_TOOL,
+      _BaseEntity
 }

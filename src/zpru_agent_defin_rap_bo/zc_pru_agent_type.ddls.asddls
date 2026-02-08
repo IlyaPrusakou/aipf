@@ -10,23 +10,23 @@
 define root view entity ZC_PRU_AGENT_TYPE
   provider contract transactional_query
   as projection on ZR_PRU_AGENT_TYPE
-  association [1..1] to ZR_PRU_AGENT_TYPE as _BaseEntity on $projection.AgentType = _BaseEntity.AgentType
+  association [1..1] to ZR_PRU_AGENT_TYPE as _BaseEntity on $projection.AIPF7AgentType = _BaseEntity.AIPF7AgentType
 {
-  key AgentType,
-  ShortMemVolume,
-  DiscardStrategy,
-  SummaryStrategy,
-  MaxNumbLoop,
-  CreatedBy,
-  CreatedAt,
-  ChangedBy,
-  @Semantics: {
-    systemDateTime.lastChangedAt: true
-  }
-  LastChanged,
-  @Semantics: {
-    systemDateTime.localInstanceLastChangedAt: true
-  }
-  LocalLastChanged,
-  _BaseEntity
+  key AIPF7AgentType,
+      AIPF7ShortMemoryVolume,
+      AIPF7DiscardStrategy,
+      AIPF7SummaryStrategy,
+      AIPF7MaxNumberOfLoop,
+      AIPF7CreatedBy,
+      AIPF7CreatedAt,
+      AIPF7ChangedBy,
+      @Semantics: {
+        systemDateTime.lastChangedAt: true
+      }
+      AIPF7LastChanged,
+      @Semantics: {
+        systemDateTime.localInstanceLastChangedAt: true
+      }
+      AIPF7LocalLastChanged,
+      _BaseEntity
 }

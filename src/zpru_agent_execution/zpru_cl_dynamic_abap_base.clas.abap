@@ -42,33 +42,33 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT log_area    AS logarea,
-           class_name  AS classname,
-           method_name AS methodname,
-           is_static   AS isstatic
+    SELECT logarea    AS logarea,
+           classname  AS classname,
+           methodname AS methodname,
+           isstatic   AS isstatic
       FROM zpru_dyn_list
       FOR ALL ENTRIES IN @lt_invocation_payload
-      WHERE log_area    = @lt_invocation_payload-logarea
-        AND class_name  = @lt_invocation_payload-classname
-        AND method_name = @lt_invocation_payload-methodname
+      WHERE logarea    = @lt_invocation_payload-logarea
+        AND classname  = @lt_invocation_payload-classname
+        AND methodname = @lt_invocation_payload-methodname
       INTO TABLE @DATA(lt_dynamic_methods).
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
 
-    SELECT log_area      AS logarea,
-           class_name    AS classname,
-           method_name   AS methodname,
-           param_name    AS paramname,
-           param_order   AS paramorder,
-           param_type    AS paramtype,
+    SELECT logarea      AS logarea,
+           classname    AS classname,
+           methodname   AS methodname,
+           paramname    AS paramname,
+           paramorder   AS paramorder,
+           paramtype    AS paramtype,
            rollname      AS rollname,
            default_value AS defaultvalue
       FROM zpru_dyn_list_pr
       FOR ALL ENTRIES IN @lt_dynamic_methods
-      WHERE log_area    = @lt_dynamic_methods-logarea
-        AND class_name  = @lt_dynamic_methods-classname
-        AND method_name = @lt_dynamic_methods-methodname
+      WHERE logarea    = @lt_dynamic_methods-logarea
+        AND classname  = @lt_dynamic_methods-classname
+        AND methodname = @lt_dynamic_methods-methodname
       INTO TABLE @DATA(lt_dynamic_params).
 
     LOOP AT lt_invocation_payload ASSIGNING FIELD-SYMBOL(<ls_invocation_payload>).

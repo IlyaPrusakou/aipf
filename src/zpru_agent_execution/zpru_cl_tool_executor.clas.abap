@@ -274,16 +274,16 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                             |Wrong combination of agent { ls_last_step-agentuuid } and tool { ls_last_step-tooluuid }| ).
 
       lt_message_in = VALUE #(
-          ( message_cid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
+          ( messagecid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
             stage        = 'VALIDATE_ADDITIONAL_STEPS'
-            sub_stage    = 'AFTER VALIDATION'
+            substage    = 'AFTER VALIDATION'
             namespace    = |{ sy-uname }.{ ls_current_agent-agentname }.{ ls_current_run-runid }.{ ls_current_query-querynumber }|
-            user_name    = sy-uname
-            agent_uuid   = ls_current_agent-agentuuid
-            message_time = lv_now
+            username    = sy-uname
+            agentuuid   = ls_current_agent-agentuuid
+            messagetime = lv_now
             content      = |\{ "AGENT_NAME" : "{ ls_current_agent-agentname }", | &&
                            | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
-            message_type = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+            messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
       TRY.
           io_controller->mo_short_memory->save_message( lt_message_in ).
         CATCH zpru_cx_agent_core.

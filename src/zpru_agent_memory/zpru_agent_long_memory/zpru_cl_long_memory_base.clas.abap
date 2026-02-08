@@ -315,25 +315,25 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       <ls_summarization_db> = CORRESPONDING #( <ls_summarization> EXCEPT content ).
 
       TRY.
-          <ls_summarization_db>-summary_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+          <ls_summarization_db>-summaryuuid = cl_system_uuid=>create_uuid_x16_static( ).
         CATCH cx_uuid_error.
           ASSERT 1 = 2.
       ENDTRY.
 
-      IF <ls_summarization_db>-summary_cid IS INITIAL.
-        <ls_summarization_db>-summary_cid = |{ sy-uname }-{ lv_now }-{ lv_count }|.
+      IF <ls_summarization_db>-summarycid IS INITIAL.
+        <ls_summarization_db>-summarycid = |{ sy-uname }-{ lv_now }-{ lv_count }|.
       ENDIF.
 
-      IF <ls_summarization_db>-user_name IS INITIAL.
-        <ls_summarization_db>-user_name = sy-uname.
+      IF <ls_summarization_db>-username IS INITIAL.
+        <ls_summarization_db>-username = sy-uname.
       ENDIF.
 
       <ls_summarization_db>-content    = lo_util->serialize_json_2_xstring( <ls_summarization>-content ).
 
-      <ls_summarization_db>-created_by = sy-uname.
-      <ls_summarization_db>-created_at = lv_now.
-      <ls_summarization_db>-changed_by = sy-uname.
-      <ls_summarization_db>-changed_at = lv_now.
+      <ls_summarization_db>-createdby = sy-uname.
+      <ls_summarization_db>-createdat = lv_now.
+      <ls_summarization_db>-changedby = sy-uname.
+      <ls_summarization_db>-changedat = lv_now.
 
       lv_count += 1.
     ENDLOOP.

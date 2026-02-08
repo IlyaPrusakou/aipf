@@ -5,20 +5,20 @@
 @VDM.viewType: #BASIC
 define view entity ZI_PRU_AXC_STEP
   as select from zpru_axc_step
-  association to one ZI_PRU_AXC_QUERY as _executionquery  on _executionquery.QueryUuid = $projection.QueryUuid
-  association to one ZI_PRU_AXC_HEAD  as _executionheader on _executionheader.RunUuid = $projection.RunUuid
+  association to one ZI_PRU_AXC_QUERY as _executionquery  on _executionquery.AIPF7QueryUuid = $projection.AIPF7QueryUuid
+  association to one ZI_PRU_AXC_HEAD  as _executionheader on _executionheader.AIPF7RunUuid = $projection.AIPF7RunUuid
 {
-  key step_uuid       as StepUuid,
-      step_number     as StepNumber,
-      query_uuid      as QueryUuid,
-      run_uuid        as RunUuid,
-      tool_uuid       as ToolUuid,
-      execution_seq   as ExecutionSeq,
-      step_status     as StepStatus,
-      start_timestamp as StartTimestamp,
-      end_timestamp   as EndTimestamp,
-      input_prompt    as InputPrompt,
-      output_prompt   as OutputPrompt,
+  key stepuuid       as AIPF7StepUuid,
+      stepnumber     as AIPF7StepNumber,
+      queryuuid      as AIPF7QueryUuid,
+      runuuid        as AIPF7RunUuid,
+      tooluuid       as AIPF7ToolUuid,
+      executionseq   as AIPF7StepSequence,
+      stepstatus     as AIPF7StepStatus,
+      starttimestamp as AIPF7StepStartDateTime,
+      endtimestamp   as AIPF7StepEndDateTime,
+      inputprompt    as AIPF7StepInputPrompt,
+      outputprompt   as AIPF7StepOutputResponse,
       _executionquery,
       _executionheader
 

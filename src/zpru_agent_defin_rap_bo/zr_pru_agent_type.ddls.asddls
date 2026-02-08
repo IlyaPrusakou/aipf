@@ -5,16 +5,16 @@
 define root view entity ZR_PRU_AGENT_TYPE
   as select from ZI_PRU_AGENT_TYPE
 {
-  key AgentType        as AgentType,
-      ShortMemVolume   as ShortMemVolume,
-      DiscardStrategy  as DiscardStrategy,
-      SummaryStrategy  as SummaryStrategy,
-      MaxNumbLoop      as MaxNumbLoop,
-      CreatedBy        as CreatedBy,
-      CreatedAt        as CreatedAt,
-      ChangedBy        as ChangedBy,
+  key AIPF7AgentType         as AIPF7AgentType,
+      AIPF7ShortMemoryVolume as AIPF7ShortMemoryVolume,
+      AIPF7DiscardStrategy   as AIPF7DiscardStrategy,
+      AIPF7SummaryStrategy   as AIPF7SummaryStrategy,
+      AIPF7MaxNumberOfLoop   as AIPF7MaxNumberOfLoop,
+      AIPF7CreatedBy         as AIPF7CreatedBy,
+      AIPF7CreatedAt         as AIPF7CreatedAt,
+      AIPF7ChangedBy         as AIPF7ChangedBy,
       @Semantics.systemDateTime.lastChangedAt: true
-      LastChanged      as LastChanged,
+      AIPF7LastChanged       as AIPF7LastChanged,
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
-      LocalLastChanged as LocalLastChanged
+      AIPF7LocalLastChanged  as AIPF7LocalLastChanged
 }

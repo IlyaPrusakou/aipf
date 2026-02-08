@@ -1,30 +1,31 @@
 @Metadata.allowExtensions: true
 @Metadata.ignorePropagatedAnnotations: true
-@Endusertext: {
-  Label: '###GENERATED Core Data Service Entity'
+@EndUserText: {
+  label: '###GENERATED Core Data Service Entity'
 }
-@Objectmodel: {
-  Sapobjectnodetype.Name: 'ZPRU_AGENT_SERV'
+@ObjectModel: {
+  sapObjectNodeType.name: 'ZPRU_AGENT_SERV'
 }
 @AccessControl.authorizationCheck: #MANDATORY
 define root view entity ZC_PRU_AGENT_SERV
-  provider contract TRANSACTIONAL_QUERY
+  provider contract transactional_query
   as projection on ZR_PRU_AGENT_SERV
-  association [1..1] to ZR_PRU_AGENT_SERV as _BaseEntity on $projection.SERVICE = _BaseEntity.SERVICE and $projection.CONTEXT = _BaseEntity.CONTEXT
+  association [1..1] to ZR_PRU_AGENT_SERV as _BaseEntity on  $projection.AIPF7Service = _BaseEntity.AIPF7Service
+                                                         and $projection.AIPF7Context = _BaseEntity.AIPF7Context
 {
-  key Service,
-  key Context,
-  Class,
-  CreatedBy,
-  CreatedAt,
-  ChangedBy,
-  @Semantics: {
-    Systemdatetime.Lastchangedat: true
-  }
-  LastChanged,
-  @Semantics: {
-    Systemdatetime.Localinstancelastchangedat: true
-  }
-  LocalLastChanged,
-  _BaseEntity
+  key AIPF7Service,
+  key AIPF7Context,
+      AIPF7Class,
+      AIPF7CreatedBy,
+      AIPF7CreatedAt,
+      AIPF7ChangedBy,
+      @Semantics: {
+        systemDateTime.lastChangedAt: true
+      }
+      AIPF7LastChanged,
+      @Semantics: {
+        systemDateTime.localInstanceLastChangedAt: true
+      }
+      AIPF7LocalLastChanged,
+      _BaseEntity
 }

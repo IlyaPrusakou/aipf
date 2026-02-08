@@ -6,16 +6,16 @@ define behavior for ZR_PRU_AXC_HEAD alias executionHeader
 persistent table zpru_axc_head
 extensible
 draft table zpru_axc_head_d
-etag master LocalLastChanged
-lock master total etag LastChanged
+etag master AIPF7LocalLastChanged
+lock master total etag AIPF7LastChanged
 authorization master ( global )
 {
-  field ( numbering : managed ) RunUUID;
+  field ( numbering : managed ) AIPF7RunUUID;
 
   field ( readonly )
-  RunUUID,
-  LastChanged,
-  LocalLastChanged;
+  AIPF7RunUUID,
+  AIPF7LastChanged,
+  AIPF7LocalLastChanged;
 
   create;
   update;
@@ -32,17 +32,17 @@ authorization master ( global )
 
   mapping for zpru_axc_head corresponding extensible
     {
-      RunUUID          = run_uuid;
-      RunID            = run_id;
-      AgentUUID        = agent_uuid;
-      UserID           = user_id;
-      StartTimestamp   = start_timestamp;
-      EndTimestamp     = end_timestamp;
-      CreatedBy        = created_by;
-      CreatedAt        = created_at;
-      ChangedBy        = changed_by;
-      LastChanged      = last_changed;
-      LocalLastChanged = local_last_changed;
+      AIPF7RunUUID          = runuuid;
+      AIPF7RunID            = runid;
+      AIPF7AgentUUID        = agentuuid;
+      AIPF7UserID           = userid;
+      AIPF7RunStartDateTime   = starttimestamp;
+      AIPF7RunEndDateTime     = endtimestamp;
+      AIPF7CreatedBy        = createdby;
+      AIPF7CreatedAt        = createdat;
+      AIPF7ChangedBy        = changedby;
+      AIPF7LastChanged      = lastchanged;
+      AIPF7LocalLastChanged = locallastchanged;
     }
 
 }
@@ -57,8 +57,8 @@ authorization dependent by _executionheader
 
 {
 
-  field ( numbering : managed ) QueryUuid;
-  field ( readonly ) QueryUuid, RunUuid;
+  field ( numbering : managed ) AIPF7QueryUuid;
+  field ( readonly ) AIPF7QueryUuid, AIPF7RunUuid;
 
   update;
   delete;
@@ -68,16 +68,16 @@ authorization dependent by _executionheader
 
   mapping for zpru_axc_query corresponding extensible
     {
-      QueryUuid       = query_uuid;
-      QueryNumber     = query_number;
-      RunUuid         = run_uuid;
-      Language        = language;
-      ExecutionStatus = execution_status;
-      StartTimestamp  = start_timestamp;
-      EndTimestamp    = end_timestamp;
-      InputPrompt     = input_prompt;
-      DecisionLog     = decision_log;
-      OutputResponse  = output_response;
+      AIPF7QueryUuid       = queryuuid;
+      AIPF7QueryNumber     = querynumber;
+      AIPF7RunUuid         = runuuid;
+      AIPF7QueryLanguage        = language;
+      AIPF7QueryStatus = executionstatus;
+      AIPF7QueryStartDateTime  = starttimestamp;
+      AIPF7QueryEndDateTime    = endtimestamp;
+      AIPF7QueryInputPrompt     = inputprompt;
+      AIPF7QueryDecisionLog     = decisionlog;
+      AIPF7QueryOutputResponse  = outputresponse;
     }
 
 }
@@ -92,8 +92,8 @@ authorization dependent by _executionheader
 
 {
 
-  field ( numbering : managed ) StepUuid;
-  field ( readonly ) StepUuid, QueryUuid, RunUuid;
+  field ( numbering : managed ) AIPF7StepUuid;
+  field ( readonly ) AIPF7StepUuid, AIPF7QueryUuid, AIPF7RunUuid;
 
   update;
   delete;
@@ -103,17 +103,17 @@ authorization dependent by _executionheader
 
   mapping for zpru_axc_step corresponding extensible
     {
-      StepUuid       = step_uuid;
-      StepNumber     = step_number;
-      QueryUuid      = query_uuid;
-      RunUuid        = run_uuid;
-      ToolUuid       = tool_uuid;
-      ExecutionSeq   = execution_seq;
-      StepStatus     = step_status;
-      StartTimestamp = start_timestamp;
-      EndTimestamp   = end_timestamp;
-      InputPrompt    = input_prompt;
-      OutputPrompt   = output_prompt;
+      AIPF7StepUuid       = stepuuid;
+      AIPF7StepNumber     = stepnumber;
+      AIPF7QueryUuid      = queryuuid;
+      AIPF7RunUuid        = runuuid;
+      AIPF7ToolUuid       = tooluuid;
+      AIPF7StepSequence   = executionseq;
+      AIPF7StepStatus     = stepstatus;
+      AIPF7StepStartDateTime = starttimestamp;
+      AIPF7StepEndDateTime   = endtimestamp;
+      AIPF7StepInputPrompt    = inputprompt;
+      AIPF7StepOutputResponse   = outputprompt;
     }
 
 

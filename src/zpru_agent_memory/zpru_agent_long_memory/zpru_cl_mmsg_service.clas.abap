@@ -184,17 +184,17 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
   METHOD zpru_if_mmsg_service~query_mmsg.
     CLEAR et_mmsg_k.
 
-    SELECT message_uuid FROM zpru_mem_msg
-      WHERE message_uuid IN @it_message_uuid
-        AND agent_uuid   IN @it_agent_uuid
-        AND run_uuid     IN @it_run_uuid
-        AND query_uuid   IN @it_query_uuid
-        AND step_uuid    IN @it_step_uuid
-        AND message_type IN @it_message_type
-        AND created_by   IN @it_created_by
-        AND created_at   IN @it_created_at
-        AND changed_by   IN @it_changed_by
-        AND changed_at   IN @it_changed_at
+    SELECT messageuuid FROM zpru_mem_msg
+      WHERE messageuuid IN @it_message_uuid
+        AND agentuuid   IN @it_agent_uuid
+        AND runuuid     IN @it_run_uuid
+        AND queryuuid   IN @it_query_uuid
+        AND stepuuid    IN @it_step_uuid
+        AND messagetype IN @it_message_type
+        AND createdby   IN @it_created_by
+        AND createdat   IN @it_created_at
+        AND changedby   IN @it_changed_by
+        AND changedat   IN @it_changed_at
       INTO TABLE @et_mmsg_k.
   ENDMETHOD.
 

@@ -20,7 +20,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 10
   } ]
-  AgentUuid;
+  AIPF7AgentUuid;
   @EndUserText.label: 'ToolName'
   @UI.identification: [ {
     position: 20 ,
@@ -33,7 +33,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 20
   } ]
-  ToolName;
+  AIPF7ToolName;
   @EndUserText.label: 'ToolProvider'
   @UI.identification: [ {
     position: 30 ,
@@ -46,7 +46,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 30
   } ]
-  ToolProvider;
+  AIPF7ToolProvider;
   @EndUserText.label: 'StepType'
   @UI.identification: [ {
     position: 40 ,
@@ -59,7 +59,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 40
   } ]
-  StepType;
+  AIPF7StepType;
   @EndUserText.label: 'ToolSchemaProvider'
   @UI.identification: [ {
     position: 50 ,
@@ -72,7 +72,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 50
   } ]
-  ToolSchemaProvider;
+  AIPF7ToolSchemaProvider;
   @EndUserText.label: 'ToolInfoProvider'
   @UI.identification: [ {
     position: 60 ,
@@ -85,7 +85,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 60
   } ]
-  ToolInfoProvider;
+  AIPF7ToolInfoProvider;
 
   @EndUserText.label: 'IsBorrowed'
   @UI.identification: [ {
@@ -99,7 +99,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 70
   } ]
-  IsBorrowed;
+  AIPF7ToolIsBorrowed;
 
   @EndUserText.label: 'IsTransient'
   @UI.identification: [ {
@@ -113,7 +113,7 @@ annotate entity ZC_PRU_AGENT_TOOL with
   @UI.selectionField: [ {
     position: 80
   } ]
-  IsTransient;
+  AIPF7ToolIsTransient;
 
 
 

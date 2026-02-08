@@ -31,18 +31,18 @@ CLASS zpru_cl_axc_buffer DEFINITION
     CLASS-DATA step_buffer   TYPE tt_step.
 
     TYPES: BEGIN OF ts_header_keys,
-             run_uuid TYPE zpru_axc_head-run_uuid,
+             run_uuid TYPE zpru_axc_head-runuuid,
            END OF ts_header_keys.
 
     TYPES: BEGIN OF ts_query_keys,
-             run_uuid   TYPE zpru_axc_query-run_uuid,
-             query_uuid TYPE zpru_axc_query-query_uuid,
+             run_uuid   TYPE zpru_axc_query-runuuid,
+             query_uuid TYPE zpru_axc_query-queryuuid,
              full_key   TYPE abap_bool,
            END OF ts_query_keys.
 
     TYPES: BEGIN OF ts_step_keys,
-             query_uuid TYPE zpru_axc_step-query_uuid,
-             step_uuid  TYPE zpru_axc_step-step_uuid,
+             query_uuid TYPE zpru_axc_step-queryuuid,
+             step_uuid  TYPE zpru_axc_step-stepuuid,
              full_key   TYPE abap_bool,
            END OF ts_step_keys.
 
@@ -68,15 +68,15 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key>).
 
-      IF line_exists( zpru_cl_axc_buffer=>header_buffer[ instance-run_uuid = <ls_key>-run_uuid ] ).
+      IF line_exists( zpru_cl_axc_buffer=>header_buffer[ instance-runuuid = <ls_key>-run_uuid ] ).
         " do nothing
       ELSE.
         SELECT SINGLE @abap_true FROM zpru_axc_head
-          WHERE run_uuid = @<ls_key>-run_uuid
+          WHERE runuuid = @<ls_key>-run_uuid
           INTO @DATA(lv_exists).
         IF lv_exists = abap_true.
           SELECT SINGLE * FROM zpru_axc_head
-            WHERE run_uuid = @<ls_key>-run_uuid
+            WHERE runuuid = @<ls_key>-run_uuid
             INTO CORRESPONDING FIELDS OF @ls_line.
           IF sy-subrc = 0.
             APPEND VALUE #( instance = ls_line ) TO zpru_cl_axc_buffer=>header_buffer.
@@ -92,15 +92,15 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key_child>).
       IF <ls_key_child>-full_key = abap_true.
-        IF line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-query_uuid = <ls_key_child>-query_uuid ] ).
+        IF line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-queryuuid = <ls_key_child>-query_uuid ] ).
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_query
-            WHERE query_uuid = @<ls_key_child>-query_uuid
+            WHERE queryuuid = @<ls_key_child>-query_uuid
             INTO @DATA(lv_exists).
           IF lv_exists = abap_true.
             SELECT SINGLE * FROM zpru_axc_query
-              WHERE query_uuid = @<ls_key_child>-query_uuid
+              WHERE queryuuid = @<ls_key_child>-query_uuid
               INTO CORRESPONDING FIELDS OF @ls_child_line.
             IF sy-subrc = 0.
               APPEND VALUE #( instance = ls_child_line ) TO zpru_cl_axc_buffer=>query_buffer.
@@ -109,21 +109,21 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
         ENDIF.
 
       ELSE.
-        IF     line_exists( zpru_cl_axc_buffer=>header_buffer[ instance-run_uuid = <ls_key_child>-run_uuid ] )
-           AND VALUE #( zpru_cl_axc_buffer=>header_buffer[ instance-run_uuid = <ls_key_child>-run_uuid ]-deleted OPTIONAL ) IS NOT INITIAL.
+        IF     line_exists( zpru_cl_axc_buffer=>header_buffer[ instance-runuuid = <ls_key_child>-run_uuid ] )
+           AND VALUE #( zpru_cl_axc_buffer=>header_buffer[ instance-runuuid = <ls_key_child>-run_uuid ]-deleted OPTIONAL ) IS NOT INITIAL.
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_query
-            WHERE run_uuid = @<ls_key_child>-run_uuid
+            WHERE runuuid = @<ls_key_child>-run_uuid
             INTO @DATA(lv_exists_ch).
           IF lv_exists_ch = abap_true.
             SELECT * FROM zpru_axc_query
-              WHERE run_uuid = @<ls_key_child>-run_uuid
+              WHERE runuuid = @<ls_key_child>-run_uuid
               INTO CORRESPONDING FIELDS OF TABLE @lt_child_tab.
             IF sy-subrc = 0.
               LOOP AT lt_child_tab ASSIGNING FIELD-SYMBOL(<ls_child>).
-                IF NOT line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-run_uuid   = <ls_child>-run_uuid
-                                                                      instance-query_uuid = <ls_child>-query_uuid ] ).
+                IF NOT line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-runuuid   = <ls_child>-runuuid
+                                                                      instance-queryuuid = <ls_child>-queryuuid ] ).
                   APPEND VALUE #( instance = <ls_child> ) TO zpru_cl_axc_buffer=>query_buffer.
                 ENDIF.
               ENDLOOP.
@@ -140,15 +140,15 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key_child>).
       IF <ls_key_child>-full_key = abap_true.
-        IF line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-step_uuid  = <ls_key_child>-step_uuid ] ).
+        IF line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-stepuuid  = <ls_key_child>-step_uuid ] ).
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_step
-            WHERE step_uuid  = @<ls_key_child>-step_uuid
+            WHERE stepuuid  = @<ls_key_child>-step_uuid
             INTO @DATA(lv_exists).
           IF lv_exists = abap_true.
             SELECT SINGLE * FROM zpru_axc_step
-              WHERE step_uuid  = @<ls_key_child>-step_uuid
+              WHERE stepuuid  = @<ls_key_child>-step_uuid
               INTO CORRESPONDING FIELDS OF @ls_child_line.
             IF sy-subrc = 0.
               APPEND VALUE #( instance = ls_child_line ) TO zpru_cl_axc_buffer=>step_buffer.
@@ -157,21 +157,21 @@ CLASS zpru_cl_axc_buffer IMPLEMENTATION.
         ENDIF.
 
       ELSE.
-        IF     line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-query_uuid = <ls_key_child>-query_uuid ] )
-           AND VALUE #( zpru_cl_axc_buffer=>query_buffer[ instance-query_uuid = <ls_key_child>-query_uuid ]-deleted OPTIONAL ) IS NOT INITIAL.
+        IF     line_exists( zpru_cl_axc_buffer=>query_buffer[ instance-queryuuid = <ls_key_child>-query_uuid ] )
+           AND VALUE #( zpru_cl_axc_buffer=>query_buffer[ instance-queryuuid = <ls_key_child>-query_uuid ]-deleted OPTIONAL ) IS NOT INITIAL.
           " do nothing
         ELSE.
           SELECT SINGLE @abap_true FROM zpru_axc_step
-            WHERE query_uuid = @<ls_key_child>-query_uuid
+            WHERE queryuuid = @<ls_key_child>-query_uuid
             INTO @DATA(lv_exists_ch).
           IF lv_exists_ch = abap_true.
             SELECT * FROM zpru_axc_step
-              WHERE query_uuid = @<ls_key_child>-query_uuid
+              WHERE queryuuid = @<ls_key_child>-query_uuid
               INTO CORRESPONDING FIELDS OF TABLE @lt_child_tab.
             IF sy-subrc = 0.
               LOOP AT lt_child_tab ASSIGNING FIELD-SYMBOL(<ls_child>).
-                IF NOT line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-query_uuid = <ls_child>-query_uuid
-                                                                     instance-step_uuid  = <ls_child>-step_uuid ] ).
+                IF NOT line_exists( zpru_cl_axc_buffer=>step_buffer[ instance-queryuuid = <ls_child>-queryuuid
+                                                                     instance-stepuuid  = <ls_child>-stepuuid ] ).
                   APPEND VALUE #( instance = <ls_child> ) TO zpru_cl_axc_buffer=>step_buffer.
                 ENDIF.
               ENDLOOP.

@@ -45,8 +45,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     DATA(lv_count) = 0.
     LOOP AT mt_agent_message ASSIGNING FIELD-SYMBOL(<ls_search_count>).
-      IF lv_count < <ls_search_count>-sort_number.
-        lv_count = <ls_search_count>-sort_number.
+      IF lv_count < <ls_search_count>-sortnumber.
+        lv_count = <ls_search_count>-sortnumber.
       ENDIF.
     ENDLOOP.
 
@@ -54,23 +54,23 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     LOOP AT it_message ASSIGNING FIELD-SYMBOL(<ls_message>).
 
-      IF <ls_message>-message_time IS INITIAL.
-        <ls_message>-message_time = lv_now.
+      IF <ls_message>-messagetime IS INITIAL.
+        <ls_message>-messagetime = lv_now.
       ENDIF.
 
-      IF <ls_message>-message_type IS INITIAL.
-        <ls_message>-message_type = zpru_if_short_memory_provider=>cs_msg_type-info.
+      IF <ls_message>-messagetype IS INITIAL.
+        <ls_message>-messagetype = zpru_if_short_memory_provider=>cs_msg_type-info.
       ENDIF.
 
       APPEND INITIAL LINE TO mt_agent_message ASSIGNING FIELD-SYMBOL(<ls_target>).
       <ls_target> = <ls_message>.
-      <ls_target>-sort_number = lv_count.
+      <ls_target>-sortnumber = lv_count.
 
       lv_count += 1.
 
     ENDLOOP.
 
-    SORT mt_agent_message BY sort_number DESCENDING.
+    SORT mt_agent_message BY sortnumber DESCENDING.
 
     IF lines( mt_agent_message ) > mv_short_memory_size.
       LOOP AT mt_agent_message FROM mv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
@@ -80,7 +80,7 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
         APPEND INITIAL LINE TO lr_sort_number_r ASSIGNING FIELD-SYMBOL(<ls_sort_number_r>).
         <ls_sort_number_r>-sign   = 'I'.
         <ls_sort_number_r>-option = 'EQ'.
-        <ls_sort_number_r>-low    = <ls_discard>-sort_number.
+        <ls_sort_number_r>-low    = <ls_discard>-sortnumber.
       ENDLOOP.
 
       IF lt_message_2_discard IS NOT INITIAL.
@@ -109,7 +109,7 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
         eo_output = lo_discard_output.
 
         IF lr_sort_number_r IS NOT INITIAL.
-          DELETE mt_agent_message WHERE sort_number IN lr_sort_number_r.
+          DELETE mt_agent_message WHERE sortnumber IN lr_sort_number_r.
         ENDIF.
       ENDIF.
     ENDIF.

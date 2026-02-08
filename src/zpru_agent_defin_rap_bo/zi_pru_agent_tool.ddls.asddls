@@ -5,16 +5,17 @@
 @VDM.viewType: #BASIC
 define view entity ZI_PRU_AGENT_TOOL
   as select from zpru_agent_tool
-  association to one ZI_PRU_AGENT as _agent on _agent.AgentUuid = $projection.AgentUuid
+  association to one ZI_PRU_AGENT as _agent on _agent.AIPF7agentuuid = $projection.AIPF7AgentUuid
 {
-  key tool_uuid            as ToolUuid,
-      agent_uuid           as AgentUuid,
-      tool_name            as ToolName,
-      tool_provider        as ToolProvider,
-      step_type            as StepType,
-      tool_schema_provider as ToolSchemaProvider,
-      tool_info_provider   as ToolInfoProvider,
-      is_borrowed          as IsBorrowed,
-      is_transient         as IsTransient,
+  key tooluuid            as AIPF7ToolUuid,
+      agentuuid           as AIPF7AgentUuid,
+      toolname            as AIPF7ToolName,
+      toolprovider        as AIPF7ToolProvider,
+      steptype            as AIPF7StepType,
+      toolschemaprovider  as AIPF7ToolSchemaProvider,
+      toolinfoprovider    as AIPF7ToolInfoProvider,
+      isborrowed          as AIPF7ToolIsBorrowed,
+      istransient         as AIPF7ToolIsTransient
+      ,
       _agent
 }

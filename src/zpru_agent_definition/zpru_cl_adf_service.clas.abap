@@ -318,44 +318,44 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
 
-      IF    NOT line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_create>-agentuuid ] )
-         OR     line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_create>-agentuuid
+      IF    NOT line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid ] )
+         OR     line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
                                                                deleted             = abap_true ] ).
 
-        ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_create>-agentuuid
+        ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
                                                  deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
         IF sy-subrc = 0.
           DELETE zpru_cl_adf_buffer=>agent_buffer
-                 WHERE     instance-agent_uuid = <ls_buffer>-instance-agent_uuid
+                 WHERE     instance-agentuuid = <ls_buffer>-instance-agentuuid
                        AND deleted             = abap_true.
         ENDIF.
 
         APPEND VALUE #(
-            instance-agent_uuid             = <ls_create>-agentuuid
-            instance-agent_name             = <ls_create>-agentname
-            instance-agent_type             = COND #( WHEN <ls_create>-control-agenttype = abap_true
+            instance-agentuuid             = <ls_create>-agentuuid
+            instance-agentname             = <ls_create>-agentname
+            instance-agenttype             = COND #( WHEN <ls_create>-control-agenttype = abap_true
                                                       THEN <ls_create>-agenttype )
-            instance-decision_provider      = COND #( WHEN <ls_create>-control-decisionprovider = abap_true
+            instance-decisionprovider      = COND #( WHEN <ls_create>-control-decisionprovider = abap_true
                                                       THEN <ls_create>-decisionprovider )
-            instance-short_memory_provider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true
+            instance-shortmemoryprovider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true
                                                       THEN <ls_create>-shortmemoryprovider )
-            instance-long_memory_provider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true
+            instance-longmemoryprovider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true
                                                       THEN <ls_create>-longmemoryprovider )
-            instance-agent_info_provider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true
+            instance-agentinfoprovider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true
                                                       THEN <ls_create>-agentinfoprovider )
-            instance-system_prompt_provider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true
+            instance-systempromptprovider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true
                                                       THEN <ls_create>-systempromptprovider )
             instance-status                 = COND #( WHEN <ls_create>-control-status = abap_true
                                                       THEN <ls_create>-status )
-            instance-created_by             = COND #( WHEN <ls_create>-control-createdby = abap_true
+            instance-createdby             = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                       THEN <ls_create>-createdby )
-            instance-created_at             = COND #( WHEN <ls_create>-control-createdat = abap_true
+            instance-createdat             = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                       THEN <ls_create>-createdat )
-            instance-changed_by             = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
+            instance-changedby             = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
                                                       THEN <ls_create>-changedby )
-            instance-last_changed           = COND #( WHEN <ls_create>-control-lastchanged = abap_true
+            instance-lastchanged           = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                                       THEN <ls_create>-lastchanged )
-            instance-local_last_changed     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
+            instance-locallastchanged     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
                                                       THEN <ls_create>-locallastchanged )
             changed                         = abap_true
             deleted                         = abap_false ) TO zpru_cl_adf_buffer=>agent_buffer ASSIGNING FIELD-SYMBOL(<ls_just_added>).
@@ -410,38 +410,38 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_read>-agentuuid
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_read>-agentuuid
                                                deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0.
         CLEAR ls_out.
-        ls_out-agentuuid            = <ls_buffer>-instance-agent_uuid.
+        ls_out-agentuuid            = <ls_buffer>-instance-agentuuid.
 
         ls_out-agentname            = COND #( WHEN <ls_read>-control-agentname = abap_true
-                                              THEN <ls_buffer>-instance-agent_name ).
+                                              THEN <ls_buffer>-instance-agentname ).
         ls_out-agenttype            = COND #( WHEN <ls_read>-control-agenttype = abap_true
-                                              THEN <ls_buffer>-instance-agent_type ).
+                                              THEN <ls_buffer>-instance-agenttype ).
         ls_out-decisionprovider     = COND #( WHEN <ls_read>-control-decisionprovider = abap_true
-                                              THEN <ls_buffer>-instance-decision_provider ).
+                                              THEN <ls_buffer>-instance-decisionprovider ).
         ls_out-shortmemoryprovider  = COND #( WHEN <ls_read>-control-shortmemoryprovider = abap_true
-                                              THEN <ls_buffer>-instance-short_memory_provider ).
+                                              THEN <ls_buffer>-instance-shortmemoryprovider ).
         ls_out-longmemoryprovider   = COND #( WHEN <ls_read>-control-longmemoryprovider = abap_true
-                                              THEN <ls_buffer>-instance-long_memory_provider ).
+                                              THEN <ls_buffer>-instance-longmemoryprovider ).
         ls_out-agentinfoprovider    = COND #( WHEN <ls_read>-control-agentinfoprovider = abap_true
-                                              THEN <ls_buffer>-instance-agent_info_provider ).
+                                              THEN <ls_buffer>-instance-agentinfoprovider ).
         ls_out-systempromptprovider = COND #( WHEN <ls_read>-control-systempromptprovider = abap_true
-                                              THEN <ls_buffer>-instance-system_prompt_provider ).
+                                              THEN <ls_buffer>-instance-systempromptprovider ).
         ls_out-status               = COND #( WHEN <ls_read>-control-status = abap_true
                                               THEN <ls_buffer>-instance-status ).
         ls_out-createdby            = COND #( WHEN <ls_read>-control-createdby = abap_true
-                                              THEN <ls_buffer>-instance-created_by ).
+                                              THEN <ls_buffer>-instance-createdby ).
         ls_out-createdat            = COND #( WHEN <ls_read>-control-createdat = abap_true
-                                              THEN <ls_buffer>-instance-created_at ).
+                                              THEN <ls_buffer>-instance-createdat ).
         ls_out-changedby            = COND #( WHEN <ls_read>-control-changedby = abap_true
-                                              THEN <ls_buffer>-instance-changed_by ).
+                                              THEN <ls_buffer>-instance-changedby ).
         ls_out-lastchanged          = COND #( WHEN <ls_read>-control-lastchanged = abap_true
-                                              THEN <ls_buffer>-instance-last_changed ).
+                                              THEN <ls_buffer>-instance-lastchanged ).
         ls_out-locallastchanged     = COND #( WHEN <ls_read>-control-locallastchanged = abap_true
-                                              THEN <ls_buffer>-instance-local_last_changed ).
+                                              THEN <ls_buffer>-instance-locallastchanged ).
 
         APPEND ls_out TO et_agent.
 
@@ -478,48 +478,48 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_update>-agentuuid
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_update>-agentuuid
                                                deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0.
-        <ls_buffer>-instance-agent_name             = COND #( WHEN <ls_update>-control-agentname = abap_true
+        <ls_buffer>-instance-agentname             = COND #( WHEN <ls_update>-control-agentname = abap_true
                                                               THEN <ls_update>-agentname
-                                                              ELSE <ls_buffer>-instance-agent_name ).
-        <ls_buffer>-instance-agent_type             = COND #( WHEN <ls_update>-control-agenttype = abap_true
+                                                              ELSE <ls_buffer>-instance-agentname ).
+        <ls_buffer>-instance-agenttype             = COND #( WHEN <ls_update>-control-agenttype = abap_true
                                                               THEN <ls_update>-agenttype
-                                                              ELSE <ls_buffer>-instance-agent_type ).
-        <ls_buffer>-instance-decision_provider      = COND #( WHEN <ls_update>-control-decisionprovider = abap_true
+                                                              ELSE <ls_buffer>-instance-agenttype ).
+        <ls_buffer>-instance-decisionprovider      = COND #( WHEN <ls_update>-control-decisionprovider = abap_true
                                                               THEN <ls_update>-decisionprovider
-                                                              ELSE <ls_buffer>-instance-decision_provider ).
-        <ls_buffer>-instance-short_memory_provider  = COND #( WHEN <ls_update>-control-shortmemoryprovider = abap_true
+                                                              ELSE <ls_buffer>-instance-decisionprovider ).
+        <ls_buffer>-instance-shortmemoryprovider  = COND #( WHEN <ls_update>-control-shortmemoryprovider = abap_true
                                                               THEN <ls_update>-shortmemoryprovider
-                                                              ELSE <ls_buffer>-instance-short_memory_provider ).
-        <ls_buffer>-instance-long_memory_provider   = COND #( WHEN <ls_update>-control-longmemoryprovider = abap_true
+                                                              ELSE <ls_buffer>-instance-shortmemoryprovider ).
+        <ls_buffer>-instance-longmemoryprovider   = COND #( WHEN <ls_update>-control-longmemoryprovider = abap_true
                                                               THEN <ls_update>-longmemoryprovider
-                                                              ELSE <ls_buffer>-instance-long_memory_provider ).
-        <ls_buffer>-instance-agent_info_provider    = COND #( WHEN <ls_update>-control-agentinfoprovider = abap_true
+                                                              ELSE <ls_buffer>-instance-longmemoryprovider ).
+        <ls_buffer>-instance-agentinfoprovider    = COND #( WHEN <ls_update>-control-agentinfoprovider = abap_true
                                                               THEN <ls_update>-agentinfoprovider
-                                                              ELSE <ls_buffer>-instance-agent_info_provider ).
-        <ls_buffer>-instance-system_prompt_provider = COND #( WHEN <ls_update>-control-systempromptprovider = abap_true
+                                                              ELSE <ls_buffer>-instance-agentinfoprovider ).
+        <ls_buffer>-instance-systempromptprovider = COND #( WHEN <ls_update>-control-systempromptprovider = abap_true
                                                               THEN <ls_update>-systempromptprovider
-                                                              ELSE <ls_buffer>-instance-system_prompt_provider ).
+                                                              ELSE <ls_buffer>-instance-systempromptprovider ).
         <ls_buffer>-instance-status                 = COND #( WHEN <ls_update>-control-status = abap_true
                                                               THEN <ls_update>-status
                                                               ELSE <ls_buffer>-instance-status ).
-        <ls_buffer>-instance-created_by             = COND #( WHEN <ls_update>-control-createdby = abap_true
+        <ls_buffer>-instance-createdby             = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                               THEN <ls_update>-createdby
-                                                              ELSE <ls_buffer>-instance-created_by ).
-        <ls_buffer>-instance-created_at             = COND #( WHEN <ls_update>-control-createdat = abap_true
+                                                              ELSE <ls_buffer>-instance-createdby ).
+        <ls_buffer>-instance-createdat             = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                               THEN <ls_update>-createdat
-                                                              ELSE <ls_buffer>-instance-created_at ).
-        <ls_buffer>-instance-changed_by             = COND #( WHEN <ls_update>-control-changedby = abap_true
+                                                              ELSE <ls_buffer>-instance-createdat ).
+        <ls_buffer>-instance-changedby             = COND #( WHEN <ls_update>-control-changedby = abap_true
                                                               THEN <ls_update>-changedby
-                                                              ELSE <ls_buffer>-instance-changed_by ).
-        <ls_buffer>-instance-last_changed           = COND #( WHEN <ls_update>-control-lastchanged = abap_true
+                                                              ELSE <ls_buffer>-instance-changedby ).
+        <ls_buffer>-instance-lastchanged           = COND #( WHEN <ls_update>-control-lastchanged = abap_true
                                                               THEN <ls_update>-lastchanged
-                                                              ELSE <ls_buffer>-instance-last_changed ).
-        <ls_buffer>-instance-local_last_changed     = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
+                                                              ELSE <ls_buffer>-instance-lastchanged ).
+        <ls_buffer>-instance-locallastchanged     = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
                                                               THEN <ls_update>-locallastchanged
-                                                              ELSE <ls_buffer>-instance-local_last_changed ).
+                                                              ELSE <ls_buffer>-instance-locallastchanged ).
 
         <ls_buffer>-changed = abap_true.
         <ls_buffer>-deleted = abap_false.
@@ -575,14 +575,14 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_delete>-agentuuid
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_delete>-agentuuid
                                                deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0.
         <ls_buffer>-deleted = abap_true.
         <ls_buffer>-changed = abap_true.
 
         LOOP AT zpru_cl_adf_buffer=>tool_buffer ASSIGNING FIELD-SYMBOL(<ls_tool_del>)
-             WHERE instance-agent_uuid = <ls_buffer>-instance-agent_uuid.
+             WHERE instance-agentuuid = <ls_buffer>-instance-agentuuid.
           <ls_tool_del>-changed = abap_true.
           <ls_tool_del>-deleted = abap_true.
         ENDLOOP.
@@ -643,42 +643,42 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_create>-agentuuid
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
                                                " TODO: variable is assigned but never used (ABAP cleaner)
                                                deleted             = abap_false ] TO FIELD-SYMBOL(<ls_parent>).
       IF sy-subrc = 0.
-        IF    NOT line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_create>-agentuuid
-                                                                instance-tool_uuid  = <ls_create>-tooluuid ] )
-           OR     line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_create>-agentuuid
-                                                                instance-tool_uuid  = <ls_create>-tooluuid
+        IF    NOT line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
+                                                                instance-tooluuid  = <ls_create>-tooluuid ] )
+           OR     line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
+                                                                instance-tooluuid  = <ls_create>-tooluuid
                                                                 deleted             = abap_true ] ).
 
-          ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_create>-agentuuid
-                                                  instance-tool_uuid  = <ls_create>-tooluuid
+          ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
+                                                  instance-tooluuid  = <ls_create>-tooluuid
                                                   deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
           IF sy-subrc = 0.
             DELETE zpru_cl_adf_buffer=>tool_buffer
-                   WHERE     instance-agent_uuid = <ls_buffer>-instance-agent_uuid
-                         AND instance-tool_uuid  = <ls_buffer>-instance-tool_uuid
+                   WHERE     instance-agentuuid = <ls_buffer>-instance-agentuuid
+                         AND instance-tooluuid  = <ls_buffer>-instance-tooluuid
                          AND deleted             = abap_true.
           ENDIF.
 
           APPEND VALUE #(
-              instance-tool_uuid            = <ls_create>-tooluuid
-              instance-agent_uuid           = <ls_create>-agentuuid
-              instance-tool_name            = COND #( WHEN <ls_create>-control-toolname = abap_true
+              instance-tooluuid            = <ls_create>-tooluuid
+              instance-agentuuid           = <ls_create>-agentuuid
+              instance-toolname            = COND #( WHEN <ls_create>-control-toolname = abap_true
                                                       THEN <ls_create>-toolname )
-              instance-tool_provider        = COND #( WHEN <ls_create>-control-toolprovider = abap_true
+              instance-toolprovider        = COND #( WHEN <ls_create>-control-toolprovider = abap_true
                                                       THEN <ls_create>-toolprovider )
-              instance-step_type            = COND #( WHEN <ls_create>-control-steptype = abap_true
+              instance-steptype            = COND #( WHEN <ls_create>-control-steptype = abap_true
                                                       THEN <ls_create>-steptype )
-              instance-tool_schema_provider = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true
+              instance-toolschemaprovider = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true
                                                       THEN <ls_create>-toolschemaprovider )
-              instance-tool_info_provider   = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true
+              instance-toolinfoprovider   = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true
                                                       THEN <ls_create>-toolinfoprovider )
-              instance-is_borrowed          = COND #( WHEN <ls_create>-control-isborrowed = abap_true
+              instance-isborrowed          = COND #( WHEN <ls_create>-control-isborrowed = abap_true
                                                       THEN <ls_create>-isborrowed )
-              instance-is_transient         = COND #( WHEN <ls_create>-control-istransient = abap_true
+              instance-istransient         = COND #( WHEN <ls_create>-control-istransient = abap_true
                                                       THEN <ls_create>-istransient )
               changed                       = abap_true
               deleted                       = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
@@ -755,27 +755,27 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_h>).
       LOOP AT zpru_cl_adf_buffer=>tool_buffer ASSIGNING FIELD-SYMBOL(<ls_t_buf>)
-           WHERE     instance-agent_uuid = <ls_h>-agentuuid
+           WHERE     instance-agentuuid = <ls_h>-agentuuid
                  AND deleted             = abap_false.
 
         CLEAR ls_out.
-        ls_out-tooluuid           = <ls_t_buf>-instance-tool_uuid.
+        ls_out-tooluuid           = <ls_t_buf>-instance-tooluuid.
         ls_out-agentuuid          = COND #( WHEN <ls_h>-control-agentuuid = abap_true
-                                            THEN <ls_t_buf>-instance-agent_uuid ).
+                                            THEN <ls_t_buf>-instance-agentuuid ).
         ls_out-toolname           = COND #( WHEN <ls_h>-control-toolname = abap_true
-                                            THEN <ls_t_buf>-instance-tool_name ).
+                                            THEN <ls_t_buf>-instance-toolname ).
         ls_out-toolprovider       = COND #( WHEN <ls_h>-control-toolprovider = abap_true
-                                            THEN <ls_t_buf>-instance-tool_provider ).
+                                            THEN <ls_t_buf>-instance-toolprovider ).
         ls_out-steptype           = COND #( WHEN <ls_h>-control-steptype = abap_true
-                                            THEN <ls_t_buf>-instance-step_type ).
+                                            THEN <ls_t_buf>-instance-steptype ).
         ls_out-toolschemaprovider = COND #( WHEN <ls_h>-control-toolschemaprovider = abap_true
-                                            THEN <ls_t_buf>-instance-tool_schema_provider ).
+                                            THEN <ls_t_buf>-instance-toolschemaprovider ).
         ls_out-toolinfoprovider   = COND #( WHEN <ls_h>-control-toolinfoprovider = abap_true
-                                            THEN <ls_t_buf>-instance-tool_info_provider ).
+                                            THEN <ls_t_buf>-instance-toolinfoprovider ).
         ls_out-isborrowed         = COND #( WHEN <ls_h>-control-isborrowed = abap_true
-                                            THEN <ls_t_buf>-instance-is_borrowed ).
+                                            THEN <ls_t_buf>-instance-isborrowed ).
         ls_out-istransient        = COND #( WHEN <ls_h>-control-istransient = abap_true
-                                            THEN <ls_t_buf>-instance-is_transient ).
+                                            THEN <ls_t_buf>-instance-istransient ).
 
         APPEND ls_out TO et_tool.
       ENDLOOP.
@@ -807,7 +807,7 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                      full_key   = abap_true ) ) ).
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_read>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_read>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
       IF sy-subrc = 0 AND <ls_parent>-deleted = abap_true.
         APPEND VALUE #( agentuuid = <ls_read>-agentuuid
                         tooluuid  = <ls_read>-tooluuid
@@ -816,8 +816,8 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_read>-agentuuid
-                                              instance-tool_uuid  = <ls_read>-tooluuid ] TO FIELD-SYMBOL(<ls_buffer>).
+      ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_read>-agentuuid
+                                              instance-tooluuid  = <ls_read>-tooluuid ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0.
         IF <ls_buffer>-deleted = abap_true.
           APPEND VALUE #( agentuuid = <ls_read>-agentuuid
@@ -828,23 +828,23 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         ENDIF.
 
         CLEAR ls_out.
-        ls_out-tooluuid           = <ls_buffer>-instance-tool_uuid.
+        ls_out-tooluuid           = <ls_buffer>-instance-tooluuid.
         ls_out-agentuuid          = COND #( WHEN <ls_read>-control-agentuuid = abap_true
-                                            THEN <ls_buffer>-instance-agent_uuid ).
+                                            THEN <ls_buffer>-instance-agentuuid ).
         ls_out-toolname           = COND #( WHEN <ls_read>-control-toolname = abap_true
-                                            THEN <ls_buffer>-instance-tool_name ).
+                                            THEN <ls_buffer>-instance-toolname ).
         ls_out-toolprovider       = COND #( WHEN <ls_read>-control-toolprovider = abap_true
-                                            THEN <ls_buffer>-instance-tool_provider ).
+                                            THEN <ls_buffer>-instance-toolprovider ).
         ls_out-steptype           = COND #( WHEN <ls_read>-control-steptype = abap_true
-                                            THEN <ls_buffer>-instance-step_type ).
+                                            THEN <ls_buffer>-instance-steptype ).
         ls_out-toolschemaprovider = COND #( WHEN <ls_read>-control-toolschemaprovider = abap_true
-                                            THEN <ls_buffer>-instance-tool_schema_provider ).
+                                            THEN <ls_buffer>-instance-toolschemaprovider ).
         ls_out-toolinfoprovider   = COND #( WHEN <ls_read>-control-toolinfoprovider = abap_true
-                                            THEN <ls_buffer>-instance-tool_info_provider ).
+                                            THEN <ls_buffer>-instance-toolinfoprovider ).
         ls_out-isborrowed         = COND #( WHEN <ls_read>-control-isborrowed = abap_true
-                                            THEN <ls_buffer>-instance-is_borrowed ).
+                                            THEN <ls_buffer>-instance-isborrowed ).
         ls_out-istransient        = COND #( WHEN <ls_read>-control-istransient = abap_true
-                                            THEN <ls_buffer>-instance-is_transient ).
+                                            THEN <ls_buffer>-instance-istransient ).
 
         APPEND ls_out TO et_tool.
 
@@ -888,7 +888,7 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_update>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_update>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
       IF sy-subrc = 0 AND <ls_parent>-deleted = abap_true.
         APPEND VALUE #( agentuuid = <ls_update>-agentuuid
                         tooluuid  = <ls_update>-tooluuid
@@ -898,30 +898,30 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_update>-agentuuid
-                                              instance-tool_uuid  = <ls_update>-tooluuid ] TO FIELD-SYMBOL(<ls_buffer>).
+      ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_update>-agentuuid
+                                              instance-tooluuid  = <ls_update>-tooluuid ] TO FIELD-SYMBOL(<ls_buffer>).
       IF sy-subrc = 0 AND <ls_buffer>-deleted = abap_false.
-        <ls_buffer>-instance-tool_name            = COND #( WHEN <ls_update>-control-toolname = abap_true
+        <ls_buffer>-instance-toolname            = COND #( WHEN <ls_update>-control-toolname = abap_true
                                                             THEN <ls_update>-toolname
-                                                            ELSE <ls_buffer>-instance-tool_name ).
-        <ls_buffer>-instance-tool_provider        = COND #( WHEN <ls_update>-control-toolprovider = abap_true
+                                                            ELSE <ls_buffer>-instance-toolname ).
+        <ls_buffer>-instance-toolprovider        = COND #( WHEN <ls_update>-control-toolprovider = abap_true
                                                             THEN <ls_update>-toolprovider
-                                                            ELSE <ls_buffer>-instance-tool_provider ).
-        <ls_buffer>-instance-step_type            = COND #( WHEN <ls_update>-control-steptype = abap_true
+                                                            ELSE <ls_buffer>-instance-toolprovider ).
+        <ls_buffer>-instance-steptype            = COND #( WHEN <ls_update>-control-steptype = abap_true
                                                             THEN <ls_update>-steptype
-                                                            ELSE <ls_buffer>-instance-step_type ).
-        <ls_buffer>-instance-tool_schema_provider = COND #( WHEN <ls_update>-control-toolschemaprovider = abap_true
+                                                            ELSE <ls_buffer>-instance-steptype ).
+        <ls_buffer>-instance-toolschemaprovider = COND #( WHEN <ls_update>-control-toolschemaprovider = abap_true
                                                             THEN <ls_update>-toolschemaprovider
-                                                            ELSE <ls_buffer>-instance-tool_schema_provider ).
-        <ls_buffer>-instance-tool_info_provider   = COND #( WHEN <ls_update>-control-toolinfoprovider = abap_true
+                                                            ELSE <ls_buffer>-instance-toolschemaprovider ).
+        <ls_buffer>-instance-toolinfoprovider   = COND #( WHEN <ls_update>-control-toolinfoprovider = abap_true
                                                             THEN <ls_update>-toolinfoprovider
-                                                            ELSE <ls_buffer>-instance-tool_info_provider ).
-        <ls_buffer>-instance-is_borrowed          = COND #( WHEN <ls_update>-control-isborrowed = abap_true
+                                                            ELSE <ls_buffer>-instance-toolinfoprovider ).
+        <ls_buffer>-instance-isborrowed          = COND #( WHEN <ls_update>-control-isborrowed = abap_true
                                                             THEN <ls_update>-isborrowed
-                                                            ELSE <ls_buffer>-instance-is_borrowed ).
-        <ls_buffer>-instance-is_transient         = COND #( WHEN <ls_update>-control-istransient = abap_true
+                                                            ELSE <ls_buffer>-instance-isborrowed ).
+        <ls_buffer>-instance-istransient         = COND #( WHEN <ls_update>-control-istransient = abap_true
                                                             THEN <ls_update>-istransient
-                                                            ELSE <ls_buffer>-instance-is_transient ).
+                                                            ELSE <ls_buffer>-instance-istransient ).
         <ls_buffer>-changed = abap_true.
 
       ELSE.
@@ -975,13 +975,13 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agent_uuid = <ls_delete>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
+      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_delete>-agentuuid ] TO FIELD-SYMBOL(<ls_parent>).
       IF sy-subrc = 0 AND <ls_parent>-deleted = abap_true.
         " Parent deleted implies child deleted.
       ELSE.
 
-        ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agent_uuid = <ls_delete>-agentuuid
-                                                instance-tool_uuid  = <ls_delete>-tooluuid
+        ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_delete>-agentuuid
+                                                instance-tooluuid  = <ls_delete>-tooluuid
                                                 deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
         IF sy-subrc = 0.
           <ls_buffer>-deleted = abap_true.

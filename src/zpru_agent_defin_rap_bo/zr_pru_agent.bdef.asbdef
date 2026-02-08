@@ -6,18 +6,18 @@ define behavior for ZR_PRU_AGENT alias Agent
 persistent table zpru_agent
 extensible
 draft table zpru_agent_d
-etag master LocalLastChanged
-lock master total etag LastChanged
+etag master AIPF7LocalLastChanged
+lock master total etag AIPF7LastChanged
 authorization master ( global )
 {
-  field ( numbering : managed ) AgentUUID;
+  field ( numbering : managed ) AIPF7AgentUUID;
 
   field ( readonly )
-  LastChanged,
-  LocalLastChanged;
+  AIPF7LastChanged,
+  AIPF7LocalLastChanged;
 
   field ( readonly )
-  AgentUUID;
+  AIPF7AgentUUID;
 
   association _tool { create; with draft; }
 
@@ -33,20 +33,20 @@ authorization master ( global )
 
   mapping for zpru_agent corresponding extensible
     {
-      AgentUUID            = agent_uuid;
-      AgentType            = agent_type;
-      AgentName            = agent_name;
-      DecisionProvider     = decision_provider;
-      ShortMemoryProvider  = short_memory_provider;
-      LongMemoryProvider   = long_memory_provider;
-      AgentInfoProvider    = agent_info_provider;
-      SystemPromptProvider = system_prompt_provider;
-      Status               = status;
-      CreatedBy            = created_by;
-      CreatedAt            = created_at;
-      ChangedBy            = changed_by;
-      LastChanged          = last_changed;
-      LocalLastChanged     = local_last_changed;
+      AIPF7AgentUUID            = agentuuid;
+      AIPF7AgentType            = agenttype;
+      AIPF7AgentName            = agentname;
+      AIPF7DecisionProvider     = decisionprovider;
+      AIPF7ShortMemoryProvider  = shortmemoryprovider;
+      AIPF7LongMemoryProvider   = longmemoryprovider;
+      AIPF7AgentInfoProvider    = agentinfoprovider;
+      AIPF7SystemPromptProvider = systempromptprovider;
+      AIPF7AgentStatus          = status;
+      AIPF7CreatedBy            = createdby;
+      AIPF7CreatedAt            = createdat;
+      AIPF7ChangedBy            = changedby;
+      AIPF7LastChanged          = lastchanged;
+      AIPF7LocalLastChanged     = locallastchanged;
     }
 
 }
@@ -60,8 +60,8 @@ lock dependent by _agent
 authorization dependent by _agent
 {
 
-  field ( numbering : managed ) ToolUuid;
-  field ( readonly ) ToolUuid, AgentUuid;
+  field ( numbering : managed ) AIPF7ToolUuid;
+  field ( readonly ) AIPF7ToolUuid, AIPF7AgentUuid;
 
   update;
   delete;
@@ -70,14 +70,14 @@ authorization dependent by _agent
 
   mapping for zpru_agent_tool corresponding extensible
     {
-      ToolUuid            = tool_uuid;
-      AgentUuid           = agent_uuid;
-      ToolName            = tool_name;
-      ToolProvider        = tool_provider;
-      StepType            = step_type;
-      ToolSchemaProvider = tool_schema_provider;
-      ToolInfoProvider    = tool_info_provider;
-      IsBorrowed          = is_borrowed;
-      IsTransient         = is_transient;
+      AIPF7ToolUuid           = tooluuid;
+      AIPF7AgentUuid          = agentuuid;
+      AIPF7ToolName           = toolname;
+      AIPF7ToolProvider       = toolprovider;
+      AIPF7StepType           = steptype;
+      AIPF7ToolSchemaProvider = toolschemaprovider;
+      AIPF7ToolInfoProvider   = toolinfoprovider;
+      AIPF7ToolIsBorrowed     = isborrowed;
+      AIPF7ToolIsTransient    = istransient;
     }
 }
