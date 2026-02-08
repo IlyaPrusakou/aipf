@@ -29,14 +29,14 @@ CLASS zpru_cl_msum_precheck IMPLEMENTATION.
     LOOP AT it_msum_create_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
 
-      IF ls_line-summary_uuid IS INITIAL.
+      IF ls_line-summaryuuid IS INITIAL.
         APPEND INITIAL LINE TO cs_failed-msum ASSIGNING FIELD-SYMBOL(<ls_msum_failed>).
-        <ls_msum_failed>-summary_uuid = ls_line-summary_uuid.
+        <ls_msum_failed>-summaryuuid = ls_line-summaryuuid.
         <ls_msum_failed>-fail         = zpru_if_agent_frw=>cs_fail_cause-unspecific.
         <ls_msum_failed>-create       = abap_true.
 
         APPEND INITIAL LINE TO cs_reported-msum ASSIGNING FIELD-SYMBOL(<ls_msum_reported>).
-        <ls_msum_reported>-summary_uuid = ls_line-summary_uuid.
+        <ls_msum_reported>-summaryuuid = ls_line-summaryuuid.
         <ls_msum_reported>-create       = abap_true.
         <ls_msum_reported>-msg          = lo_util->new_message(
                                               iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition

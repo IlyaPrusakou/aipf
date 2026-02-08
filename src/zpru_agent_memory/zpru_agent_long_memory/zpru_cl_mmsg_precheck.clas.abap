@@ -25,14 +25,14 @@ CLASS zpru_cl_mmsg_precheck IMPLEMENTATION.
     LOOP AT it_mmsg_create_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
 
-      IF ls_line-message_uuid IS INITIAL.
+      IF ls_line-messageuuid IS INITIAL.
         APPEND INITIAL LINE TO cs_failed-mmsg ASSIGNING FIELD-SYMBOL(<ls_mmsg_failed>).
-        <ls_mmsg_failed>-message_uuid = ls_line-message_uuid.
+        <ls_mmsg_failed>-messageuuid = ls_line-messageuuid.
         <ls_mmsg_failed>-fail         = zpru_if_agent_frw=>cs_fail_cause-unspecific.
         <ls_mmsg_failed>-create       = abap_true.
 
         APPEND INITIAL LINE TO cs_reported-mmsg ASSIGNING FIELD-SYMBOL(<ls_mmsg_reported>).
-        <ls_mmsg_reported>-message_uuid = ls_line-message_uuid.
+        <ls_mmsg_reported>-messageuuid = ls_line-messageuuid.
         <ls_mmsg_reported>-create       = abap_true.
         <ls_mmsg_reported>-msg          = lo_util->new_message(
                                               iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_definition

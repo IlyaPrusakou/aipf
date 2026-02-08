@@ -44,22 +44,22 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
     LOOP AT lt_messages ASSIGNING FIELD-SYMBOL(<ls_db_messages>).
       APPEND INITIAL LINE TO et_mem_sum ASSIGNING FIELD-SYMBOL(<ls_target>).
-      <ls_target>-summaryuuid = <ls_db_messages>-summary_uuid.
+      <ls_target>-summaryuuid = <ls_db_messages>-summaryuuid.
       <ls_target>-content     = lo_util->deserialize_xstring_2_json( <ls_db_messages>-content ).
-      <ls_target>-summarycid  = <ls_db_messages>-summary_cid.
+      <ls_target>-summarycid  = <ls_db_messages>-summarycid.
       <ls_target>-stage       = <ls_db_messages>-stage.
-      <ls_target>-substage    = <ls_db_messages>-sub_stage.
+      <ls_target>-substage    = <ls_db_messages>-substage.
       <ls_target>-namespace   = <ls_db_messages>-namespace.
-      <ls_target>-username    = <ls_db_messages>-user_name.
-      <ls_target>-agentuuid   = <ls_db_messages>-agent_uuid.
-      <ls_target>-runuuid     = <ls_db_messages>-run_uuid.
-      <ls_target>-queryuuid   = <ls_db_messages>-query_uuid.
-      <ls_target>-stepuuid    = <ls_db_messages>-step_uuid.
-      <ls_target>-messagetime = <ls_db_messages>-message_time.
-      <ls_target>-createdby   = <ls_db_messages>-created_by.
-      <ls_target>-createdat   = <ls_db_messages>-created_at.
-      <ls_target>-changedby   = <ls_db_messages>-changed_by.
-      <ls_target>-changedat   = <ls_db_messages>-changed_at.
+      <ls_target>-username    = <ls_db_messages>-username.
+      <ls_target>-agentuuid   = <ls_db_messages>-agentuuid.
+      <ls_target>-runuuid     = <ls_db_messages>-runuuid.
+      <ls_target>-queryuuid   = <ls_db_messages>-queryuuid.
+      <ls_target>-stepuuid    = <ls_db_messages>-stepuuid.
+      <ls_target>-messagetime = <ls_db_messages>-messagetime.
+      <ls_target>-createdby   = <ls_db_messages>-createdby.
+      <ls_target>-createdat   = <ls_db_messages>-createdat.
+      <ls_target>-changedby   = <ls_db_messages>-changedby.
+      <ls_target>-changedat   = <ls_db_messages>-changedat.
 
     ENDLOOP.
 
@@ -85,23 +85,23 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
 
     LOOP AT lt_messages ASSIGNING FIELD-SYMBOL(<ls_db_messages>).
       APPEND INITIAL LINE TO et_mem_msg ASSIGNING FIELD-SYMBOL(<ls_target>).
-      <ls_target>-messageuuid = <ls_db_messages>-message_uuid.
+      <ls_target>-messageuuid = <ls_db_messages>-messageuuid.
       <ls_target>-content     = lo_util->deserialize_xstring_2_json( <ls_db_messages>-content ).
-      <ls_target>-messagetype = <ls_db_messages>-message_type.
-      <ls_target>-messagecid  = <ls_db_messages>-message_cid.
+      <ls_target>-messagetype = <ls_db_messages>-messagetype.
+      <ls_target>-messagecid  = <ls_db_messages>-messagecid.
       <ls_target>-stage       = <ls_db_messages>-stage.
-      <ls_target>-substage    = <ls_db_messages>-sub_stage.
+      <ls_target>-substage    = <ls_db_messages>-substage.
       <ls_target>-namespace   = <ls_db_messages>-namespace.
-      <ls_target>-username    = <ls_db_messages>-user_name.
-      <ls_target>-agentuuid   = <ls_db_messages>-agent_uuid.
-      <ls_target>-runuuid     = <ls_db_messages>-run_uuid.
-      <ls_target>-queryuuid   = <ls_db_messages>-query_uuid.
-      <ls_target>-stepuuid    = <ls_db_messages>-step_uuid.
-      <ls_target>-messagetime = <ls_db_messages>-message_time.
-      <ls_target>-createdby   = <ls_db_messages>-created_by.
-      <ls_target>-createdat   = <ls_db_messages>-created_at.
-      <ls_target>-changedby   = <ls_db_messages>-changed_by.
-      <ls_target>-changedat   = <ls_db_messages>-changed_at.
+      <ls_target>-username    = <ls_db_messages>-username.
+      <ls_target>-agentuuid   = <ls_db_messages>-agentuuid.
+      <ls_target>-runuuid     = <ls_db_messages>-runuuid.
+      <ls_target>-queryuuid   = <ls_db_messages>-queryuuid.
+      <ls_target>-stepuuid    = <ls_db_messages>-stepuuid.
+      <ls_target>-messagetime = <ls_db_messages>-messagetime.
+      <ls_target>-createdby   = <ls_db_messages>-createdby.
+      <ls_target>-createdat   = <ls_db_messages>-createdat.
+      <ls_target>-changedby   = <ls_db_messages>-changedby.
+      <ls_target>-changedat   = <ls_db_messages>-changedat.
 
     ENDLOOP.
   ENDMETHOD.
@@ -240,29 +240,29 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
       <ls_message_db> = CORRESPONDING #( <ls_message> EXCEPT content ).
 
       TRY.
-          <ls_message_db>-message_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+          <ls_message_db>-messageuuid = cl_system_uuid=>create_uuid_x16_static( ).
         CATCH cx_uuid_error.
           ASSERT 1 = 2.
       ENDTRY.
 
-      IF <ls_message_db>-message_cid IS INITIAL.
-        <ls_message_db>-message_cid = |{ sy-uname }-{ lv_now }-{ lv_count }|.
+      IF <ls_message_db>-messagecid IS INITIAL.
+        <ls_message_db>-messagecid = |{ sy-uname }-{ lv_now }-{ lv_count }|.
       ENDIF.
 
-      IF <ls_message_db>-user_name IS INITIAL.
-        <ls_message_db>-user_name = sy-uname.
+      IF <ls_message_db>-username IS INITIAL.
+        <ls_message_db>-username = sy-uname.
       ENDIF.
 
-      IF <ls_message_db>-message_type IS INITIAL.
-        <ls_message_db>-message_type = zpru_if_short_memory_provider=>cs_msg_type-info.
+      IF <ls_message_db>-messagetype IS INITIAL.
+        <ls_message_db>-messagetype = zpru_if_short_memory_provider=>cs_msg_type-info.
       ENDIF.
 
       <ls_message_db>-content    = lo_util->serialize_json_2_xstring( <ls_message>-content ).
 
-      <ls_message_db>-created_by = sy-uname.
-      <ls_message_db>-created_at = lv_now.
-      <ls_message_db>-changed_by = sy-uname.
-      <ls_message_db>-changed_at = lv_now.
+      <ls_message_db>-createdby = sy-uname.
+      <ls_message_db>-createdat = lv_now.
+      <ls_message_db>-changedby = sy-uname.
+      <ls_message_db>-changedat = lv_now.
 
       lv_count += 1.
     ENDLOOP.

@@ -58,47 +58,47 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
-      <ls_create_in>-%cid        = <ls_create>-summary_uuid.
-      <ls_create_in>-SummaryUUID = <ls_create>-summary_uuid.
+      <ls_create_in>-%cid        = <ls_create>-summaryuuid.
+      <ls_create_in>-SummaryUUID = <ls_create>-summaryuuid.
       <ls_create_in>-Content     = COND #( WHEN <ls_create>-control-content = abap_true THEN <ls_create>-content ).
       <ls_create_in>-%control-Content = COND #( WHEN <ls_create>-control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-SummaryCid = COND #( WHEN <ls_create>-control-summary_cid = abap_true THEN <ls_create>-summary_cid ).
-      <ls_create_in>-%control-SummaryCid = COND #( WHEN <ls_create>-control-summary_cid = abap_true
+      <ls_create_in>-SummaryCid = COND #( WHEN <ls_create>-control-summarycid = abap_true THEN <ls_create>-summarycid ).
+      <ls_create_in>-%control-SummaryCid = COND #( WHEN <ls_create>-control-summarycid = abap_true
                                                    THEN if_abap_behv=>mk-on ).
       <ls_create_in>-Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN <ls_create>-stage ).
       <ls_create_in>-%control-Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-SubStage = COND #( WHEN <ls_create>-control-sub_stage = abap_true THEN <ls_create>-sub_stage ).
-      <ls_create_in>-%control-SubStage = COND #( WHEN <ls_create>-control-sub_stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN <ls_create>-substage ).
+      <ls_create_in>-%control-SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
       <ls_create_in>-Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true THEN <ls_create>-namespace ).
       <ls_create_in>-%control-Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-UserName = COND #( WHEN <ls_create>-control-user_name = abap_true THEN <ls_create>-user_name ).
-      <ls_create_in>-%control-UserName = COND #( WHEN <ls_create>-control-user_name = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-AgentUUID = COND #( WHEN <ls_create>-control-agent_uuid = abap_true THEN <ls_create>-agent_uuid ).
-      <ls_create_in>-%control-AgentUUID = COND #( WHEN <ls_create>-control-agent_uuid = abap_true
+      <ls_create_in>-UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN <ls_create>-username ).
+      <ls_create_in>-%control-UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true THEN <ls_create>-agentuuid ).
+      <ls_create_in>-%control-AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-RunUUID = COND #( WHEN <ls_create>-control-run_uuid = abap_true THEN <ls_create>-run_uuid ).
-      <ls_create_in>-%control-RunUUID = COND #( WHEN <ls_create>-control-run_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-QueryUUID = COND #( WHEN <ls_create>-control-query_uuid = abap_true THEN <ls_create>-query_uuid ).
-      <ls_create_in>-%control-QueryUUID = COND #( WHEN <ls_create>-control-query_uuid = abap_true
+      <ls_create_in>-RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN <ls_create>-runuuid ).
+      <ls_create_in>-%control-RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true THEN <ls_create>-queryuuid ).
+      <ls_create_in>-%control-QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-StepUUID = COND #( WHEN <ls_create>-control-step_uuid = abap_true THEN <ls_create>-step_uuid ).
-      <ls_create_in>-%control-StepUUID = COND #( WHEN <ls_create>-control-step_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-MessageTime = COND #( WHEN <ls_create>-control-message_time = abap_true
-                                           THEN <ls_create>-message_time ).
-      <ls_create_in>-%control-MessageTime = COND #( WHEN <ls_create>-control-message_time = abap_true
+      <ls_create_in>-StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN <ls_create>-stepuuid ).
+      <ls_create_in>-%control-StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-MessageTime = COND #( WHEN <ls_create>-control-messagetime = abap_true
+                                           THEN <ls_create>-messagetime ).
+      <ls_create_in>-%control-MessageTime = COND #( WHEN <ls_create>-control-messagetime = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-CreatedBy = COND #( WHEN <ls_create>-control-created_by = abap_true THEN <ls_create>-created_by ).
-      <ls_create_in>-%control-CreatedBy = COND #( WHEN <ls_create>-control-created_by = abap_true
+      <ls_create_in>-CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true THEN <ls_create>-createdby ).
+      <ls_create_in>-%control-CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-CreatedAt = COND #( WHEN <ls_create>-control-created_at = abap_true THEN <ls_create>-created_at ).
-      <ls_create_in>-%control-CreatedAt = COND #( WHEN <ls_create>-control-created_at = abap_true
+      <ls_create_in>-CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true THEN <ls_create>-createdat ).
+      <ls_create_in>-%control-CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-ChangedBy = COND #( WHEN <ls_create>-control-changed_by = abap_true THEN <ls_create>-changed_by ).
-      <ls_create_in>-%control-ChangedBy = COND #( WHEN <ls_create>-control-changed_by = abap_true
+      <ls_create_in>-ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true THEN <ls_create>-changedby ).
+      <ls_create_in>-%control-ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-ChangedAt = COND #( WHEN <ls_create>-control-changed_at = abap_true THEN <ls_create>-changed_at ).
-      <ls_create_in>-%control-ChangedAt = COND #( WHEN <ls_create>-control-changed_at = abap_true
+      <ls_create_in>-ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true THEN <ls_create>-changedat ).
+      <ls_create_in>-%control-ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -111,20 +111,20 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT ls_cr_failed-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_failed_msum>).
       APPEND INITIAL LINE TO cs_failed-msum ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-summary_uuid = <ls_failed_msum>-SummaryUUID.
+      <ls_failed_target>-summaryuuid = <ls_failed_msum>-SummaryUUID.
       <ls_failed_target>-fail         = CONV #( <ls_failed_msum>-%fail-cause ).
       <ls_failed_target>-create       = <ls_failed_msum>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_reported-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_reported_msum>).
       APPEND INITIAL LINE TO cs_reported-msum ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-summary_uuid = <ls_reported_msum>-SummaryUUID.
+      <ls_reported_target>-summaryuuid = <ls_reported_msum>-SummaryUUID.
       <ls_reported_target>-create       = <ls_reported_msum>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_mapped-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_mapped_msum>).
       APPEND INITIAL LINE TO cs_mapped-msum ASSIGNING FIELD-SYMBOL(<ls_mapped_target>).
-      <ls_mapped_target>-summary_uuid = <ls_mapped_msum>-SummaryUUID.
+      <ls_mapped_target>-summaryuuid = <ls_mapped_msum>-SummaryUUID.
     ENDLOOP.
   ENDMETHOD.
 
@@ -148,7 +148,7 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
       APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-SummaryUUID = <ls_delete>-summary_uuid.
+      <ls_delete_in>-SummaryUUID = <ls_delete>-summaryuuid.
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_mem_sum
@@ -159,14 +159,14 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT ls_del_failed-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_failed_msum>).
       APPEND INITIAL LINE TO cs_failed-msum ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-summary_uuid = <ls_failed_msum>-SummaryUUID.
+      <ls_failed_target>-summaryuuid = <ls_failed_msum>-SummaryUUID.
       <ls_failed_target>-fail         = CONV #( <ls_failed_msum>-%fail-cause ).
       <ls_failed_target>-delete       = <ls_failed_msum>-%delete.
     ENDLOOP.
 
     LOOP AT ls_del_reported-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_reported_msum>).
       APPEND INITIAL LINE TO cs_reported-msum ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-summary_uuid = <ls_reported_msum>-SummaryUUID.
+      <ls_reported_target>-summaryuuid = <ls_reported_msum>-SummaryUUID.
       <ls_reported_target>-delete       = <ls_reported_msum>-%delete.
     ENDLOOP.
   ENDMETHOD.
@@ -219,24 +219,24 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_req>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-SummaryUUID = <ls_req>-summary_uuid.
+      <ls_read_in>-SummaryUUID = <ls_req>-summaryuuid.
 
       <ls_read_in>-%control-Content     = COND #( WHEN <ls_req>-control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-SummaryCid  = COND #( WHEN <ls_req>-control-summary_cid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-SummaryCid  = COND #( WHEN <ls_req>-control-summarycid = abap_true THEN if_abap_behv=>mk-on ).
       <ls_read_in>-%control-Stage       = COND #( WHEN <ls_req>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-SubStage    = COND #( WHEN <ls_req>-control-sub_stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-SubStage    = COND #( WHEN <ls_req>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
       <ls_read_in>-%control-Namespace   = COND #( WHEN <ls_req>-control-namespace = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-UserName    = COND #( WHEN <ls_req>-control-user_name = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-AgentUUID   = COND #( WHEN <ls_req>-control-agent_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-RunUUID     = COND #( WHEN <ls_req>-control-run_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-QueryUUID   = COND #( WHEN <ls_req>-control-query_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-StepUUID    = COND #( WHEN <ls_req>-control-step_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-MessageTime = COND #( WHEN <ls_req>-control-message_time = abap_true
+      <ls_read_in>-%control-UserName    = COND #( WHEN <ls_req>-control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AgentUUID   = COND #( WHEN <ls_req>-control-agentuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-RunUUID     = COND #( WHEN <ls_req>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-QueryUUID   = COND #( WHEN <ls_req>-control-queryuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-StepUUID    = COND #( WHEN <ls_req>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-MessageTime = COND #( WHEN <ls_req>-control-messagetime = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-CreatedBy   = COND #( WHEN <ls_req>-control-created_by = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-CreatedAt   = COND #( WHEN <ls_req>-control-created_at = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-ChangedBy   = COND #( WHEN <ls_req>-control-changed_by = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-ChangedAt   = COND #( WHEN <ls_req>-control-changed_at = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-CreatedBy   = COND #( WHEN <ls_req>-control-createdby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-CreatedAt   = COND #( WHEN <ls_req>-control-createdat = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-ChangedBy   = COND #( WHEN <ls_req>-control-changedby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-ChangedAt   = COND #( WHEN <ls_req>-control-changedat = abap_true THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_mem_sum
@@ -248,33 +248,33 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT ls_rd_failed-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_failed_rd>).
       APPEND INITIAL LINE TO cs_failed-msum ASSIGNING FIELD-SYMBOL(<ls_failed_target_rd>).
-      <ls_failed_target_rd>-summary_uuid = <ls_failed_rd>-SummaryUUID.
+      <ls_failed_target_rd>-summaryuuid = <ls_failed_rd>-SummaryUUID.
       <ls_failed_target_rd>-fail         = CONV #( <ls_failed_rd>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_rd_reported-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_reported_rd>).
       APPEND INITIAL LINE TO cs_reported-msum ASSIGNING FIELD-SYMBOL(<ls_reported_target_rd>).
-      <ls_reported_target_rd>-summary_uuid = <ls_reported_rd>-SummaryUUID.
+      <ls_reported_target_rd>-summaryuuid = <ls_reported_rd>-SummaryUUID.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       APPEND INITIAL LINE TO et_msum ASSIGNING FIELD-SYMBOL(<ls_out_msum>).
-      <ls_out_msum>-summary_uuid = <ls_res>-SummaryUUID.
+      <ls_out_msum>-summaryuuid = <ls_res>-SummaryUUID.
       <ls_out_msum>-content      = <ls_res>-Content.
-      <ls_out_msum>-summary_cid  = <ls_res>-SummaryCid.
+      <ls_out_msum>-summarycid  = <ls_res>-SummaryCid.
       <ls_out_msum>-stage        = <ls_res>-Stage.
-      <ls_out_msum>-sub_stage    = <ls_res>-SubStage.
+      <ls_out_msum>-substage    = <ls_res>-SubStage.
       <ls_out_msum>-namespace    = <ls_res>-Namespace.
-      <ls_out_msum>-user_name    = <ls_res>-UserName.
-      <ls_out_msum>-agent_uuid   = <ls_res>-AgentUUID.
-      <ls_out_msum>-run_uuid     = <ls_res>-RunUUID.
-      <ls_out_msum>-query_uuid   = <ls_res>-QueryUUID.
-      <ls_out_msum>-step_uuid    = <ls_res>-StepUUID.
-      <ls_out_msum>-message_time = <ls_res>-MessageTime.
-      <ls_out_msum>-created_by   = <ls_res>-CreatedBy.
-      <ls_out_msum>-created_at   = <ls_res>-CreatedAt.
-      <ls_out_msum>-changed_by   = <ls_res>-ChangedBy.
-      <ls_out_msum>-changed_at   = <ls_res>-ChangedAt.
+      <ls_out_msum>-username    = <ls_res>-UserName.
+      <ls_out_msum>-agentuuid   = <ls_res>-AgentUUID.
+      <ls_out_msum>-runuuid     = <ls_res>-RunUUID.
+      <ls_out_msum>-queryuuid   = <ls_res>-QueryUUID.
+      <ls_out_msum>-stepuuid    = <ls_res>-StepUUID.
+      <ls_out_msum>-messagetime = <ls_res>-MessageTime.
+      <ls_out_msum>-createdby   = <ls_res>-CreatedBy.
+      <ls_out_msum>-createdat   = <ls_res>-CreatedAt.
+      <ls_out_msum>-changedby   = <ls_res>-ChangedBy.
+      <ls_out_msum>-changedat   = <ls_res>-ChangedAt.
     ENDLOOP.
   ENDMETHOD.
 
@@ -298,47 +298,47 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
       APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-SummaryUUID = <ls_update>-summary_uuid.
+      <ls_update_in>-SummaryUUID = <ls_update>-summaryuuid.
 
       <ls_update_in>-Content     = COND #( WHEN <ls_update>-control-content = abap_true THEN <ls_update>-content ).
       <ls_update_in>-%control-Content = COND #( WHEN <ls_update>-control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-SummaryCid = COND #( WHEN <ls_update>-control-summary_cid = abap_true THEN <ls_update>-summary_cid ).
-      <ls_update_in>-%control-SummaryCid = COND #( WHEN <ls_update>-control-summary_cid = abap_true
+      <ls_update_in>-SummaryCid = COND #( WHEN <ls_update>-control-summarycid = abap_true THEN <ls_update>-summarycid ).
+      <ls_update_in>-%control-SummaryCid = COND #( WHEN <ls_update>-control-summarycid = abap_true
                                                    THEN if_abap_behv=>mk-on ).
       <ls_update_in>-Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN <ls_update>-stage ).
       <ls_update_in>-%control-Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-SubStage = COND #( WHEN <ls_update>-control-sub_stage = abap_true THEN <ls_update>-sub_stage ).
-      <ls_update_in>-%control-SubStage = COND #( WHEN <ls_update>-control-sub_stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN <ls_update>-substage ).
+      <ls_update_in>-%control-SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
       <ls_update_in>-Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true THEN <ls_update>-namespace ).
       <ls_update_in>-%control-Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-UserName = COND #( WHEN <ls_update>-control-user_name = abap_true THEN <ls_update>-user_name ).
-      <ls_update_in>-%control-UserName = COND #( WHEN <ls_update>-control-user_name = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-AgentUUID = COND #( WHEN <ls_update>-control-agent_uuid = abap_true THEN <ls_update>-agent_uuid ).
-      <ls_update_in>-%control-AgentUUID = COND #( WHEN <ls_update>-control-agent_uuid = abap_true
+      <ls_update_in>-UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN <ls_update>-username ).
+      <ls_update_in>-%control-UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true THEN <ls_update>-agentuuid ).
+      <ls_update_in>-%control-AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-RunUUID = COND #( WHEN <ls_update>-control-run_uuid = abap_true THEN <ls_update>-run_uuid ).
-      <ls_update_in>-%control-RunUUID = COND #( WHEN <ls_update>-control-run_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-QueryUUID = COND #( WHEN <ls_update>-control-query_uuid = abap_true THEN <ls_update>-query_uuid ).
-      <ls_update_in>-%control-QueryUUID = COND #( WHEN <ls_update>-control-query_uuid = abap_true
+      <ls_update_in>-RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN <ls_update>-runuuid ).
+      <ls_update_in>-%control-RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true THEN <ls_update>-queryuuid ).
+      <ls_update_in>-%control-QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-StepUUID = COND #( WHEN <ls_update>-control-step_uuid = abap_true THEN <ls_update>-step_uuid ).
-      <ls_update_in>-%control-StepUUID = COND #( WHEN <ls_update>-control-step_uuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-MessageTime = COND #( WHEN <ls_update>-control-message_time = abap_true
-                                           THEN <ls_update>-message_time ).
-      <ls_update_in>-%control-MessageTime = COND #( WHEN <ls_update>-control-message_time = abap_true
+      <ls_update_in>-StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN <ls_update>-stepuuid ).
+      <ls_update_in>-%control-StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-MessageTime = COND #( WHEN <ls_update>-control-messagetime = abap_true
+                                           THEN <ls_update>-messagetime ).
+      <ls_update_in>-%control-MessageTime = COND #( WHEN <ls_update>-control-messagetime = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-CreatedBy = COND #( WHEN <ls_update>-control-created_by = abap_true THEN <ls_update>-created_by ).
-      <ls_update_in>-%control-CreatedBy = COND #( WHEN <ls_update>-control-created_by = abap_true
+      <ls_update_in>-CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true THEN <ls_update>-createdby ).
+      <ls_update_in>-%control-CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-CreatedAt = COND #( WHEN <ls_update>-control-created_at = abap_true THEN <ls_update>-created_at ).
-      <ls_update_in>-%control-CreatedAt = COND #( WHEN <ls_update>-control-created_at = abap_true
+      <ls_update_in>-CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true THEN <ls_update>-createdat ).
+      <ls_update_in>-%control-CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-ChangedBy = COND #( WHEN <ls_update>-control-changed_by = abap_true THEN <ls_update>-changed_by ).
-      <ls_update_in>-%control-ChangedBy = COND #( WHEN <ls_update>-control-changed_by = abap_true
+      <ls_update_in>-ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true THEN <ls_update>-changedby ).
+      <ls_update_in>-%control-ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-ChangedAt = COND #( WHEN <ls_update>-control-changed_at = abap_true THEN <ls_update>-changed_at ).
-      <ls_update_in>-%control-ChangedAt = COND #( WHEN <ls_update>-control-changed_at = abap_true
+      <ls_update_in>-ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true THEN <ls_update>-changedat ).
+      <ls_update_in>-%control-ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -350,14 +350,14 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
 
     LOOP AT ls_up_failed-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_failed_up>).
       APPEND INITIAL LINE TO cs_failed-msum ASSIGNING FIELD-SYMBOL(<ls_failed_target_up>).
-      <ls_failed_target_up>-summary_uuid = <ls_failed_up>-SummaryUUID.
+      <ls_failed_target_up>-summaryuuid = <ls_failed_up>-SummaryUUID.
       <ls_failed_target_up>-fail         = CONV #( <ls_failed_up>-%fail-cause ).
       <ls_failed_target_up>-update       = <ls_failed_up>-%update.
     ENDLOOP.
 
     LOOP AT ls_up_reported-zrprumemsum ASSIGNING FIELD-SYMBOL(<ls_reported_up>).
       APPEND INITIAL LINE TO cs_reported-msum ASSIGNING FIELD-SYMBOL(<ls_reported_target_up>).
-      <ls_reported_target_up>-summary_uuid = <ls_reported_up>-SummaryUUID.
+      <ls_reported_target_up>-summaryuuid = <ls_reported_up>-SummaryUUID.
       <ls_reported_target_up>-update       = <ls_reported_up>-%update.
     ENDLOOP.
   ENDMETHOD.
