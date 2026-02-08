@@ -59,50 +59,50 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
       <ls_create_in>-%cid        = <ls_create>-messageuuid.
-      <ls_create_in>-MessageUUID = <ls_create>-messageuuid.
-      <ls_create_in>-Content     = COND #( WHEN <ls_create>-control-content = abap_true THEN <ls_create>-content ).
-      <ls_create_in>-%control-Content = COND #( WHEN <ls_create>-control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-MessageType = COND #( WHEN <ls_create>-control-messagetype = abap_true
+      <ls_create_in>-AIPF7MessageUUID = <ls_create>-messageuuid.
+      <ls_create_in>-AIPF7Content     = COND #( WHEN <ls_create>-control-content = abap_true THEN <ls_create>-content ).
+      <ls_create_in>-%control-AIPF7Content = COND #( WHEN <ls_create>-control-content = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7MessageType = COND #( WHEN <ls_create>-control-messagetype = abap_true
                                            THEN <ls_create>-messagetype ).
-      <ls_create_in>-%control-MessageType = COND #( WHEN <ls_create>-control-messagetype = abap_true
+      <ls_create_in>-%control-AIPF7MessageType = COND #( WHEN <ls_create>-control-messagetype = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-MessageCid = COND #( WHEN <ls_create>-control-messagecid = abap_true THEN <ls_create>-messagecid ).
-      <ls_create_in>-%control-MessageCid = COND #( WHEN <ls_create>-control-messagecid = abap_true
+      <ls_create_in>-AIPF7MessageCONTENTid = COND #( WHEN <ls_create>-control-messageCONTENTid = abap_true THEN <ls_create>-messageCONTENTid ).
+      <ls_create_in>-%control-AIPF7MessageCONTENTid = COND #( WHEN <ls_create>-control-messageCONTENTid = abap_true
                                                    THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN <ls_create>-stage ).
-      <ls_create_in>-%control-Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN <ls_create>-substage ).
-      <ls_create_in>-%control-SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true THEN <ls_create>-namespace ).
-      <ls_create_in>-%control-Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true
+      <ls_create_in>-AIPF7Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN <ls_create>-stage ).
+      <ls_create_in>-%control-AIPF7Stage = COND #( WHEN <ls_create>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN <ls_create>-substage ).
+      <ls_create_in>-%control-AIPF7SubStage = COND #( WHEN <ls_create>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true THEN <ls_create>-namespace ).
+      <ls_create_in>-%control-AIPF7Namespace = COND #( WHEN <ls_create>-control-namespace = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN <ls_create>-username ).
-      <ls_create_in>-%control-UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true THEN <ls_create>-agentuuid ).
-      <ls_create_in>-%control-AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true
+      <ls_create_in>-AIPF7UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN <ls_create>-username ).
+      <ls_create_in>-%control-AIPF7UserName = COND #( WHEN <ls_create>-control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true THEN <ls_create>-agentuuid ).
+      <ls_create_in>-%control-AIPF7AgentUUID = COND #( WHEN <ls_create>-control-agentuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN <ls_create>-runuuid ).
-      <ls_create_in>-%control-RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true THEN <ls_create>-queryuuid ).
-      <ls_create_in>-%control-QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true
+      <ls_create_in>-AIPF7RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN <ls_create>-runuuid ).
+      <ls_create_in>-%control-AIPF7RunUUID = COND #( WHEN <ls_create>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true THEN <ls_create>-queryuuid ).
+      <ls_create_in>-%control-AIPF7QueryUUID = COND #( WHEN <ls_create>-control-queryuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN <ls_create>-stepuuid ).
-      <ls_create_in>-%control-StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-MessageTime = COND #( WHEN <ls_create>-control-messagetime = abap_true
-                                           THEN <ls_create>-messagetime ).
-      <ls_create_in>-%control-MessageTime = COND #( WHEN <ls_create>-control-messagetime = abap_true
+      <ls_create_in>-AIPF7StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN <ls_create>-stepuuid ).
+      <ls_create_in>-%control-AIPF7StepUUID = COND #( WHEN <ls_create>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-AIPF7MessageDATETime = COND #( WHEN <ls_create>-control-messageDATEtime = abap_true
+                                           THEN <ls_create>-messageDATEtime ).
+      <ls_create_in>-%control-AIPF7MessageDATETime = COND #( WHEN <ls_create>-control-messageDATEtime = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true THEN <ls_create>-createdby ).
-      <ls_create_in>-%control-CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true
+      <ls_create_in>-AIPF7CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true THEN <ls_create>-createdby ).
+      <ls_create_in>-%control-AIPF7CreatedBy = COND #( WHEN <ls_create>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true THEN <ls_create>-createdat ).
-      <ls_create_in>-%control-CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true
+      <ls_create_in>-AIPF7CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true THEN <ls_create>-createdat ).
+      <ls_create_in>-%control-AIPF7CreatedAt = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true THEN <ls_create>-changedby ).
-      <ls_create_in>-%control-ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true
+      <ls_create_in>-AIPF7ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true THEN <ls_create>-changedby ).
+      <ls_create_in>-%control-AIPF7ChangedBy = COND #( WHEN <ls_create>-control-changedby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true THEN <ls_create>-changedat ).
-      <ls_create_in>-%control-ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true
+      <ls_create_in>-AIPF7ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true THEN <ls_create>-changedat ).
+      <ls_create_in>-%control-AIPF7ChangedAt = COND #( WHEN <ls_create>-control-changedat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -115,20 +115,20 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT ls_cr_failed-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_failed_mmsg>).
       APPEND INITIAL LINE TO cs_failed-mmsg ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-messageuuid = <ls_failed_mmsg>-MessageUUID.
+      <ls_failed_target>-messageuuid = <ls_failed_mmsg>-AIPF7MessageUUID.
       <ls_failed_target>-fail        = CONV #( <ls_failed_mmsg>-%fail-cause ).
       <ls_failed_target>-create      = <ls_failed_mmsg>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_reported-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_reported_mmsg>).
       APPEND INITIAL LINE TO cs_reported-mmsg ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-messageuuid = <ls_reported_mmsg>-MessageUUID.
+      <ls_reported_target>-messageuuid = <ls_reported_mmsg>-AIPF7MessageUUID.
       <ls_reported_target>-create      = <ls_reported_mmsg>-%create.
     ENDLOOP.
 
     LOOP AT ls_cr_mapped-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_mapped_mmsg>).
       APPEND INITIAL LINE TO cs_mapped-mmsg ASSIGNING FIELD-SYMBOL(<ls_mapped_target>).
-      <ls_mapped_target>-MessageUUID = <ls_mapped_mmsg>-MessageUUID.
+      <ls_mapped_target>-MessageUUID = <ls_mapped_mmsg>-AIPF7MessageUUID.
     ENDLOOP.
   ENDMETHOD.
 
@@ -152,7 +152,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_delete>).
       APPEND INITIAL LINE TO lt_delete_in ASSIGNING FIELD-SYMBOL(<ls_delete_in>).
-      <ls_delete_in>-MessageUUID = <ls_delete>-MessageUUID.
+      <ls_delete_in>-AIPF7MessageUUID = <ls_delete>-MessageUUID.
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_mem_msg
@@ -163,14 +163,14 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT ls_del_failed-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_failed_mmsg>).
       APPEND INITIAL LINE TO cs_failed-mmsg ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
-      <ls_failed_target>-messageuuid = <ls_failed_mmsg>-MessageUUID.
+      <ls_failed_target>-messageuuid = <ls_failed_mmsg>-AIPF7MessageUUID.
       <ls_failed_target>-fail        = CONV #( <ls_failed_mmsg>-%fail-cause ).
       <ls_failed_target>-delete      = <ls_failed_mmsg>-%delete.
     ENDLOOP.
 
     LOOP AT ls_del_reported-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_reported_mmsg>).
       APPEND INITIAL LINE TO cs_reported-mmsg ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
-      <ls_reported_target>-messageuuid = <ls_reported_mmsg>-MessageUUID.
+      <ls_reported_target>-messageuuid = <ls_reported_mmsg>-AIPF7MessageUUID.
       <ls_reported_target>-delete      = <ls_reported_mmsg>-%delete.
     ENDLOOP.
   ENDMETHOD.
@@ -224,26 +224,26 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_req>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
-      <ls_read_in>-MessageUUID = <ls_req>-MessageUUID.
+      <ls_read_in>-AIPF7MessageUUID = <ls_req>-MessageUUID.
 
-      <ls_read_in>-%control-Content     = COND #( WHEN <ls_req>-Control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-MessageType = COND #( WHEN <ls_req>-Control-messagetype = abap_true
+      <ls_read_in>-%control-AIPF7Content     = COND #( WHEN <ls_req>-Control-content = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7MessageType = COND #( WHEN <ls_req>-Control-messagetype = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-MessageCid  = COND #( WHEN <ls_req>-Control-messagecid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-Stage       = COND #( WHEN <ls_req>-Control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-SubStage    = COND #( WHEN <ls_req>-Control-substage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-Namespace   = COND #( WHEN <ls_req>-Control-namespace = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-UserName    = COND #( WHEN <ls_req>-Control-username = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-AgentUUID   = COND #( WHEN <ls_req>-Control-agentuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-RunUUID     = COND #( WHEN <ls_req>-Control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-QueryUUID   = COND #( WHEN <ls_req>-Control-queryuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-StepUUID    = COND #( WHEN <ls_req>-Control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-MessageTime = COND #( WHEN <ls_req>-Control-messagetime = abap_true
+      <ls_read_in>-%control-AIPF7MessageCONTENTid  = COND #( WHEN <ls_req>-Control-messagecONTENTid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7Stage       = COND #( WHEN <ls_req>-Control-stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7SubStage    = COND #( WHEN <ls_req>-Control-substage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7Namespace   = COND #( WHEN <ls_req>-Control-namespace = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7UserName    = COND #( WHEN <ls_req>-Control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7AgentUUID   = COND #( WHEN <ls_req>-Control-agentuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7RunUUID     = COND #( WHEN <ls_req>-Control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7QueryUUID   = COND #( WHEN <ls_req>-Control-queryuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7StepUUID    = COND #( WHEN <ls_req>-Control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7MessageDATETime = COND #( WHEN <ls_req>-Control-messageDATEtime = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-CreatedBy   = COND #( WHEN <ls_req>-Control-createdby = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-CreatedAt   = COND #( WHEN <ls_req>-Control-createdat = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-ChangedBy   = COND #( WHEN <ls_req>-Control-changedby = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_read_in>-%control-ChangedAt   = COND #( WHEN <ls_req>-Control-changedat = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7CreatedBy   = COND #( WHEN <ls_req>-Control-createdby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7CreatedAt   = COND #( WHEN <ls_req>-Control-createdat = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7ChangedBy   = COND #( WHEN <ls_req>-Control-changedby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_read_in>-%control-AIPF7ChangedAt   = COND #( WHEN <ls_req>-Control-changedat = abap_true THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_mem_msg
@@ -255,34 +255,34 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT ls_rd_failed-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_failed_rd>).
       APPEND INITIAL LINE TO cs_failed-mmsg ASSIGNING FIELD-SYMBOL(<ls_failed_target_rd>).
-      <ls_failed_target_rd>-messageuuid = <ls_failed_rd>-MessageUUID.
+      <ls_failed_target_rd>-messageuuid = <ls_failed_rd>-AIPF7MessageUUID.
       <ls_failed_target_rd>-fail        = CONV #( <ls_failed_rd>-%fail-cause ).
     ENDLOOP.
 
     LOOP AT ls_rd_reported-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_reported_rd>).
       APPEND INITIAL LINE TO cs_reported-mmsg ASSIGNING FIELD-SYMBOL(<ls_reported_target_rd>).
-      <ls_reported_target_rd>-MessageUUID = <ls_reported_rd>-MessageUUID.
+      <ls_reported_target_rd>-MessageUUID = <ls_reported_rd>-AIPF7MessageUUID.
     ENDLOOP.
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
       APPEND INITIAL LINE TO et_mmsg ASSIGNING FIELD-SYMBOL(<ls_out_mmsg>).
-      <ls_out_mmsg>-messageuuid = <ls_res>-MessageUUID.
-      <ls_out_mmsg>-content     = <ls_res>-Content.
-      <ls_out_mmsg>-messagetype = <ls_res>-MessageType.
-      <ls_out_mmsg>-messagecid  = <ls_res>-MessageCid.
-      <ls_out_mmsg>-stage       = <ls_res>-Stage.
-      <ls_out_mmsg>-substage    = <ls_res>-SubStage.
-      <ls_out_mmsg>-namespace   = <ls_res>-Namespace.
-      <ls_out_mmsg>-username    = <ls_res>-UserName.
-      <ls_out_mmsg>-agentuuid   = <ls_res>-AgentUUID.
-      <ls_out_mmsg>-runuuid     = <ls_res>-RunUUID.
-      <ls_out_mmsg>-queryuuid   = <ls_res>-QueryUUID.
-      <ls_out_mmsg>-stepuuid    = <ls_res>-StepUUID.
-      <ls_out_mmsg>-messagetime = <ls_res>-MessageTime.
-      <ls_out_mmsg>-createdby   = <ls_res>-CreatedBy.
-      <ls_out_mmsg>-createdat   = <ls_res>-CreatedAt.
-      <ls_out_mmsg>-changedby   = <ls_res>-ChangedBy.
-      <ls_out_mmsg>-changedat   = <ls_res>-ChangedAt.
+      <ls_out_mmsg>-messageuuid = <ls_res>-AIPF7MessageUUID.
+      <ls_out_mmsg>-content     = <ls_res>-AIPF7Content.
+      <ls_out_mmsg>-messagetype = <ls_res>-AIPF7MessageType.
+      <ls_out_mmsg>-MessageCONTENTid  = <ls_res>-AIPF7MessageCONTENTid.
+      <ls_out_mmsg>-stage       = <ls_res>-AIPF7Stage.
+      <ls_out_mmsg>-substage    = <ls_res>-AIPF7SubStage.
+      <ls_out_mmsg>-namespace   = <ls_res>-AIPF7Namespace.
+      <ls_out_mmsg>-username    = <ls_res>-AIPF7UserName.
+      <ls_out_mmsg>-agentuuid   = <ls_res>-AIPF7AgentUUID.
+      <ls_out_mmsg>-runuuid     = <ls_res>-AIPF7RunUUID.
+      <ls_out_mmsg>-queryuuid   = <ls_res>-AIPF7QueryUUID.
+      <ls_out_mmsg>-stepuuid    = <ls_res>-AIPF7StepUUID.
+      <ls_out_mmsg>-messageDATEtime = <ls_res>-AIPF7MessageDATETime.
+      <ls_out_mmsg>-createdby   = <ls_res>-AIPF7CreatedBy.
+      <ls_out_mmsg>-createdat   = <ls_res>-AIPF7CreatedAt.
+      <ls_out_mmsg>-changedby   = <ls_res>-AIPF7ChangedBy.
+      <ls_out_mmsg>-changedat   = <ls_res>-AIPF7ChangedAt.
     ENDLOOP.
   ENDMETHOD.
 
@@ -306,51 +306,51 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_update>).
       APPEND INITIAL LINE TO lt_update_in ASSIGNING FIELD-SYMBOL(<ls_update_in>).
-      <ls_update_in>-MessageUUID = <ls_update>-messageuuid.
+      <ls_update_in>-AIPF7MessageUUID = <ls_update>-messageuuid.
 
-      <ls_update_in>-Content     = COND #( WHEN <ls_update>-control-content = abap_true THEN <ls_update>-content ).
-      <ls_update_in>-%control-Content = COND #( WHEN <ls_update>-control-content = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-MessageType = COND #( WHEN <ls_update>-control-messagetype = abap_true
+      <ls_update_in>-AIPF7Content     = COND #( WHEN <ls_update>-control-content = abap_true THEN <ls_update>-content ).
+      <ls_update_in>-%control-AIPF7Content = COND #( WHEN <ls_update>-control-content = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7MessageType = COND #( WHEN <ls_update>-control-messagetype = abap_true
                                            THEN <ls_update>-messagetype ).
-      <ls_update_in>-%control-MessageType = COND #( WHEN <ls_update>-control-messagetype = abap_true
+      <ls_update_in>-%control-AIPF7MessageType = COND #( WHEN <ls_update>-control-messagetype = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-MessageCid = COND #( WHEN <ls_update>-control-messagecid = abap_true THEN <ls_update>-messagecid ).
-      <ls_update_in>-%control-MessageCid = COND #( WHEN <ls_update>-control-messagecid = abap_true
+      <ls_update_in>-AIPF7MessageCONTENTid = COND #( WHEN <ls_update>-control-MessageCONTENTid = abap_true THEN <ls_update>-MessageCONTENTid ).
+      <ls_update_in>-%control-AIPF7MessageCONTENTid = COND #( WHEN <ls_update>-control-MessageCONTENTid = abap_true
                                                    THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN <ls_update>-stage ).
-      <ls_update_in>-%control-Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN <ls_update>-substage ).
-      <ls_update_in>-%control-SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true THEN <ls_update>-namespace ).
-      <ls_update_in>-%control-Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true
+      <ls_update_in>-AIPF7Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN <ls_update>-stage ).
+      <ls_update_in>-%control-AIPF7Stage = COND #( WHEN <ls_update>-control-stage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN <ls_update>-substage ).
+      <ls_update_in>-%control-AIPF7SubStage = COND #( WHEN <ls_update>-control-substage = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true THEN <ls_update>-namespace ).
+      <ls_update_in>-%control-AIPF7Namespace = COND #( WHEN <ls_update>-control-namespace = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN <ls_update>-username ).
-      <ls_update_in>-%control-UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true THEN <ls_update>-agentuuid ).
-      <ls_update_in>-%control-AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true
+      <ls_update_in>-AIPF7UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN <ls_update>-username ).
+      <ls_update_in>-%control-AIPF7UserName = COND #( WHEN <ls_update>-control-username = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true THEN <ls_update>-agentuuid ).
+      <ls_update_in>-%control-AIPF7AgentUUID = COND #( WHEN <ls_update>-control-agentuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN <ls_update>-runuuid ).
-      <ls_update_in>-%control-RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true THEN <ls_update>-queryuuid ).
-      <ls_update_in>-%control-QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true
+      <ls_update_in>-AIPF7RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN <ls_update>-runuuid ).
+      <ls_update_in>-%control-AIPF7RunUUID = COND #( WHEN <ls_update>-control-runuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true THEN <ls_update>-queryuuid ).
+      <ls_update_in>-%control-AIPF7QueryUUID = COND #( WHEN <ls_update>-control-queryuuid = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN <ls_update>-stepuuid ).
-      <ls_update_in>-%control-StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-MessageTime = COND #( WHEN <ls_update>-control-messagetime = abap_true
-                                           THEN <ls_update>-messagetime ).
-      <ls_update_in>-%control-MessageTime = COND #( WHEN <ls_update>-control-messagetime = abap_true
+      <ls_update_in>-AIPF7StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN <ls_update>-stepuuid ).
+      <ls_update_in>-%control-AIPF7StepUUID = COND #( WHEN <ls_update>-control-stepuuid = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_update_in>-AIPF7MessageDATETime = COND #( WHEN <ls_update>-control-MessageDATETime = abap_true
+                                           THEN <ls_update>-MessageDATETime ).
+      <ls_update_in>-%control-AIPF7MessageDATETime = COND #( WHEN <ls_update>-control-MessageDATETime = abap_true
                                                     THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true THEN <ls_update>-createdby ).
-      <ls_update_in>-%control-CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true
+      <ls_update_in>-AIPF7CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true THEN <ls_update>-createdby ).
+      <ls_update_in>-%control-AIPF7CreatedBy = COND #( WHEN <ls_update>-control-createdby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true THEN <ls_update>-createdat ).
-      <ls_update_in>-%control-CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true
+      <ls_update_in>-AIPF7CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true THEN <ls_update>-createdat ).
+      <ls_update_in>-%control-AIPF7CreatedAt = COND #( WHEN <ls_update>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true THEN <ls_update>-changedby ).
-      <ls_update_in>-%control-ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true
+      <ls_update_in>-AIPF7ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true THEN <ls_update>-changedby ).
+      <ls_update_in>-%control-AIPF7ChangedBy = COND #( WHEN <ls_update>-control-changedby = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_update_in>-ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true THEN <ls_update>-changedat ).
-      <ls_update_in>-%control-ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true
+      <ls_update_in>-AIPF7ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true THEN <ls_update>-changedat ).
+      <ls_update_in>-%control-AIPF7ChangedAt = COND #( WHEN <ls_update>-control-changedat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
     ENDLOOP.
 
@@ -362,14 +362,14 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     LOOP AT ls_up_failed-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_failed_up>).
       APPEND INITIAL LINE TO cs_failed-mmsg ASSIGNING FIELD-SYMBOL(<ls_failed_target_up>).
-      <ls_failed_target_up>-messageuuid = <ls_failed_up>-MessageUUID.
+      <ls_failed_target_up>-messageuuid = <ls_failed_up>-AIPF7MessageUUID.
       <ls_failed_target_up>-fail        = CONV #( <ls_failed_up>-%fail-cause ).
       <ls_failed_target_up>-update      = <ls_failed_up>-%update.
     ENDLOOP.
 
     LOOP AT ls_up_reported-zrprumemmsg ASSIGNING FIELD-SYMBOL(<ls_reported_up>).
       APPEND INITIAL LINE TO cs_reported-mmsg ASSIGNING FIELD-SYMBOL(<ls_reported_target_up>).
-      <ls_reported_target_up>-messageuuid = <ls_reported_up>-MessageUUID.
+      <ls_reported_target_up>-messageuuid = <ls_reported_up>-AIPF7MessageUUID.
       <ls_reported_target_up>-update      = <ls_reported_up>-%update.
     ENDLOOP.
   ENDMETHOD.
