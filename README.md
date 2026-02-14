@@ -72,11 +72,12 @@ Execution Header is root for execution and has unique UUID. It can have multiple
 
 ### Execution Query
 
-Execution Query is combination initial input prompt, provided by framework consumer, and final response, provided by agent framework after execution all steps from the execution plan. It recieves unique UUID and attach to certain Execution Header.
+Execution Query is combination initial input prompt, provided by framework consumer, and final response, provided by agent framework after execution all steps from the execution plan. It recieves unique UUID and attach to certain Execution Header. It can have multiple execution steps.
 
 ### Execution Step
 
-Execution Step contains input prompt to step and output of execution of ABAP Tool Provider class. Apart of output itself the Execution Step can return list of additional steps for execution to initiate Miniloop. 
+Execution Step contains input prompt to step and output of execution of ABAP Tool Provider class. Apart of output itself the Execution Step can return list of additional steps for execution to initiate Miniloop.
+It recieves unique UUID and attach to certain Execution Query.
 
 ### Miniloop
 
