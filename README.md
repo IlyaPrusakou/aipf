@@ -12,11 +12,17 @@ Standard AI calls in ABAP are stateless—they send a prompt and get a response.
 **Actionables:** Various ABAP-based Tools, etc.
 The framework requires writing a significant amount of ABAP code. It is designed for developers and implies that you are proficient in writing ABAP code and have a solid understanding of concepts like APIs, HTTP, and integration patterns. You must be capable of integrating different types of APIs, such as LLMs, Machine Learning models, and various external services. Moreover, you must know how to execute these integrations within the constraints and architecture of the SAP landscape. 
 
-### Decision Platform
+### Agent Definition
 
-Decision Platform is an ABAP class. The framework does not contain a generic implementation. The developer is responsible for writing ABAP code to provide the decision logic.
-Decision logic is a broad concept. It may involve a call to an LLM, hard-coded ABAP logic, or the invocation of a Machine Learning API. Creating a Decision Platform means decomposing domain logic into manageable questions. Some of these can be decided by ABAP, while others can be decided by an LLM, etc. The Decision Platform must implement the interface ZPRU_IF_DECISION_PROVIDER. The output of the Decision Platform's work is an Execution Plan.
-For each agent, the developer must insert an entry into table ZPRU_AGENT containing the name of the ABAP class for the Decision Platform.
+Agent Definition is a combination of data base tables, containing names of main ABAP classes; table for Agent and table for Agent Tools.
+Agent table contains names for ABAP classes: Decision Provider, Short Memory Provider, Long Memory Provider, Agent Info Provider, System Prompr Provider.
+Agent Tool contains names for ABAP classes: Tool Provider, Tools Schema Provider and Tool Info Provider
+
+### Decision Provider
+
+Decision Provider is an ABAP class. The framework does not contain a generic implementation. The developer is responsible for writing ABAP code to provide the decision logic.
+Decision logic is a broad concept. It may involve a call to an LLM, hard-coded ABAP logic, or the invocation of a Machine Learning API. Creating a Decision Provider means decomposing domain logic into manageable questions. Some of these questions can be decided by ABAP, while others can be decided by an LLM, etc. The Decision Provider must implement the interface ZPRU_IF_DECISION_PROVIDER. The output of the Decision Provider's work is an Execution Plan.
+For each agent, the developer must insert an entry into table ZPRU_AGENT containing the name of the ABAP class for the Decision Provider.
 
 ### Execution Plan
 
@@ -32,8 +38,7 @@ Tool Metadata is an ABAP class implementing the interface ZPRU_IF_TOOL_INFO_PROV
 
 ### Tool Schema Provider
 
-
-
+Tool Schema Provider is ABAP class returning input and output schema. It support two formats: JSON and ABAP RTTS types. 
 
 ### Miniloop
 
