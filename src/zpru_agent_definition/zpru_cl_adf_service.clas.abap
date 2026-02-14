@@ -363,7 +363,7 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~read_agent.
-    DATA ls_out TYPE zpru_s_agent.
+    DATA lt_read_in TYPE TABLE FOR READ IMPORT ZR_PRU_AGENT\\Agent.
 
     CLEAR et_agent.
 
@@ -376,52 +376,63 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                          CHANGING  cs_reported     = cs_reported
                                    cs_failed       = cs_failed ).
 
-    zpru_cl_adf_buffer=>prep_agent_buffer( VALUE #( FOR <ls_k>
-                                                    IN     lt_entities
-                                                    ( agent_uuid = <ls_k>-agentuuid ) ) ).
+    IF lt_entities IS INITIAL.
+      RETURN.
+    ENDIF.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
+      APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
+      <ls_read_in>-AIPF7AgentUUID = <ls_read>-agentuuid.
+      <ls_read_in>-%control-AIPF7AgentName            = <ls_read>-control-agentname.
+      <ls_read_in>-%control-AIPF7AgentType            = <ls_read>-control-agenttype.
+      <ls_read_in>-%control-AIPF7DecisionProvider     = <ls_read>-control-decisionprovider.
+      <ls_read_in>-%control-AIPF7ShortMemoryProvider  = <ls_read>-control-shortmemoryprovider.
+      <ls_read_in>-%control-AIPF7LongMemoryProvider   = <ls_read>-control-longmemoryprovider.
+      <ls_read_in>-%control-AIPF7AgentInfoProvider    = <ls_read>-control-agentinfoprovider.
+      <ls_read_in>-%control-AIPF7SystemPromptProvider = <ls_read>-control-systempromptprovider.
+      <ls_read_in>-%control-AIPF7AgentStatus                = <ls_read>-control-agentstatus.
+      <ls_read_in>-%control-AIPF7CreatedBy            = <ls_read>-control-createdby.
+      <ls_read_in>-%control-AIPF7CreatedAt            = <ls_read>-control-createdat.
+      <ls_read_in>-%control-AIPF7ChangedBy            = <ls_read>-control-changedby.
+      <ls_read_in>-%control-AIPF7LastChanged          = <ls_read>-control-lastchanged.
+      <ls_read_in>-%control-AIPF7LocalLastChanged     = <ls_read>-control-locallastchanged.
+    ENDLOOP.
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_read>-agentuuid
-                                               deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-      IF sy-subrc = 0.
-        CLEAR ls_out.
-        ls_out-agentuuid            = <ls_buffer>-instance-agentuuid.
+    READ ENTITIES OF ZR_PRU_AGENT
+         ENTITY Agent
+         FROM lt_read_in
+         RESULT DATA(lt_result)
+         FAILED DATA(ls_failed_eml)
+         REPORTED DATA(ls_reported_eml).
 
-        ls_out-agentname            = COND #( WHEN <ls_read>-control-agentname = abap_true
-                                              THEN <ls_buffer>-instance-agentname ).
-        ls_out-agenttype            = COND #( WHEN <ls_read>-control-agenttype = abap_true
-                                              THEN <ls_buffer>-instance-agenttype ).
-        ls_out-decisionprovider     = COND #( WHEN <ls_read>-control-decisionprovider = abap_true
-                                              THEN <ls_buffer>-instance-decisionprovider ).
-        ls_out-shortmemoryprovider  = COND #( WHEN <ls_read>-control-shortmemoryprovider = abap_true
-                                              THEN <ls_buffer>-instance-shortmemoryprovider ).
-        ls_out-longmemoryprovider   = COND #( WHEN <ls_read>-control-longmemoryprovider = abap_true
-                                              THEN <ls_buffer>-instance-longmemoryprovider ).
-        ls_out-agentinfoprovider    = COND #( WHEN <ls_read>-control-agentinfoprovider = abap_true
-                                              THEN <ls_buffer>-instance-agentinfoprovider ).
-        ls_out-systempromptprovider = COND #( WHEN <ls_read>-control-systempromptprovider = abap_true
-                                              THEN <ls_buffer>-instance-systempromptprovider ).
-        ls_out-agentstatus               = COND #( WHEN <ls_read>-control-agentstatus = abap_true
-                                              THEN <ls_buffer>-instance-agentstatus ).
-        ls_out-createdby            = COND #( WHEN <ls_read>-control-createdby = abap_true
-                                              THEN <ls_buffer>-instance-createdby ).
-        ls_out-createdat            = COND #( WHEN <ls_read>-control-createdat = abap_true
-                                              THEN <ls_buffer>-instance-createdat ).
-        ls_out-changedby            = COND #( WHEN <ls_read>-control-changedby = abap_true
-                                              THEN <ls_buffer>-instance-changedby ).
-        ls_out-lastchanged          = COND #( WHEN <ls_read>-control-lastchanged = abap_true
-                                              THEN <ls_buffer>-instance-lastchanged ).
-        ls_out-locallastchanged     = COND #( WHEN <ls_read>-control-locallastchanged = abap_true
-                                              THEN <ls_buffer>-instance-locallastchanged ).
+    LOOP AT ls_failed_eml-agent ASSIGNING FIELD-SYMBOL(<ls_failed_agent>).
+      APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_failed_agent_target>).
+      <ls_failed_agent_target>-agentuuid = <ls_failed_agent>-AIPF7AgentUUID.
+      <ls_failed_agent_target>-fail     = CONV #( <ls_failed_agent>-%fail-cause ).
+    ENDLOOP.
 
-        APPEND ls_out TO et_agent.
+    LOOP AT ls_reported_eml-agent ASSIGNING FIELD-SYMBOL(<ls_reported_agent>).
+      APPEND INITIAL LINE TO cs_reported-agent ASSIGNING FIELD-SYMBOL(<ls_reported_agent_target>).
+      <ls_reported_agent_target>-agentuuid = <ls_reported_agent>-AIPF7AgentUUID.
+*      <ls_reported_agent_target>-msg       = <ls_reported_agent>-%msg.
+    ENDLOOP.
 
-      ELSE.
-        APPEND VALUE #( agentuuid = <ls_read>-agentuuid
-                        fail      = zpru_if_agent_frw=>cs_fail_cause-not_found )
-               TO cs_failed-agent.
-      ENDIF.
+    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<ls_res>).
+      APPEND INITIAL LINE TO et_agent ASSIGNING FIELD-SYMBOL(<ls_out>).
+      <ls_out>-agentuuid            = <ls_res>-AIPF7AgentUUID.
+      <ls_out>-agentname            = <ls_res>-AIPF7AgentName.
+      <ls_out>-agenttype            = <ls_res>-AIPF7AgentType.
+      <ls_out>-decisionprovider     = <ls_res>-AIPF7DecisionProvider.
+      <ls_out>-shortmemoryprovider  = <ls_res>-AIPF7ShortMemoryProvider.
+      <ls_out>-longmemoryprovider   = <ls_res>-AIPF7LongMemoryProvider.
+      <ls_out>-agentinfoprovider    = <ls_res>-AIPF7AgentInfoProvider.
+      <ls_out>-systempromptprovider = <ls_res>-AIPF7SystemPromptProvider.
+      <ls_out>-agentstatus               = <ls_res>-AIPF7AgentStatus.
+      <ls_out>-createdby            = <ls_res>-AIPF7CreatedBy.
+      <ls_out>-createdat            = <ls_res>-AIPF7CreatedAt.
+      <ls_out>-changedby            = <ls_res>-AIPF7ChangedBy.
+      <ls_out>-lastchanged          = <ls_res>-AIPF7LastChanged.
+      <ls_out>-locallastchanged     = <ls_res>-AIPF7LocalLastChanged.
     ENDLOOP.
   ENDMETHOD.
 
