@@ -126,9 +126,11 @@ Long Memory is an ABAP class handling different strategies for saving messages i
 
 ### Technical Features
 
-Adapter Service Framework
-ABAP Cloud Language Version
-Base Implementation
+#### Adapter Service Framework
+
+#### ABAP Cloud Language Version
+
+#### Base Implementation
 
 ### Developer Experience
 
@@ -155,8 +157,37 @@ AIPF is designed to be model-agnostic. You can choose the "Intelligence Level" o
 
 ### Implementation Details
 
-* **IF-ELSE Agent:** Perfect for "Clean Core" legacy modernization where you want to wrap existing BRF+ or Condition Technique logic into an agentic interface.
-* **ML & LLM Agents:** Fully integrated with SAP AI Core, allowing you to swap models (e.g., moving from GPT-3.5 to GPT-4o) without changing your ABAP code.
+Basically, this differiantion are made based on how developer provides implementation for interface zpru_if_decision_provider~call_decision_engine 
+
+#### If-ELSE Agent
+
+```abap
+METHOD zpru_if_decision_provider~call_decision_engine.
+IF ls_input-strategy_name = `CREATE_INBOUND_DELIVERY`.
+APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+<ls_execution_plan>-tool_name = `GET_PO_DETAILS`.
+"""""
+"""""
+APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+<ls_execution_plan>-tool_name = `POST_INBOUND_DELIVERY`
+
+ELSEIF ls_input-strategy_name = `COMPLETE_WAREHOUSE_ORDER`.
+APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+<ls_execution_plan>-tool_name = `CONFIRM_PICKING_WTS`.
+""""
+""""
+APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+<ls_execution_plan>-tool_name = `SET_WO_STATUS_COMPLETE`.
+
+ELSE.
+APPEND INITIAL LINE TO et_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
+<ls_execution_plan>-tool_name = `SEND_EMAIL_WRONG_STRATEGY`.
+ENDIF.
+ENDMETHOD. 
+```
+#### LLM Agent
+
+
 * **Decision Agent:** Acts as a meta-orchestrator. It can use an LLM to "think," an ML model to "calculate," and BRF+ to "verify" against corporate policy before executing a BAPI.
 
 ### Agent Composition
