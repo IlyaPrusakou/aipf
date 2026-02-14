@@ -246,7 +246,7 @@ ENDMETHOD.
 ### Implement Decision Provider
 Create class and implement interface ZPRU_IF_DECISION_PROVIDER
 ```abap
-CLASS ZCL_DECISION_PROVIDER DEFINTION CREATE PUBLIC.
+CLASS ZCL_DECISION_PROVIDER DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_decision_provider.
   PROTECTED SECTION.
@@ -254,19 +254,19 @@ CLASS ZCL_DECISION_PROVIDER DEFINTION CREATE PUBLIC.
 ENDCLASS.
 
 CLASS ZCL_DECISION_PROVIDER IMPLEMENTATION.  
-METHOD zpru_if_decision_provider~call_decision_engine.
+  METHOD zpru_if_decision_provider~call_decision_engine.
 
-ENDMETHOD.
+  ENDMETHOD.
 
-METHOD zpru_if_decision_provider~prepare_final_response.
+  METHOD zpru_if_decision_provider~prepare_final_response.
 
-ENDMETHOD.
+  ENDMETHOD.
 ENDCLASS.
 ```
 ### Implement Agent Info Provider
 Create class and implement interface ZPRU_IF_AGENT_INFO_PROVIDER
 ```abap
-CLASS ZCL_AGENT_INFO_PROVIDER DEFINTION CREATE PUBLIC.
+CLASS ZCL_AGENT_INFO_PROVIDER DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_info_provider.
   PROTECTED SECTION.
@@ -274,16 +274,16 @@ CLASS ZCL_AGENT_INFO_PROVIDER DEFINTION CREATE PUBLIC.
 ENDCLASS.
 
 CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
-METHOD zpru_if_agent_info_provider~get_agent_info.
-  rv_agent_info = `It is my first agent and it does some stuff`.
-ENDMETHOD.
+  METHOD zpru_if_agent_info_provider~get_agent_info.
+    rv_agent_info = `It is my first agent and it does some stuff`.
+  ENDMETHOD.
 ENDCLASS.
 ```
 
 ### Implement System Prompt Provider
 Create class and implement interface ZPRU_IF_PROMPT_PROVIDER
 ```abap
-CLASS ZCL_SYST_PROMPT_PROVIDER DEFINTION CREATE PUBLIC.
+CLASS ZCL_SYST_PROMPT_PROVIDER DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_prompt_provider.
   PROTECTED SECTION.
@@ -291,9 +291,9 @@ CLASS ZCL_SYST_PROMPT_PROVIDER DEFINTION CREATE PUBLIC.
 ENDCLASS.
 
 CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
-METHOD zpru_if_prompt_provider~get_system_prompt.
-  rv_system_prompt = `It is my system prompt. I am about to feed to LLM`.
-ENDMETHOD.
+  METHOD zpru_if_prompt_provider~get_system_prompt.
+    rv_system_prompt = `It is my system prompt. I am about to feed to LLM`.
+  ENDMETHOD.
 ENDCLASS.
 ```
 ### Short Memory Provider
@@ -313,13 +313,14 @@ ls_agent-longmemoryprovider   = `ZPRU_CL_LONG_MEMORY_BASE`.
 ls_agent-agentinfoprovider    = `ZCL_AGENT_INFO_PROVIDER`.
 ls_agent-systempromptprovider = `ZCL_SYST_PROMPT_PROVIDER`.
 ```
+
 ### Implement your first tool - ABAP code tool
 Developer has two options. First is to create new class and implement common tool interface ZPRU_IF_TOOL_EXECUTOR and specific tool interface ZPRU_IF_ABAP_EXECUTOR. The second option is just inherit from basic class ZPRU_CL_ABAP_EXECUTOR and implement only abstract method EXECUTE_CODE_INT. In both variants developer must additionally implement interface ZPRU_IF_TOOL_PROVIDER to provide logic to instantiate tool.
 For sure you can make separate class for interface ZPRU_IF_TOOL_PROVIDER if you need make some fancy instantiating logic. In our simple example we just return self reference ME.
 
 #### Tool from scratch
 ```abap
-CLASS ZCL_ABAP_CODE_TOOL1 DEFINTION CREATE PUBLIC.
+CLASS ZCL_ABAP_CODE_TOOL1 DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_executor.
     INTERFACES zpru_if_abap_executor.
@@ -329,19 +330,20 @@ CLASS ZCL_ABAP_CODE_TOOL1 DEFINTION CREATE PUBLIC.
 ENDCLASS.
 
 CLASS ZCL_ABAP_CODE_TOOL1 IMPLEMENTATION.
-METHOD zpru_if_abap_executor~execute_code.
-  DATA lv_tool_output TYPE string.
-  lv_tool_output = `My tool is executed`.
-ENDMETHOD.
-METHOD zpru_if_tool_provider~get_tool.
-  ro_executor = me.
-ENDMETHOD.
+  METHOD zpru_if_abap_executor~execute_code.
+    DATA lv_tool_output TYPE string.
+    lv_tool_output = `My tool is executed`.
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
 ENDCLASS.
 ```
 
 #### Tool via inheriting
 ```abap
-CLASS ZCL_ABAP_CODE_TOOL2 DEFINTION INHERITING FROM zpru_cl_abap_executor CREATE PUBLIC.
+CLASS ZCL_ABAP_CODE_TOOL2 DEFINITION INHERITING FROM zpru_cl_abap_executor CREATE PUBLIC.
   PUBLIC SECTION.
   INTERFACES zpru_if_tool_provider.
   PROTECTED SECTION.
@@ -350,15 +352,72 @@ CLASS ZCL_ABAP_CODE_TOOL2 DEFINTION INHERITING FROM zpru_cl_abap_executor CREATE
 ENDCLASS.
 
 CLASS ZCL_ABAP_CODE_TOOL2 IMPLEMENTATION.
-METHOD  execute_code_int.
-  DATA lv_tool_output TYPE string.
-  lv_tool_output = `My tool is executed`.
-ENDMETHOD.
-METHOD zpru_if_tool_provider~get_tool.
-  ro_executor = me.
-ENDMETHOD.
+  METHOD  execute_code_int.
+    DATA lv_tool_output TYPE string.
+    lv_tool_output = `My tool is executed`.
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
 ENDCLASS.
 ```
 
+### Implement Tool Info Provider
+Create ABAP class and implement interface ZPRU_IF_TOOL_INFO_PROVIDER.
+```abap
+CLASS ZCL_TOOL_INFO DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+  INTERFACES zpru_if_tool_info_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
 
+CLASS ZCL_TOOL_INFO IMPLEMENTATION.
+  METHOD zpru_if_tool_info_provider~get_tool_info.
+    rv_tool_info = `some tool metadata`.
+  ENDMETHOD.
+ENDCLASS.
+```
 
+### Implement Tool Schema Provider
+Create ABAP class and implement interface ZPRU_IF_TOOL_SCHEMA_PROVIDER
+```abap
+CLASS ZCL_TOOL_SCHEMA DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+  INTERFACES zpru_if_tool_schema_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_TOOL_SCHEMA IMPLEMENTATION.
+  METHOD zpru_if_tool_schema_provider~input_rtts_schema.
+    DATA ls_input_struct TYPE zs_some_input.
+    ro_structure_schema ?= cl_abap_typedescr=>describe_by_data( ls_input_struct ).
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
+    DATA ls_output_struct TYPE zs_some_output.
+    ro_structure_schema ?= cl_abap_typedescr=>describe_by_data( ls_output_struct ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
+### Create entry in database table ZPRU_AGENT_TOOL
+You can use preview app for RAP business object ZR_PRU_AGENT via service binding ZUI_PRU_AGENT_TYPE_O4
+```abap
+DATA ls_agent_tool TYPE zpru_agent_tool.
+ls_agent_tool-toolname           = `My first Tool`.
+ls_agent_tool-toolprovider       = `ZCL_ABAP_CODE_TOOL1`. " or ZCL_ABAP_CODE_TOOL2 or separate class implementing interface ZPRU_IF_TOOL_PROVIDER
+ls_agent_tool-toolschemaprovider = `ZCL_TOOL_SCHEMA`.
+ls_agent_tool-toolinfoprovider   = `ZCL_TOOL_INFO`.
+```
+
+### How to run Agent from your abap code
+```abap
+    DATA lo_cl_unit_agent TYPE REF TO zpru_if_unit_agent.
+
+    lo_cl_unit_agent = NEW zpru_cl_unit_agent( ).
+    lo_cl_unit_agent->execute_agent( iv_agent_name  = 'DUMMY_AGENT'
+                                     is_prompt = VALUE #( string_content =  zpru_cl_dummy_agent_logic=>get_input_prompt( ) ) ).
+```
