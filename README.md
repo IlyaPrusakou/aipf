@@ -37,7 +37,8 @@ Tool Metadata is an ABAP class implementing the interface ZPRU_IF_TOOL_INFO_PROV
 
 ### Miniloop
 
-
+Miniloop is a dynamic feature that enables the creation and execution of sub-steps within an existing execution plan.
+Technically, a developer simply populates an exporting parameter during tool execution with the new steps required. The framework then intercepts these additional steps and injects them into the workflow—executing them immediately after the current step and before the next scheduled step in the initial plan.
 
 ### Supported Tools
 
