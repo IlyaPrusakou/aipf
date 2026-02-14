@@ -548,121 +548,88 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~cba_tool.
-    DATA lo_util TYPE REF TO zpru_if_agent_util.
+    DATA ls_reported TYPE zpru_if_agent_frw=>ts_adf_reported.
+    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_adf_failed.
+    DATA lt_cba_in   TYPE TABLE FOR CREATE ZR_PRU_AGENT\_tool.
 
-    precheck_cba_tool( EXPORTING it_tool_create_imp = it_tool_create_imp
-                       IMPORTING et_entities        = DATA(lt_entities)
-                       CHANGING  cs_reported        = cs_reported
-                                 cs_failed          = cs_failed ).
-
-    IF lt_entities IS INITIAL.
+    IF it_tool_create_imp IS INITIAL.
       RETURN.
     ENDIF.
 
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
+    precheck_cba_tool( EXPORTING it_tool_create_imp = it_tool_create_imp
+                       IMPORTING et_entities        = DATA(lt_entities)
+                       CHANGING  cs_reported        = ls_reported
+                                 cs_failed          = ls_failed ).
 
-    zpru_cl_adf_buffer=>prep_agent_buffer( VALUE #( FOR <ls_k>
-                                                    IN  lt_entities
-                                                    ( agent_uuid = <ls_k>-agentuuid ) ) ).
+    cs_failed = CORRESPONDING #( DEEP ls_failed ).
+    cs_reported = CORRESPONDING #( DEEP ls_reported ).
 
-    zpru_cl_adf_buffer=>prep_tool_buffer( VALUE #( FOR <ls_q>
-                                                   IN     lt_entities
-                                                   ( agent_uuid = <ls_q>-agentuuid
-                                                     tool_uuid  = <ls_q>-tooluuid
-                                                     full_key   = abap_true ) ) ).
+    IF    lt_entities       <> it_tool_create_imp
+       OR ls_failed-tool IS NOT INITIAL.
+      RETURN.
+    ENDIF.
 
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
+      APPEND INITIAL LINE TO lt_cba_in ASSIGNING FIELD-SYMBOL(<ls_cba_in>).
+      <ls_cba_in>-AIPF7AgentUUID = <ls_create>-agentuuid.
+      APPEND INITIAL LINE TO <ls_cba_in>-%target ASSIGNING FIELD-SYMBOL(<ls_target>).
+      <ls_target>-%cid            = |CID_{ sy-index }_{ <ls_create>-tooluuid }|.
+      <ls_target>-AIPF7ToolUuid             = <ls_create>-tooluuid.
+      <ls_target>-AIPF7AgentUuid            = <ls_create>-agentuuid.
+      <ls_target>-AIPF7ToolName             = COND #( WHEN <ls_create>-control-toolname = abap_true THEN <ls_create>-toolname ).
+      <ls_target>-AIPF7ToolProvider         = COND #( WHEN <ls_create>-control-toolprovider = abap_true THEN <ls_create>-toolprovider ).
+      <ls_target>-AIPF7StepType             = COND #( WHEN <ls_create>-control-steptype = abap_true THEN <ls_create>-steptype ).
+      <ls_target>-AIPF7ToolSchemaProvider   = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true THEN <ls_create>-toolschemaprovider ).
+      <ls_target>-AIPF7ToolInfoProvider     = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true THEN <ls_create>-toolinfoprovider ).
+      <ls_target>-AIPF7ToolIsBorrowed       = COND #( WHEN <ls_create>-control-toolisborrowed = abap_true THEN <ls_create>-toolisborrowed ).
+      <ls_target>-AIPF7ToolIsTransient      = COND #( WHEN <ls_create>-control-toolistransient = abap_true THEN <ls_create>-toolistransient ).
 
-      ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                               " TODO: variable is assigned but never used (ABAP cleaner)
-                                               deleted             = abap_false ] TO FIELD-SYMBOL(<ls_parent>).
-      IF sy-subrc = 0.
-        IF    NOT line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                                                instance-tooluuid  = <ls_create>-tooluuid ] )
-           OR     line_exists( zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                                                instance-tooluuid  = <ls_create>-tooluuid
-                                                                deleted             = abap_true ] ).
+      <ls_target>-%control-AIPF7ToolName             = COND #( WHEN <ls_create>-control-toolname = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7ToolProvider         = COND #( WHEN <ls_create>-control-toolprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7StepType             = COND #( WHEN <ls_create>-control-steptype = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7ToolSchemaProvider   = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7ToolInfoProvider     = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7ToolIsBorrowed       = COND #( WHEN <ls_create>-control-toolisborrowed = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_target>-%control-AIPF7ToolIsTransient      = COND #( WHEN <ls_create>-control-toolistransient = abap_true THEN if_abap_behv=>mk-on ).
+    ENDLOOP.
 
-          ASSIGN zpru_cl_adf_buffer=>tool_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                                  instance-tooluuid  = <ls_create>-tooluuid
-                                                  deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-          IF sy-subrc = 0.
-            DELETE zpru_cl_adf_buffer=>tool_buffer
-                   WHERE     instance-agentuuid = <ls_buffer>-instance-agentuuid
-                         AND instance-tooluuid  = <ls_buffer>-instance-tooluuid
-                         AND deleted             = abap_true.
-          ENDIF.
+    MODIFY ENTITIES OF ZR_PRU_AGENT
+           ENTITY Agent
+           CREATE BY \_tool FROM lt_cba_in
+           MAPPED DATA(ls_mapped_eml)
+           FAILED DATA(ls_failed_eml)
+           REPORTED DATA(ls_reported_eml).
 
-          APPEND VALUE #(
-              instance-tooluuid            = <ls_create>-tooluuid
-              instance-agentuuid           = <ls_create>-agentuuid
-              instance-toolname            = COND #( WHEN <ls_create>-control-toolname = abap_true
-                                                      THEN <ls_create>-toolname )
-              instance-toolprovider        = COND #( WHEN <ls_create>-control-toolprovider = abap_true
-                                                      THEN <ls_create>-toolprovider )
-              instance-steptype            = COND #( WHEN <ls_create>-control-steptype = abap_true
-                                                      THEN <ls_create>-steptype )
-              instance-toolschemaprovider = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true
-                                                      THEN <ls_create>-toolschemaprovider )
-              instance-toolinfoprovider   = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true
-                                                      THEN <ls_create>-toolinfoprovider )
-              instance-toolisborrowed          = COND #( WHEN <ls_create>-control-toolisborrowed = abap_true
-                                                      THEN <ls_create>-toolisborrowed )
-              instance-toolistransient         = COND #( WHEN <ls_create>-control-toolistransient = abap_true
-                                                      THEN <ls_create>-toolistransient )
-              changed                       = abap_true
-              deleted                       = abap_false ) TO zpru_cl_adf_buffer=>tool_buffer.
+    LOOP AT ls_failed_eml-agent ASSIGNING FIELD-SYMBOL(<ls_failed_parent>).
+      APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_failed_agent_target>).
+      <ls_failed_agent_target>-agentuuid = <ls_failed_parent>-AIPF7AgentUUID.
+      <ls_failed_agent_target>-fail    = CONV #( <ls_failed_parent>-%fail-cause ).
+    ENDLOOP.
 
-          APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                          tooluuid  = <ls_create>-tooluuid ) TO cs_mapped-tool.
+    LOOP AT ls_failed_eml-agenttool ASSIGNING FIELD-SYMBOL(<ls_failed_tool>).
+      APPEND INITIAL LINE TO cs_failed-tool ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
+      <ls_failed_target>-agentuuid = <ls_failed_tool>-AIPF7AgentUuid.
+      <ls_failed_target>-tooluuid  = <ls_failed_tool>-AIPF7ToolUuid.
+      <ls_failed_target>-fail       = CONV #( <ls_failed_tool>-%fail-cause ).
+    ENDLOOP.
 
-          APPEND VALUE #( msg       = lo_util->new_message(
-                                          iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                          iv_number   = `001`
-                                          iv_severity = zpru_if_agent_message=>sc_severity-success
-                                          iv_v1       = <ls_create>-tooluuid )
-                          agentuuid = <ls_create>-agentuuid
-                          tooluuid  = <ls_create>-tooluuid ) TO cs_reported-tool.
+    LOOP AT ls_reported_eml-agent ASSIGNING FIELD-SYMBOL(<ls_reported_parent>).
+      APPEND INITIAL LINE TO cs_reported-agent ASSIGNING FIELD-SYMBOL(<ls_reported_parent_target>).
+      <ls_reported_parent_target>-agentuuid = <ls_reported_parent>-AIPF7AgentUUID.
+*      <ls_reported_parent_target>-msg      = <ls_reported_parent>-%msg.
+    ENDLOOP.
 
-        ELSE.
-          APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                          tooluuid  = <ls_create>-tooluuid
-                          create    = abap_true
-                          fail      = zpru_if_agent_frw=>cs_fail_cause-conflict )
-                 TO cs_failed-tool.
+    LOOP AT ls_reported_eml-agenttool ASSIGNING FIELD-SYMBOL(<ls_reported_tool>).
+      APPEND INITIAL LINE TO cs_reported-tool ASSIGNING FIELD-SYMBOL(<ls_reported_target>).
+      <ls_reported_target>-agentuuid = <ls_reported_tool>-AIPF7AgentUuid.
+      <ls_reported_target>-tooluuid  = <ls_reported_tool>-AIPF7ToolUuid.
+*      <ls_reported_target>-msg       = <ls_reported_tool>-%msg.
+    ENDLOOP.
 
-          APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                          tooluuid  = <ls_create>-tooluuid
-                          create    = abap_true
-                          msg       = lo_util->new_message(
-                                          iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                          iv_number   = `001`
-                                          iv_severity = zpru_if_agent_message=>sc_severity-error
-                                          iv_v1       = <ls_create>-tooluuid ) )
-                 TO cs_reported-tool.
-        ENDIF.
-
-      ELSE.
-        APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                        tooluuid  = <ls_create>-tooluuid
-                        create    = abap_true
-                        fail      = zpru_if_agent_frw=>cs_fail_cause-not_found )
-               TO cs_failed-tool.
-
-        APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                        tooluuid  = <ls_create>-tooluuid
-                        create    = abap_true
-                        msg       = lo_util->new_message(
-                                        iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                        iv_number   = `002`
-                                        iv_severity = zpru_if_agent_message=>sc_severity-error ) )
-               TO cs_reported-tool.
-      ENDIF.
+    LOOP AT ls_mapped_eml-agenttool ASSIGNING FIELD-SYMBOL(<ls_mapped_tool>).
+      APPEND INITIAL LINE TO cs_mapped-tool ASSIGNING FIELD-SYMBOL(<ls_mapped_target>).
+      <ls_mapped_target>-agentuuid = <ls_mapped_tool>-AIPF7AgentUuid.
+      <ls_mapped_target>-tooluuid  = <ls_mapped_tool>-AIPF7ToolUuid.
     ENDLOOP.
   ENDMETHOD.
 
