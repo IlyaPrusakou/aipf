@@ -6,6 +6,45 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 **Disclaimer**: SAP, ABAP, BTP, and BOPF are trademarks or registered trademarks of SAP SE in Germany and other countries. AIPF is an independent open-source project and is not affiliated with, sponsored by, or endorsed by SAP SE.
 
+## Table of Contents
+* [Long Story Short](#long-story-short)
+* [Installation](#installation)
+* [Agent Definition](#agent-definition)
+    * [Decision Provider](#decision-provider)
+    * [Execution Plan](#execution-plan)
+    * [Tool](#tool)
+    * [Supported Tools](#supported-tools)
+    * [Tool Info Provider](#tool-info-provider)
+    * [Tool Schema Provider](#tool-schema-provider)
+* [Agent Type](#agent-type)
+* [Agent Execution](#agent-execution)
+    * [Execution Header](#execution-header)
+    * [Execution Query](#execution-query)
+    * [Execution Step](#execution-step)
+    * [Miniloop](#miniloop)
+* [Memory Management](#memory-management)
+    * [Short Memory](#short-memory)
+    * [Long Memory](#long-memory)
+* [Developer Experience](#developer-experience)
+    * [Core Interfaces](#core-interfaces)
+* [Agent Categories](#agent-categories)
+    * [IF-ELSE Agent](#if-else-agent)
+    * [LLM Agent](#llm-agent)
+    * [Decision Agent](#decision-agent)
+* [Agent Composition](#agent-composition)
+* [How to implement your first agent](#how-to-implement-your-first-agent)
+    * [Implement Decision Provider](#implement-decision-provider)
+    * [Implement Agent Info Provider](#implement-agent-info-provider)
+    * [Implement System Prompt Provider](#implement-system-prompt-provider)
+    * [Short Memory Provider](#short-memory-provider)
+    * [Long Memory Provider](#long-memory-provider)
+    * [Create entry in database table ZPRU_AGENT](#create-entry-in-database-table-zpru_agent)
+    * [Implement your first tool - ABAP code tool](#implement-your-first-tool---abap-code-tool)
+    * [Implement Tool Info Provider](#implement-tool-info-provider-1)
+    * [Implement Tool Schema Provider](#implement-tool-schema-provider-1)
+    * [Create entry in database table ZPRU_AGENT_TOOL](#create-entry-in-database-table-zpru_agent_tool)
+    * [How to run Agent from your abap code](#how-to-run-agent-from-your-abap-code)
+
 ## Long Story Short
 Standard AI calls in ABAP are stateless—they send a prompt and get a response. AIPF adds the Brain and Muscles:
 **Decision Platform:** ABAP-based Decision Engine, ABAP-based Short-Term Memory Management, ABAP-based Long-Term Memory Framework, etc.
