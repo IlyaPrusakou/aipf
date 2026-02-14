@@ -240,3 +240,73 @@ ENDMETHOD.
 * **Nested Agents:** An agent can be assigned as a tool to another agent. This allows for specialized "sub-agents" to handle specific domains (e.g., an HR Agent calling a Payroll Agent as a tool).
 * **Composed Agents:** Multiple agents can be chained together to handle multi-stage workflows.
 * **Reflexive Agents:** The simplest form of composition where the output of an agent is immediately fed back as the input for the next round of processing to refine or validate the result.
+
+## How to implement your first agent
+
+### Implement Decision Provider
+Create class and implement interface ZPRU_IF_DECISION_PROVIDER
+```abap
+CLASS ZCL_DECISION_PROVIDER DEFINTION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_decision_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_DECISION_PROVIDER IMPLEMENTATION.  
+METHOD zpru_if_decision_provider~call_decision_engine.
+
+ENDMETHOD.
+
+METHOD zpru_if_decision_provider~prepare_final_response.
+
+ENDMETHOD.
+ENDCLASS.
+```
+### Implement Agent Info Provider
+Create class and implement interface ZPRU_IF_AGENT_INFO_PROVIDER
+```abap
+CLASS ZCL_AGENT_INFO_PROVIDER DEFINTION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_agent_info_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
+METHOD zpru_if_agent_info_provider~get_agent_info.
+  rv_agent_info = `It is my first agent and it does some stuff`.
+ENDMETHOD.
+ENDCLASS.
+```
+
+### Implement System Prompt Provider
+Create class and implement interface ZPRU_IF_PROMPT_PROVIDER
+```abap
+CLASS ZCL_SYST_PROMPT_PROVIDER DEFINTION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_prompt_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
+METHOD zpru_if_prompt_provider~get_system_prompt.
+  rv_system_prompt = `It is my system prompt. I am about to feed to LLM`.
+ENDMETHOD.
+ENDCLASS.
+```
+### Create entry in database table ZPRU_AGENT
+You can use preview app for RAP business object ZR_PRU_AGENT via service binding ZUI_PRU_AGENT_TYPE_O4
+```abap
+DATA ls_agent TYPE zpru_agent.
+ls_agent-agentname            = `My first Agent`.
+ls_agent-decisionprovider     = `ZCL_DECISION_PROVIDER`.
+ls_agent-systempromptprovider = `ZCL_SYST_PROMPT_PROVIDER`.
+ls_agent-shortmemoryprovider  = `ZPRU_IF_SHORT_MEMORY_PROVIDER`.
+ls_agent-agentinfoprovider    = `ZCL_AGENT_INFO_PROVIDER`.
+ls_agent-longmemoryprovider   = `ZPRU_CL_LONG_MEMORY_BASE`.
+```
+
+
+
