@@ -103,6 +103,11 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 *rename paramname, paramtype and paramorder in table for dynamic tool normally
 
+* ADD BASIC CLASS FOR DECISION PROVIDER
+* ADD STRUCTURE FOR DECISION LOG - LOOK AT EXAMPLE IMPLEMENTATION
+
+* check how you use messages wher json and where is string
+
   ENDMETHOD.
 
 ENDCLASS.

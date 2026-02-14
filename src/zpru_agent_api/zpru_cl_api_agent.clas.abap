@@ -2420,6 +2420,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD prepare_controller_4_return.
+    DATA(LO_SHORT_MEMORY) = get_short_memory(  ).
+    LO_SHORT_MEMORY->flush_memory( EXPORTING iv_all_messages = ABAP_TRUE ).
     eo_executed_controller = get_controller( ).
   ENDMETHOD.
 

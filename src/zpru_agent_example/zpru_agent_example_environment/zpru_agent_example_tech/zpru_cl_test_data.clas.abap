@@ -299,6 +299,13 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
                                    toolinfoprovider   = 'ZPRU_CL_DUMMY_AGENT_LOGIC'  )
                                  ( tooluuid            = cl_system_uuid=>create_uuid_x16_static( )
                                    agentuuid           = lv_agent_uuid2 "2
+                                   toolname            = 'DUMMY_LLM'
+                                   toolprovider        = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
+                                   steptype            = 'L'
+                                   toolschemaprovider = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
+                                   toolinfoprovider   = 'ZPRU_CL_DUMMY_AGENT_LOGIC'  )
+                                 ( tooluuid            = cl_system_uuid=>create_uuid_x16_static( )
+                                   agentuuid           = lv_agent_uuid2 "2
                                    toolname            = 'DUMMY_KNOWLEDGE'
                                    toolprovider        = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
                                    steptype            = 'K'

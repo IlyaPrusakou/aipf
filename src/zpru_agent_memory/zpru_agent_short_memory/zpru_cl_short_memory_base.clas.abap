@@ -30,6 +30,66 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
     rt_history = mt_agent_message.
   ENDMETHOD.
 
+  METHOD zpru_if_short_memory_provider~flush_memory.
+    DATA lt_message_2_discard LIKE mt_agent_message.
+    DATA lo_discard_input     TYPE REF TO zpru_if_payload.
+    DATA lo_discard_output    TYPE REF TO zpru_if_payload.
+    DATA lr_sort_number_r     TYPE RANGE OF i.
+
+    SORT mt_agent_message BY sortnumber DESCENDING.
+
+    if iv_all_messages = abap_false.
+      IF lines( mt_agent_message ) > mv_short_memory_size.
+        LOOP AT mt_agent_message FROM mv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
+          APPEND INITIAL LINE TO lt_message_2_discard ASSIGNING FIELD-SYMBOL(<ls_discard>).
+          <ls_discard> = <ls_message_to_discard>.
+
+          APPEND INITIAL LINE TO lr_sort_number_r ASSIGNING FIELD-SYMBOL(<ls_sort_number_r>).
+          <ls_sort_number_r>-sign   = 'I'.
+          <ls_sort_number_r>-option = 'EQ'.
+          <ls_sort_number_r>-low    = <ls_discard>-sortnumber.
+        ENDLOOP.
+      ENDIF.
+    else.
+      lt_message_2_discard = mt_agent_message.
+    endif.
+
+      IF lt_message_2_discard IS NOT INITIAL.
+
+        TRY.
+            lo_discard_input ?= zpru_cl_agent_service_mngr=>get_service(
+                                    iv_service = `ZPRU_IF_PAYLOAD`
+                                    iv_context = zpru_if_agent_frw=>cs_context-standard ).
+          CATCH zpru_cx_agent_core.
+            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+        ENDTRY.
+
+        lo_discard_input->set_data( ir_data = REF #( lt_message_2_discard ) ).
+
+        TRY.
+            lo_discard_output ?= zpru_cl_agent_service_mngr=>get_service(
+                                     iv_service = `ZPRU_IF_PAYLOAD`
+                                     iv_context = zpru_if_agent_frw=>cs_context-standard ).
+          CATCH zpru_cx_agent_core.
+            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+        ENDTRY.
+
+        discard_messages( EXPORTING io_input  = lo_discard_input
+                          IMPORTING eo_output = lo_discard_output ).
+
+        eo_output = lo_discard_output.
+        
+        if iv_all_messages = abap_false.
+          IF lr_sort_number_r IS NOT INITIAL.
+            DELETE mt_agent_message WHERE sortnumber IN lr_sort_number_r.
+          ENDIF.
+        else.
+           clear: mt_agent_message. 
+        endif.
+
+      ENDIF.
+  ENDMETHOD.
+
   METHOD zpru_if_short_memory_provider~save_message.
     DATA lt_message_2_discard LIKE mt_agent_message.
     DATA lo_discard_input     TYPE REF TO zpru_if_payload.
@@ -70,49 +130,9 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     ENDLOOP.
 
-    SORT mt_agent_message BY sortnumber DESCENDING.
+    zpru_if_short_memory_provider=>flush_memory( EXPORTING iv_all_messages = abap_false 
+                                                 IMPORTING eo_output = lo_discard_output ).
 
-    IF lines( mt_agent_message ) > mv_short_memory_size.
-      LOOP AT mt_agent_message FROM mv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
-        APPEND INITIAL LINE TO lt_message_2_discard ASSIGNING FIELD-SYMBOL(<ls_discard>).
-        <ls_discard> = <ls_message_to_discard>.
-
-        APPEND INITIAL LINE TO lr_sort_number_r ASSIGNING FIELD-SYMBOL(<ls_sort_number_r>).
-        <ls_sort_number_r>-sign   = 'I'.
-        <ls_sort_number_r>-option = 'EQ'.
-        <ls_sort_number_r>-low    = <ls_discard>-sortnumber.
-      ENDLOOP.
-
-      IF lt_message_2_discard IS NOT INITIAL.
-
-        TRY.
-            lo_discard_input ?= zpru_cl_agent_service_mngr=>get_service(
-                                    iv_service = `ZPRU_IF_PAYLOAD`
-                                    iv_context = zpru_if_agent_frw=>cs_context-standard ).
-          CATCH zpru_cx_agent_core.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-
-        lo_discard_input->set_data( ir_data = REF #( lt_message_2_discard ) ).
-
-        TRY.
-            lo_discard_output ?= zpru_cl_agent_service_mngr=>get_service(
-                                     iv_service = `ZPRU_IF_PAYLOAD`
-                                     iv_context = zpru_if_agent_frw=>cs_context-standard ).
-          CATCH zpru_cx_agent_core.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-
-        discard_messages( EXPORTING io_input  = lo_discard_input
-                          IMPORTING eo_output = lo_discard_output ).
-
-        eo_output = lo_discard_output.
-
-        IF lr_sort_number_r IS NOT INITIAL.
-          DELETE mt_agent_message WHERE sortnumber IN lr_sort_number_r.
-        ENDIF.
-      ENDIF.
-    ENDIF.
   ENDMETHOD.
 
   METHOD discard_messages.

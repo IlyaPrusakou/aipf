@@ -1,10 +1,49 @@
-# AIPF - Agentic Intelligence Processing Framework
+# AIPF - Agent Integration Processing Framework
 
 The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 **So far AIPF is under heavy development!!!**
 
 **Disclaimer**: SAP, ABAP, BTP, and BOPF are trademarks or registered trademarks of SAP SE in Germany and other countries. AIPF is an independent open-source project and is not affiliated with, sponsored by, or endorsed by SAP SE.
+
+## Table of Contents
+* [Long Story Short](#long-story-short)
+* [Installation](#installation)
+* [Agent Definition](#agent-definition)
+    * [Decision Provider](#decision-provider)
+    * [Execution Plan](#execution-plan)
+    * [Tool](#tool)
+    * [Supported Tools](#supported-tools)
+    * [Tool Info Provider](#tool-info-provider)
+    * [Tool Schema Provider](#tool-schema-provider)
+* [Agent Type](#agent-type)
+* [Agent Execution](#agent-execution)
+    * [Execution Header](#execution-header)
+    * [Execution Query](#execution-query)
+    * [Execution Step](#execution-step)
+    * [Miniloop](#miniloop)
+* [Memory Management](#memory-management)
+    * [Short Memory](#short-memory)
+    * [Long Memory](#long-memory)
+* [Developer Experience](#developer-experience)
+    * [Core Interfaces](#core-interfaces)
+* [Agent Categories](#agent-categories)
+    * [IF-ELSE Agent](#if-else-agent)
+    * [LLM Agent](#llm-agent)
+    * [Decision Agent](#decision-agent)
+* [Agent Composition](#agent-composition)
+* [How to implement your first agent](#how-to-implement-your-first-agent)
+    * [Implement Decision Provider](#implement-decision-provider)
+    * [Implement Agent Info Provider](#implement-agent-info-provider)
+    * [Implement System Prompt Provider](#implement-system-prompt-provider)
+    * [Short Memory Provider](#short-memory-provider)
+    * [Long Memory Provider](#long-memory-provider)
+    * [Create entry in database table ZPRU_AGENT](#create-entry-in-database-table-zpru_agent)
+    * [Implement your first tool - ABAP code tool](#implement-your-first-tool---abap-code-tool)
+    * [Implement Tool Info Provider](#implement-tool-info-provider-1)
+    * [Implement Tool Schema Provider](#implement-tool-schema-provider-1)
+    * [Create entry in database table ZPRU_AGENT_TOOL](#create-entry-in-database-table-zpru_agent_tool)
+    * [How to run Agent from your abap code](#how-to-run-agent-from-your-abap-code)
 
 ## Long Story Short
 Standard AI calls in ABAP are stateless—they send a prompt and get a response. AIPF adds the Brain and Muscles:
@@ -108,9 +147,9 @@ It recieves unique UUID and attach to certain Execution Query.
 Miniloop is a dynamic feature that enables the creation and execution of sub-steps within an existing execution plan.
 Technically, a developer simply populates an exporting parameter during tool execution with the new steps required. The framework then intercepts these additional steps and injects them into the workflow - executing them immediately after the current step and before the next scheduled step in the initial plan.
 
-## Memory Managment
+## Memory Management
 
-Memory Managment comprises ABAP classes, processing Short Memory, Long Memory, Memory Summirization and Memory Discard.
+Memory Management comprises ABAP classes, processing Short Memory, Long Memory, Memory Summirization and Memory Discard.
 
 ### Short Memory
 
@@ -240,3 +279,184 @@ ENDMETHOD.
 * **Nested Agents:** An agent can be assigned as a tool to another agent. This allows for specialized "sub-agents" to handle specific domains (e.g., an HR Agent calling a Payroll Agent as a tool).
 * **Composed Agents:** Multiple agents can be chained together to handle multi-stage workflows.
 * **Reflexive Agents:** The simplest form of composition where the output of an agent is immediately fed back as the input for the next round of processing to refine or validate the result.
+
+## How to implement your first agent
+
+### Implement Decision Provider
+Create class and implement interface ZPRU_IF_DECISION_PROVIDER
+```abap
+CLASS ZCL_DECISION_PROVIDER DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_decision_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_DECISION_PROVIDER IMPLEMENTATION.  
+  METHOD zpru_if_decision_provider~call_decision_engine.
+
+  ENDMETHOD.
+
+  METHOD zpru_if_decision_provider~prepare_final_response.
+
+  ENDMETHOD.
+ENDCLASS.
+```
+### Implement Agent Info Provider
+Create class and implement interface ZPRU_IF_AGENT_INFO_PROVIDER
+```abap
+CLASS ZCL_AGENT_INFO_PROVIDER DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_agent_info_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
+  METHOD zpru_if_agent_info_provider~get_agent_info.
+    rv_agent_info = `It is my first agent and it does some stuff`.
+  ENDMETHOD.
+ENDCLASS.
+```
+
+### Implement System Prompt Provider
+Create class and implement interface ZPRU_IF_PROMPT_PROVIDER
+```abap
+CLASS ZCL_SYST_PROMPT_PROVIDER DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_prompt_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_AGENT_INFO_PROVIDER IMPLEMENTATION.
+  METHOD zpru_if_prompt_provider~get_system_prompt.
+    rv_system_prompt = `It is my system prompt. I am about to feed to LLM`.
+  ENDMETHOD.
+ENDCLASS.
+```
+### Short Memory Provider
+Just use framework class ZPRU_CL_SHORT_MEMORY_BASE, but if you want to implement your own short memory management, you may inherit theis class or even create new class and implement interface ZPRU_IF_SHORT_MEMORY_PROVIDER. 
+
+### Long Memory Provider
+Just use framework class ZPRU_CL_LONG_MEMORY_BASE, but if you want to implement your own short memory management, you may inherit theis class or even create new class and implement interface ZPRU_IF_LONG_MEMORY_PROVIDER. 
+
+### Create entry in database table ZPRU_AGENT
+You can use preview app for RAP business object ZR_PRU_AGENT via service binding ZUI_PRU_AGENT_TYPE_O4
+```abap
+DATA ls_agent TYPE zpru_agent.
+ls_agent-agentname            = `MY_FIRST_AGENT`.
+ls_agent-decisionprovider     = `ZCL_DECISION_PROVIDER`.
+ls_agent-shortmemoryprovider  = `ZPRU_CL_SHORT_MEMORY_BASE`.
+ls_agent-longmemoryprovider   = `ZPRU_CL_LONG_MEMORY_BASE`.
+ls_agent-agentinfoprovider    = `ZCL_AGENT_INFO_PROVIDER`.
+ls_agent-systempromptprovider = `ZCL_SYST_PROMPT_PROVIDER`.
+```
+
+### Implement your first tool - ABAP code tool
+Developer has two options. First is to create new class and implement common tool interface ZPRU_IF_TOOL_EXECUTOR and specific tool interface ZPRU_IF_ABAP_EXECUTOR. The second option is just inherit from basic class ZPRU_CL_ABAP_EXECUTOR and implement only abstract method EXECUTE_CODE_INT. In both variants developer must additionally implement interface ZPRU_IF_TOOL_PROVIDER to provide logic to instantiate tool.
+For sure you can make separate class for interface ZPRU_IF_TOOL_PROVIDER if you need make some fancy instantiating logic. In our simple example we just return self reference ME.
+
+#### Tool from scratch
+```abap
+CLASS ZCL_ABAP_CODE_TOOL1 DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zpru_if_tool_executor.
+    INTERFACES zpru_if_abap_executor.
+    INTERFACES zpru_if_tool_provider
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_ABAP_CODE_TOOL1 IMPLEMENTATION.
+  METHOD zpru_if_abap_executor~execute_code.
+    DATA lv_tool_output TYPE string.
+    lv_tool_output = `My tool is executed`.
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
+ENDCLASS.
+```
+
+#### Tool via inheriting
+```abap
+CLASS ZCL_ABAP_CODE_TOOL2 DEFINITION INHERITING FROM zpru_cl_abap_executor CREATE PUBLIC.
+  PUBLIC SECTION.
+  INTERFACES zpru_if_tool_provider.
+  PROTECTED SECTION.
+   METHODS execute_code_int REDEFINITION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_ABAP_CODE_TOOL2 IMPLEMENTATION.
+  METHOD  execute_code_int.
+    DATA lv_tool_output TYPE string.
+    lv_tool_output = `My tool is executed`.
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
+ENDCLASS.
+```
+
+### Implement Tool Info Provider
+Create ABAP class and implement interface ZPRU_IF_TOOL_INFO_PROVIDER.
+```abap
+CLASS ZCL_TOOL_INFO DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+  INTERFACES zpru_if_tool_info_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_TOOL_INFO IMPLEMENTATION.
+  METHOD zpru_if_tool_info_provider~get_tool_info.
+    rv_tool_info = `some tool metadata`.
+  ENDMETHOD.
+ENDCLASS.
+```
+
+### Implement Tool Schema Provider
+Create ABAP class and implement interface ZPRU_IF_TOOL_SCHEMA_PROVIDER
+```abap
+CLASS ZCL_TOOL_SCHEMA DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+  INTERFACES zpru_if_tool_schema_provider.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS ZCL_TOOL_SCHEMA IMPLEMENTATION.
+  METHOD zpru_if_tool_schema_provider~input_rtts_schema.
+    DATA ls_input_struct TYPE zs_some_input.
+    ro_structure_schema ?= cl_abap_typedescr=>describe_by_data( ls_input_struct ).
+  ENDMETHOD.
+
+  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
+    DATA ls_output_struct TYPE zs_some_output.
+    ro_structure_schema ?= cl_abap_typedescr=>describe_by_data( ls_output_struct ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
+### Create entry in database table ZPRU_AGENT_TOOL
+You can use preview app for RAP business object ZR_PRU_AGENT via service binding ZUI_PRU_AGENT_TYPE_O4
+```abap
+DATA ls_agent_tool TYPE zpru_agent_tool.
+ls_agent_tool-toolname           = `My first Tool`.
+ls_agent_tool-toolprovider       = `ZCL_ABAP_CODE_TOOL1`. " or ZCL_ABAP_CODE_TOOL2 or separate class implementing interface ZPRU_IF_TOOL_PROVIDER
+ls_agent_tool-toolschemaprovider = `ZCL_TOOL_SCHEMA`.
+ls_agent_tool-toolinfoprovider   = `ZCL_TOOL_INFO`.
+```
+
+### How to run Agent from your abap code
+```abap
+    DATA lo_cl_unit_agent TYPE REF TO zpru_if_unit_agent.
+
+    lo_cl_unit_agent = NEW zpru_cl_unit_agent( ).
+    lo_cl_unit_agent->execute_agent( iv_agent_name  = 'MY_FIRST_AGENT'
+                                     is_prompt = VALUE #( string_content = `Process CMR N1231411KL` ) ).
+```

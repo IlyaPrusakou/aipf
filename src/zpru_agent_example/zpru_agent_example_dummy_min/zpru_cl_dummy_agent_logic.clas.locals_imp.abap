@@ -1,48 +1,171 @@
 CLASS lcl_decision_provider DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zpru_if_decision_provider.
+
+TYPES: BEGIN OF tS_thinking_step,
+         step_no    TYPE i,
+         timestamp  TYPE timestampl,
+         content    TYPE string,
+       END OF tS_thinking_step.
+
+  TYPES: tt_thinking_steps TYPE STANDARD TABLE OF tS_thinking_step WITH EMPTY KEY.
+
+  TYPES: BEGIN OF tS_usage,
+           prompt_tokens     TYPE i,
+           completion_tokens TYPE i,
+           total_tokens      TYPE i,
+         END OF tS_usage.
+
+  TYPES: BEGIN OF tS_decision_log,
+    agent_UUID         TYPE XSTRING,
+    model_id         TYPE string,
+    input_prompt     TYPE string,
+    final_output     TYPE string,
+    thinking_steps TYPE tt_thinking_steps,
+    usage            TYPE tS_usage,
+    duration_ms      TYPE i,
+  END OF tS_decision_log.
+
+  PROTECTED SECTION.
+  METHODS MAKE_DECISION
+    IMPORTING
+      IV_PROMPT TYPE STRING
+    EXPORTING
+      EV_FULL_EXECUTION TYPE abap_boolean
+    CHANGING
+      CS_DECISION_LOG TYPE tS_decision_log
+    RAISING
+      zpru_if_agent_logic=>cx_agent_logic.
+  PRIVATE SECTION.
+    
 ENDCLASS.
 
 
 CLASS lcl_decision_provider IMPLEMENTATION.
   METHOD zpru_if_decision_provider~call_decision_engine.
     DATA lt_execution_plan TYPE zpru_if_decision_provider=>tt_execution_plan.
+    DATA LS_DECISION_LOG TYPE tS_decision_log.
+    DATA lo_utility          TYPE REF TO zpru_if_agent_util.
+    DATA LV_DECISION_LOG_JSON TYPE zpru_if_agent_frw=>ts_json.
 
     zpru_cl_dummy_agent_logic=>ms_method_registr-call_decision_engine = abap_true.
 
-    TRY.
-        FINAL(lo_api) = cl_aic_islm_compl_api_factory=>get( )->create_instance( 'ST-GEMINI-3.0' ).
-        FINAL(lo_params) = lo_api->get_parameter_setter( ).
-        lo_params->set_temperature( '0.5' ).
+    lo_utility ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-        " TODO: variable is assigned but never used (ABAP cleaner)
-        FINAL(lv_response) = lo_api->execute_for_string( 'How are you?' )->get_completion( ).
-      CATCH cx_aic_api_factory
-            cx_aic_completion_api.
-
-    ENDTRY.
+    make_decision( EXPORTING iv_prompt = io_input->get_data( )->*
+                   IMPORTING EV_FULL_EXECUTION = DATA(lv_full_execution)
+                   CHANGING  CS_DECISION_LOG = LS_DECISION_LOG ).
 
     GET TIME STAMP FIELD DATA(lv_now).
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 2.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_CODE to execution plan'.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
     <ls_execution_plan>-agentuuid = is_agent-agentuuid.
     <ls_execution_plan>-toolname  = 'DUMMY_CODE'.
     <ls_execution_plan>-sequence   = 1.
 
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 3.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_KNOWLEDGE to execution plan'.
+
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
     <ls_execution_plan>-agentuuid = is_agent-agentuuid.
     <ls_execution_plan>-toolname  = 'DUMMY_KNOWLEDGE'.
     <ls_execution_plan>-sequence   = 2.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 4.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added NESTED_AGENT to execution plan'.
 
     APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
     <ls_execution_plan>-agentuuid = is_agent-agentuuid.
     <ls_execution_plan>-toolname  = 'NESTED_AGENT'.
     <ls_execution_plan>-sequence   = 3.
 
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 5.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_LLM to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_LLM'.
+    <ls_execution_plan>-sequence   = 4.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 6.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_HTTP to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_HTTP'.
+    <ls_execution_plan>-sequence   = 5.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 7.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_ML to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_ML'.
+    <ls_execution_plan>-sequence   = 6.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 8.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_SCM to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_SCM'.
+    <ls_execution_plan>-sequence   = 7.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 9.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_DYN_CODE to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_DYN_CODE'.
+    <ls_execution_plan>-sequence   = 8.
+
+
+    APPEND LS_DECISION_LOG-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 10.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We added DUMMY_USER_TOOL to execution plan'.
+
+    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
+    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
+    <ls_execution_plan>-toolname  = 'DUMMY_USER_TOOL'.
+    <ls_execution_plan>-sequence   = 9.
+
+
     eo_execution_plan->set_data( ir_data = NEW zpru_if_decision_provider=>tt_execution_plan( lt_execution_plan ) ).
-    eo_first_tool_input->set_data( ir_data = NEW string( |FIRST TOOL INPUT - { lv_now }| ) ).
+    eo_first_tool_input->set_data( ir_data = NEW string( `Let's start full execution` ) ). " must be json add schema provider for first tool input!!!
     eo_langu->set_data( ir_data = NEW spras( sy-langu ) ).
-    eo_decision_log->set_data( ir_data = NEW string( |DECISION LOG - { lv_now }| ) ).
+
+    lo_utility->convert_to_string( EXPORTING ir_abap = REF #( LS_DECISION_LOG )
+                                   CHANGING cr_string = LV_DECISION_LOG_JSON ).
+
+    eo_decision_log->set_data( ir_data = NEW string( LV_DECISION_LOG_JSON ) ).
   ENDMETHOD.
 
   METHOD zpru_if_decision_provider~prepare_final_response.
@@ -55,6 +178,40 @@ CLASS lcl_decision_provider IMPLEMENTATION.
     lv_final_response = |{ lv_last_output->* } - FINAL_RESPONSE - { lv_now } |.
     eo_final_response->set_data( ir_data = NEW string( lv_final_response ) ).
   ENDMETHOD.
+
+METHOD make_decision.
+
+  GET TIME STAMP FIELD DATA(lv_now).
+
+    cs_decision_log-agent_UUID = '12345678901234567890123456789012'.
+    cs_decision_log-model_id = 'GEMINI 3.0'.
+    cs_decision_log-input_prompt = iv_prompt.
+    cs_decision_log-final_output = `Start Full Execution`.
+    cs_decision_log-usage-prompt_tokens = 100.
+    cs_decision_log-usage-completion_tokens = 200.
+    cs_decision_log-usage-total_tokens = 300.
+    cs_decision_log-duration_ms = 1000.
+
+  TRY.
+        FINAL(lo_api) = cl_aic_islm_compl_api_factory=>get( )->create_instance( 'ST-GEMINI-3.0' ).
+        FINAL(lo_params) = lo_api->get_parameter_setter( ).
+        lo_params->set_temperature( '0.5' ).
+
+        " TODO: variable is assigned but never used (ABAP cleaner)
+        FINAL(lv_response) = lo_api->execute_for_string( 'How are you?' )->get_completion( ).
+      CATCH cx_aic_api_factory
+            cx_aic_completion_api.
+
+    ENDTRY.
+
+    APPEND cs_decision_log-thinking_steps assigning FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-step_no = 1.
+    <ls_thinking_step>-timestamp = lv_now.
+    <ls_thinking_step>-content = 'We got decision to start full execution'.
+
+    rv_full_execution = abap_true.
+ENDMETHOD.
+
 ENDCLASS.
 
 
