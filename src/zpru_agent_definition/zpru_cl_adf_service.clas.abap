@@ -288,105 +288,77 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_adf_service~create_agent.
-    DATA ls_reported TYPE zpru_if_agent_frw=>ts_adf_reported.
-    DATA ls_failed   TYPE zpru_if_agent_frw=>ts_adf_failed.
-    DATA lo_util     TYPE REF TO zpru_if_agent_util.
-
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
+    DATA ls_reported  TYPE zpru_if_agent_frw=>ts_adf_reported.
+    DATA ls_failed    TYPE zpru_if_agent_frw=>ts_adf_failed.
+    DATA lt_create_in TYPE TABLE FOR READ IMPORT ZR_PRU_AGENT\\Agent.
 
     precheck_create_agent( EXPORTING it_agent_create_imp = it_agent_create_imp
-                           IMPORTING et_entities         = DATA(lt_entities)
-                           CHANGING  cs_reported         = ls_reported
-                                     cs_failed           = ls_failed ).
+                            IMPORTING et_entities        = DATA(lt_entities)
+                            CHANGING  cs_reported        = ls_reported
+                                      cs_failed          = ls_failed ).
 
     cs_failed = CORRESPONDING #( DEEP ls_failed ).
     cs_reported = CORRESPONDING #( DEEP ls_reported ).
 
-    IF    lt_entities     <> it_agent_create_imp
+    IF    lt_entities       <> it_agent_create_imp
        OR ls_failed-agent IS NOT INITIAL.
       RETURN.
     ENDIF.
 
-    zpru_cl_adf_buffer=>prep_agent_buffer( VALUE #( FOR <ls_k>
-                                                    IN     lt_entities
-                                                    ( agent_uuid = <ls_k>-agentuuid ) ) ).
-
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_create>).
+      APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
+      <ls_create_in>-AIPF7AgentUUID          = <ls_create>-agentuuid.
+      <ls_create_in>-AIPF7AgentName            = COND #( WHEN <ls_create>-control-agentname = abap_true THEN <ls_create>-agentname ).
+      <ls_create_in>-AIPF7AgentType            = COND #( WHEN <ls_create>-control-agenttype = abap_true THEN <ls_create>-agenttype ).
+      <ls_create_in>-AIPF7DecisionProvider     = COND #( WHEN <ls_create>-control-decisionprovider = abap_true THEN <ls_create>-decisionprovider ).
+      <ls_create_in>-AIPF7ShortMemoryProvider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true THEN <ls_create>-shortmemoryprovider ).
+      <ls_create_in>-AIPF7LongMemoryProvider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true THEN <ls_create>-longmemoryprovider ).
+      <ls_create_in>-AIPF7AgentInfoProvider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true THEN <ls_create>-agentinfoprovider ).
+      <ls_create_in>-AIPF7SystemPromptProvider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true THEN <ls_create>-systempromptprovider ).
+      <ls_create_in>-AIPF7AgentStatus                = COND #( WHEN <ls_create>-control-agentstatus = abap_true THEN <ls_create>-agentstatus ).
+      <ls_create_in>-AIPF7CreatedBy            = COND #( WHEN <ls_create>-control-createdby = abap_true THEN <ls_create>-createdby ).
+      <ls_create_in>-AIPF7CreatedAt            = COND #( WHEN <ls_create>-control-createdat = abap_true THEN <ls_create>-createdat ).
+      <ls_create_in>-AIPF7ChangedBy            = COND #( WHEN <ls_create>-control-changedby = abap_true THEN <ls_create>-changedby ).
+      <ls_create_in>-AIPF7LastChanged          = COND #( WHEN <ls_create>-control-lastchanged = abap_true THEN <ls_create>-lastchanged ).
+      <ls_create_in>-AIPF7LocalLastChanged     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true THEN <ls_create>-locallastchanged ).
 
-      IF    NOT line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid ] )
-         OR     line_exists( zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                                               deleted             = abap_true ] ).
+      <ls_create_in>-%control-AIPF7AgentName            = COND #( WHEN <ls_create>-control-agentname = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7AgentType            = COND #( WHEN <ls_create>-control-agenttype = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7DecisionProvider     = COND #( WHEN <ls_create>-control-decisionprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7ShortMemoryProvider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7LongMemoryProvider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7AgentInfoProvider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7SystemPromptProvider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7AgentStatus                = COND #( WHEN <ls_create>-control-agentstatus = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7CreatedBy            = COND #( WHEN <ls_create>-control-createdby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7CreatedAt            = COND #( WHEN <ls_create>-control-createdat = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7ChangedBy            = COND #( WHEN <ls_create>-control-changedby = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7LastChanged          = COND #( WHEN <ls_create>-control-lastchanged = abap_true THEN if_abap_behv=>mk-on ).
+      <ls_create_in>-%control-AIPF7LocalLastChanged     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true THEN if_abap_behv=>mk-on ).
+    ENDLOOP.
 
-        ASSIGN zpru_cl_adf_buffer=>agent_buffer[ instance-agentuuid = <ls_create>-agentuuid
-                                                 deleted             = abap_false ] TO FIELD-SYMBOL(<ls_buffer>).
-        IF sy-subrc = 0.
-          DELETE zpru_cl_adf_buffer=>agent_buffer
-                 WHERE     instance-agentuuid = <ls_buffer>-instance-agentuuid
-                       AND deleted             = abap_true.
-        ENDIF.
+    MODIFY ENTITIES OF ZR_PRU_AGENT
+           ENTITY Agent
+           CREATE AUTO FILL CID WITH lt_create_in
+           MAPPED DATA(ls_mapped_eml)
+           FAILED DATA(ls_failed_eml)
+           REPORTED DATA(ls_reported_eml).
 
-        APPEND VALUE #(
-            instance-agentuuid             = <ls_create>-agentuuid
-            instance-agentname             = <ls_create>-agentname
-            instance-agenttype             = COND #( WHEN <ls_create>-control-agenttype = abap_true
-                                                      THEN <ls_create>-agenttype )
-            instance-decisionprovider      = COND #( WHEN <ls_create>-control-decisionprovider = abap_true
-                                                      THEN <ls_create>-decisionprovider )
-            instance-shortmemoryprovider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true
-                                                      THEN <ls_create>-shortmemoryprovider )
-            instance-longmemoryprovider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true
-                                                      THEN <ls_create>-longmemoryprovider )
-            instance-agentinfoprovider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true
-                                                      THEN <ls_create>-agentinfoprovider )
-            instance-systempromptprovider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true
-                                                      THEN <ls_create>-systempromptprovider )
-            instance-agentstatus                 = COND #( WHEN <ls_create>-control-agentstatus = abap_true
-                                                      THEN <ls_create>-agentstatus )
-            instance-createdby             = COND #( WHEN <ls_create>-control-createdby = abap_true
-                                                      THEN <ls_create>-createdby )
-            instance-createdat             = COND #( WHEN <ls_create>-control-createdat = abap_true
-                                                      THEN <ls_create>-createdat )
-            instance-changedby             = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
-                                                      THEN <ls_create>-changedby )
-            instance-lastchanged           = COND #( WHEN <ls_create>-control-lastchanged = abap_true
-                                                      THEN <ls_create>-lastchanged )
-            instance-locallastchanged     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
-                                                      THEN <ls_create>-locallastchanged )
-            changed                         = abap_true
-            deleted                         = abap_false ) TO zpru_cl_adf_buffer=>agent_buffer ASSIGNING FIELD-SYMBOL(<ls_just_added>).
+    LOOP AT ls_failed_eml-agent ASSIGNING FIELD-SYMBOL(<ls_failed_agent>).
+      APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_failed_target>).
+      <ls_failed_target>-agentuuid = <ls_failed_agent>-AIPF7AgentUUID.
+      <ls_failed_target>-fail    = CONV #( <ls_failed_agent>-%fail-cause ).
+    ENDLOOP.
 
-        fill_agent_admin_fields( EXPORTING iv_during_create = abap_true
-                                 CHANGING  cs_agent         = <ls_just_added> ).
+    LOOP AT ls_reported_eml-agent ASSIGNING FIELD-SYMBOL(<ls_reported_agent>).
+      APPEND INITIAL LINE TO cs_reported-agent ASSIGNING FIELD-SYMBOL(<ls_reported_agent_target>).
+      <ls_reported_agent_target>-agentuuid = <ls_reported_agent>-AIPF7AgentUUID.
+*      <ls_reported_agent_target>-msg      = <ls_reported_agent>-%msg.
+    ENDLOOP.
 
-        INSERT VALUE #( agentuuid = <ls_create>-agentuuid ) INTO TABLE cs_mapped-agent.
-
-        APPEND VALUE #( msg       = lo_util->new_message(
-                                        iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                        iv_number   = `001`
-                                        iv_severity = zpru_if_agent_message=>sc_severity-success
-                                        iv_v1       = <ls_create>-agentuuid )
-                        agentuuid = <ls_create>-agentuuid ) TO cs_reported-agent.
-
-      ELSE.
-        APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                        create    = abap_true
-                        fail      = zpru_if_agent_frw=>cs_fail_cause-conflict )
-               TO cs_failed-agent.
-
-        APPEND VALUE #( agentuuid = <ls_create>-agentuuid
-                        create    = abap_true
-                        msg       = lo_util->new_message(
-                                        iv_id       = zpru_if_agent_frw=>cs_message_class-zpru_msg_execution
-                                        iv_number   = `002`
-                                        iv_severity = zpru_if_agent_message=>sc_severity-error
-                                        iv_v1       = <ls_create>-agentuuid ) )
-               TO cs_reported-agent.
-      ENDIF.
+    LOOP AT ls_mapped_eml-agent ASSIGNING FIELD-SYMBOL(<ls_mapped_agent>).
+      APPEND INITIAL LINE TO cs_mapped-agent ASSIGNING FIELD-SYMBOL(<ls_mapped_agent_target>).
+      <ls_mapped_agent_target>-agentuuid = <ls_mapped_agent>-AIPF7AgentUUID.
     ENDLOOP.
   ENDMETHOD.
 
