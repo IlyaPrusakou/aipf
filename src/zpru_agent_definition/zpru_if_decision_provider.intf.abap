@@ -23,7 +23,8 @@ INTERFACE zpru_if_decision_provider
     EXPORTING eo_execution_plan      TYPE REF TO zpru_if_payload
               eo_first_tool_input    TYPE REF TO zpru_if_payload
               eo_langu               TYPE REF TO zpru_if_payload
-              eo_decision_log        TYPE REF TO zpru_if_payload.
+              eo_decision_log        TYPE REF TO zpru_if_payload
+     RAISING zpru_cx_agent_core.
 
   METHODS prepare_final_response
     IMPORTING iv_run_uuid       TYPE sysuuid_x16
@@ -33,6 +34,7 @@ INTERFACE zpru_if_decision_provider
     CHANGING  cs_axc_reported   TYPE zpru_if_agent_frw=>ts_axc_reported
               cs_axc_failed     TYPE zpru_if_agent_frw=>ts_axc_failed
               cs_adf_reported   TYPE zpru_if_agent_frw=>ts_adf_reported
-              cs_adf_failed     TYPE zpru_if_agent_frw=>ts_adf_failed.
+              cs_adf_failed     TYPE zpru_if_agent_frw=>ts_adf_failed
+              RAISING zpru_cx_agent_core.
 
 ENDINTERFACE.

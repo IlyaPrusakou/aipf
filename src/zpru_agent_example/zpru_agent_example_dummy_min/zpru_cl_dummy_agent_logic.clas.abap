@@ -603,4 +603,8 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
 
 
 
+  METHOD zpru_if_short_memory_provider~flush_memory.
+
+  ENDMETHOD.
+
 ENDCLASS.

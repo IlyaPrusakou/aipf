@@ -108,6 +108,10 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 * check how you use messages wher json and where is string
 
+* add service for zpru_semant_mem - semantic memory and zpru_semmem_rlnp - semantic relationships
+* add service for  - procedural memory
+
+
   ENDMETHOD.
 
 ENDCLASS.

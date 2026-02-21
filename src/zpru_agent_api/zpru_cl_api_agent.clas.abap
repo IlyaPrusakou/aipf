@@ -137,10 +137,10 @@ CLASS zpru_cl_api_agent DEFINITION
                 io_long_memory            TYPE REF TO zpru_if_long_memory_provider
                 io_agent_info_provider    TYPE REF TO zpru_if_agent_info_provider
                 iv_stage                  TYPE string
-      EXPORTING et_execution_plan         TYPE zpru_if_decision_provider=>tt_execution_plan
-                ev_first_tool_input       TYPE zpru_if_agent_frw=>ts_json
-                ev_langu                  TYPE sylangu
-                ev_decision_log           TYPE zpru_if_agent_frw=>ts_json
+      EXPORTING eo_execution_plan         TYPE REF TO zpru_if_payload
+                eo_first_tool_input       TYPE REF TO zpru_if_payload
+                eo_langu                  TYPE REF TO zpru_if_payload
+                eo_decision_log           TYPE REF TO zpru_if_payload
       RAISING   zpru_cx_agent_core.
 
     METHODS construct_execution_steps
@@ -329,6 +329,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~build_execution.
+    DATA lt_execution_plan   TYPE zpru_if_decision_provider=>tt_execution_plan.
+    DATA lv_first_tool_input TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_langu    TYPE sylangu.
+    DATA lv_decision_log TYPE zpru_if_agent_frw=>ts_json.
+
+
+
     CLEAR ev_built_run_uuid.
     CLEAR ev_built_query_uuid.
 
@@ -360,10 +367,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        io_long_memory            = lo_long_memory
                                        io_agent_info_provider    = lo_agent_info_provider
                                        iv_stage                  = 'BUILD_EXECUTION'
-                             IMPORTING et_execution_plan         = DATA(lt_execution_plan)
-                                       ev_first_tool_input       = DATA(lv_first_tool_input)
-                                       ev_langu                  = DATA(lv_langu)
-                                       ev_decision_log           = DATA(lv_decision_log) ).
+                             IMPORTING eo_execution_plan         = DATA(lo_execution_plan)
+                                       eo_first_tool_input       = DATA(lo_first_tool_input)
+                                       eo_langu                  = DATA(lo_langu)
+                                       eo_decision_log           = DATA(lo_decision_log) ).
+
+    IF lo_execution_plan IS BOUND.
+      lt_execution_plan = lo_execution_plan->get_data( )->*.
+    ENDIF.
+
+    IF lo_decision_log IS BOUND.
+      lv_decision_log = lo_decision_log->get_data( )->*.
+    ENDIF.
+
+    IF lo_first_tool_input IS BOUND.
+      lv_first_tool_input = lo_first_tool_input->get_data( )->*.
+    ENDIF.
+
+    IF lo_langu IS BOUND.
+      lv_langu = lo_langu->get_data( )->*.
+    ENDIF.
 
     TRY.
         DATA(lo_axc_service) = CAST zpru_if_axc_service( zpru_cl_agent_service_mngr=>get_service(
@@ -1123,6 +1146,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
   METHOD zpru_if_api_agent~add_query_2_run.
     DATA lo_axc_service TYPE REF TO zpru_if_axc_service.
+    DATA lt_execution_plan   TYPE zpru_if_decision_provider=>tt_execution_plan.
+    DATA lv_first_tool_input TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_langu    TYPE sylangu.
+    DATA lv_decision_log TYPE zpru_if_agent_frw=>ts_json.
 
     CLEAR ev_run_uuid.
     CLEAR ev_query_uuid.
@@ -1181,10 +1208,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        io_long_memory            = lo_long_memory
                                        io_agent_info_provider    = lo_agent_info_provider
                                        iv_stage                  = 'ADD_QUERY_2_RUN'
-                             IMPORTING et_execution_plan         = DATA(lt_execution_plan)
-                                       ev_first_tool_input       = DATA(lv_first_tool_input)
-                                       ev_langu                  = DATA(lv_langu)
-                                       ev_decision_log           = DATA(lv_decision_log) ).
+                             IMPORTING eo_execution_plan         = DATA(lo_execution_plan)
+                                       eo_first_tool_input       = DATA(lo_first_tool_input)
+                                       eo_langu                  = DATA(lo_langu)
+                                       eo_decision_log           = DATA(lo_decision_log) ).
+
+    IF lo_execution_plan IS BOUND.
+      lt_execution_plan = lo_execution_plan->get_data( )->*.
+    ENDIF.
+
+    IF lo_decision_log IS BOUND.
+      lv_decision_log = lo_decision_log->get_data( )->*.
+    ENDIF.
+
+    IF lo_first_tool_input IS BOUND.
+      lv_first_tool_input = lo_first_tool_input->get_data( )->*.
+    ENDIF.
+
+    IF lo_langu IS BOUND.
+      lv_langu = lo_langu->get_data( )->*.
+    ENDIF.
 
     create_execution_query( EXPORTING iv_run_uuid         = ls_execution_header-runuuid
                                       iv_input_query      = is_input_query-string_content
@@ -1855,6 +1898,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_first_tool_input TYPE REF TO zpru_if_payload.
     DATA lo_langu            TYPE REF TO zpru_if_payload.
     DATA lo_decision_log     TYPE REF TO zpru_if_payload.
+    DATA lt_execution_plan   TYPE zpru_if_decision_provider=>tt_execution_plan.
+    DATA lv_first_tool_input TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_langu    TYPE sylangu.
+    DATA lv_decision_log TYPE zpru_if_agent_frw=>ts_json.
+
 
     TRY.
         lo_utility ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
@@ -1924,32 +1972,37 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                           eo_decision_log        = lo_decision_log ).
 
     IF lo_execution_plan IS BOUND.
-      et_execution_plan = lo_execution_plan->get_data( )->*.
+      eo_execution_plan = lo_execution_plan.
+      lt_execution_plan = lo_execution_plan->get_data( )->*.
+
     ENDIF.
 
-    IF et_execution_plan IS INITIAL.
+    IF lt_execution_plan IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     IF lo_decision_log IS BOUND.
-      ev_decision_log = lo_decision_log->get_data( )->*.
+      eo_decision_log = lo_decision_log.
+      lv_decision_log = lo_decision_log->get_data( )->*.
     ENDIF.
 
     IF lo_first_tool_input IS BOUND.
-      ev_first_tool_input = lo_first_tool_input->get_data( )->*.
+      eo_first_tool_input = lo_first_tool_input.
+      lv_first_tool_input = lo_first_tool_input->get_data( )->*.
     ENDIF.
 
     IF lo_langu IS BOUND.
-      ev_langu = lo_langu->get_data( )->*.
+      eo_langu = lo_langu.
+      lv_langu = lo_langu->get_data( )->*.
     ENDIF.
 
     GET TIME STAMP FIELD lv_now.
 
     DATA(lv_decision_log_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
-                                    | "CONTENT" : "{ ev_decision_log }" \}|.
+                                    | "CONTENT" : "{ lv_decision_log }" \}|.
 
     DATA(lv_first_tool_input_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
-                                   | "CONTENT" : "{ ev_first_tool_input }" \}|.
+                                   | "CONTENT" : "{ lv_first_tool_input }" \}|.
 
     lt_message_in = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
                                stage            = iv_stage
@@ -1962,7 +2015,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                   | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                                   | "QUERY" : { iv_input_query }, | &&
                                                   | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
-                                                  | "LANGUAGE" : "{ ev_langu }", | &&
+                                                  | "LANGUAGE" : "{ lv_langu }", | &&
                                                   | "DECISION LOG" : { lv_decision_log_message } \}|
                                messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 

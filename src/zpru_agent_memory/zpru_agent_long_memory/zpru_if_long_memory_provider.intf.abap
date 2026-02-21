@@ -5,7 +5,7 @@ INTERFACE zpru_if_long_memory_provider
 
   METHODS retrieve_message
     IMPORTING it_mmsg_read_k    TYPE zpru_if_mmsg_crud=>tt_mmsg_read_k
-    RETURNING VALUE(et_mem_msg) TYPE zpru_tt_API_mem_msg.
+    RETURNING VALUE(et_mem_msg) TYPE ZPRU_TT_EXPORT_MEM_MSG.
 
   METHODS save_messages
     IMPORTING io_input  TYPE REF TO zpru_if_payload
@@ -19,7 +19,7 @@ INTERFACE zpru_if_long_memory_provider
 
   METHODS retrieve_summary
     IMPORTING it_msum_read_k    TYPE zpru_if_msum_crud=>tt_msum_read_k
-    RETURNING VALUE(et_mem_sum) TYPE zpru_tt_API_mem_sum.
+    RETURNING VALUE(et_mem_sum) TYPE zpru_TT_export_mem_sum.
 
   METHODS summarize_conversation
     IMPORTING io_input  TYPE REF TO zpru_if_payload

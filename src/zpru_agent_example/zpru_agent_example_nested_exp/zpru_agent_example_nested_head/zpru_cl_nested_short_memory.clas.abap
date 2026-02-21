@@ -48,4 +48,8 @@ CLASS zpru_cl_nested_short_memory IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD zpru_if_short_memory_provider~flush_memory.
+
+  ENDMETHOD.
+
 ENDCLASS.
