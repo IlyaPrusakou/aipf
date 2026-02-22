@@ -1,182 +1,56 @@
-CLASS lcl_decision_provider DEFINITION CREATE PUBLIC.
+CLASS lcl_common_algorithms DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
-    INTERFACES zpru_if_decision_provider.
 
-    TYPES: BEGIN OF tS_thinking_step,
-             step_no   TYPE i,
-             timestamp TYPE timestampl,
-             content   TYPE string,
-           END OF tS_thinking_step.
+    CLASS-METHODS get_last_thinkingstepnumber
+      IMPORTING it_thinking_step                  TYPE zpru_tt_thinking_step
+      RETURNING VALUE(rv_last_thinkingstepnumber) TYPE i.
 
-    TYPES tt_thinking_steps TYPE STANDARD TABLE OF tS_thinking_step WITH EMPTY KEY.
-
-    TYPES: BEGIN OF tS_usage,
-             prompt_tokens     TYPE i,
-             completion_tokens TYPE i,
-             total_tokens      TYPE i,
-           END OF tS_usage.
-
-    TYPES: BEGIN OF tS_decision_log,
-             agent_UUID     TYPE xstring,
-             model_id       TYPE string,
-             input_prompt   TYPE string,
-             final_output   TYPE string,
-             thinking_steps TYPE tt_thinking_steps,
-             usage          TYPE tS_usage,
-             duration_ms    TYPE i,
-           END OF tS_decision_log.
+    CLASS-METHODS get_timestamp
+      RETURNING VALUE(rv_now) TYPE timestampl.
 
   PROTECTED SECTION.
-    METHODS make_decision
-      IMPORTING iv_prompt         TYPE string
-      EXPORTING ev_full_execution TYPE abap_boolean
-      CHANGING  cs_decision_log   TYPE tS_decision_log
-      RAISING   zpru_cx_agent_core.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS lcl_common_algorithms IMPLEMENTATION.
+  METHOD get_last_thinkingstepnumber.
+    DATA(lt_thinking_step) = it_thinking_step.
+    SORT lt_thinking_step BY thinkingstepnumber DESCENDING.
+    rv_last_thinkingstepnumber = VALUE i( lt_thinking_step[ 1 ]-thinkingstepnumber OPTIONAL ) + 1.
+  ENDMETHOD.
+
+  METHOD get_timestamp.
+    GET TIME STAMP FIELD rv_now.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_decision_provider DEFINITION INHERITING FROM zpru_cl_decision_provider CREATE PUBLIC.
+  PROTECTED SECTION.
+    METHODS check_authorizations        REDEFINITION.
+    METHODS recall_memory               REDEFINITION.
+    METHODS read_data_4_thinking        REDEFINITION.
+    METHODS process_thinking            REDEFINITION.
+    METHODS prepare_first_tool_input    REDEFINITION.
+    METHODS set_model_id                REDEFINITION.
+    METHODS set_result_comment          REDEFINITION.
+    METHODS set_final_response_content  REDEFINITION.
+    METHODS set_final_response_metadata REDEFINITION.
 
 ENDCLASS.
 
 
 CLASS lcl_decision_provider IMPLEMENTATION.
-  METHOD zpru_if_decision_provider~call_decision_engine.
-    DATA lt_execution_plan    TYPE zpru_if_decision_provider=>tt_execution_plan.
-    DATA ls_decision_log      TYPE tS_decision_log.
-    DATA lo_utility           TYPE REF TO zpru_if_agent_util.
-    DATA lv_decision_log_json TYPE zpru_if_agent_frw=>ts_json.
 
-    zpru_cl_dummy_agent_logic=>ms_method_registr-call_decision_engine = abap_true.
-
-    lo_utility ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    make_decision( EXPORTING iv_prompt = io_input->get_data( )->*
-                   " TODO: variable is assigned but never used (ABAP cleaner)
-                   IMPORTING ev_full_execution = DATA(lv_full_execution)
-                   CHANGING  cs_decision_log = ls_decision_log ).
-
-    GET TIME STAMP FIELD DATA(lv_now).
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
-    <ls_thinking_step>-step_no   = 2.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_CODE to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING FIELD-SYMBOL(<ls_execution_plan>).
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_CODE'.
-    <ls_execution_plan>-sequence  = 1.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 3.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_KNOWLEDGE to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_KNOWLEDGE'.
-    <ls_execution_plan>-sequence  = 2.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 4.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added NESTED_AGENT to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'NESTED_AGENT'.
-    <ls_execution_plan>-sequence  = 3.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 5.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_LLM to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_LLM'.
-    <ls_execution_plan>-sequence  = 4.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 6.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_HTTP to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_HTTP'.
-    <ls_execution_plan>-sequence  = 5.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 7.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_ML to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_ML'.
-    <ls_execution_plan>-sequence  = 6.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 8.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_SCM to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_SCM'.
-    <ls_execution_plan>-sequence  = 7.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 9.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_DYN_CODE to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_DYN_CODE'.
-    <ls_execution_plan>-sequence  = 8.
-
-    APPEND INITIAL LINE TO ls_decision_log-thinking_steps ASSIGNING <ls_thinking_step>.
-    <ls_thinking_step>-step_no   = 10.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We added DUMMY_USER_TOOL to execution plan'.
-
-    APPEND INITIAL LINE TO lt_execution_plan ASSIGNING <ls_execution_plan>.
-    <ls_execution_plan>-agentuuid = is_agent-agentuuid.
-    <ls_execution_plan>-toolname  = 'DUMMY_USER_TOOL'.
-    <ls_execution_plan>-sequence  = 9.
-
-    eo_execution_plan->set_data( ir_data = NEW zpru_if_decision_provider=>tt_execution_plan( lt_execution_plan ) ).
-    eo_first_tool_input->set_data( ir_data = NEW string( `Let's start full execution` ) ). " must be json add schema provider for first tool input!!!
-    eo_langu->set_data( ir_data = NEW spras( sy-langu ) ).
-
-    lo_utility->convert_to_string( EXPORTING ir_abap   = REF #( ls_decision_log )
-                                   CHANGING  cr_string = lv_decision_log_json ).
-
-    eo_decision_log->set_data( ir_data = NEW string( lv_decision_log_json ) ).
+  METHOD check_authorizations.
+    " CHECK AUTHORIZATION
+    ev_allowed = abap_true.
   ENDMETHOD.
 
-  METHOD zpru_if_decision_provider~prepare_final_response.
-    DATA lv_final_response TYPE string.
-
-    zpru_cl_dummy_agent_logic=>ms_method_registr-prepare_final_response = abap_true.
-
-    DATA(lv_last_output) = io_last_output->get_data( ).
-    GET TIME STAMP FIELD DATA(lv_now).
-    lv_final_response = |{ lv_last_output->* } - FINAL_RESPONSE - { lv_now } |.
-    eo_final_response->set_data( ir_data = NEW string( lv_final_response ) ).
+  METHOD prepare_first_tool_input.
   ENDMETHOD.
 
-  METHOD make_decision.
-    GET TIME STAMP FIELD DATA(lv_now).
-
-    cs_decision_log-agent_UUID   = '12345678901234567890123456789012'.
-    cs_decision_log-model_id     = 'GEMINI 3.0'.
-    cs_decision_log-input_prompt = iv_prompt.
-    cs_decision_log-final_output = `Start Full Execution`.
-    cs_decision_log-usage-prompt_tokens     = 100.
-    cs_decision_log-usage-completion_tokens = 200.
-    cs_decision_log-usage-total_tokens      = 300.
-    cs_decision_log-duration_ms = 1000.
+  METHOD process_thinking.
 
     TRY.
         FINAL(lo_api) = cl_aic_islm_compl_api_factory=>get( )->create_instance( 'ST-GEMINI-3.0' ).
@@ -190,12 +64,134 @@ CLASS lcl_decision_provider IMPLEMENTATION.
 
     ENDTRY.
 
-    APPEND INITIAL LINE TO cs_decision_log-thinking_steps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
-    <ls_thinking_step>-step_no   = 1.
-    <ls_thinking_step>-timestamp = lv_now.
-    <ls_thinking_step>-content   = 'We got decision to start full execution'.
+  ENDMETHOD.
 
-    ev_full_execution = abap_true.
+  METHOD read_data_4_thinking.
+
+    et_rag_data = VALUE #( ( ragsourceuuid = '000000000000000000000001'
+                             ragsourcename = 'Good reciept instruction'
+                             ragchunks = VALUE #( ( ragsourceuuid = '000000000000000000000001'
+                                                    ragchunkid = 1
+                                                    chunkcontent = 'first chunk'  )
+                                                  ( ragsourceuuid = '000000000000000000000001'
+                                                    ragchunkid = 2
+                                                    chunkcontent = 'second chunk'  ) ) ) ).
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `RAG data is fetched`.
+
+    ev_user_data = `{ "user_data" : "some data" }`.
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `User data is fetched`.
+
+  ENDMETHOD.
+
+  METHOD recall_memory.
+    DATA lo_msg_service TYPE REF TO zpru_if_mmsg_service.
+    DATA lo_sum_service TYPE REF TO zpru_if_msum_service.
+
+    et_session_memory = io_short_memory->get_history( ).
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `Session messages are fetched`.
+
+    lo_msg_service ?= zpru_cl_agent_service_mngr=>get_service(
+                          iv_service = `ZPRU_IF_MMSG_SERVICE`
+                          iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+
+    lo_msg_service->query_mmsg( EXPORTING it_agent_uuid = VALUE #( ( sign   = `I`
+                                                                     option = `EQ`
+                                                                     low    = is_agent-agentuuid ) )
+                                IMPORTING et_mmsg_k     = DATA(lt_mmsg_k) ).
+
+    et_episodic_message_memory = io_long_memory->retrieve_message(
+                                     it_mmsg_read_k = VALUE #( FOR <ls_m1>
+                                                               IN lt_mmsg_k
+                                                               ( messageuuid              = <ls_m1>-messageuuid
+                                                                 control-messageuuid      = abap_true
+                                                                 control-content          = abap_true
+                                                                 control-messagetype      = abap_true
+                                                                 control-messagecontentid = abap_true
+                                                                 control-stage            = abap_true
+                                                                 control-substage         = abap_true
+                                                                 control-namespace        = abap_true
+                                                                 control-username         = abap_true
+                                                                 control-agentuuid        = abap_true
+                                                                 control-runuuid          = abap_true
+                                                                 control-queryuuid        = abap_true
+                                                                 control-stepuuid         = abap_true
+                                                                 control-messagedatetime  = abap_true
+                                                                 control-createdby        = abap_true
+                                                                 control-createdat        = abap_true
+                                                                 control-changedby        = abap_true
+                                                                 control-changedat        = abap_true  ) ) ).
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `Episodic memory messages are fetched`.
+
+    lo_sum_service ?= zpru_cl_agent_service_mngr=>get_service(
+                          iv_service = `ZPRU_IF_MSUM_SERVICE`
+                          iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+
+    lo_sum_service->query_msum( EXPORTING it_agent_uuid = VALUE #( ( sign   = `I`
+                                                                     option = `EQ`
+                                                                     low    = is_agent-agentuuid ) )
+                                IMPORTING et_msum_k     = DATA(lt_msum_k) ).
+
+    et_episodic_summary_memory = io_long_memory->retrieve_summary( it_msum_read_k = VALUE #(
+                                                                       FOR <ls_m2>
+                                                                       IN lt_msum_k
+                                                                       ( summaryuuid              = <ls_m2>-summaryuuid
+                                                                         control-summaryuuid      = abap_true
+                                                                         control-content          = abap_true
+                                                                         control-summarycontentid = abap_true
+                                                                         control-stage            = abap_true
+                                                                         control-substage         = abap_true
+                                                                         control-namespace        = abap_true
+                                                                         control-username         = abap_true
+                                                                         control-agentuuid        = abap_true
+                                                                         control-runuuid          = abap_true
+                                                                         control-queryuuid        = abap_true
+                                                                         control-stepuuid         = abap_true
+                                                                         control-messagedatetime  = abap_true
+                                                                         control-createdby        = abap_true
+                                                                         control-createdat        = abap_true
+                                                                         control-changedby        = abap_true
+                                                                         control-changedat        = abap_true  ) ) ).
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `Episodic summary messages are fetched`.
+
+*  et_semantic_memory = ADD SERVICE
+
+    APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
+    <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber( cs_decision_log-thinkingsteps ).
+    <ls_thinking_step>-thinkingstepdatetime = lcl_common_algorithms=>get_timestamp( ).
+    <ls_thinking_step>-thinkingstepcontent  = `Semantic memory are fetched`.
+
+  ENDMETHOD.
+
+  METHOD set_final_response_content.
+  ENDMETHOD.
+
+  METHOD set_final_response_metadata.
+  ENDMETHOD.
+
+  METHOD set_model_id.
+  ENDMETHOD.
+
+  METHOD set_result_comment.
   ENDMETHOD.
 ENDCLASS.
 
@@ -248,10 +244,9 @@ CLASS lcl_agent_info_provider IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
     rv_agent_info = |JUST DUMMY AGENT - { lv_now }|.
   ENDMETHOD.
+
   METHOD zpru_if_agent_info_provider~get_abap_agent_info.
-
   ENDMETHOD.
-
 ENDCLASS.
 
 
