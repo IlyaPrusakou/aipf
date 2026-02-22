@@ -111,6 +111,8 @@ CLASS zpru_todo_list IMPLEMENTATION.
 * add service for zpru_semant_mem - semantic memory and zpru_semmem_rlnp - semantic relationships
 * add service for  - procedural memory
 
+* add basic classes for agent info, agent syst prompt(reuse class), tool info, tool schema and tool provider
+
 
   ENDMETHOD.
 
