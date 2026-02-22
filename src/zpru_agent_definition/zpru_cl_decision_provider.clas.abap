@@ -91,9 +91,22 @@ CLASS zpru_cl_decision_provider DEFINITION
     METHODS set_result_comment ABSTRACT
       RETURNING VALUE(rv_result_comment) TYPE string.
 
-    METHODS precheck_final_response ABSTRACT.
-    METHODS set_final_response_content ABSTRACT.
-    METHODS set_final_response_metadata ABSTRACT.
+    METHODS precheck_final_response ABSTRACT
+      IMPORTING iv_run_uuid       TYPE sysuuid_x16
+                iv_query_uuid     TYPE sysuuid_x16
+                io_last_output    TYPE REF TO zpru_if_payload OPTIONAL
+      CHANGING  cs_final_response TYPE zpru_s_final_response.
+
+    METHODS set_final_response_content ABSTRACT
+      IMPORTING iv_run_uuid       TYPE sysuuid_x16
+                iv_query_uuid     TYPE sysuuid_x16
+                io_last_output    TYPE REF TO zpru_if_payload OPTIONAL
+      CHANGING  cs_final_response TYPE zpru_s_final_response.
+    METHODS set_final_response_metadata ABSTRACT
+      IMPORTING iv_run_uuid       TYPE sysuuid_x16
+                iv_query_uuid     TYPE sysuuid_x16
+                io_last_output    TYPE REF TO zpru_if_payload OPTIONAL
+      CHANGING  cs_final_response TYPE zpru_s_final_response.
 
     METHODS get_timestamp
       RETURNING VALUE(rv_now) TYPE timestampl.
@@ -109,6 +122,8 @@ ENDCLASS.
 CLASS zpru_cl_decision_provider IMPLEMENTATION.
   METHOD zpru_if_decision_provider~call_decision_engine.
     DATA ls_decision_log         TYPE zpru_s_decision_log.
+    DATA lv_decision_log_string         TYPE string.
+    DATA lv_first_input_string         TYPE string.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
     DATA lr_first_input          TYPE REF TO data.
     DATA lo_decision_request     TYPE REF TO zpru_if_decision_request.
@@ -116,6 +131,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     DATA lo_agent_info_provider  TYPE REF TO zpru_if_agent_info_provider.
     DATA lo_syst_prompt_provider TYPE REF TO zpru_if_prompt_provider.
     DATA lo_tool_info_provider TYPE REF TO zpru_if_tool_info_provider.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
 
     ls_decision_log-agentuuid            = is_agent-agentuuid.
     ls_decision_log-modelid              = set_model_id( ).
@@ -304,12 +320,22 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     <ls_thinking_step>-thinkingstepdatetime = get_timestamp( ).
     <ls_thinking_step>-thinkingstepcontent  = `Preparation of first input is finished`.
 
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
     IF eo_first_tool_input IS NOT BOUND.
       eo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service(
                                  iv_service = `ZPRU_IF_PAYLOAD`
                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
     ENDIF.
-    eo_first_tool_input->set_data( ir_data = lr_first_input ).
+
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap   = lr_first_input
+      CHANGING
+        cr_string = lv_first_input_string ).
+
+    eo_first_tool_input->set_data( ir_data = NEW string( lv_first_input_string ) ).
 
     ls_decision_log-resultcomment = set_result_comment( ).
 
@@ -317,13 +343,52 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
       eo_decision_log ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
                                                                   iv_context = zpru_if_agent_frw=>cs_context-standard ).
     ENDIF.
-    eo_decision_log->set_data( ir_data = NEW zpru_s_decision_log( ls_decision_log ) ).
+
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap   = REF #(  ls_decision_log )
+      CHANGING
+        cr_string = lv_decision_log_string ).
+
+    eo_decision_log->set_data( ir_data = NEW string( lv_decision_log_string ) ).
   ENDMETHOD.
 
   METHOD zpru_if_decision_provider~prepare_final_response.
-    precheck_final_response( ).
-    set_final_response_content( ).
-    set_final_response_metadata( ).
+    DATA ls_final_response TYPE zpru_s_final_response.
+
+    TRY.
+        ls_final_response-finalresponseheader-responseid = cl_system_uuid=>create_uuid_x16_static( ).
+      CATCH   cx_uuid_error.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDTRY.
+
+ls_final_response-finalresponseheader-generationdatetime = get_timestamp( ).
+*ls_final_response-finalresponseheader-agentuuid = iv_
+
+    precheck_final_response(
+      EXPORTING
+        iv_run_uuid       = iv_run_uuid
+        iv_query_uuid     = iv_query_uuid
+        io_last_output    = io_last_output
+      CHANGING
+        cs_final_response = ls_final_response ).
+
+    set_final_response_content(
+      EXPORTING
+        iv_run_uuid       = iv_run_uuid
+        iv_query_uuid     = iv_query_uuid
+        io_last_output    = io_last_output
+      CHANGING
+        cs_final_response = ls_final_response ).
+
+    set_final_response_metadata(
+      EXPORTING
+        iv_run_uuid       = iv_run_uuid
+        iv_query_uuid     = iv_query_uuid
+        io_last_output    = io_last_output
+      CHANGING
+        cs_final_response = ls_final_response ).
+
   ENDMETHOD.
 
   METHOD get_timestamp.

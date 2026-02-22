@@ -109,6 +109,137 @@ CLASS zpru_cl_decision_request IMPLEMENTATION.
 
         lv_subdomain_count += 1.
       ENDLOOP.
+
+      " tool overview
+      DATA(lv_agent_tool_count) = 0.
+      LOOP AT ls_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+        IF    <ls_agent_tool>-toolname IS INITIAL
+           OR <ls_agent_tool>-toolexplanation     IS INITIAL.
+          CONTINUE.
+        ENDIF.
+
+
+        IF lv_agent_tool_count = 0.
+          lv_string = |{ lv_string } Agent Tools: { cl_abap_char_utilities=>newline }|.
+        ENDIF.
+
+        lv_string = |{ lv_string } Agent Tool Name: { <ls_agent_tool>-toolname } { cl_abap_char_utilities=>newline }|.
+
+        IF <ls_agent_tool>-tooldesciption IS NOT INITIAL.
+          lv_string = |{ lv_string } Agent Description: { <ls_agent_tool>-tooldesciption } { cl_abap_char_utilities=>newline }|.
+        ENDIF.
+
+        lv_string = |{ lv_string } Agent Explanation: { <ls_agent_tool>-toolexplanation } { cl_abap_char_utilities=>newline }|.
+
+
+        CASE <ls_agent_tool>-tooltype.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+            lv_string = |{ lv_string } Tool Type is Nested Agent. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Invokes another autonomous agent as a tool, allowing for complex, multi-agent task delegation. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+            lv_string = |{ lv_string } Tool Type is Knowledge Source. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } IA specialized ABAP class designed specifically to retrieve and return data packets for the agent to process. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+            lv_string = |{ lv_string } Tool Type is ABAP Code. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Executes a standard ABAP code within the SAP backend to perform specific logic or data processing. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+            lv_string = |{ lv_string } Tool Type is HTTP Request. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Sends standard HTTP requests to external sources and feeds the resulting payload back into the agent loop. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+            lv_string = |{ lv_string } Tool Type is Service Consumption. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Similar to HTTP request but utilizes SAP's structured service consumption artifacts for more robust API integration. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+            lv_string = |{ lv_string } Tool Type is Call LLM. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Sends a secondary prompt to an Large Language Model and captures its response as part of a larger chain of thought. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+            lv_string = |{ lv_string } Tool Type is Dynamic ABAP Code. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Runs ABAP code logic stored directly in configuration database tables, allowing for updates without without writting specific class. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+            lv_string = |{ lv_string } Tool Type is Call Machine Learning Model. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Calls external Machine Learning APIs to perform predictive analysis or data classification. { cl_abap_char_utilities=>newline }|.
+          WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+            lv_string = |{ lv_string } Tool Type is User Tool. { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Provides a "Human-In-The-Loop" pattern by invoking UI screens in on-premise or private cloud systems for manual intervention. { cl_abap_char_utilities=>newline }|.
+          WHEN OTHERS.
+        ENDCASE.
+
+        DATA(lv_agent_tool_property_count) = 0.
+        LOOP AT <ls_agent_tool>-toolproperty ASSIGNING FIELD-SYMBOL(<ls_toolproperty>).
+
+          IF    <ls_toolproperty>-toolpropertyname IS INITIAL
+             OR <ls_toolproperty>-toolproperty     IS INITIAL.
+            CONTINUE.
+          ENDIF.
+
+          IF lv_agent_tool_property_count = 0.
+            lv_string = |{ lv_string } Agent Tool Properties for Tool { <ls_agent_tool>-toolname } { cl_abap_char_utilities=>newline }|.
+          ENDIF.
+
+          lv_string = |{ lv_string } Tool Property Name: { <ls_toolproperty>-toolpropertyname } { cl_abap_char_utilities=>newline }|.
+          lv_string = |{ lv_string } Tool Property: { <ls_toolproperty>-toolproperty } { cl_abap_char_utilities=>newline }|.
+
+          lv_agent_tool_property_count = lv_agent_tool_property_count + 1.
+        ENDLOOP.
+
+
+        DATA(lv_parameter_count) = 0.
+        LOOP AT <ls_agent_tool>-parameterinfo ASSIGNING FIELD-SYMBOL(<ls_parameter>).
+
+          IF    <ls_parameter>-parametername IS INITIAL
+             OR <ls_parameter>-parameterexplanation      IS INITIAL OR
+             <ls_parameter>-parametertype      IS INITIAL.
+            CONTINUE.
+          ENDIF.
+
+          IF lv_parameter_count = 0.
+            lv_string = |{ lv_string } Agent Tool Parameters for Tool { <ls_agent_tool>-toolname } { cl_abap_char_utilities=>newline }|.
+          ENDIF.
+
+          lv_string = |{ lv_string } Tool Parameter Name: { <ls_parameter>-parametername } { cl_abap_char_utilities=>newline }|.
+          lv_string = |{ lv_string } Tool Parameter Explanation: { <ls_parameter>-parameterexplanation } { cl_abap_char_utilities=>newline }|.
+
+          IF <ls_parameter>-parameterdesciption  IS NOT INITIAL.
+            lv_string = |{ lv_string } Tool Parameter Description: { <ls_parameter>-parameterdesciption } { cl_abap_char_utilities=>newline }|.
+          ENDIF.
+
+          CASE <ls_parameter>-parametertype.
+            WHEN zpru_if_tool_info_provider=>cs_param_kind-importing.
+              lv_string = |{ lv_string } Parameter is INPUT. { cl_abap_char_utilities=>newline }|.
+            WHEN zpru_if_tool_info_provider=>cs_param_kind-exporting.
+              lv_string = |{ lv_string } Parameter is OUTPUT. { cl_abap_char_utilities=>newline }|.
+            WHEN zpru_if_tool_info_provider=>cs_param_kind-changing.
+              lv_string = |{ lv_string } Parameter is INPUT and OUTPUT. { cl_abap_char_utilities=>newline }|.
+            WHEN zpru_if_tool_info_provider=>cs_param_kind-receiving.
+              lv_string = |{ lv_string } Parameter is SINGLE OUTPUT. { cl_abap_char_utilities=>newline }|.
+          ENDCASE.
+
+          DATA(lv_param_prop_count) = 0.
+          LOOP AT <ls_parameter>-parameterproperty ASSIGNING FIELD-SYMBOL(<ls_parameter_property>).
+
+            IF    <ls_parameter_property>-parameterpropertyname IS INITIAL
+               OR <ls_parameter_property>-parameterproperty     IS INITIAL.
+              CONTINUE.
+            ENDIF.
+
+            IF lv_param_prop_count = 0.
+              lv_string = |{ lv_string } Properties for Parameter { <ls_parameter>-parametername } { cl_abap_char_utilities=>newline }|.
+            ENDIF.
+
+            lv_string = |{ lv_string } Parameter Property Name: { <ls_parameter_property>-parameterpropertyname } { cl_abap_char_utilities=>newline }|.
+            lv_string = |{ lv_string } Parameter Property: { <ls_parameter_property>-parameterproperty  } { cl_abap_char_utilities=>newline }|.
+
+            lv_param_prop_count = lv_param_prop_count + 1.
+          ENDLOOP.
+
+          lv_string = |{ lv_string } Tool Parameter JSON Schema: { <ls_parameter>-parameterjsonschema } { cl_abap_char_utilities=>newline }|.
+
+          lv_parameter_count = lv_parameter_count + 1.
+        ENDLOOP.
+
+        lv_agent_tool_count = lv_agent_tool_count + 1.
+
+      ENDLOOP.
     ENDIF.
 
     " agent system prompt
