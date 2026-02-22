@@ -3,6 +3,33 @@ INTERFACE zpru_if_long_memory_provider
 
   INTERFACES zpru_if_agent_frw.
 
+CONSTANTS: BEGIN OF cs_semantic_cat,
+             entity  TYPE zpru_de_semantic_cat VALUE 'E',
+             concept TYPE zpru_de_semantic_cat VALUE 'C',
+             rule    TYPE zpru_de_semantic_cat VALUE 'R',
+             domain  TYPE zpru_de_semantic_cat VALUE 'D',
+           END OF cs_semantic_cat.
+
+CONSTANTS: BEGIN OF gc_semantic_rel,
+             " Hierarchical
+             parent_of    TYPE zpru_de_concept_relationship VALUE 1,  " PARENT_OF
+             child_of     TYPE zpru_de_concept_relationship VALUE 2,  " CHILD_OF
+             comprises    TYPE zpru_de_concept_relationship VALUE 3,  " COMPRISES
+             part_of      TYPE zpru_de_concept_relationship VALUE 4,  " PART_OF
+             " Logical & Inheritance
+             generalizes  TYPE zpru_de_concept_relationship VALUE 5,  " GENERALIZES
+             specializes  TYPE zpru_de_concept_relationship VALUE 6,  " SPECIALIZES
+             depends_on   TYPE zpru_de_concept_relationship VALUE 7,  " DEPENDS_ON
+             required_by  TYPE zpru_de_concept_relationship VALUE 8,  " REQUIRED_BY
+             " Process Flow
+             precedes     TYPE zpru_de_concept_relationship VALUE 9,  " PRECEDES
+             follows      TYPE zpru_de_concept_relationship VALUE 10, " FOLLOWS
+             " Associative
+             relates_to   TYPE zpru_de_concept_relationship VALUE 11, " RELATES_TO
+             conflicts    TYPE zpru_de_concept_relationship VALUE 12, " CONFLICTS_WITH
+             duplicates   TYPE zpru_de_concept_relationship VALUE 13, " DUPLICATES
+           END OF gc_semantic_rel.
+
   METHODS retrieve_message
     IMPORTING it_mmsg_read_k    TYPE zpru_if_mmsg_crud=>tt_mmsg_read_k
     RETURNING VALUE(et_mem_msg) TYPE ZPRU_TT_EXPORT_MEM_MSG.

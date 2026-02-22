@@ -17,6 +17,9 @@ CLASS zpru_cl_short_memory_base DEFINITION
       EXPORTING eo_output TYPE REF TO zpru_if_payload
       RAISING   zpru_cx_agent_core.
 
+    METHODS get_now
+      RETURNING VALUE(rv_now) TYPE timestampl.
+
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -38,7 +41,7 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     SORT mt_agent_message BY sortnumber DESCENDING.
 
-    if iv_all_messages = abap_false.
+    IF iv_all_messages = abap_false.
       IF lines( mt_agent_message ) > mv_short_memory_size.
         LOOP AT mt_agent_message FROM mv_short_memory_size + 1 ASSIGNING FIELD-SYMBOL(<ls_message_to_discard>).
           APPEND INITIAL LINE TO lt_message_2_discard ASSIGNING FIELD-SYMBOL(<ls_discard>).
@@ -50,44 +53,44 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
           <ls_sort_number_r>-low    = <ls_discard>-sortnumber.
         ENDLOOP.
       ENDIF.
-    else.
+    ELSE.
       lt_message_2_discard = mt_agent_message.
-    endif.
+    ENDIF.
 
-      IF lt_message_2_discard IS NOT INITIAL.
+    IF lt_message_2_discard IS NOT INITIAL.
 
-        TRY.
-            lo_discard_input ?= zpru_cl_agent_service_mngr=>get_service(
-                                    iv_service = `ZPRU_IF_PAYLOAD`
-                                    iv_context = zpru_if_agent_frw=>cs_context-standard ).
-          CATCH zpru_cx_agent_core.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
+      TRY.
+          lo_discard_input ?= zpru_cl_agent_service_mngr=>get_service(
+                                  iv_service = `ZPRU_IF_PAYLOAD`
+                                  iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        CATCH zpru_cx_agent_core.
+          RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+      ENDTRY.
 
-        lo_discard_input->set_data( ir_data = REF #( lt_message_2_discard ) ).
+      lo_discard_input->set_data( ir_data = REF #( lt_message_2_discard ) ).
 
-        TRY.
-            lo_discard_output ?= zpru_cl_agent_service_mngr=>get_service(
-                                     iv_service = `ZPRU_IF_PAYLOAD`
-                                     iv_context = zpru_if_agent_frw=>cs_context-standard ).
-          CATCH zpru_cx_agent_core.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
+      TRY.
+          lo_discard_output ?= zpru_cl_agent_service_mngr=>get_service(
+                                   iv_service = `ZPRU_IF_PAYLOAD`
+                                   iv_context = zpru_if_agent_frw=>cs_context-standard ).
+        CATCH zpru_cx_agent_core.
+          RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
+      ENDTRY.
 
-        discard_messages( EXPORTING io_input  = lo_discard_input
-                          IMPORTING eo_output = lo_discard_output ).
+      discard_messages( EXPORTING io_input  = lo_discard_input
+                        IMPORTING eo_output = lo_discard_output ).
 
-        eo_output = lo_discard_output.
+      eo_output = lo_discard_output.
 
-        if iv_all_messages = abap_false.
-          IF lr_sort_number_r IS NOT INITIAL.
-            DELETE mt_agent_message WHERE sortnumber IN lr_sort_number_r.
-          ENDIF.
-        else.
-           clear: mt_agent_message.
-        endif.
-
+      IF iv_all_messages = abap_false.
+        IF lr_sort_number_r IS NOT INITIAL.
+          DELETE mt_agent_message WHERE sortnumber IN lr_sort_number_r.
+        ENDIF.
+      ELSE.
+        CLEAR: mt_agent_message.
       ENDIF.
+
+    ENDIF.
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~save_message.
@@ -101,8 +104,6 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    GET TIME STAMP FIELD DATA(lv_now).
-
     DATA(lv_count) = 0.
     LOOP AT mt_agent_message ASSIGNING FIELD-SYMBOL(<ls_search_count>).
       IF lv_count < <ls_search_count>-sortnumber.
@@ -114,8 +115,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     LOOP AT it_message ASSIGNING FIELD-SYMBOL(<ls_message>).
 
-      IF <ls_message>-messageDATEtime IS INITIAL.
-        <ls_message>-messageDATEtime = lv_now.
+      IF <ls_message>-messagedatetime IS INITIAL.
+        <ls_message>-messagedatetime = get_now( ).
       ENDIF.
 
       IF <ls_message>-messagetype IS INITIAL.
@@ -192,4 +193,9 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
   METHOD zpru_if_short_memory_provider~set_mem_volume.
     mv_short_memory_size = iv_mem_volume.
   ENDMETHOD.
+
+  METHOD get_now.
+    GET TIME STAMP FIELD rv_now.
+  ENDMETHOD.
+
 ENDCLASS.
