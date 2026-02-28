@@ -338,7 +338,7 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     DATA lo_agent_info_provider TYPE REF TO zpru_if_agent_info_provider.
 
     lo_agent_info_provider = NEW lcl_agent_info_provider( ).
-    rv_agent_info = lo_agent_info_provider->get_agent_info( ).
+    rv_agent_info = lo_agent_info_provider->get_agent_info( iv_agent_uuid = iv_agent_uuid ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~get_discard_strategy.

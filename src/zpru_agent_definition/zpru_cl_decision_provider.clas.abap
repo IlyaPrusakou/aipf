@@ -212,7 +212,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_decision_request-agentmetadata = lo_agent_info_provider->get_abap_agent_info( ).
+    ls_decision_request-agentmetadata = lo_agent_info_provider->get_abap_agent_info( iv_agent_uuid = is_agent-agentuuid ).
 
     LOOP AT it_tool ASSIGNING FIELD-SYMBOL(<ls_tool>).
 

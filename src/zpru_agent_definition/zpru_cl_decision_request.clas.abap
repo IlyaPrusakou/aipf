@@ -240,6 +240,12 @@ CLASS zpru_cl_decision_request IMPLEMENTATION.
         lv_agent_tool_count = lv_agent_tool_count + 1.
 
       ENDLOOP.
+
+      IF ls_request-agentmetadata-freetextlabel IS NOT INITIAL AND
+         ls_request-agentmetadata-freetextcontent IS NOT INITIAL.
+        lv_string = |{ lv_string } { ls_request-agentmetadata-freetextlabel }: { cl_abap_char_utilities=>newline }|.
+        lv_string = |{ lv_string } { ls_request-agentmetadata-freetextcontent }. { cl_abap_char_utilities=>newline }|.
+      ENDIF.
     ENDIF.
 
     " agent system prompt

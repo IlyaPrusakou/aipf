@@ -132,6 +132,8 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
 
   METHOD zpru_if_agent_util~convert_to_string.
     cr_string = /ui2/cl_json=>serialize( data          = ir_abap->*
+                                         compress      = iv_compress
+                                         name_mappings = it_name_mappings
                                          hex_as_base64 = abap_false ).
   ENDMETHOD.
 

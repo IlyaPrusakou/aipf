@@ -33,6 +33,8 @@ INTERFACE zpru_if_agent_util
 
   METHODS convert_to_string
     IMPORTING ir_abap   TYPE REF TO data
+              iv_compress    type /ui2/cl_json=>bool default abap_false
+              it_name_mappings type /ui2/cl_json=>name_mappings optional
     CHANGING  cr_string TYPE zpru_if_agent_frw=>ts_json.
 
   " support only simple text targets, don't work with json subtree

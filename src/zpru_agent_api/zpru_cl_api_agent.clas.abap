@@ -1856,7 +1856,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              | "CONTENT" : "{ io_system_prompt_provider->get_system_prompt( ) }" \}|.
 
     DATA(lv_agent_info) = |\{ "USER": "{ sy-uname }", "TOPIC" : "AGENT_INFO", "TIMESTAMP" : "{ lv_now }",| &&
-                             | "CONTENT" : "{ io_agent_info_provider->get_agent_info( ) }" \}|.
+                             | "CONTENT" : "{ io_agent_info_provider->get_agent_info( iv_agent_uuid = is_agent-agentuuid ) }" \}|.
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
                                     ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
