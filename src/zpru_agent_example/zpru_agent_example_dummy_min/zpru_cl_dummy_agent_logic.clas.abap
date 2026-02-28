@@ -492,7 +492,10 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
 
     lo_tool_provider = NEW lcl_tool_provider( ).
-    ro_executor = lo_tool_provider->get_tool( is_tool_master_data = is_tool_master_data
+    ro_executor = lo_tool_provider->get_tool( is_agent = is_agent
+                                              io_controller = io_controller
+                                              io_input = io_input
+                                              is_tool_master_data = is_tool_master_data
                                               is_execution_step   = is_execution_step ).
   ENDMETHOD.
 

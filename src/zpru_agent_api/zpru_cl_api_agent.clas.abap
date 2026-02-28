@@ -77,7 +77,8 @@ CLASS zpru_cl_api_agent DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS execute_tool_logic
-      IMPORTING io_controller       TYPE REF TO zpru_if_agent_controller
+      IMPORTING is_agent    type zpru_if_adf_type_and_constant=>ts_agent
+                io_controller       TYPE REF TO zpru_if_agent_controller
                 io_input            TYPE REF TO zpru_if_payload
                 is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step
@@ -830,7 +831,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       lv_error_flag = abap_false.
 
-      execute_tool_logic( EXPORTING io_controller       = lo_controller
+      execute_tool_logic( EXPORTING is_agent            = is_agent
+                                    io_controller       = lo_controller
                                     io_input            = lo_input
                                     is_tool_master_data = <ls_tool_master_data>
                                     is_execution_step   = <ls_execution_step>
@@ -1361,7 +1363,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       GET TIME STAMP FIELD DATA(lv_now).
 
-      execute_tool_logic( EXPORTING io_controller       = lo_controller
+      execute_tool_logic( EXPORTING is_agent            = is_agent
+                                    io_controller       = lo_controller
                                     io_input            = lo_input
                                     is_tool_master_data = <ls_additional_tool>
                                     is_execution_step   = <ls_additional_step>
@@ -1497,7 +1500,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_executor      TYPE REF TO zpru_if_tool_executor.
 
     CREATE OBJECT lo_tool_provider TYPE (is_tool_master_data-toolprovider).
-    lo_executor = lo_tool_provider->get_tool( is_tool_master_data = is_tool_master_data
+    lo_executor = lo_tool_provider->get_tool( is_agent            = is_agent
+                                              io_controller       = io_controller
+                                              io_input            = io_input
+                                              is_tool_master_data = is_tool_master_data
                                               is_execution_step   = is_execution_step ).
 
     CASE is_tool_master_data-steptype.
