@@ -15,4 +15,8 @@ CLASS zpru_cl_nested_code_info_prvdr IMPLEMENTATION.
   METHOD zpru_if_tool_info_provider~get_tool_info.
 
   ENDMETHOD.
+  METHOD zpru_if_tool_info_provider~get_abap_tool_info.
+
+  ENDMETHOD.
+
 ENDCLASS.

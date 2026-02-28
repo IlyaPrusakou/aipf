@@ -8,7 +8,7 @@ INTERFACE zpru_if_prompt_provider
 
   METHODS get_abap_system_prompt
     IMPORTING iv_agent_uuid                TYPE sysuuid_x16
-    RETURNING VALUE(rv_abap_system_prompt) TYPE zpru_s_system_prompt
+    RETURNING VALUE(rs_abap_system_prompt) TYPE zpru_s_system_prompt
     RAISING   zpru_cx_agent_core.
 
 ENDINTERFACE.

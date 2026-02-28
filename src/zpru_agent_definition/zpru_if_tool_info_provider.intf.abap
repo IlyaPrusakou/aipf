@@ -10,13 +10,15 @@ INTERFACE zpru_if_tool_info_provider
 
   METHODS get_tool_info
     IMPORTING is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
-              is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step opTIONAL
-    RETURNING VALUE(rv_tool_info) TYPE zpru_if_agent_frw=>ts_json.
+              is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+    RETURNING VALUE(rv_tool_info) TYPE zpru_if_agent_frw=>ts_json
+    RAISING   zpru_cx_agent_core.
 
-   METHODS get_abap_tool_info
-    IMPORTING is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
-              is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step opTIONAL
-    RETURNING VALUE(rs_abap_tool_info) TYPE zpru_s_tool_info.
+  METHODS get_abap_tool_info
+    IMPORTING is_tool_master_data      TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
+              is_execution_step        TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+    RETURNING VALUE(rs_abap_tool_info) TYPE zpru_s_tool_info
+    RAISING   zpru_cx_agent_core.
 
 
 ENDINTERFACE.
