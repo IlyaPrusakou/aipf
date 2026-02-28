@@ -32,10 +32,10 @@ INTERFACE zpru_if_agent_util
     CHANGING  cr_abap   TYPE data.
 
   METHODS convert_to_string
-    IMPORTING ir_abap   TYPE REF TO data
-              iv_compress    type /ui2/cl_json=>bool default abap_false
-              it_name_mappings type /ui2/cl_json=>name_mappings optional
-    CHANGING  cr_string TYPE zpru_if_agent_frw=>ts_json.
+    IMPORTING ir_abap          TYPE REF TO data
+              iv_compress      TYPE /ui2/cl_json=>bool          DEFAULT abap_false
+              it_name_mappings TYPE /ui2/cl_json=>name_mappings OPTIONAL
+    CHANGING  cr_string        TYPE zpru_if_agent_frw=>ts_json.
 
   " support only simple text targets, don't work with json subtree
   METHODS search_node_in_json
@@ -48,7 +48,7 @@ INTERFACE zpru_if_agent_util
            is_valid TYPE abap_boolean,
          END OF ts_fragment.
 
-  TYPES: tt_fragment TYPE STANDARD TABLE OF ts_fragment WITH EMPTY KEY.
+  TYPES tt_fragment TYPE STANDARD TABLE OF ts_fragment WITH EMPTY KEY.
 
   METHODS snip_json
     IMPORTING iv_json             TYPE zpru_if_agent_frw=>ts_json
@@ -56,11 +56,33 @@ INTERFACE zpru_if_agent_util
     RETURNING VALUE(rt_fragments) TYPE tt_fragment.
 
   METHODS append_json_to_json
-    IMPORTING
-              iv_field_4_append  TYPE string
+    IMPORTING iv_field_4_append  TYPE string
               iv_json_4_append   TYPE zpru_if_agent_frw=>ts_json
               iv_json_target     TYPE zpru_if_agent_frw=>ts_json
     RETURNING VALUE(rv_new_json) TYPE zpru_if_agent_frw=>ts_json.
 
+  METHODS wrap_to_json_markdown
+    IMPORTING iv_content         TYPE string
+    RETURNING VALUE(rv_markdown) TYPE string.
+
+  METHODS unwrap_from_json_markdown
+    IMPORTING iv_markdown       TYPE string
+    RETURNING VALUE(rv_content) TYPE string.
+
+  METHODS is_wrapped_in_json_markdown
+    IMPORTING iv_content                   TYPE string
+    RETURNING VALUE(rv_content_is_wrapped) TYPE string.
+
+  METHODS wrap_to_text_markdown
+    IMPORTING iv_content         TYPE string
+    RETURNING VALUE(rv_markdown) TYPE string.
+
+  METHODS unwrap_from_text_markdown
+    IMPORTING iv_markdown       TYPE string
+    RETURNING VALUE(rv_content) TYPE string.
+
+  METHODS is_wrapped_in_text_markdown
+    IMPORTING iv_content                   TYPE string
+    RETURNING VALUE(rv_content_is_wrapped) TYPE string.
 
 ENDINTERFACE.

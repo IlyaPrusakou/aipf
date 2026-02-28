@@ -57,7 +57,7 @@ CLASS zpru_cl_syst_prmpt_prvdr_base IMPLEMENTATION.
                         IMPORTING ev_arbitrarytexttitle = ls_system_prompt-arbitrarytexttitle
                                   ev_arbitrarytext      = ls_system_prompt-arbitrarytext ).
 
-    rv_abap_system_prompt = ls_system_prompt.
+    rs_abap_system_prompt = ls_system_prompt.
   ENDMETHOD.
 
   METHOD zpru_if_prompt_provider~get_system_prompt.

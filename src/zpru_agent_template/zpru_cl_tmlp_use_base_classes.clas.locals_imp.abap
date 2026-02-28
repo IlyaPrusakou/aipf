@@ -1,5 +1,5 @@
 
-CLASS lcl_decision_provider IMPLEMENTATION.
+CLASS lcl_adf_decision_provider IMPLEMENTATION.
   METHOD check_authorizations.
   ENDMETHOD.
 
@@ -29,16 +29,16 @@ CLASS lcl_decision_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_short_memory_provider IMPLEMENTATION.
+CLASS lcl_adf_short_memory_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_long_memory_provider IMPLEMENTATION.
+CLASS lcl_adf_long_memory_provider IMPLEMENTATION.
 
 ENDCLASS.
 
 
-CLASS lcl_agent_info_provider IMPLEMENTATION.
+CLASS lcl_adf_agent_info_provider IMPLEMENTATION.
   METHOD get_agent_main_info.
   ENDMETHOD.
 
@@ -59,7 +59,7 @@ CLASS lcl_agent_info_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_syst_prompt_provider IMPLEMENTATION.
+CLASS lcl_adf_syst_prompt_provider IMPLEMENTATION.
   METHOD set_primary_session_task.
   ENDMETHOD.
 
@@ -83,65 +83,65 @@ CLASS lcl_syst_prompt_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_abap_executor IMPLEMENTATION.
+CLASS lcl_adf_abap_executor IMPLEMENTATION.
   METHOD execute_code_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_knowledge_provider IMPLEMENTATION.
+CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_nested_agent IMPLEMENTATION.
+CLASS lcl_adf_nested_agent IMPLEMENTATION.
   METHOD run_nested_agent_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_http_request_tool IMPLEMENTATION.
+CLASS lcl_adf_http_request_tool IMPLEMENTATION.
   METHOD send_http_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_service_cons_model_tool IMPLEMENTATION.
+CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
   METHOD consume_service_model_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_call_llm_tool IMPLEMENTATION.
+CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
   METHOD call_large_language_model_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_dynamic_abap_code_tool IMPLEMENTATION.
+CLASS lcl_adf_dynamic_abap_code_tool IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_ml_model_inference IMPLEMENTATION.
+CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
   METHOD get_ml_inference_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_user_tool IMPLEMENTATION.
+CLASS lcl_adf_user_tool IMPLEMENTATION.
   METHOD execute_user_tool_int.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_tool_provider IMPLEMENTATION.
+CLASS lcl_adf_tool_provider IMPLEMENTATION.
   METHOD provide_tool_instance.
   ENDMETHOD.
 ENDCLASS.
 
 
-CLASS lcl_tool_info_provider IMPLEMENTATION.
+CLASS lcl_adf_tool_info_provider IMPLEMENTATION.
   METHOD get_main_tool_info.
   ENDMETHOD.
 
@@ -153,7 +153,7 @@ CLASS lcl_tool_info_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_schema_provider IMPLEMENTATION.
+CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
   ENDMETHOD.
 

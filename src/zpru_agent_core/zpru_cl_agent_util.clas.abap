@@ -3,7 +3,7 @@ CLASS zpru_cl_agent_util DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-  INTERFACES zpru_if_agent_frw.
+    INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_agent_util.
   PROTECTED SECTION.
     METHODS add_json_2_writer
@@ -365,6 +365,55 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
       CATCH cx_sxml_parse_error.
         RETURN.
     ENDTRY.
+  ENDMETHOD.
+
+  METHOD zpru_if_agent_util~wrap_to_json_markdown.
+    " concatenate with the required spaces: ```JSON [SPACE] content [SPACE] ```
+    rv_markdown = |```JSON { iv_content } ```|.
+  ENDMETHOD.
+
+  METHOD zpru_if_agent_util~unwrap_from_json_markdown.
+    DATA(lv_temp) = iv_markdown.
+
+    "  using regex to handle the specific pattern:
+    rv_content = replace( val = iv_markdown sub = '```JSON '  with = '' ).
+    rv_content = replace( val = rv_content   sub = ' ```'      with = '' ).
+
+    " trim leading/trailing whitespace just in case
+    rv_content = condense( rv_content ).
+  ENDMETHOD.
+
+
+  METHOD zpru_if_agent_util~wrap_to_TEXT_markdown.
+    " concatenate with the required spaces: ```JSON [SPACE] content [SPACE] ```
+    rv_markdown = |```JSON { iv_content } ```|.
+  ENDMETHOD.
+
+  METHOD zpru_if_agent_util~unwrap_from_TEXT_markdown.
+    DATA(lv_temp) = iv_markdown.
+
+    "  using regex to handle the specific pattern:
+    rv_content = replace( val = iv_markdown sub = '```TEXT '  with = '' ).
+    rv_content = replace( val = rv_content   sub = ' ```'      with = '' ).
+
+    " trim leading/trailing whitespace just in case
+    rv_content = condense( rv_content ).
+  ENDMETHOD.
+
+  METHOD zpru_if_agent_util~is_wrapped_in_json_markdown.
+" * is the wildcard in ABAP CP operator
+  " we use uppercase JSON specifically here
+  IF iv_content CP '```JSON * ```'.
+    rv_content_is_wrapped = abap_true.
+  ENDIF.
+  ENDMETHOD.
+
+  METHOD zpru_if_agent_util~is_wrapped_in_text_markdown.
+" * is the wildcard in ABAP CP operator
+  " we use uppercase JSON specifically here
+  IF iv_content CP '```TEXT * ```'.
+    rv_content_is_wrapped = abap_true.
+  ENDIF.
   ENDMETHOD.
 
 ENDCLASS.
