@@ -59,7 +59,7 @@ CLASS lcl_agent_info_provider IMPLEMENTATION.
 ENDCLASS.
 
 
-CLASS lcl_prompt_provider IMPLEMENTATION.
+CLASS lcl_syst_prompt_provider IMPLEMENTATION.
   METHOD set_primary_session_task.
   ENDMETHOD.
 
@@ -114,11 +114,8 @@ ENDCLASS.
 
 
 CLASS lcl_call_llm_tool IMPLEMENTATION.
-
   METHOD call_large_language_model_int.
-
   ENDMETHOD.
-
 ENDCLASS.
 
 
@@ -127,45 +124,45 @@ ENDCLASS.
 
 
 CLASS lcl_ml_model_inference IMPLEMENTATION.
-
   METHOD get_ml_inference_int.
-
   ENDMETHOD.
-
 ENDCLASS.
 
 
 CLASS lcl_user_tool IMPLEMENTATION.
-  METHOD zpru_if_user_tool~execute_user_tool.
+  METHOD execute_user_tool_int.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_tool_provider IMPLEMENTATION.
-  METHOD zpru_if_tool_provider~get_tool.
+  METHOD provide_tool_instance.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_tool_info_provider IMPLEMENTATION.
-  METHOD zpru_if_tool_info_provider~get_tool_info.
+  METHOD get_main_tool_info.
   ENDMETHOD.
 
-  METHOD zpru_if_tool_info_provider~get_abap_tool_info.
+  METHOD set_tool_parameters.
+  ENDMETHOD.
+
+  METHOD set_tool_properties.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_schema_provider IMPLEMENTATION.
-  METHOD zpru_if_tool_schema_provider~input_json_schema.
+  METHOD get_input_abap_type.
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~input_rtts_schema.
+  METHOD get_input_json_schema.
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~output_json_schema.
+  METHOD get_output_abap_type.
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
+  METHOD get_output_json_schema.
   ENDMETHOD.
 ENDCLASS.
