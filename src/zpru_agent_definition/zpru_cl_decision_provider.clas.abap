@@ -226,7 +226,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     ENDLOOP.
 
-    ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt( ).
+    ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt( iv_agent_uuid = is_agent-agentuuid ).
     ls_decision_request-sessionmemory         = lt_session_memory.
     ls_decision_request-episodicmessagememory = lt_episodic_message_memory.
     ls_decision_request-episodicsummarymemory = lt_episodic_summary_memory.
