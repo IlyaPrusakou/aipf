@@ -1612,6 +1612,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_decision_provider TYPE REF TO zpru_if_decision_provider.
     DATA lo_axc_service       TYPE REF TO zpru_if_axc_service.
     DATA lt_step_final_state  TYPE zpru_if_axc_type_and_constant=>tt_axc_step.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
+    DATA lv_final_response TYPE string.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
@@ -1650,7 +1655,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                             cs_adf_reported   = cs_adf_reported
                                                             cs_adf_failed     = cs_adf_failed   ).
     IF eo_final_response IS BOUND.
-      <ls_query_2_upd>-queryoutputresponse = eo_final_response->get_data( )->*.
+
+      IF lo_util->is_wrapped_in_json_markdown( iv_content = eo_final_response->get_data( )->* ).
+        lo_util->unwrap_from_json_markdown(
+          EXPORTING
+            iv_markdown = eo_final_response->get_data( )->*
+          RECEIVING
+            rv_content  = lv_final_response ).
+      ELSE.
+        lv_final_response = eo_final_response->get_data( )->*.
+      ENDIF.
+
+      <ls_query_2_upd>-queryoutputresponse = lv_final_response.
       <ls_query_2_upd>-control-queryoutputresponse = abap_true.
     ENDIF.
 
@@ -1659,7 +1675,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                             cs_failed           = cs_axc_failed ).
 
     DATA(lv_final_response_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "FINAL_RESPONSE", "TIMESTAMP" : "{ lv_now }",| &&
-                                      | "CONTENT" : "{ <ls_query_2_upd>-queryoutputresponse }" \} ```|.
+                                      | "CONTENT" : "```JSON { <ls_query_2_upd>-queryoutputresponse } ```" \} ```|.
 
     DATA(lv_last_number) = lines( io_controller->mt_input_output ).
     ASSIGN io_controller->mt_input_output[ number = lv_last_number ] TO FIELD-SYMBOL(<ls_input_output>).
@@ -1869,10 +1885,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     DATA(lv_system_prompt) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "SYSTEM_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                             | "CONTENT" : "```JSON { io_system_prompt_provider->get_system_prompt( iv_agent_uuid = is_agent-agentuuid ) } ```" \} ```|.
+                             | "CONTENT" : "{ io_system_prompt_provider->get_system_prompt( iv_agent_uuid = is_agent-agentuuid ) }" \} ```|.
 
     DATA(lv_agent_info) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "AGENT_INFO", "TIMESTAMP" : "{ lv_now }",| &&
-                             | "CONTENT" : "```JSON { io_agent_info_provider->get_agent_info( iv_agent_uuid = is_agent-agentuuid ) } ```" \} ```|.
+                             | "CONTENT" : "{ io_agent_info_provider->get_agent_info( iv_agent_uuid = is_agent-agentuuid ) }" \} ```|.
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
                                     ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
@@ -1947,9 +1963,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                   | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
                                                   | "QUERY" : "```TEXT { lv_unwrapped_query } ```", | &&
-                                                  | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
+                                                  | "FIRST TOOL INPUT" : "{ lv_first_tool_input_message }", | &&
                                                   | "LANGUAGE" : "{ lv_langu }", | &&
-                                                  | "DECISION LOG" : { lv_decision_log_message } \}|
+                                                  | "DECISION LOG" : "{ lv_decision_log_message }" \}|
                                messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
