@@ -253,18 +253,56 @@ ENDCLASS.
 
 CLASS lcl_adf_agent_info_provider IMPLEMENTATION.
   METHOD get_agent_main_info.
+    ev_agentname = `Dummy Agent`.
+    ev_agentversion = `Version 1.0.0`.
+    ev_agentrole = `It's demo agent, using for testing and demo purposes. The legend is that it get data for CMR and perform action on it.`.
   ENDMETHOD.
 
   METHOD get_free_text.
   ENDMETHOD.
 
   METHOD prepare_agent_domains.
+    rs_agent_domains-agentdomainname    = `Demo and Testing AIPF framework.`.
+    rs_agent_domains-agentdomaincontent = |It is used for my internal testing of AIPF framework.| &&
+                                          |It is used for demo purposes to show basic Agent structure.|.
+
+    APPEND INITIAL LINE TO rs_agent_domains-agentsubdomains ASSIGNING FIELD-SYMBOL(<ls_sub_domains>).
+    <ls_sub_domains>-agentsubdomainname    = `Transportation Management.`.
+    <ls_sub_domains>-agentsubdomaincontent = `For demo I use scenario of processing CMR document handled by driver to clerk during finishing delivery.`.
+
+    APPEND INITIAL LINE TO rs_agent_domains-agentsubdomains ASSIGNING <ls_sub_domains>.
+    <ls_sub_domains>-agentsubdomainname    = `Extended Warehouse Management.`.
+    <ls_sub_domains>-agentsubdomaincontent = `For demo I use scenario of processing CMR document handled by driver to clerk during starting putaway in EWM complex.`.
   ENDMETHOD.
 
   METHOD set_agent_goals.
+    APPEND INITIAL LINE TO rt_agent_goals ASSIGNING FIELD-SYMBOL(<ls_agent_goal>).
+    <ls_agent_goal>-agentgoalid              = 1.
+    <ls_agent_goal>-agentgoaldescription     = `Demo Purpose`.
+    <ls_agent_goal>-agentgoalpriority        = 1.
+    <ls_agent_goal>-agentgoalcontent         = `Consumer must be satisfied by Demo and get clear understanding how he can use AIPF framework in his business.`.
+    <ls_agent_goal>-agentgoalsuccesscriteria = `Consumer gets clear vision of AIPF framework.`.
+
+    APPEND INITIAL LINE TO rt_agent_goals ASSIGNING <ls_agent_goal>.
+    <ls_agent_goal>-agentgoalid              = 2.
+    <ls_agent_goal>-agentgoaldescription     = `Test Purpose`.
+    <ls_agent_goal>-agentgoalpriority        = 1.
+    <ls_agent_goal>-agentgoalcontent         = `Developer must test AIPF framework and get clear understanding how he can use AIPF framework in his development.`.
+    <ls_agent_goal>-agentgoalsuccesscriteria = `Developer gets clear vision of AIPF framework.`.
+
+    APPEND INITIAL LINE TO rt_agent_goals ASSIGNING <ls_agent_goal>.
+    <ls_agent_goal>-agentgoalid              = 3.
+    <ls_agent_goal>-agentgoaldescription     = `Be Close To Business Purpose`.
+    <ls_agent_goal>-agentgoalpriority        = 2.
+    <ls_agent_goal>-agentgoalcontent         = `You must work in a way which is the most natural for Transportation and Extended Warehouse Management`.
+    <ls_agent_goal>-agentgoalsuccesscriteria = `Your behavior simulates real business process`.
+
   ENDMETHOD.
 
   METHOD set_agent_restrictions.
+    APPEND INITIAL LINE TO rt_agent_restrictions ASSIGNING FIELD-SYMBOL(<ls_agent_restrictions>).
+    <ls_agent_restrictions>-agentrestrictionname = `Grounding`.
+    <ls_agent_restrictions>-agentrestriction = `Strictly follow all provided instructions`.
   ENDMETHOD.
 
   METHOD set_tool_metadata.
@@ -274,6 +312,7 @@ ENDCLASS.
 
 CLASS lcl_adf_syst_prompt_provider IMPLEMENTATION.
   METHOD set_primary_session_task.
+    ev_primary_session_task = `Show how to build agent and how agents work in general in AIPF framework`.
   ENDMETHOD.
 
   METHOD set_business_rules.
