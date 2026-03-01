@@ -84,5 +84,7 @@ CLASS zpru_cl_tool_info_provider IMPLEMENTATION.
                                           iv_compress      = abap_true
                                 CHANGING  cr_string        = rv_tool_info ).
 
+    rv_tool_info = lo_util->wrap_to_json_markdown( iv_content = rv_tool_info ).
+
   ENDMETHOD.
 ENDCLASS.
