@@ -386,7 +386,7 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
 
   METHOD zpru_if_agent_util~wrap_to_TEXT_markdown.
     " concatenate with the required spaces: ```JSON [SPACE] content [SPACE] ```
-    rv_markdown = |```JSON { iv_content } ```|.
+    rv_markdown = |```TEXT { iv_content } ```|.
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~unwrap_from_TEXT_markdown.

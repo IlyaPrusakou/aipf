@@ -1658,8 +1658,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                   CHANGING  cs_reported         = cs_axc_reported
                                             cs_failed           = cs_axc_failed ).
 
-    DATA(lv_final_response_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FINAL_RESPONSE", "TIMESTAMP" : "{ lv_now }",| &&
-                                      | "CONTENT" : "{ <ls_query_2_upd>-queryoutputresponse }" \}|.
+    DATA(lv_final_response_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "FINAL_RESPONSE", "TIMESTAMP" : "{ lv_now }",| &&
+                                      | "CONTENT" : "{ <ls_query_2_upd>-queryoutputresponse }" \} ```|.
 
     DATA(lv_last_number) = lines( io_controller->mt_input_output ).
     ASSIGN io_controller->mt_input_output[ number = lv_last_number ] TO FIELD-SYMBOL(<ls_input_output>).
@@ -1679,7 +1679,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           messagedatetime  = lv_now
           content          = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
                              | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
-                             | "FINAL_RESPONSE" : { lv_final_response_message }  \}|
+                             | "FINAL_RESPONSE" : "{ lv_final_response_message }"  \}|
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
     io_short_memory->save_message( it_message = lt_message ).
@@ -1745,11 +1745,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD log_step_execution.
     GET TIME STAMP FIELD DATA(lv_now).
 
-    DATA(lv_input_tool_prompt_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                         | "CONTENT" : "{ iv_input_prompt }" \}|.
+    DATA(lv_input_tool_prompt_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
+                                         | "CONTENT" : "{ iv_input_prompt }" \} ```|.
 
-    DATA(lv_output_tool_prompt_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_OUTPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                          | "CONTENT" : "{ iv_output_prompt }" \}|.
+    DATA(lv_output_tool_prompt_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_OUTPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
+                                          | "CONTENT" : "{ iv_output_prompt }" \} ```|.
 
     rs_message = VALUE #(
         messagecontentid = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
@@ -1768,8 +1768,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                            | "EXECUTION_SEQ" : "{ is_execution_step-stepsequence }", | &&
                            | "TOOL_NAME" : "{ is_tool_master_data-toolname }", | &&
                            | "STEP_TYPE" : "{ is_tool_master_data-steptype }", | &&
-                           | "INPUT_PROMPT" : { lv_input_tool_prompt_message }, | &&
-                           | "OUTPUT_PROMPT" : { lv_output_tool_prompt_message }, | &&
+                           | "INPUT_PROMPT" : "{ lv_input_tool_prompt_message }", | &&
+                           | "OUTPUT_PROMPT" : "{ lv_output_tool_prompt_message }", | &&
                            | "ERROR" : "{ iv_error_flag }"  \}|
         messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
   ENDMETHOD.
@@ -1833,6 +1833,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lv_first_tool_input TYPE zpru_if_agent_frw=>ts_json.
     DATA lv_langu            TYPE sylangu.
     DATA lv_decision_log     TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_unwrapped_query TYPE string.
 
     lo_utility ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
@@ -1853,17 +1854,25 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_decision_log ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
                                                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    lo_query->set_data( ir_data = NEW zpru_if_agent_frw=>ts_json( lo_utility->search_node_in_json(
-                                                                      iv_json           = iv_input_query
-                                                                      iv_field_2_search = 'CONTENT' ) ) ).
+    IF lo_utility->is_wrapped_in_text_markdown( iv_content = iv_input_query ) = abap_true.
+      lo_utility->unwrap_from_text_markdown(
+        EXPORTING
+          iv_markdown            = iv_input_query
+        RECEIVING
+          rv_content = lv_unwrapped_query  ).
+    ELSE.
+      lv_unwrapped_query = iv_input_query.
+    ENDIF.
+
+    lo_query->set_data( ir_data = NEW string( lv_unwrapped_query )  ).
 
     GET TIME STAMP FIELD DATA(lv_now).
 
-    DATA(lv_system_prompt) = |\{ "USER": "{ sy-uname }", "TOPIC" : "SYSTEM_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                             | "CONTENT" : "{ io_system_prompt_provider->get_system_prompt( iv_agent_uuid = is_agent-agentuuid ) }" \}|.
+    DATA(lv_system_prompt) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "SYSTEM_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
+                             | "CONTENT" : "```JSON { io_system_prompt_provider->get_system_prompt( iv_agent_uuid = is_agent-agentuuid ) } ```" \} ```|.
 
-    DATA(lv_agent_info) = |\{ "USER": "{ sy-uname }", "TOPIC" : "AGENT_INFO", "TIMESTAMP" : "{ lv_now }",| &&
-                             | "CONTENT" : "{ io_agent_info_provider->get_agent_info( iv_agent_uuid = is_agent-agentuuid ) }" \}|.
+    DATA(lv_agent_info) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "AGENT_INFO", "TIMESTAMP" : "{ lv_now }",| &&
+                             | "CONTENT" : "```JSON { io_agent_info_provider->get_agent_info( iv_agent_uuid = is_agent-agentuuid ) } ```" \} ```|.
 
     DATA(lt_message_in) = VALUE zpru_if_short_memory_provider=>tt_message(
                                     ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 1 }|
@@ -1875,8 +1884,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                       messagedatetime  = lv_now
                                       content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                          | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
-                                                         | "QUERY" : { iv_input_query }, | &&
-                                                         | "SYSTEM PROMPT" : { lv_system_prompt }, | &&
+                                                         | "QUERY" : "```TEXT { lv_unwrapped_query } ```", | &&
+                                                         | "SYSTEM PROMPT" : "{ lv_system_prompt }", | &&
                                                          | "AGENT INFO" : "{ lv_agent_info }" \}|
                                       messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
@@ -1922,11 +1931,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD lv_now.
 
-    DATA(lv_decision_log_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
-                                    | "CONTENT" : "{ lv_decision_log }" \}|.
+    DATA(lv_decision_log_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
+                                    | "CONTENT" : "{ lv_decision_log }" \} ```|.
 
-    DATA(lv_first_tool_input_message) = |\{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
-                                   | "CONTENT" : "{ lv_first_tool_input }" \}|.
+    DATA(lv_first_tool_input_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
+                                   | "CONTENT" : "{ lv_first_tool_input }" \} ```|.
 
     lt_message_in = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
                                stage            = iv_stage
@@ -1937,7 +1946,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                messagedatetime  = lv_now
                                content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                   | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
-                                                  | "QUERY" : { iv_input_query }, | &&
+                                                  | "QUERY" : "```TEXT { lv_unwrapped_query } ```", | &&
                                                   | "FIRST TOOL INPUT" : { lv_first_tool_input_message }, | &&
                                                   | "LANGUAGE" : "{ lv_langu }", | &&
                                                   | "DECISION LOG" : { lv_decision_log_message } \}|
@@ -1990,15 +1999,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       DATA(lv_tool_prompt_message) = ||.
       IF <ls_execution_step>-stepinputprompt IS NOT INITIAL.
-        lv_tool_prompt_message = |\{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                       | "CONTENT" : "{ <ls_execution_step>-stepinputprompt }" \}|.
+        lv_tool_prompt_message = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
+                                       | "CONTENT" : "{ <ls_execution_step>-stepinputprompt }" \} ```|.
       ENDIF.
 
       DATA(lv_content_json) = |\{ "STEP_NUMBER" : "{ <ls_execution_step>-stepnumber }", | &&
                               | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                               | "RUN_ID" : "{ is_execution_header-runid }", | &&
                               | "EXECUTION_SEQUENCE" : "{ <ls_execution_step>-stepsequence }", | &&
-                              | "INPUT_PROMPT" : { lv_tool_prompt_message } \}|.
+                              | "INPUT_PROMPT" : "{ lv_tool_prompt_message }" \}|.
 
       APPEND INITIAL LINE TO lt_message_in ASSIGNING FIELD-SYMBOL(<ls_message>).
       <ls_message> = VALUE #(
@@ -2275,7 +2284,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                             content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
                                                |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
                                                |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
-                                               |"INPUT_QUERY" : { mv_input_query } \}|
+                                               |"INPUT_QUERY" : "{ mv_input_query }" \}|
                             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
     io_short_memory->save_message( lt_message ).
@@ -2344,10 +2353,37 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_execution_query.
+    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+    DATA lv_query TYPE string.
+    DATA lv_decision_log TYPE string.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
     GET TIME STAMP FIELD DATA(lv_now).
 
-    ev_decision_log_msg = |\{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
-                          | "CONTENT" : "{ iv_decision_log }" \}|.
+    ev_decision_log_msg = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
+                          | "CONTENT" : "{ iv_decision_log }" \} ```|.
+
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = iv_input_query ).
+      lo_util->unwrap_from_text_markdown(
+        EXPORTING
+          iv_markdown = iv_input_query
+        RECEIVING
+          rv_content  = lv_query ).
+    ELSE.
+      lv_query = iv_input_query.
+    ENDIF.
+
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = iv_decision_log ).
+      lo_util->unwrap_from_text_markdown(
+        EXPORTING
+          iv_markdown = iv_decision_log
+        RECEIVING
+          rv_content  = lv_decision_log ).
+    ELSE.
+      lv_decision_log = iv_decision_log.
+    ENDIF.
 
     TRY.
         es_execution_query = VALUE #(
@@ -2357,10 +2393,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             querylanguage      = COND #( WHEN iv_langu IS NOT INITIAL THEN iv_langu ELSE sy-langu )
             querystatus        = zpru_if_axc_type_and_constant=>sc_query_status-new
             querystartdatetime = lv_now
-            queryinputprompt   = io_utility->search_node_in_json( iv_json           = iv_input_query
-                                                                  iv_field_2_search = 'CONTENT' )
-            querydecisionlog   = io_utility->search_node_in_json( iv_json           = ev_decision_log_msg
-                                                                  iv_field_2_search = 'CONTENT' )
+            queryinputprompt   = lv_query
+            querydecisionlog   = lv_decision_log
             control            = VALUE #( queryuuid           = abap_true
                                           querynumber         = abap_true
                                           runuuid             = abap_true
@@ -2398,8 +2432,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              | "RUN_ID" : "{ is_execution_header-runid }", | &&
                              | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
                              | "LANGUAGE" : "{ is_execution_query-querylanguage }", | &&
-                             | "QUERY" : { iv_input_query }, | &&
-                             | "DECISION LOG" : { iv_decision_log_msg } \}|
+                             | "QUERY" : "{ iv_input_query }", | &&
+                             | "DECISION LOG" : "{ iv_decision_log_msg }" \}|
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
     io_short_memory->save_message( lt_message_in ).
   ENDMETHOD.

@@ -348,6 +348,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #(  ls_decision_log )
                                 CHANGING  cr_string = lv_decision_log_string ).
 
+    lv_decision_log_string = lo_util->wrap_to_json_markdown( iv_content = lv_decision_log_string ).
+
     eo_decision_log->set_data( ir_data = NEW string( lv_decision_log_string ) ).
   ENDMETHOD.
 
