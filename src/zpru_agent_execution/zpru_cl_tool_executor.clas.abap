@@ -18,7 +18,8 @@ CLASS zpru_cl_tool_executor DEFINITION
                 eo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider
                 eo_structure_output     TYPE REF TO cl_abap_structdescr
                 eo_structure_input      TYPE REF TO cl_abap_structdescr
-                eo_util                 TYPE REF TO zpru_if_agent_util.
+                eo_util                 TYPE REF TO zpru_if_agent_util
+      RAISING   zpru_cx_agent_core.
 
     METHODS prepare_additional_steps
       IMPORTING is_current_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step
@@ -112,8 +113,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                                                      control-steptype           = abap_true
                                                                      control-toolschemaprovider = abap_true
                                                                      control-toolinfoprovider   = abap_true
-                                                                     control-TOOLisborrowed         = abap_true
-                                                                     control-TOOListransient        = abap_true  ) )
+                                                                     control-toolisborrowed     = abap_true
+                                                                     control-toolistransient    = abap_true  ) )
                                IMPORTING et_tool        = DATA(lt_existing_tool) ).
 
     lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( runuuid       = is_current_step-runuuid
@@ -228,12 +229,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
           IF     <ls_existing_agent> IS NOT ASSIGNED
              AND <ls_existing_tool>  IS NOT ASSIGNED.
-            <ls_additional_tool>-TOOListransient = abap_true.
+            <ls_additional_tool>-toolistransient = abap_true.
           ENDIF.
 
           IF     <ls_existing_agent> IS ASSIGNED
              AND <ls_existing_tool>  IS ASSIGNED.
-            <ls_additional_tool>-TOOLisborrowed = abap_true.
+            <ls_additional_tool>-toolisborrowed = abap_true.
           ENDIF.
 
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
@@ -274,16 +275,16 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                             |Wrong combination of agent { ls_last_step-agentuuid } and tool { ls_last_step-tooluuid }| ).
 
       lt_message_in = VALUE #(
-          ( messagecONTENTid  = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
-            stage        = 'VALIDATE_ADDITIONAL_STEPS'
-            substage    = 'AFTER VALIDATION'
-            namespace    = |{ sy-uname }.{ ls_current_agent-agentname }.{ ls_current_run-runid }.{ ls_current_query-querynumber }|
-            username    = sy-uname
-            agentuuid   = ls_current_agent-agentuuid
-            messageDATEtime = lv_now
-            content      = |\{ "AGENT_NAME" : "{ ls_current_agent-agentname }", | &&
-                           | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
-            messagetype = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
+          ( messagecontentid = |{ lv_now }-{ sy-uname }-VALIDATE_ADDITIONAL_STEPS_{ is_current_step-stepuuid }|
+            stage            = 'VALIDATE_ADDITIONAL_STEPS'
+            substage         = 'AFTER VALIDATION'
+            namespace        = |{ sy-uname }.{ ls_current_agent-agentname }.{ ls_current_run-runid }.{ ls_current_query-querynumber }|
+            username         = sy-uname
+            agentuuid        = ls_current_agent-agentuuid
+            messagedatetime  = lv_now
+            content          = |\{ "AGENT_NAME" : "{ ls_current_agent-agentname }", | &&
+                               | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
+            messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
       TRY.
           io_controller->mo_short_memory->save_message( lt_message_in ).
         CATCH zpru_cx_agent_core.
@@ -298,6 +299,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     DATA lr_input                TYPE REF TO data.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
+    DATA lv_input_string         TYPE string.
 
     ev_error_flag = abap_false.
 
@@ -317,13 +319,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     eo_tool_info_provider = lo_tool_info_provider.
 
-    TRY.
-        lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
-      CATCH zpru_cx_agent_core.
-        RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-    ENDTRY.
-
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
     eo_util = lo_util.
 
     DATA(lo_structure_input) = lo_tool_schema_provider->input_rtts_schema( is_tool_master_data = is_tool_master_data
@@ -333,13 +330,23 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     CREATE DATA lr_input TYPE HANDLE lo_structure_input.
 
-    lo_util->convert_to_abap(
-      EXPORTING
-        ir_string = io_request->get_data( )->*
-      CHANGING
-        cr_abap   = lr_input->* ).
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = io_request->get_data( )->* ) = abap_true.
+      ev_error_flag = abap_true.
+      RETURN.
+    ENDIF.
 
-    er_input = er_input.
+    " unwrap json
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = io_request->get_data( )->* ) = abap_true.
+      lv_input_string = lo_util->unwrap_from_json_markdown(
+                            iv_markdown = io_request->get_data( )->* ).
+    ELSE.
+      lv_input_string = io_request->get_data( )->*.
+    ENDIF.
+
+    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
+                              CHANGING  cr_abap   = lr_input->* ).
+
+    er_input = lr_input.
 
     DATA(lo_structure_output) = lo_tool_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
                                                                              is_execution_step   = is_execution_step  ).
@@ -358,6 +365,9 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     io_util->convert_to_string( EXPORTING ir_abap   = ir_output
                                 CHANGING  cr_string = lv_output_json ).
+
+    " wrap into json
+    lv_output_json = io_util->wrap_to_json_markdown( iv_content = lv_output_json ).
 
     eo_response->set_data( NEW zpru_if_agent_frw=>ts_json( lv_output_json ) ).
 

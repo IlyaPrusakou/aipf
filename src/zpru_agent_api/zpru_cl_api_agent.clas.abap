@@ -77,7 +77,7 @@ CLASS zpru_cl_api_agent DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS execute_tool_logic
-      IMPORTING is_agent    type zpru_if_adf_type_and_constant=>ts_agent
+      IMPORTING is_agent            TYPE zpru_if_adf_type_and_constant=>ts_agent
                 io_controller       TYPE REF TO zpru_if_agent_controller
                 io_input            TYPE REF TO zpru_if_payload
                 is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
@@ -221,7 +221,8 @@ CLASS zpru_cl_api_agent DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS update_query_internal_state
-      IMPORTING is_input_query TYPE zpru_s_prompt.
+      IMPORTING is_input_query TYPE zpru_s_prompt
+      RAISING   zpru_cx_agent_core.
 
     METHODS append_query_to_controller
       RAISING zpru_cx_agent_core.
@@ -492,8 +493,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -542,7 +543,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -621,8 +622,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -2214,9 +2215,36 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD update_query_internal_state.
+    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+    DATA lv_content TYPE string.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = is_input_query-string_content ) = abap_true.
+      lo_util->unwrap_from_json_markdown(
+        EXPORTING
+          iv_markdown = is_input_query-string_content
+        RECEIVING
+          rv_content  = lv_content ).
+    ELSE.
+      lv_content =  is_input_query-string_content.
+    ENDIF.
+
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_content ) = abap_false.
+      lo_util->wrap_to_text_markdown(
+        EXPORTING
+          iv_content  = lv_content
+        RECEIVING
+          rv_markdown = lv_content ).
+    ENDIF.
+
     GET TIME STAMP FIELD DATA(lv_now).
-    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ is_input_query-string_content }"  \}|.
+    mv_input_query = |\{ "USER": "{ sy-uname }", "TOPIC" : "QUERY", "TIMESTAMP" : "{ lv_now }", "CONTENT" : "{ lv_content }"  \}|.
+
     ms_input_prompt = is_input_query.
+    ms_input_prompt-string_content = lv_content.
+
     CLEAR: mv_output_response,
            mv_output_response_prev.
   ENDMETHOD.

@@ -360,9 +360,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = io_input
                                 CHANGING  cr_string = lv_json_input ).
 
-    ls_prompt-string_content = lo_util->wrap_to_json_markdown(
-       EXPORTING
-         iv_content  = lv_json_input ).
+    ls_prompt-string_content = lv_json_input.
 
     lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
                                               is_prompt              = ls_prompt
@@ -378,7 +376,15 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody-responsecontent )
+
+    IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
+      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown( iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+    ELSE.
+      ev_error_flag = abap_true.
+      RETURN.
+    ENDIF.
+
+    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_response_content_json )
                               CHANGING  cr_abap   = <ls_safety_response> ).
   ENDMETHOD.
 ENDCLASS.
