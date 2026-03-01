@@ -100,7 +100,8 @@ CLASS zpru_cl_decision_provider DEFINITION
       IMPORTING iv_run_uuid            TYPE sysuuid_x16
                 iv_query_uuid          TYPE sysuuid_x16
                 io_controller          TYPE REF TO zpru_if_agent_controller
-                io_last_output         TYPE REF TO zpru_if_payload OPTIONAL
+                iv_last_output         TYPE string                                   OPTIONAL
+                is_last_step           TYPE zpru_if_agent_controller=>ts_run_context OPTIONAL
       CHANGING  cs_final_response_body TYPE zpru_s_final_response_body
       RAISING   zpru_cx_agent_core.
 
@@ -212,7 +213,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_decision_request-agentmetadata = lo_agent_info_provider->get_abap_agent_info( iv_agent_uuid = is_agent-agentuuid ).
+    ls_decision_request-agentmetadata = lo_agent_info_provider->get_abap_agent_info(
+                                            iv_agent_uuid = is_agent-agentuuid ).
 
     LOOP AT it_tool ASSIGNING FIELD-SYMBOL(<ls_tool>).
 
@@ -226,7 +228,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     ENDLOOP.
 
-    ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt( iv_agent_uuid = is_agent-agentuuid ).
+    ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt(
+                                                    iv_agent_uuid = is_agent-agentuuid ).
     ls_decision_request-sessionmemory         = lt_session_memory.
     ls_decision_request-episodicmessagememory = lt_episodic_message_memory.
     ls_decision_request-episodicsummarymemory = lt_episodic_summary_memory.
@@ -331,6 +334,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = lr_first_input
                                 CHANGING  cr_string = lv_first_input_string ).
 
+    lv_first_input_string = lo_util->wrap_to_json_markdown( iv_content = lv_first_input_string ).
+
     eo_first_tool_input->set_data( ir_data = NEW string( lv_first_input_string ) ).
 
     ls_decision_log-resultcomment = set_result_comment( ).
@@ -343,6 +348,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #(  ls_decision_log )
                                 CHANGING  cr_string = lv_decision_log_string ).
 
+    lv_decision_log_string = lo_util->wrap_to_json_markdown( iv_content = lv_decision_log_string ).
+
     eo_decision_log->set_data( ir_data = NEW string( lv_decision_log_string ) ).
   ENDMETHOD.
 
@@ -351,6 +358,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     DATA lv_final_response_json TYPE zpru_de_json.
     DATA lo_axc_service         TYPE REF TO zpru_if_axc_service.
     DATA lo_util                TYPE REF TO zpru_if_agent_util.
+    DATA lv_last_output         TYPE string.
+    DATA lv_last_step_sequence  TYPE zpru_de_step_sequence.
 
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
@@ -403,10 +412,38 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_final_response-finalresponseheader-runuuid            = <ls_axc_head>-runuuid.
     ls_final_response-finalresponseheader-queryuuid          = <ls_axc_query>-queryuuid.
 
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = io_last_output->get_data( )->* ) = abap_true.
+      lv_last_output = lo_util->unwrap_from_text_markdown(
+                           iv_markdown = io_last_output->get_data( )->* ).
+    ELSE.
+      lv_last_output = io_last_output->get_data( )->*.
+    ENDIF.
+
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = lv_last_output ).
+      lv_last_output = lo_util->unwrap_from_json_markdown( iv_markdown = lv_last_output ).
+    ENDIF.
+
+    LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_step_candidate>)
+         WHERE stepstatus = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+      IF lv_last_step_sequence < <ls_step_candidate>-stepsequence.
+        lv_last_step_sequence = <ls_step_candidate>-stepsequence.
+      ENDIF.
+    ENDLOOP.
+
+    DATA(ls_last_step) = VALUE #( io_controller->mt_execution_steps[ stepsequence = lv_last_step_sequence ] OPTIONAL ).
+    IF ls_last_step IS NOT INITIAL.
+      DATA(ls_last_step_context) = VALUE #( io_controller->mt_run_context[
+                                                execution_step-stepsequence = ls_last_step-stepsequence ] OPTIONAL ).
+    ENDIF.
+
     set_final_response_content( EXPORTING iv_run_uuid            = iv_run_uuid
                                           iv_query_uuid          = iv_query_uuid
                                           io_controller          = io_controller
-                                          io_last_output         = io_last_output
+                                          iv_last_output         = lv_last_output
+                                          is_last_step           = ls_last_step_context
                                 CHANGING  cs_final_response_body = ls_final_response-finalresponsebody  ).
 
     set_final_response_metadata( EXPORTING iv_run_uuid        = iv_run_uuid
@@ -415,11 +452,10 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                            io_last_output     = io_last_output
                                  CHANGING  cs_reasoning_trace = ls_final_response-reasoning_trace ).
 
-    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
     lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
                                 CHANGING  cr_string = lv_final_response_json ).
+
+    lv_final_response_json = lo_util->wrap_to_json_markdown( iv_content = lv_final_response_json ).
 
     IF eo_final_response IS NOT BOUND.
       eo_final_response ?= zpru_cl_agent_service_mngr=>get_service(

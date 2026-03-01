@@ -8,7 +8,7 @@ CLASS lcl_common_algorithms DEFINITION CREATE PUBLIC.
     CLASS-METHODS get_timestamp
       RETURNING VALUE(rv_now) TYPE timestampl.
 
-    class-METHODS get_llm_api_factory
+    CLASS-METHODS get_llm_api_factory
       RETURNING VALUE(ro_llm_api_factory) TYPE REF TO if_aic_islm_compl_api_factory.
 
   PROTECTED SECTION.
@@ -91,6 +91,15 @@ ENDCLASS.
 CLASS lcl_adf_http_request_tool DEFINITION INHERITING FROM zpru_cl_http_request_sender CREATE PUBLIC.
   PROTECTED SECTION.
     METHODS send_http_int REDEFINITION.
+    METHODS get_http_client
+      IMPORTING iv_url                TYPE string
+      RETURNING VALUE(ro_http_client) TYPE REF TO if_web_http_client.
+
+    METHODS send_via_url
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
 ENDCLASS.
 
 
@@ -101,8 +110,44 @@ ENDCLASS.
 
 
 CLASS lcl_adf_call_llm_tool DEFINITION INHERITING FROM zpru_cl_llm_caller CREATE PUBLIC.
+  PUBLIC SECTION.
+    TYPES: BEGIN OF ts_result_payload,
+             llm_response               TYPE string,
+             llm_total_tokens           TYPE i,
+             llm_finish_reason          TYPE aic_finish_reason=>type,
+             llm_original_finish_reason TYPE string,
+           END OF ts_result_payload.
   PROTECTED SECTION.
     METHODS call_large_language_model_int REDEFINITION.
+    METHODS prepare_prompt
+      IMPORTING io_llm_api           TYPE REF TO if_aic_completion_api
+                iv_system_role       TYPE string
+                iv_user_message      TYPE string
+                iv_assistant_message TYPE string
+                iv_user_message_2    TYPE string
+      RETURNING VALUE(ro_message)    TYPE REF TO if_aic_message_container.
+
+    METHODS get_response_schema
+      RETURNING VALUE(rv_response_schema) TYPE  string.
+
+    METHODS preprocess_llm_request
+      IMPORTING io_controller    TYPE REF TO zpru_if_agent_controller
+                io_request       TYPE REF TO zpru_if_payload
+                iv_islm_scenario TYPE aic_islm_scenario_id=>type
+      EXPORTING eo_message       TYPE REF TO if_aic_message_container
+                eo_llm_api       TYPE REF TO if_aic_completion_api
+                ev_error_flag    TYPE abap_boolean.
+
+    METHODS process_llm_request
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+                io_message    TYPE REF TO if_aic_message_container
+                io_llm_api    TYPE REF TO if_aic_completion_api
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
+
+
+
 ENDCLASS.
 
 
@@ -119,6 +164,25 @@ ENDCLASS.
 CLASS lcl_adf_user_tool DEFINITION INHERITING FROM zpru_cl_user_tool CREATE PUBLIC.
   PROTECTED SECTION.
     METHODS execute_user_tool_int REDEFINITION.
+    METHODS process_dummy_email
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
+
+    METHODS process_prod_email
+      IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
+                io_request    TYPE REF TO zpru_if_payload
+      EXPORTING eo_response   TYPE REF TO zpru_if_payload
+                ev_error_flag TYPE abap_boolean.
+
+    METHODS prepare_dummy_email
+      IMPORTING iv_sender       TYPE zpru_cl_bcs_mail_message=>ty_address
+                iv_recipient    TYPE zpru_cl_bcs_mail_message=>ty_address
+                iv_subject      TYPE zpru_cl_bcs_mail_message=>ty_subject
+                iv_content      TYPE string
+                iv_content_type TYPE char128
+      EXPORTING eo_mail_manager TYPE REF TO zpru_cl_bcs_mail_message.
 ENDCLASS.
 
 
