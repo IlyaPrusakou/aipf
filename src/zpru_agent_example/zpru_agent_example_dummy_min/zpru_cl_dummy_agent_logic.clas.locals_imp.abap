@@ -156,7 +156,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( messageuuid              = <ls_m1>-messageuuid
+                                                               ( MessageUUID              = <ls_m1>-MessageUUID
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -296,13 +296,12 @@ CLASS lcl_adf_agent_info_provider IMPLEMENTATION.
     <ls_agent_goal>-agentgoalpriority        = 2.
     <ls_agent_goal>-agentgoalcontent         = `You must work in a way which is the most natural for Transportation and Extended Warehouse Management`.
     <ls_agent_goal>-agentgoalsuccesscriteria = `Your behavior simulates real business process`.
-
   ENDMETHOD.
 
   METHOD set_agent_restrictions.
     APPEND INITIAL LINE TO rt_agent_restrictions ASSIGNING FIELD-SYMBOL(<ls_agent_restrictions>).
     <ls_agent_restrictions>-agentrestrictionname = `Grounding`.
-    <ls_agent_restrictions>-agentrestriction = `Strictly follow all provided instructions`.
+    <ls_agent_restrictions>-agentrestriction     = `Strictly follow all provided instructions`.
   ENDMETHOD.
 
   METHOD set_tool_metadata.
@@ -316,18 +315,113 @@ CLASS lcl_adf_syst_prompt_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD set_business_rules.
+    APPEND INITIAL LINE TO rt_business_rules ASSIGNING FIELD-SYMBOL(<ls_rule>).
+    <ls_rule>-businessrulesname = `RULE_VALIDATE_RMA`.
+    <ls_rule>-businessrule      = `IF rma_number IS INITIAL, BLOCK_GR 'Goods receipt requires a valid Return Material Authorization (RMA)'.`.
+
+    APPEND INITIAL LINE TO rt_business_rules ASSIGNING <ls_rule>.
+    <ls_rule>-businessrulesname = `RULE_QI_TRIGGER`.
+    <ls_rule>-businessrule      = `IF return_reason = 'DEFECTIVE' OR return_reason = 'DAMAGED', SET stock_type = 'S' (Blocked/QI).`.
+
+    APPEND INITIAL LINE TO rt_business_rules ASSIGNING <ls_rule>.
+    <ls_rule>-businessrulesname = `RULE_RESTOCKING_FEE`.
+    <ls_rule>-businessrule      = `IF return_reason = 'NOT_LIKED' AND days_since_purchase > 30, APPLY fee_pct = 15. ELSE, fee_pct = 0.`.
+
+    APPEND INITIAL LINE TO rt_business_rules ASSIGNING <ls_rule>.
+    <ls_rule>-businessrulesname = `RULE_AUTO_REPLACEMENT`.
+    <ls_rule>-businessrule      = `IF customer_tier = 'GOLD' AND gr_quantity_verified = 'X', CREATE_SO_TYPE 'RE' (Immediate Replacement).`.
   ENDMETHOD.
 
   METHOD set_format_guidelines.
+    APPEND INITIAL LINE TO rt_format_guidelines ASSIGNING FIELD-SYMBOL(<ls_format_guidelines>).
+    <ls_format_guidelines>-formatguidelinename = `NO_MARKDOWN_WRAPPERS`.
+    <ls_format_guidelines>-formatguideline     = `Return only raw ABAP code. Do not include triple backticks or explanatory text.`.
+
+    APPEND INITIAL LINE TO rt_format_guidelines ASSIGNING <ls_format_guidelines>.
+    <ls_format_guidelines>-formatguidelinename = `PLANE_ENGLISH`.
+    <ls_format_guidelines>-formatguideline     = `Avoid corporate jargon (e.g., 'Logistics Processing') in favor of clear actions (e.g., 'We are checking your item now').`.
+
+    APPEND INITIAL LINE TO rt_format_guidelines ASSIGNING <ls_format_guidelines>.
+    <ls_format_guidelines>-formatguidelinename = `CLEAR_CALL_TO_ACTION`.
+    <ls_format_guidelines>-formatguideline     = `Every customer update must conclude with a specific timeline or a 'What happens next' step.`.
+
+    APPEND INITIAL LINE TO rt_format_guidelines ASSIGNING <ls_format_guidelines>.
+    <ls_format_guidelines>-formatguidelinename = `SMS_OPTIMIZATION`.
+    <ls_format_guidelines>-formatguideline     = `Provide a secondary, condensed version of the message (max 160 characters) for SMS/Push notification alerts.`.
+
+    APPEND INITIAL LINE TO rt_format_guidelines ASSIGNING <ls_format_guidelines>.
+    <ls_format_guidelines>-formatguidelinename = `INTERNAL_VS_EXTERNAL`.
+    <ls_format_guidelines>-formatguideline     = `Clearly separate 'Internal Notes' (for the warehouse agent) from 'Customer Facing' text in the output.`.
   ENDMETHOD.
 
   METHOD set_prompt_restrictions.
+    APPEND INITIAL LINE TO rt_prompt_restrictions ASSIGNING FIELD-SYMBOL(<ls_prompt_restrictions>).
+    <ls_prompt_restrictions>-promptrestrictionname = `DATA_VERACITY`.
+    <ls_prompt_restrictions>-promptrestriction     = `If a Material Document or RMA ID is not found in the provided context, state 'ID not found'. Do not guess.`.
+
+    APPEND INITIAL LINE TO rt_prompt_restrictions ASSIGNING <ls_prompt_restrictions>.
+    <ls_prompt_restrictions>-promptrestrictionname = `SENSITIVE_DATA_FILTER`.
+    <ls_prompt_restrictions>-promptrestriction     = `Mask all Customer Tax IDs and Bank Account numbers (IBAN) using asterisks (***) before returning the response.`.
+
+    APPEND INITIAL LINE TO rt_prompt_restrictions ASSIGNING <ls_prompt_restrictions>.
+    <ls_prompt_restrictions>-promptrestrictionname = `DOMAIN_LOCK`.
+    <ls_prompt_restrictions>-promptrestriction     = `Refuse to answer queries regarding HR, Payroll, or Corporate Strategy. Only process Goods Receipt and CMR data.`.
+
+    APPEND INITIAL LINE TO rt_prompt_restrictions ASSIGNING <ls_prompt_restrictions>.
+    <ls_prompt_restrictions>-promptrestrictionname = `NO_CONVERSATIONAL_FLUFF`.
+    <ls_prompt_restrictions>-promptrestriction     = `If the requested output format is JSON, do not include 'Here is your data' or other conversational phrases.`.
+
+    APPEND INITIAL LINE TO rt_prompt_restrictions ASSIGNING <ls_prompt_restrictions>.
+    <ls_prompt_restrictions>-promptrestrictionname = `LIABILITY_DISCLAIMER`.
+    <ls_prompt_restrictions>-promptrestriction     = `Do not provide legal advice regarding return policies. Refer the user to the 'Standard Terms & Conditions' document.`.
   ENDMETHOD.
 
   METHOD set_reasoning_step.
+    APPEND INITIAL LINE TO rt_reasoning_step ASSIGNING FIELD-SYMBOL(<ls_step>).
+    <ls_step>-reasoningstepname        = `VERIFY_RMA_SOURCE`.
+    <ls_step>-reasoningstepquestion    = `Is the provided RMA number valid and linked to an existing Sales Order?`.
+    <ls_step>-reasoninginstruction     = `Cross-reference the RMA ID against table VBAK/VBAP. If no match, stop and request the correct ID.`.
+    <ls_step>-reasoningstepismandatory = abap_true.
+
+    APPEND INITIAL LINE TO rt_reasoning_step ASSIGNING <ls_step>.
+    <ls_step>-reasoningstepname        = `QUANTITY_CHECK`.
+    <ls_step>-reasoningstepquestion    = `Does the physical arrived quantity match the expected return quantity?`.
+    <ls_step>-reasoninginstruction     = `Compare 'iv_arrived_qty' with 'et_expected_qty'. Note any overages or shortages for the adjustment log.`.
+    <ls_step>-reasoningstepismandatory = abap_true.
+
+    APPEND INITIAL LINE TO rt_reasoning_step ASSIGNING <ls_step>.
+    <ls_step>-reasoningstepname        = `STOCK_TYPE_DETERMINATION`.
+    <ls_step>-reasoningstepquestion    = `Which warehouse bin/stock type is appropriate for the item condition?`.
+    <ls_step>-reasoninginstruction     = `Analyze the 'item_condition' attribute. If 'Damaged', assign to Blocked Stock (S). If 'New', assign to Unrestricted.`.
+    <ls_step>-reasoningstepismandatory = abap_true.
+
+    APPEND INITIAL LINE TO rt_reasoning_step ASSIGNING <ls_step>.
+    <ls_step>-reasoningstepname        = `REFUND_ELIGIBILITY`.
+    <ls_step>-reasoningstepquestion    = `Should an immediate credit memo be issued or a replacement order created?`.
+    <ls_step>-reasoninginstruction     = `Check customer master 'KNA1' for VIP status. VIPs get immediate credit; Standard customers wait for QI approval.`.
+    <ls_step>-reasoningstepismandatory = abap_false.
   ENDMETHOD.
 
   METHOD set_technical_rules.
+    APPEND INITIAL LINE TO rt_tech_rules ASSIGNING FIELD-SYMBOL(<ls_tech_rules>).
+    <ls_tech_rules>-technicalrulesname = `LOCKING_PROTOCOL`.
+    <ls_tech_rules>-technicalrule      = `Ensure exclusive lock on RMA_ID before processing to prevent race conditions.`.
+
+    APPEND INITIAL LINE TO rt_tech_rules ASSIGNING <ls_tech_rules>.
+    <ls_tech_rules>-technicalrulesname = `MAX_PAYLOAD_SIZE`.
+    <ls_tech_rules>-technicalrule      = `IF xstring_length( iv_attachment ) > 10485760, REJECT_UPLOAD 'Attachment exceeds 10MB limit'.`.
+
+    APPEND INITIAL LINE TO rt_tech_rules ASSIGNING <ls_tech_rules>.
+    <ls_tech_rules>-technicalrulesname = `EXTERNAL_SERVICE_TIMEOUT`.
+    <ls_tech_rules>-technicalrule      = `Call to Address_Validation_Service must fail-soft if response exceeds 2000ms.`.
+
+    APPEND INITIAL LINE TO rt_tech_rules ASSIGNING <ls_tech_rules>.
+    <ls_tech_rules>-technicalrulesname = `INPUT_SANITIZATION`.
+    <ls_tech_rules>-technicalrule      = `Use cl_abap_doclib_util=>escape_xss for any comment fields rendered in external web views.`.
+
+    APPEND INITIAL LINE TO rt_tech_rules ASSIGNING <ls_tech_rules>.
+    <ls_tech_rules>-technicalrulesname = `DESTINATION_VALIDATION`.
+    <ls_tech_rules>-technicalrule      = `If ping fails, route GR data to local recovery table (ZGR_QUEUE).`.
   ENDMETHOD.
 
   METHOD set_arbitrary_text.
@@ -381,7 +475,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     DATA ls_prompt         TYPE zpru_s_prompt.
     DATA lo_util           TYPE REF TO zpru_if_agent_util.
     DATA ls_final_response TYPE zpru_s_final_response.
-    DATA lv_json_input TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_json_input     TYPE zpru_if_agent_frw=>ts_json.
 
     FIELD-SYMBOLS <ls_safety_request>  TYPE zpru_s_dummy_safety_req.
     FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_dummy_safety_res.
@@ -405,6 +499,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
                                               is_prompt              = ls_prompt
                                               io_parent_controller   = io_controller
                                     IMPORTING ev_final_response      = lv_final_response
+                                    " TODO: variable is assigned but never used (ABAP cleaner)
                                               eo_executed_controller = DATA(lo_nested_controler) ).
 
     ASSIGN eo_output->* TO <ls_safety_response>.
@@ -415,9 +510,9 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
 
-
     IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
-      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown( iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
+                                           iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
     ELSE.
       ev_error_flag = abap_true.
       RETURN.
