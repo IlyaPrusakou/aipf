@@ -362,7 +362,7 @@ CLASS zpru_cl_decision_request IMPLEMENTATION.
 
     " session memory
     IF ls_request-sessionmemory IS NOT INITIAL.
-      SORT ls_request-sessionmemory BY messagedatetime ASCENDING.
+      SORT ls_request-sessionmemory BY sortnumber ASCENDING.
 
       DATA(lv_session_msg_count) = 1.
       LOOP AT ls_request-sessionmemory ASSIGNING FIELD-SYMBOL(<ls_sessionmemory>).

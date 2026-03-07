@@ -33,7 +33,7 @@ CLASS zpru_cl_summarize_simple IMPLEMENTATION.
       lv_summary_count += 1.
     ENDLOOP.
 
-    SORT lt_message BY messagedatetime DESCENDING.
+    SORT lt_message BY sortnumber DESCENDING.
     DATA(ls_last_message) = VALUE #( lt_message[ 1 ] OPTIONAL ).
 
     APPEND INITIAL LINE TO lt_summarization ASSIGNING FIELD-SYMBOL(<ls_sum>).

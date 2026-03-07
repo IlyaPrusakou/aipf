@@ -113,6 +113,8 @@ CLASS zpru_todo_list IMPLEMENTATION.
 
 * add basic classes for agent info, agent syst prompt(reuse class), tool info, tool schema and tool provider
 
+* ADD MESSAGE ABOUT ADDED QUERY IN SCENARIO ADD QUERY
+* IN CYCLE OF TOOLS WE NEED TO MAKE COMMIT AND SAVE AGENT STATE THEN WE WILL USE RUN FROM STEP SCENARIO
 
   ENDMETHOD.
 
