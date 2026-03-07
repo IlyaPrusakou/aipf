@@ -84,9 +84,9 @@ CLASS zpru_cl_agty_service IMPLEMENTATION.
                                          THEN <ls_create>-createdat ).
       <ls_create_in>-%control-aipf7createdat = COND #( WHEN <ls_create>-control-createdat = abap_true
                                                   THEN if_abap_behv=>mk-on ).
-      <ls_create_in>-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
+      <ls_create_in>-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> abap_true
                                          THEN <ls_create>-changedby ).
-      <ls_create_in>-%control-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> if_abap_behv=>mk-off
+      <ls_create_in>-%control-aipf7changedby = COND #( WHEN <ls_create>-control-changedby <> abap_true
                                                   THEN if_abap_behv=>mk-on ).
       <ls_create_in>-aipf7lastchanged = COND #( WHEN <ls_create>-control-lastchanged = abap_true
                                            THEN <ls_create>-lastchanged ).
