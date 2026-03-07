@@ -3,11 +3,20 @@ CLASS zpru_cl_test_data DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
     CLASS-METHODS refresh_test_data.
 ENDCLASS.
 
 
 CLASS zpru_cl_test_data IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+    refresh_test_data( ).
+
+  ENDMETHOD.
+
+
   METHOD refresh_test_data.
     DATA lt_agent_serv      TYPE STANDARD TABLE OF zpru_agent_serv WITH EMPTY KEY.
     DATA lt_agent           TYPE STANDARD TABLE OF zpru_agent WITH EMPTY KEY.
@@ -209,7 +218,7 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     ENDTRY.
 
     lt_agent = VALUE #( agenttype = 'AGTYP1'
-                        AGENTstatus     = 'N'
+                        agentstatus     = 'N'
                         createdby = ''
                         createdat = '0.0000000'
                         changedby = ''
@@ -321,10 +330,10 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
 
 
     lt_agent_type = VALUE #( ( agenttype         = 'AGTYP1'
-                               shortmemORYvolume   = '8'
+                               shortmemoryvolume   = '8'
                                discardstrategy   = 'SUM1'
                                summarystrategy   = 'SUM1'
-                               MaximumNumberOfLoop      = '3'
+                               maximumnumberofloop      = '3'
                                createdby         = ''
                                createdat         = '0.0000000'
                                changedby         = ''
