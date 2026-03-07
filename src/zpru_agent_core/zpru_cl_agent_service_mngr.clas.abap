@@ -33,10 +33,10 @@ CLASS zpru_cl_agent_service_mngr IMPLEMENTATION.
       lv_fields = |service AS service,| &&
                   | context AS context,| &&
                   | class AS class,| &&
-                  | created_by AS createdby,| &&
-                  | created_at AS createdat,| &&
-                  | changed_by AS changedby,| &&
-                  | last_changed AS lastchanged|.
+                  | createdby AS createdby,| &&
+                  | createdat AS createdat,| &&
+                  | changedby AS changedby,| &&
+                  | lastchanged AS lastchanged|.
       lv_where = `service = @iv_service AND context = @iv_context`.
 
       SELECT SINGLE (lv_fields)

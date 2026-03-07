@@ -377,7 +377,9 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
       <ls_read_in>-AIPF7AgentUUID = <ls_read>-agentuuid.
-      <ls_read_in>-%control-AIPF7AgentName            = <ls_read>-control-agentname.
+      <ls_read_in>-%control-AIPF7AgentName            = COND #( WHEN <ls_read>-control-agentname = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_read_in>-%control-AIPF7AgentType            = <ls_read>-control-agenttype.
       <ls_read_in>-%control-AIPF7DecisionProvider     = <ls_read>-control-decisionprovider.
       <ls_read_in>-%control-AIPF7ShortMemoryProvider  = <ls_read>-control-shortmemoryprovider.
