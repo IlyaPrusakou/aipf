@@ -126,6 +126,15 @@ ENDCLASS.
 
 CLASS zpru_cl_decision_provider IMPLEMENTATION.
   METHOD zpru_if_decision_provider~call_decision_engine.
+
+    DATA: BEGIN OF ls_json_type,
+            user      TYPE string,
+            topic     TYPE string,
+            timestamp TYPE timestampl,
+            content   TYPE string,
+          END OF ls_json_type.
+
+    DATA lv_content TYPE string.
     DATA ls_decision_log         TYPE zpru_s_decision_log.
     DATA lv_decision_log_string  TYPE string.
     DATA lv_first_input_string   TYPE string.
@@ -137,6 +146,9 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     DATA lo_syst_prompt_provider TYPE REF TO zpru_if_prompt_provider.
     DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     ls_decision_log-agentuuid            = is_agent-agentuuid.
     ls_decision_log-modelid              = set_model_id( ).
@@ -236,7 +248,25 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_decision_request-semanticmemory        = lt_semantic_memory.
     ls_decision_request-ragdata               = lt_rag_data.
     ls_decision_request-userdata              = lv_user_data.
-    ls_decision_request-userprompt            = io_input->get_data( )->*.
+
+    lo_util->convert_to_abap(
+      EXPORTING
+        ir_string = io_input->get_data( )->*
+      CHANGING
+        cr_abap   = ls_json_type ).
+
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_json_type-content ) = abap_true.
+      lv_content = lo_util->unwrap_from_json_markdown( iv_markdown = ls_json_type-content ).
+    ELSE.
+      lv_content = ls_json_type-content.
+    ENDIF.
+
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_content ) = abap_true.
+      lv_content = lo_util->unwrap_from_text_markdown( iv_markdown = lv_content ).
+    ENDIF.
+
+    ls_decision_request-userprompt = lv_content.
+
 
     lo_decision_request->zpru_if_payload~set_data( ir_data = NEW zpru_s_decision_request( ls_decision_request ) ).
 
@@ -321,9 +351,6 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     <ls_thinking_step>-thinkingstepnumber   = get_last_thinkingstepnumber( ls_decision_log-thinkingsteps ).
     <ls_thinking_step>-thinkingstepdatetime = get_timestamp( ).
     <ls_thinking_step>-thinkingstepcontent  = `Preparation of first input is finished`.
-
-    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     IF eo_first_tool_input IS NOT BOUND.
       eo_first_tool_input ?= zpru_cl_agent_service_mngr=>get_service(
