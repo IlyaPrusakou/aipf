@@ -183,7 +183,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
 
     lo_sum_service ?= zpru_cl_agent_service_mngr=>get_service(
                           iv_service = `ZPRU_IF_MSUM_SERVICE`
-                          iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+                          iv_context = zpru_if_agent_frw=>cs_context-st_persistence_summarize ).
 
     lo_sum_service->query_msum( EXPORTING it_agent_uuid = VALUE #( ( sign   = `I`
                                                                      option = `EQ`

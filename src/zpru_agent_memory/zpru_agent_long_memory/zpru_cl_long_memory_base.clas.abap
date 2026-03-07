@@ -31,7 +31,7 @@ CLASS zpru_cl_long_memory_base IMPLEMENTATION.
     TRY.
         lo_msg_service ?= zpru_cl_agent_service_mngr=>get_service(
                               iv_service = `ZPRU_IF_MSUM_SERVICE`
-                              iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+                              iv_context = zpru_if_agent_frw=>cs_context-st_persistence_summarize ).
 
         lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).

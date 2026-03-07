@@ -36,12 +36,12 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
                                lastchanged       = '20260125095408.0057390'
                                locallastchanged = '20260125095408.0057390' )
                              ( service            = 'ZPRU_IF_MSUM_SERVICE'
-                               context            = 'STANDARD_PERSISTENCE_MESSAGE'
+                               context            = 'STANDARD_PERSISTENCE_SUMMARIZE'
                                class              = 'ZPRU_CL_MSUM_SERVICE'
                                lastchanged       = '20260125095408.0057390'
                                locallastchanged = '20260125095408.0057390' )
                              ( service            = 'ZPRU_IF_MSUM_PRECHECK'
-                               context            = 'STANDARD_PERSISTENCE_MESSAGE'
+                               context            = 'STANDARD_PERSISTENCE_SUMMARIZE'
                                class              = 'ZPRU_CL_MSUM_PRECHECK'
                                lastchanged       = '20260125095408.0057390'
                                locallastchanged = '20260125095408.0057390' )
