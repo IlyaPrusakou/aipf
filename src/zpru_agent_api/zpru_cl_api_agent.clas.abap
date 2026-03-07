@@ -116,7 +116,8 @@ CLASS zpru_cl_api_agent DEFINITION
                 iv_output_prompt    TYPE string
                 iv_error_flag       TYPE abap_boolean
                 iv_count            TYPE i
-      RETURNING VALUE(rs_message)   TYPE zpru_if_short_memory_provider=>ts_message.
+      RETURNING VALUE(rs_message)   TYPE zpru_if_short_memory_provider=>ts_message
+      RAISING   zpru_cx_agent_core.
 
     METHODS setup_agent_context
       IMPORTING iv_agent_uuid             TYPE sysuuid_x16
@@ -495,8 +496,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -545,7 +546,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -624,8 +625,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1755,13 +1756,78 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD log_step_execution.
+
+    DATA: BEGIN OF ls_json_type,
+            user      TYPE string,
+            topic     TYPE string,
+            timestamp TYPE timestampl,
+            content   TYPE string,
+          END OF ls_json_type.
+
+    DATA: BEGIN OF ls_json_type_2,
+            run_id        TYPE string,
+            query_number  TYPE string,
+            step_number   TYPE string,
+            timestamp     TYPE timestampl,
+            execution_seq TYPE string,
+            tool_name     TYPE string,
+            step_type     TYPE string,
+            input_prompt  TYPE string,
+            output_prompt TYPE string,
+            error         TYPE string,
+          END OF ls_json_type_2.
+
+    DATA lv_content TYPE string.
+
     GET TIME STAMP FIELD DATA(lv_now).
 
-    DATA(lv_input_tool_prompt_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_INPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                         | "CONTENT" : "{ iv_input_prompt }" \} ```|.
+    DATA(lo_util) = get_utility( ).
 
-    DATA(lv_output_tool_prompt_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "TOOL_OUTPUT_PROMPT", "TIMESTAMP" : "{ lv_now }",| &&
-                                          | "CONTENT" : "{ iv_output_prompt }" \} ```|.
+    ls_json_type-user  = sy-uname.
+    ls_json_type-topic = `TOOL_INPUT_PROMPT`.
+    ls_json_type-timestamp = lv_now.
+    ls_json_type-content = iv_input_prompt.
+
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_json_type )
+      CHANGING
+        cr_string        = lv_content ).
+
+    DATA(lv_input_tool_prompt_message) = lv_content.
+
+    ls_json_type-user  = sy-uname.
+    ls_json_type-topic = `TOOL_OUTPUT_PROMPT`.
+    ls_json_type-timestamp = lv_now.
+    ls_json_type-content = iv_output_prompt.
+
+    CLEAR ls_json_type.
+    CLEAR lv_content.
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_json_type )
+      CHANGING
+        cr_string        = lv_content ).
+
+    DATA(lv_output_tool_prompt_message) = lv_content.
+
+    ls_json_type_2-run_id = is_execution_header-runid.
+    ls_json_type_2-query_number = is_execution_query-querynumber.
+    ls_json_type_2-step_number = is_execution_step-stepnumber.
+    ls_json_type_2-execution_seq = is_execution_step-stepsequence.
+    ls_json_type_2-tool_name = is_tool_master_data-toolname.
+    ls_json_type_2-step_type = is_tool_master_data-steptype.
+    ls_json_type_2-input_prompt = lv_input_tool_prompt_message.
+    ls_json_type_2-output_prompt = lv_output_tool_prompt_message.
+    ls_json_type_2-error = iv_error_flag.
+
+    CLEAR lv_content.
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_json_type_2 )
+      CHANGING
+        cr_string        = lv_content ).
+
 
     rs_message = VALUE #(
         messagecontentid = |{ lv_now }-{ sy-uname }-PROCESS_EXECUTION_STEPS_{ iv_count }|
@@ -1774,15 +1840,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         queryuuid        = is_execution_step-queryuuid
         stepuuid         = is_execution_step-stepuuid
         messagedatetime  = lv_now
-        content          = |\{ "RUN_ID" : "{ is_execution_header-runid }", | &&
-                           | "QUERY_NUMBER" : "{ is_execution_query-querynumber }", | &&
-                           | "STEP_NUMBER" : "{ is_execution_step-stepnumber }", | &&
-                           | "EXECUTION_SEQ" : "{ is_execution_step-stepsequence }", | &&
-                           | "TOOL_NAME" : "{ is_tool_master_data-toolname }", | &&
-                           | "STEP_TYPE" : "{ is_tool_master_data-steptype }", | &&
-                           | "INPUT_PROMPT" : "{ lv_input_tool_prompt_message }", | &&
-                           | "OUTPUT_PROMPT" : "{ lv_output_tool_prompt_message }", | &&
-                           | "ERROR" : "{ iv_error_flag }"  \}|
+        content          = lv_content
         messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output ).
   ENDMETHOD.
 
@@ -2321,6 +2379,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             input_query            TYPE string,
           END OF ls_json_type.
 
+    DATA lv_content TYPE string.
     DATA lt_message TYPE zpru_if_short_memory_provider=>tt_message.
     " TODO: variable is assigned but never used (ABAP cleaner)
     DATA lo_util    TYPE REF TO zpru_if_agent_util.
@@ -2334,6 +2393,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ls_json_type-system_prompt_provider = is_agent-systempromptprovider.
     ls_json_type-input_query            = mv_input_query.
 
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_json_type )
+      CHANGING
+        cr_string        = lv_content ).
+
     lt_message = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-SET_INPUT_QUERY_{ 1 }|
                             stage            = 'SET_INPUT_QUERY'
                             substage         = 'SET_INPUT_QUERY'
@@ -2341,10 +2406,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                             username         = sy-uname
                             agentuuid        = is_agent-agentuuid
                             messagedatetime  = lv_now
-                            content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                               |"DECISION_PROVIDER" : "{ is_agent-decisionprovider }",| &&
-                                               |"SYSTEM_PROMPT_PROVIDER" : "{ is_agent-systempromptprovider }", | &&
-                                               |"INPUT_QUERY" : "{ mv_input_query }" \}|
+                            content          = lv_content
                             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
     io_short_memory->save_message( lt_message ).
