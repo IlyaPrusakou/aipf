@@ -4,7 +4,7 @@ CLASS zpru_cl_islm_compl_api_factory DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-INTERFACES zpru_if_agent_frw.
+    INTERFACES zpru_if_agent_frw.
     INTERFACES if_aic_islm_compl_api_factory .
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -16,5 +16,6 @@ CLASS zpru_cl_islm_compl_api_factory IMPLEMENTATION.
 
 
   METHOD if_aic_islm_compl_api_factory~create_instance.
+    result = NEW zpru_cl_aic_completion_api( ).
   ENDMETHOD.
 ENDCLASS.

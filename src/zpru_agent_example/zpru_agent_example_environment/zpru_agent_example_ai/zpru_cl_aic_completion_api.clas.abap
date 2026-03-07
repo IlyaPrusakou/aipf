@@ -4,7 +4,7 @@ CLASS zpru_cl_aic_completion_api DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-INTERFACES zpru_if_agent_frw.
+    INTERFACES zpru_if_agent_frw.
     INTERFACES if_aic_completion_api .
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -28,10 +28,12 @@ CLASS zpru_cl_aic_completion_api IMPLEMENTATION.
 
 
   METHOD if_aic_completion_api~execute_for_string.
+    result = NEW zpru_cl_aic_completion_api_res( ).
   ENDMETHOD.
 
 
   METHOD if_aic_completion_api~get_parameter_setter.
+    result = NEW zpru_cl_aic_completion_param( ).
   ENDMETHOD.
 
 

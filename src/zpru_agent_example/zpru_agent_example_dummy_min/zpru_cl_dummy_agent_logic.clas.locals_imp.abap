@@ -52,13 +52,8 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD process_thinking.
-    DATA lo_decision_request TYPE REF TO zpru_if_decision_request.
 
-    lo_decision_request ?= zpru_cl_agent_service_mngr=>get_service(
-                               iv_service = `ZPRU_IF_DECISION_REQUEST`
-                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    DATA(lv_message) = lo_decision_request->get_decision_request_string( ).
+    DATA(lv_message) = io_decision_request->get_decision_request_string( ).
 
     DATA(lo_factory) = lcl_common_algorithms=>get_llm_api_factory( ).
 

@@ -251,7 +251,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     lo_util->convert_to_abap(
       EXPORTING
-        ir_string = io_input->get_data( )->*
+        ir_string = io_input->get_data( )
       CHANGING
         cr_abap   = ls_json_type ).
 

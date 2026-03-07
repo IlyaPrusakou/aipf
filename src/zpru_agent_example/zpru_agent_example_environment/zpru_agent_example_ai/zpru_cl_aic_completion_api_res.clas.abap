@@ -20,6 +20,7 @@ CLASS zpru_cl_aic_completion_api_res IMPLEMENTATION.
 
 
   METHOD if_aic_completion_api_result~get_completion.
+  result = `LLM IS EXECUTED`.
   ENDMETHOD.
 
 

@@ -13,6 +13,8 @@ CLASS zpru_run_agent IMPLEMENTATION.
     DATA lo_cl_unit_agent TYPE REF TO zpru_if_unit_agent.
     DATA ls_prompt        TYPE zpru_s_prompt.
 
+    zpru_cl_logic_switch=>set_logic( iv_dummy_logic = abap_true ).
+
     ls_prompt-string_content = `Hello, it's my prompt`.
 
     lo_cl_unit_agent = NEW zpru_cl_unit_agent( ).
