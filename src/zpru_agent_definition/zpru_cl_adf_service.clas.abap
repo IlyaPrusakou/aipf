@@ -304,31 +304,44 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                          THEN <ls_create>-locallastchanged ).
 
       <ls_create_in>-%control-AIPF7AgentName            = COND #( WHEN <ls_create>-control-agentname = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7AgentType            = COND #( WHEN <ls_create>-control-agenttype = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7DecisionProvider     = COND #( WHEN <ls_create>-control-decisionprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7ShortMemoryProvider  = COND #( WHEN <ls_create>-control-shortmemoryprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7LongMemoryProvider   = COND #( WHEN <ls_create>-control-longmemoryprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7AgentInfoProvider    = COND #( WHEN <ls_create>-control-agentinfoprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7SystemPromptProvider = COND #( WHEN <ls_create>-control-systempromptprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7AgentStatus          = COND #( WHEN <ls_create>-control-agentstatus = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7CreatedBy            = COND #( WHEN <ls_create>-control-createdby = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7CreatedAt            = COND #( WHEN <ls_create>-control-createdat = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7ChangedBy            = COND #( WHEN <ls_create>-control-changedby = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7LastChanged          = COND #( WHEN <ls_create>-control-lastchanged = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_create_in>-%control-AIPF7LocalLastChanged     = COND #( WHEN <ls_create>-control-locallastchanged = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_agent
@@ -380,18 +393,42 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
       <ls_read_in>-%control-AIPF7AgentName            = COND #( WHEN <ls_read>-control-agentname = abap_true
                                                                 THEN if_abap_behv=>mk-on
                                                                 ELSE if_abap_behv=>mk-off ).
-      <ls_read_in>-%control-AIPF7AgentType            = <ls_read>-control-agenttype.
-      <ls_read_in>-%control-AIPF7DecisionProvider     = <ls_read>-control-decisionprovider.
-      <ls_read_in>-%control-AIPF7ShortMemoryProvider  = <ls_read>-control-shortmemoryprovider.
-      <ls_read_in>-%control-AIPF7LongMemoryProvider   = <ls_read>-control-longmemoryprovider.
-      <ls_read_in>-%control-AIPF7AgentInfoProvider    = <ls_read>-control-agentinfoprovider.
-      <ls_read_in>-%control-AIPF7SystemPromptProvider = <ls_read>-control-systempromptprovider.
-      <ls_read_in>-%control-AIPF7AgentStatus          = <ls_read>-control-agentstatus.
-      <ls_read_in>-%control-AIPF7CreatedBy            = <ls_read>-control-createdby.
-      <ls_read_in>-%control-AIPF7CreatedAt            = <ls_read>-control-createdat.
-      <ls_read_in>-%control-AIPF7ChangedBy            = <ls_read>-control-changedby.
-      <ls_read_in>-%control-AIPF7LastChanged          = <ls_read>-control-lastchanged.
-      <ls_read_in>-%control-AIPF7LocalLastChanged     = <ls_read>-control-locallastchanged.
+      <ls_read_in>-%control-AIPF7AgentType            = COND #( WHEN <ls_read>-control-agenttype = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7DecisionProvider     = COND #( WHEN <ls_read>-control-decisionprovider = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ShortMemoryProvider  = COND #( WHEN <ls_read>-control-shortmemoryprovider = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7LongMemoryProvider   = COND #( WHEN <ls_read>-control-longmemoryprovider = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7AgentInfoProvider    = COND #( WHEN <ls_read>-control-agentinfoprovider = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7SystemPromptProvider = COND #( WHEN <ls_read>-control-systempromptprovider = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7AgentStatus          = COND #( WHEN <ls_read>-control-agentstatus = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7CreatedBy            = COND #( WHEN <ls_read>-control-createdby = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7CreatedAt            = COND #( WHEN <ls_read>-control-createdat = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ChangedBy            = COND #( WHEN <ls_read>-control-changedby = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7LastChanged          = COND #( WHEN <ls_read>-control-lastchanged = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7LocalLastChanged     = COND #( WHEN <ls_read>-control-locallastchanged = abap_true
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_agent
@@ -481,31 +518,44 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                          THEN <ls_update>-locallastchanged ).
 
       <ls_update_in>-%control-AIPF7AgentName            = COND #( WHEN <ls_update>-control-agentname = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7AgentType            = COND #( WHEN <ls_update>-control-agenttype = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7DecisionProvider     = COND #( WHEN <ls_update>-control-decisionprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ShortMemoryProvider  = COND #( WHEN <ls_update>-control-shortmemoryprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7LongMemoryProvider   = COND #( WHEN <ls_update>-control-longmemoryprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7AgentInfoProvider    = COND #( WHEN <ls_update>-control-agentinfoprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7SystemPromptProvider = COND #( WHEN <ls_update>-control-systempromptprovider = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7AgentStatus          = COND #( WHEN <ls_update>-control-agentstatus = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7CreatedBy            = COND #( WHEN <ls_update>-control-createdby = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7CreatedAt            = COND #( WHEN <ls_update>-control-createdat = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ChangedBy            = COND #( WHEN <ls_update>-control-changedby = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7LastChanged          = COND #( WHEN <ls_update>-control-lastchanged = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7LocalLastChanged     = COND #( WHEN <ls_update>-control-locallastchanged = abap_true
-                                                                  THEN if_abap_behv=>mk-on ).
+                                                                  THEN if_abap_behv=>mk-on
+                                                                  ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_agent
@@ -614,19 +664,26 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                     THEN <ls_create>-toolistransient ).
 
       <ls_target>-%control-AIPF7ToolName           = COND #( WHEN <ls_create>-control-toolname = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7ToolProvider       = COND #( WHEN <ls_create>-control-toolprovider = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7StepType           = COND #( WHEN <ls_create>-control-steptype = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7ToolSchemaProvider = COND #( WHEN <ls_create>-control-toolschemaprovider = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7ToolInfoProvider   = COND #( WHEN <ls_create>-control-toolinfoprovider = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7ToolIsBorrowed     = COND #( WHEN <ls_create>-control-toolisborrowed = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
       <ls_target>-%control-AIPF7ToolIsTransient    = COND #( WHEN <ls_create>-control-toolistransient = abap_true
-                                                             THEN if_abap_behv=>mk-on ).
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_agent
@@ -687,15 +744,33 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_rba_in ASSIGNING FIELD-SYMBOL(<ls_rba_in>).
       <ls_rba_in>-AIPF7AgentUUID = <ls_read>-agentuuid.
-      <ls_rba_in>-%control-AIPF7ToolUuid           = <ls_read>-control-tooluuid.
-      <ls_rba_in>-%control-AIPF7AgentUuid          = <ls_read>-control-agentuuid.
-      <ls_rba_in>-%control-AIPF7ToolName           = <ls_read>-control-toolname.
-      <ls_rba_in>-%control-AIPF7ToolProvider       = <ls_read>-control-toolprovider.
-      <ls_rba_in>-%control-AIPF7StepType           = <ls_read>-control-steptype.
-      <ls_rba_in>-%control-AIPF7ToolSchemaProvider = <ls_read>-control-toolschemaprovider.
-      <ls_rba_in>-%control-AIPF7ToolInfoProvider   = <ls_read>-control-toolinfoprovider.
-      <ls_rba_in>-%control-AIPF7ToolIsBorrowed     = <ls_read>-control-toolisborrowed.
-      <ls_rba_in>-%control-AIPF7ToolIsTransient    = <ls_read>-control-toolistransient.
+      <ls_rba_in>-%control-AIPF7ToolUuid           = COND #( WHEN <ls_read>-control-tooluuid = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7AgentUuid          = COND #( WHEN <ls_read>-control-agentuuid = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolName           = COND #( WHEN <ls_read>-control-toolname = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolProvider       = COND #( WHEN <ls_read>-control-toolprovider = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7StepType           = COND #( WHEN <ls_read>-control-steptype = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolSchemaProvider = COND #( WHEN <ls_read>-control-toolschemaprovider = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolInfoProvider   = COND #( WHEN <ls_read>-control-toolinfoprovider = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolIsBorrowed     = COND #( WHEN <ls_read>-control-toolisborrowed = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
+      <ls_rba_in>-%control-AIPF7ToolIsTransient    = COND #( WHEN <ls_read>-control-toolistransient = abap_true
+                                                             THEN if_abap_behv=>mk-on
+                                                             ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_agent
@@ -753,15 +828,33 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
     LOOP AT lt_entities ASSIGNING FIELD-SYMBOL(<ls_read>).
       APPEND INITIAL LINE TO lt_read_in ASSIGNING FIELD-SYMBOL(<ls_read_in>).
       <ls_read_in>-AIPF7ToolUuid = <ls_read>-tooluuid.
-      <ls_read_in>-%control-AIPF7ToolUuid           = <ls_read>-control-tooluuid.
-      <ls_read_in>-%control-AIPF7AgentUuid          = <ls_read>-control-agentuuid.
-      <ls_read_in>-%control-AIPF7ToolName           = <ls_read>-control-toolname.
-      <ls_read_in>-%control-AIPF7ToolProvider       = <ls_read>-control-toolprovider.
-      <ls_read_in>-%control-AIPF7StepType           = <ls_read>-control-steptype.
-      <ls_read_in>-%control-AIPF7ToolSchemaProvider = <ls_read>-control-toolschemaprovider.
-      <ls_read_in>-%control-AIPF7ToolInfoProvider   = <ls_read>-control-toolinfoprovider.
-      <ls_read_in>-%control-AIPF7ToolIsBorrowed     = <ls_read>-control-toolisborrowed.
-      <ls_read_in>-%control-AIPF7ToolIsTransient    = <ls_read>-control-toolistransient.
+      <ls_read_in>-%control-AIPF7ToolUuid           = COND #( WHEN <ls_read>-control-tooluuid = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7AgentUuid          = COND #( WHEN <ls_read>-control-agentuuid = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolName           = COND #( WHEN <ls_read>-control-toolname = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolProvider       = COND #( WHEN <ls_read>-control-toolprovider = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7StepType           = COND #( WHEN <ls_read>-control-steptype = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolSchemaProvider = COND #( WHEN <ls_read>-control-toolschemaprovider = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolInfoProvider   = COND #( WHEN <ls_read>-control-toolinfoprovider = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolIsBorrowed     = COND #( WHEN <ls_read>-control-toolisborrowed = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
+      <ls_read_in>-%control-AIPF7ToolIsTransient    = COND #( WHEN <ls_read>-control-toolistransient = abap_true
+                                                              THEN if_abap_behv=>mk-on
+                                                              ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     READ ENTITIES OF zr_pru_agent
@@ -839,19 +932,26 @@ CLASS zpru_cl_adf_service IMPLEMENTATION.
                                                        THEN <ls_update>-toolistransient ).
 
       <ls_update_in>-%control-AIPF7ToolName           = COND #( WHEN <ls_update>-control-toolname = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ToolProvider       = COND #( WHEN <ls_update>-control-toolprovider = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7StepType           = COND #( WHEN <ls_update>-control-steptype = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ToolSchemaProvider = COND #( WHEN <ls_update>-control-toolschemaprovider = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ToolInfoProvider   = COND #( WHEN <ls_update>-control-toolinfoprovider = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ToolIsBorrowed     = COND #( WHEN <ls_update>-control-toolisborrowed = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
       <ls_update_in>-%control-AIPF7ToolIsTransient    = COND #( WHEN <ls_update>-control-toolistransient = abap_true
-                                                                THEN if_abap_behv=>mk-on ).
+                                                                THEN if_abap_behv=>mk-on
+                                                                ELSE if_abap_behv=>mk-off ).
     ENDLOOP.
 
     MODIFY ENTITIES OF zr_pru_agent
