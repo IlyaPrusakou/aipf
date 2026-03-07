@@ -1690,8 +1690,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ls_json_type-content   = <ls_query_2_upd>-queryoutputresponse.
 
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
-*                                          iv_compress =
-*                                          it_name_mappings =
                                 CHANGING  cr_string = lv_content ).
 
     DATA(lv_final_response_message) = lv_content.
@@ -1708,8 +1706,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     CLEAR lv_content.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type_2 )
-*                                          iv_compress =
-*                                          it_name_mappings =
                                 CHANGING  cr_string = lv_content ).
 
     DATA(lt_message) = VALUE zpru_if_short_memory_provider=>tt_message(
