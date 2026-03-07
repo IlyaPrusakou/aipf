@@ -81,7 +81,7 @@ CLASS zpru_cl_agent_info_provider IMPLEMENTATION.
                                                                         json = lv_free_text_label ) )
                                 CHANGING  cr_string        = rv_agent_info ).
 
-    rv_agent_info = lo_util->is_wrapped_in_json_markdown( iv_content = rv_agent_info ).
+    rv_agent_info = lo_util->wrap_to_json_markdown( iv_content = rv_agent_info ).
 
 
   ENDMETHOD.

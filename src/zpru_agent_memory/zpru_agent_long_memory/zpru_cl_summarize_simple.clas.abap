@@ -20,6 +20,8 @@ CLASS zpru_cl_summarize_simple IMPLEMENTATION.
 
     lt_message = io_input->get_data( )->*.
 
+    SORT lt_message BY sortnumber ASCENDING.
+
     DATA(lv_summary_count) = 1.
     LOOP AT lt_message ASSIGNING FIELD-SYMBOL(<ls_message>).
 
