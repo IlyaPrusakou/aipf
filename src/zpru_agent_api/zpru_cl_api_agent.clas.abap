@@ -2537,22 +2537,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        agentuuid        = iv_agent_uuid
                                        userid           = sy-uname
                                        runstartdatetime = lv_now
-                                       createdby        = sy-uname
-                                       createdat        = lv_now
-                                       changedby        = sy-uname
-                                       lastchanged      = lv_now
-                                       locallastchanged = lv_now
                                        control          = VALUE #( runuuid          = abap_true
                                                                    runid            = abap_true
                                                                    agentuuid        = abap_true
                                                                    userid           = abap_true
                                                                    runstartdatetime = abap_true
-                                                                   runenddatetime   = abap_true
-                                                                   createdby        = abap_true
-                                                                   createdat        = abap_true
-                                                                   changedby        = abap_true
-                                                                   lastchanged      = abap_true
-                                                                   locallastchanged = abap_true ) ).
+                                                                   runenddatetime   = abap_true ) ).
 
         io_axc_service->create_header( EXPORTING it_head_create_imp = VALUE #( ( es_execution_header ) )
                                        CHANGING  cs_reported        = cs_axc_reported
@@ -2587,8 +2577,14 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_execution_query.
-    " TODO: parameter IO_UTILITY is never used (ABAP cleaner)
+    DATA: BEGIN OF ls_json_type,
+            user      TYPE string,
+            topic     TYPE string,
+            timestamp TYPE timestampl,
+            content   TYPE string,
+          END OF ls_json_type.
 
+    DATA lv_content TYPE string.
     DATA lo_util         TYPE REF TO zpru_if_agent_util.
     DATA lv_query        TYPE string.
     DATA lv_decision_log TYPE string.
@@ -2597,8 +2593,18 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
-    ev_decision_log_msg = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
-                          | "CONTENT" : "{ iv_decision_log }" \} ```|.
+    ls_json_type-user = sy-uname.
+    ls_json_type-topic = `DECISION_LOG`.
+    ls_json_type-timestamp = lv_now.
+    ls_json_type-content = iv_decision_log.
+
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_json_type )
+      CHANGING
+        cr_string        = lv_content ).
+
+    ev_decision_log_msg = lv_content.
 
     IF lo_util->is_wrapped_in_text_markdown( iv_content = iv_input_query ).
       lv_query = lo_util->unwrap_from_text_markdown( iv_markdown = iv_input_query ).
