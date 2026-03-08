@@ -1,27 +1,52 @@
-CLASS zpru_cl_nested_llm_schm_prvdr DEFINITION
-  PUBLIC
-  INHERITING FROM zpru_cl_tool_schema_provider
-  CREATE PUBLIC.
 
-  PUBLIC SECTION.
+CLASS lcl_adf_abap_executor IMPLEMENTATION.
+  METHOD execute_code_int.
+    DATA ls_input  TYPE zpru_s_nested_abap_input.
+    DATA ls_output TYPE zpru_s_nested_abap_output.
 
-  PROTECTED SECTION.
-    METHODS get_input_abap_type    REDEFINITION.
-    METHODS get_input_json_schema  REDEFINITION.
-    METHODS get_output_abap_type   REDEFINITION.
-    METHODS get_output_json_schema REDEFINITION.
+    ls_input = is_input->*.
 
-    METHODS create_json_schema_example
-      RETURNING VALUE(rv_json_shema) TYPE string
-      RAISING   zpru_cx_agent_core.
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
-  PRIVATE SECTION.
+    ls_output-nestedabapoutput = `Transient abap code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
+  ENDMETHOD.
 ENDCLASS.
 
 
-CLASS zpru_cl_nested_llm_schm_prvdr IMPLEMENTATION.
+CLASS lcl_adf_tool_provider IMPLEMENTATION.
+  METHOD provide_tool_instance.
+    ro_executor = NEW lcl_adf_abap_executor( ).
+  ENDMETHOD.
+ENDCLASS.
+
+
+CLASS lcl_adf_tool_info_provider IMPLEMENTATION.
+  METHOD get_main_tool_info.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_tool_parameters.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_tool_properties.
+    RETURN.
+  ENDMETHOD.
+ENDCLASS.
+
+
+CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
-    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_LLM_INPUT` ).
+    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_INPUT` ).
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
@@ -36,7 +61,8 @@ CLASS zpru_cl_nested_llm_schm_prvdr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
-    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_LLM_OUTPUT` ).
+
+    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_OUTPUT` ).
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.

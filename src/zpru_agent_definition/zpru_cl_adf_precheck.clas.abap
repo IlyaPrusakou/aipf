@@ -24,13 +24,6 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
 
     LOOP AT it_agent_create_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-agentuuid IS INITIAL.
-        TRY.
-            ls_line-agentuuid = cl_system_uuid=>create_uuid_x16_static( ).
-          CATCH cx_uuid_error.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-      ENDIF.
 
       IF ls_line-agentname IS INITIAL.
         APPEND INITIAL LINE TO cs_failed-agent ASSIGNING FIELD-SYMBOL(<ls_agent_failed>).
@@ -132,13 +125,6 @@ CLASS zpru_cl_adf_precheck IMPLEMENTATION.
 
     LOOP AT it_tool_create_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-tooluuid IS INITIAL.
-        TRY.
-            ls_line-tooluuid = cl_system_uuid=>create_uuid_x16_static( ).
-          CATCH cx_uuid_error.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-      ENDIF.
 
       lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_ADF_TYPE_AND_CONSTANT=>TS_TOOL_CONTROL`
                            CHANGING  cs_data    = ls_line
