@@ -150,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( MessageUUID              = <ls_m1>-MessageUUID
+                                                               ( messageuuid              = <ls_m1>-messageuuid
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -221,9 +221,22 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD set_final_response_content.
+    IF iv_last_output <> `Main User tool has played`.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    cs_final_response_body-structureddata = VALUE #( ( name = 'name1'
+                                                       value = 'value1' ) ).
+    cs_final_response_body-suggestedactions = VALUE #( (  actionname = 'Do something next' ) ).
+    cs_final_response_body-responsecontent = `Nested final response`.
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
+
+    cs_reasoning_trace-rationalsummary = 'Rational Trace'.
+    cs_reasoning_trace-confidencescore = `70.00`.
+
+
   ENDMETHOD.
 
   METHOD set_model_id.
@@ -457,7 +470,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
     <ls_add_step>-tooluuid           = `76D88C8092D91FE186C3A6B9F02B5BDF`. " renew after data replication
     <ls_add_step>-agentuuid          = `76D88C8092D91FE186C3A6B9F02ABBDF`. " renew after data replication
-    <ls_add_step>-toolname           = `DUMMY_CODE`.
+    <ls_add_step>-toolname           = `NESTED_AGENT`.
     <ls_add_step>-toolprovider       = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
     <ls_add_step>-steptype           = `B`.
     <ls_add_step>-toolschemaprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
@@ -703,15 +716,15 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
                               iv_service = `ZPRU_IF_PAYLOAD`
                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    consume_mdl( EXPORTING io_controller           = io_controller
-                           is_input                = is_input
-                           io_tool_schema_provider = io_tool_schema_provider
-                           io_tool_info_provider   = io_tool_info_provider
-                 IMPORTING es_output               = es_output
-                           ev_error_flag           = ev_error_flag
-                           et_additional_step      = et_additional_step ).
+*    consume_mdl( EXPORTING io_controller           = io_controller
+*                           is_input                = is_input
+*                           io_tool_schema_provider = io_tool_schema_provider
+*                           io_tool_info_provider   = io_tool_info_provider
+*                 IMPORTING es_output               = es_output
+*                           ev_error_flag           = ev_error_flag
+*                           et_additional_step      = et_additional_step ).
 
-    ls_output-mdlconsumeoutput = es_output->*.
+    ls_output-mdlconsumeoutput = `MDL has played`.
 
     ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
     IF sy-subrc <> 0.
@@ -812,6 +825,24 @@ ENDCLASS.
 
 CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
   METHOD call_large_language_model_int.
+    DATA ls_input  TYPE zpru_s_llm_call_input.
+    DATA ls_output TYPE zpru_s_llm_call_output.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    ls_output-llmcalloutput = `Main LLM has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
+
 *    DATA lo_llm_api TYPE REF TO if_aic_completion_api.
 *    DATA lo_message TYPE REF TO if_aic_message_container.
 
@@ -822,9 +853,9 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
 *                                      eo_llm_api       = lo_llm_api
 *                                      ev_error_flag    = ev_error_flag ).
 
-    IF ev_error_flag = abap_true.
-      RETURN.
-    ENDIF.
+*    IF ev_error_flag = abap_true.
+*      RETURN.
+*    ENDIF.
 
 *    process_llm_request( EXPORTING io_controller = io_controller
 *                                   io_request    = io_request
@@ -975,12 +1006,51 @@ ENDCLASS.
 
 CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
   METHOD get_ml_inference_int.
+    DATA ls_input  TYPE zpru_s_ml_inference_input.
+    DATA ls_output TYPE zpru_s_ml_inference_output.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    ls_output-mlinferenceoutput = `Main ML inference has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_user_tool IMPLEMENTATION.
   METHOD execute_user_tool_int.
+    DATA ls_input  TYPE zpru_s_user_tool_input.
+    DATA ls_output TYPE zpru_s_user_tool_output.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    ls_output-usertooloutput = `Main User tool has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
+
+
+
+
+
 *    IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
 *
 *      process_dummy_email( EXPORTING io_controller = io_controller
@@ -1116,31 +1186,31 @@ CLASS lcl_adf_tool_provider IMPLEMENTATION.
   METHOD provide_tool_instance.
     CASE is_tool_master_data-toolname.
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+      WHEN `NESTED_AGENT`.
         ro_executor = NEW lcl_adf_nested_agent( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+      WHEN `DUMMY_KNOWLEDGE`.
         ro_executor = NEW lcl_adf_knowledge_provider( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+      WHEN `DUMMY_CODE`.
         ro_executor = NEW lcl_adf_abap_executor( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+      WHEN `DUMMY_HTTP`.
         ro_executor = NEW lcl_adf_http_request_tool( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+      WHEN `DUMMY_SCM`.
         ro_executor = NEW lcl_adf_service_cons_mdl_tool( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+      WHEN `DUMMY_LLM`.
         ro_executor = NEW lcl_adf_call_llm_tool( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+      WHEN `DUMMY_DYN_CODE`.
         ro_executor = NEW lcl_adf_dynamic_abap_code_tool( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+      WHEN `DUMMY_ML`.
         ro_executor = NEW lcl_adf_ml_model_inference( ).
 
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+      WHEN `DUMMY_USER_TOOL`.
         ro_executor = NEW lcl_adf_user_tool( ).
 
       WHEN OTHERS.
@@ -1167,47 +1237,47 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
     DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
 
     CASE is_tool_master_data-toolname.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+      WHEN `NESTED_AGENT`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+      WHEN `DUMMY_KNOWLEDGE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+      WHEN `DUMMY_CODE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+      WHEN `DUMMY_HTTP`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+      WHEN `DUMMY_SCM`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+      WHEN `DUMMY_LLM`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+      WHEN `DUMMY_DYN_CODE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+      WHEN `DUMMY_ML`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+      WHEN `DUMMY_USER_TOOL`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
@@ -1219,55 +1289,55 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
 
   METHOD get_input_json_schema.
     CASE is_tool_master_data-toolname.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+      WHEN `NESTED_AGENT`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+      WHEN `DUMMY_KNOWLEDGE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+      WHEN `DUMMY_CODE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+      WHEN `DUMMY_HTTP`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+      WHEN `DUMMY_SCM`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+      WHEN `DUMMY_LLM`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+      WHEN `DUMMY_DYN_CODE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+      WHEN `DUMMY_ML`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+      WHEN `DUMMY_USER_TOOL`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
@@ -1282,47 +1352,47 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
     DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
 
     CASE is_tool_master_data-toolname.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+      WHEN `NESTED_AGENT`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+      WHEN `DUMMY_KNOWLEDGE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+      WHEN `DUMMY_CODE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+      WHEN `DUMMY_HTTP`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+      WHEN `DUMMY_SCM`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+      WHEN `DUMMY_LLM`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+      WHEN `DUMMY_DYN_CODE`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+      WHEN `DUMMY_ML`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+      WHEN `DUMMY_USER_TOOL`.
         lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
@@ -1334,55 +1404,55 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
 
   METHOD get_output_json_schema.
     CASE is_tool_master_data-toolname.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+      WHEN `NESTED_AGENT`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+      WHEN `DUMMY_KNOWLEDGE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+      WHEN `DUMMY_CODE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+      WHEN `DUMMY_HTTP`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+      WHEN `DUMMY_SCM`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+      WHEN `DUMMY_LLM`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+      WHEN `DUMMY_DYN_CODE`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+      WHEN `DUMMY_ML`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
-      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+      WHEN `DUMMY_USER_TOOL`.
         TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
