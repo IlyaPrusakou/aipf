@@ -500,8 +500,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -550,7 +550,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -629,8 +629,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1923,6 +1923,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             agent_info        TYPE string,
           END OF ls_json_type_2.
 
+    DATA: BEGIN OF ls_json_type_3,
+            agent_name        TYPE string,
+            decision_provider TYPE string,
+            query             TYPE string,
+            first_tool_input  TYPE string,
+            language          TYPE string,
+            decision_log      TYPE string,
+          END OF ls_json_type_3.
+
     DATA lv_content          TYPE string.
     DATA lo_query            TYPE REF TO zpru_if_payload.
     DATA lo_utility          TYPE REF TO zpru_if_agent_util.
@@ -2044,11 +2053,43 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     GET TIME STAMP FIELD lv_now.
 
-    DATA(lv_decision_log_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "DECISION_LOG", "TIMESTAMP" : "{ lv_now }",| &&
-                                    | "CONTENT" : "{ lv_decision_log }" \} ```|.
+    CLEAR ls_json_type.
 
-    DATA(lv_first_tool_input_message) = |```JSON \{ "USER": "{ sy-uname }", "TOPIC" : "FIRST_TOOL_INPUT", "TIMESTAMP" : "{ lv_now }",| &&
-                                   | "CONTENT" : "{ lv_first_tool_input }" \} ```|.
+    ls_json_type-user      = sy-uname.
+    ls_json_type-topic     = `DECISION_LOG`.
+    ls_json_type-timestamp = lv_now.
+    ls_json_type-content   = lv_decision_log.
+
+    CLEAR lv_content.
+    lo_utility->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
+                                   CHANGING  cr_string = lv_content ).
+
+    DATA(lv_decision_log_message) = lv_content.
+
+    CLEAR ls_json_type.
+
+    ls_json_type-user      = sy-uname.
+    ls_json_type-topic     = `FIRST_TOOL_INPUT`.
+    ls_json_type-timestamp = lv_now.
+    ls_json_type-content   = lv_first_tool_input.
+
+    CLEAR lv_content.
+    lo_utility->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
+                                   CHANGING  cr_string = lv_content ).
+
+
+    DATA(lv_first_tool_input_message) = lv_content.
+
+    ls_json_type_3-agent_name = is_agent-agentname.
+    ls_json_type_3-decision_provider = is_agent-decisionprovider.
+    ls_json_type_3-query = lv_unwrapped_query.
+    ls_json_type_3-first_tool_input = lv_first_tool_input_message.
+    ls_json_type_3-language =  lv_langu.
+    ls_json_type_3-decision_log = lv_decision_log_message.
+
+    CLEAR lv_content.
+    lo_utility->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type_3 )
+                                   CHANGING  cr_string = lv_content ).
 
     lt_message_in = VALUE #( ( messagecontentid = |{ lv_now }-{ sy-uname }-{ iv_stage }_{ 2 }|
                                stage            = iv_stage
@@ -2057,12 +2098,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                username         = sy-uname
                                agentuuid        = is_agent-agentuuid
                                messagedatetime  = lv_now
-                               content          = |\{ "AGENT_NAME" : "{ is_agent-agentname }", | &&
-                                                  | "DECISION_PROVIDER" : "{ is_agent-decisionprovider }", | &&
-                                                  | "QUERY" : "```TEXT { lv_unwrapped_query } ```", | &&
-                                                  | "FIRST TOOL INPUT" : "{ lv_first_tool_input_message }", | &&
-                                                  | "LANGUAGE" : "{ lv_langu }", | &&
-                                                  | "DECISION LOG" : "{ lv_decision_log_message }" \}|
+                               content          = lv_content
                                messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
     io_short_memory->save_message( lt_message_in ).
