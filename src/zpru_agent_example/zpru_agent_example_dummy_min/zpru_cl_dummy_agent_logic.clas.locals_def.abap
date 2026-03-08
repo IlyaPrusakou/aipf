@@ -104,6 +104,16 @@ ENDCLASS.
 CLASS lcl_adf_service_cons_mdl_tool DEFINITION INHERITING FROM zpru_cl_service_model_consumer CREATE PUBLIC.
   PROTECTED SECTION.
     METHODS consume_service_model_int REDEFINITION.
+
+    METHODS consume_mdl
+      IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
+                is_input                TYPE REF TO data
+                io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
+                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider OPTIONAL
+      EXPORTING es_output               TYPE REF TO data
+                ev_error_flag           TYPE abap_boolean
+                et_additional_step      TYPE zpru_tt_additional_step
+      RAISING   zpru_cx_agent_core .
 ENDCLASS.
 
 
