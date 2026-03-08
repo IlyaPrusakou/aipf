@@ -35,14 +35,14 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD prepare_first_tool_input.
-    FIELD-SYMBOLS <ls_first_input> TYPE zpru_s_first_tool_input_exmpl.
+    FIELD-SYMBOLS <ls_first_input> TYPE ZPRU_S_ABAP_EXECUTOR_INPUT.
 
     IF er_first_tool_input IS NOT BOUND.
       RETURN.
     ENDIF.
 
     ASSIGN er_first_tool_input->* TO <ls_first_input>.
-    <ls_first_input>-firstinput = `{ 'Warehouse' : '0001' }`.
+    <ls_first_input>-abapexecutorinput = `{ 'Warehouse' : '0001' }`.
 
     APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
     <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber(

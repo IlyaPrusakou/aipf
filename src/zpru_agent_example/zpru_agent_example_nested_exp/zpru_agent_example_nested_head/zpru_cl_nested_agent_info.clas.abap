@@ -1,23 +1,45 @@
-CLASS zpru_cl_nested_agent_info DEFINITION
+CLASS zpru_cl_nested_agent_info DEFINITION INHERITING FROM zpru_cl_agent_info_provider
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-  inteRFACES ZPRU_IF_AGENT_INFO_PROVIDER.
   PROTECTED SECTION.
+    METHODS: get_agent_main_info REDEFINITION,
+      set_agent_goals REDEFINITION,
+      prepare_agent_domains REDEFINITION,
+      set_agent_restrictions REDEFINITION,
+      set_tool_metadata REDEFINITION,
+      get_free_text REDEFINITION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
 CLASS zpru_cl_nested_agent_info IMPLEMENTATION.
-  METHOD zpru_if_agent_info_provider~get_agent_info.
 
+  METHOD get_agent_main_info.
+    RETURN.
   ENDMETHOD.
 
-  METHOD zpru_if_agent_info_provider~get_abap_agent_info.
+  METHOD get_free_text.
+    RETURN.
+  ENDMETHOD.
 
+  METHOD prepare_agent_domains.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_agent_goals.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_agent_restrictions.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_tool_metadata.
+    RETURN.
   ENDMETHOD.
 
 ENDCLASS.

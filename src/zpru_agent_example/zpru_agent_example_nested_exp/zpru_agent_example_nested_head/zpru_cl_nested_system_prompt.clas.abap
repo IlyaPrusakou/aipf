@@ -1,23 +1,51 @@
-CLASS zpru_cl_nested_system_prompt DEFINITION
+CLASS zpru_cl_nested_system_prompt DEFINITION INHERITING FROM zpru_cl_syst_prmpt_prvdr_base
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-  intERFACES ZPRU_IF_PROMPT_PROVIDER.
+
   PROTECTED SECTION.
+    METHODS: set_primary_session_task REDEFINITION,
+      set_technical_rules REDEFINITION,
+      set_business_rules REDEFINITION,
+      set_format_guidelines REDEFINITION,
+      set_reasoning_step REDEFINITION,
+      set_prompt_restrictions REDEFINITION,
+      set_arbitrary_text REDEFINITION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
 CLASS zpru_cl_nested_system_prompt IMPLEMENTATION.
-  METHOD zpru_if_prompt_provider~get_system_prompt.
 
+  METHOD set_arbitrary_text.
+    RETURN.
   ENDMETHOD.
 
-  METHOD zpru_if_prompt_provider~get_abap_system_prompt.
+  METHOD set_business_rules.
+    RETURN.
+  ENDMETHOD.
 
+  METHOD set_format_guidelines.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_primary_session_task.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_prompt_restrictions.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_reasoning_step.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD set_technical_rules.
+    RETURN.
   ENDMETHOD.
 
 ENDCLASS.
