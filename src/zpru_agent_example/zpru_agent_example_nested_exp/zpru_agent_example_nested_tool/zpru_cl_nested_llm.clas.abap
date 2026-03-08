@@ -15,8 +15,8 @@ ENDCLASS.
 CLASS zpru_cl_nested_llm IMPLEMENTATION.
 
   METHOD call_large_language_model_int.
-    DATA ls_input  TYPE ZPRU_S_NESTED_llm_INPUT.
-    DATA ls_output TYPE ZPRU_S_NESTED_llm_output.
+    DATA ls_input  TYPE zpru_s_nested_llm_input.
+    DATA ls_output TYPE zpru_s_nested_llm_output.
 
     ls_input = is_input->*.
 
@@ -32,6 +32,37 @@ CLASS zpru_cl_nested_llm IMPLEMENTATION.
     ENDIF.
 
     <ls_output> = ls_output.
+
+    " tool from this agent
+    APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).
+    <ls_add_step>-tooluuid = `76D88C8092D91FE186C3A6B9F02AFBDF`. " renew after data replication
+    <ls_add_step>-agentuuid = `76D88C8092D91FE186C3A6B9F02A9BDF`. " renew after data replication
+    <ls_add_step>-toolname = `NESTED_ABAP`.
+    <ls_add_step>-toolprovider = `ZPRU_CL_NESTED_CODE`.
+    <ls_add_step>-steptype = `B`.
+    <ls_add_step>-toolschemaprovider = `ZPRU_CL_NESTED_CODE_SCHM_PRVDR`.
+    <ls_add_step>-toolinfoprovider = `ZPRU_CL_NESTED_CODE_INFO_PRVDR`.
+
+    " borrowed tool
+    APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
+    <ls_add_step>-tooluuid = `76D88C8092D91FE186C3A6B9F02B5BDF`. " renew after data replication
+    <ls_add_step>-agentuuid = `76D88C8092D91FE186C3A6B9F02ABBDF`. " renew after data replication
+    <ls_add_step>-toolname = `DUMMY_CODE`.
+    <ls_add_step>-toolprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
+    <ls_add_step>-steptype = `B`.
+    <ls_add_step>-toolschemaprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
+    <ls_add_step>-toolinfoprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
+
+    " transient tool
+    APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
+    <ls_add_step>-tooluuid = ``.
+    <ls_add_step>-agentuuid = ``.
+    <ls_add_step>-toolname = `TRANSIENT_CODE`.
+    <ls_add_step>-toolprovider = `ZPRU_CL_TRANSIENT_CODE`.
+    <ls_add_step>-steptype = `B`.
+    <ls_add_step>-toolschemaprovider = `ZPRU_CL_TRANSIENT_CODE`.
+    <ls_add_step>-toolinfoprovider = `ZPRU_CL_TRANSIENT_CODE`.
+
   ENDMETHOD.
 
 ENDCLASS.
