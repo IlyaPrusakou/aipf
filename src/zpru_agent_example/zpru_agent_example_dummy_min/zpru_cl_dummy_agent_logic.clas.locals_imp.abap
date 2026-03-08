@@ -429,9 +429,13 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     DATA ls_input TYPE zpru_s_abap_executor_input.
     DATA ls_output TYPE zpru_s_abap_executor_output.
 
-*ls_input =
+    ls_input = is_input->*.
 
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
+    ls_output-abapexecutoroutput = `abap code has played`.
 
   ENDMETHOD.
 ENDCLASS.
@@ -439,7 +443,28 @@ ENDCLASS.
 
 CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
+
+    DATA ls_input TYPE zpru_s_knowledge_prvdr_input.
+    DATA ls_output TYPE zpru_s_knowledge_prvdr_input.
+  data lo_util type ref to zpru_if_agent_util.
+
     FIELD-SYMBOLS <ls_inspection_protocol> TYPE zpru_s_dummy_inspection_prtcl.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+
+*ls_output-knowledgeproviderinput =  lo_util->convert_to_stri
+
+
+
+
 
     ASSIGN es_output->* TO <ls_inspection_protocol>.
     IF sy-subrc <> 0.
