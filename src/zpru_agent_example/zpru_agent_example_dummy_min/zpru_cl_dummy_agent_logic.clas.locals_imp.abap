@@ -52,13 +52,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD process_thinking.
-    DATA lo_decision_request TYPE REF TO zpru_if_decision_request.
-
-    lo_decision_request ?= zpru_cl_agent_service_mngr=>get_service(
-                               iv_service = `ZPRU_IF_DECISION_REQUEST`
-                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    DATA(lv_message) = lo_decision_request->get_decision_request_string( ).
+    DATA(lv_message) = io_decision_request->get_decision_request_string( ).
 
     DATA(lo_factory) = lcl_common_algorithms=>get_llm_api_factory( ).
 
@@ -156,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( MessageUUID              = <ls_m1>-MessageUUID
+                                                               ( messageuuid              = <ls_m1>-messageuuid
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -431,110 +425,106 @@ ENDCLASS.
 
 CLASS lcl_adf_abap_executor IMPLEMENTATION.
   METHOD execute_code_int.
-*  DATA: ls_header         TYPE bapi2017_gm_head_01,
-*        ls_code           TYPE bapi2017_gm_code,
-*        lt_items          TYPE TABLE OF bapi2017_gm_item_create,
-*        lt_return         TYPE TABLE OF bapiret2,
-*        lv_mat_doc        TYPE mblnr.
-*
-*
-*  ls_header-pstng_date = sy-datum.
-*  ls_header-doc_date   = sy-datum.
-*  ls_header-header_txt = |RMA:{ iv_rma_id }|.
-*
-*
-*  ls_code-gm_code = '01'.
-*
-*
-*  APPEND INITIAL LINE TO lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).
-*  <ls_item>-material  = iv_material.
-*  <ls_item>-plant     = iv_plant.
-*  <ls_item>-stge_loc  = iv_storage_location.
-*  <ls_item>-move_type = '651'.
-*  <ls_item>-entry_qnt = iv_quantity.
-*  <ls_item>-entry_uom = iv_uom.
-*
-*  CALL FUNCTION 'BAPI_GOODSMVT_CREATE'
-*    EXPORTING
-*      goodsmvt_header  = ls_header
-*      goodsmvt_code    = ls_code
-*    IMPORTING
-*      materialdocument = lv_mat_doc
-*    TABLES
-*      goodsmvt_item    = lt_items
-*      return           = lt_return.
-*
-*  IF lv_mat_doc IS NOT INITIAL.
-*    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = abap_true.
-*    ev_status = |SUCCESS: Material Document { lv_mat_doc } posted.|.
-*  ELSE.
-*
-*    ev_status = |FAILED: | && lt_return[ 1 ]-message.
-*  ENDIF.
-*
+    DATA ls_input  TYPE zpru_s_abap_executor_input.
+    DATA ls_output TYPE zpru_s_abap_executor_output.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    ls_output-abapexecutoroutput = `abap code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
-    FIELD-SYMBOLS <ls_inspection_protocol> TYPE zpru_s_dummy_inspection_prtcl.
+    DATA ls_input  TYPE zpru_s_knowledge_prvdr_input.
+    DATA ls_output TYPE zpru_s_knowledge_prvdr_output.
+    DATA ls_result TYPE zpru_s_dummy_inspection_prtcl.
+    DATA lo_util   TYPE REF TO zpru_if_agent_util.
 
-    ASSIGN eo_output->* TO <ls_inspection_protocol>.
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    <ls_inspection_protocol> = VALUE zpru_s_dummy_inspection_prtcl(
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    ls_result = VALUE zpru_s_dummy_inspection_prtcl(
         inspectionprotocolname        = 'GR-2026-00892'
         inspectionprotocoldescription = 'Inbound Inspection: Steel Coil Batch X-9'
         inspectionprotocoldate        = lcl_common_algorithms=>get_timestamp( )
         inspectionprotocolperson      = 'John Doe'
         text                          = 'Visual inspection passed. Certificate of Analysis (CoA) attached and verified.' ).
+
+    lo_util->convert_to_string( EXPORTING ir_abap   = REF zpru_s_dummy_inspection_prtcl( ls_result )
+                                CHANGING  cr_string = ls_output-knowledgeprovideroutput ).
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_inspection_protocol>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_inspection_protocol> = ls_output.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_nested_agent IMPLEMENTATION.
   METHOD run_nested_agent_int.
-    " test data
-    DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
-        product_id       = 'CHEM-772-L'
-        product_name     = 'Concentrated Sulfuric Acid 98%'
-        material_group   = '00105'
-        industry_sector  = 'C'
-        quantity         = '1200.000'
-        unit_of_measure  = 'KG'
-        is_hazardous     = 'X'
-        purchase_order   = '4500001234'
-        vendor_name      = 'Global ChemCorp Solutions'
-        storage_location = 'WH02'
-        safety_notes_raw = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
-
     DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
     DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
     DATA ls_prompt         TYPE zpru_s_prompt.
     DATA lo_util           TYPE REF TO zpru_if_agent_util.
     DATA ls_final_response TYPE zpru_s_final_response.
-    DATA lv_json_input     TYPE zpru_if_agent_frw=>ts_json.
+    DATA lv_safety_request TYPE string.
 
-    FIELD-SYMBOLS <ls_safety_request>  TYPE zpru_s_dummy_safety_req.
-    FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_dummy_safety_res.
+    FIELD-SYMBOLS <ls_tool_input>      TYPE zpru_s_nested_agent_input.
+    FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_nested_agent_output.
 
-    ASSIGN io_input->* TO <ls_safety_request>.
+    ASSIGN is_input->* TO <ls_tool_input>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_safety_request> = ls_safety_request.
+    IF <ls_tool_input> IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
     lo_nested_agent = NEW zpru_cl_unit_agent( ).
+
+    " example data
+    DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
+        productid       = 'CHEM-772-L'
+        productname     = 'Concentrated Sulfuric Acid 98%'
+        materialgroup   = '00105'
+        industrysector  = 'C'
+        quantity        = '1200.000'
+        unitofmeasure   = 'KG'
+        ishazardous     = 'X'
+        purchaseorder   = '4500001234'
+        vendorname      = 'Global ChemCorp Solutions'
+        storagelocation = 'WH02'
+        safetynotesraw  = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
+
+    lv_safety_request = |{ lv_safety_request } productid: { ls_safety_request-productid } { cl_abap_char_utilities=>newline }|.
 
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
-    lo_util->convert_to_string( EXPORTING ir_abap   = io_input
-                                CHANGING  cr_string = lv_json_input ).
 
-    ls_prompt-string_content = lv_json_input.
+    ls_prompt-string_content = lv_safety_request.
 
     lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
                                               is_prompt              = ls_prompt
@@ -543,7 +533,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
                                     " TODO: variable is assigned but never used (ABAP cleaner)
                                               eo_executed_controller = DATA(lo_nested_controler) ).
 
-    ASSIGN eo_output->* TO <ls_safety_response>.
+    ASSIGN es_output->* TO <ls_safety_response>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
@@ -555,22 +545,54 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
       DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
                                            iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
     ELSE.
-      ev_error_flag = abap_true.
-      RETURN.
+      lv_response_content_json = ls_final_response-finalresponsebody-responsecontent.
     ENDIF.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_response_content_json )
-                              CHANGING  cr_abap   = <ls_safety_response> ).
+    <ls_safety_response>-nestedagentoutput = lv_response_content_json.
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_http_request_tool IMPLEMENTATION.
   METHOD send_http_int.
-*    send_via_url( EXPORTING io_controller = io_controller
-*                            io_request    = io_request
-*                  IMPORTING eo_response   = eo_response
-*                            ev_error_flag = ev_error_flag ).
+    DATA ls_input  TYPE zpru_s_http_request_input.
+    DATA ls_output TYPE zpru_s_http_request_output.
+    DATA lo_input_from_http TYPE REF TO zpru_if_payload.
+    DATA lo_output_from_http TYPE REF TO zpru_if_payload.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    lo_input_from_http ?= zpru_cl_agent_service_mngr=>get_service(
+                             iv_service = `ZPRU_IF_PAYLOAD`
+                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+
+    lo_input_from_http->set_data( ir_data = REF #( is_input ) ).
+
+    lo_output_from_http ?= zpru_cl_agent_service_mngr=>get_service(
+                             iv_service = `ZPRU_IF_PAYLOAD`
+                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+
+    send_via_url( EXPORTING io_controller = io_controller
+                            io_request    = lo_input_from_http
+                  IMPORTING eo_response   = lo_output_from_http
+                            ev_error_flag = ev_error_flag ).
+
+
+    ls_output-httprequestoutput = lo_output_from_http->get_data( )->*.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
+
   ENDMETHOD.
 
   METHOD send_via_url.
@@ -640,6 +662,46 @@ ENDCLASS.
 
 CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
   METHOD consume_service_model_int.
+    DATA ls_input  TYPE zpru_s_mdl_consume_input.
+    DATA ls_output TYPE zpru_s_mdl_consume_output.
+    DATA lo_input_from_mdl TYPE REF TO zpru_if_payload.
+    DATA lo_output_from_mdl TYPE REF TO zpru_if_payload.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+
+    lo_output_from_mdl ?= zpru_cl_agent_service_mngr=>get_service(
+                             iv_service = `ZPRU_IF_PAYLOAD`
+                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    consume_mdl(
+      EXPORTING
+        io_controller           = io_controller
+        is_input                = is_input
+        io_tool_schema_provider = io_tool_schema_provider
+        io_tool_info_provider   = io_tool_info_provider
+      IMPORTING
+        es_output               = es_output
+        ev_error_flag           = ev_error_flag
+        et_additional_step      = et_additional_step
+    ).
+
+    ls_output-mdlconsumeoutput = es_output->*.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_output> = ls_output.
+
+  ENDMETHOD.
+
+  METHOD consume_mdl.
     DATA lt_business_data         TYPE TABLE OF zpru_storage_bin=>tys_warehouse_storage_bin_type.
     DATA lo_http_client           TYPE REF TO if_web_http_client.
     DATA lo_client_proxy          TYPE REF TO /iwbep/if_cp_client_proxy.
@@ -725,6 +787,7 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
         RAISE SHORTDUMP lx_web_http_client_error.
     ENDTRY.
   ENDMETHOD.
+
 ENDCLASS.
 
 
@@ -1082,14 +1145,335 @@ ENDCLASS.
 
 CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
+    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
   METHOD get_input_json_schema.
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
+    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
   METHOD get_output_json_schema.
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        TRY.
+            rv_json_schema = create_json_schema_example( ).
+          CATCH zpru_cx_agent_core.
+            RETURN.
+        ENDTRY.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD create_json_schema_example.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
+
+    " Properties for the nested structure
+    DATA(lt_fields_3_4) = VALUE zpru_tt_json_schema_prop(
+                                    ( name = 'field3' type = 'string'  description = 'Third field' )
+                                    ( name = 'field4' type = 'integer' description = 'Fourth field' ) ).
+
+    " The nested structure itself is an 'object' type
+    DATA(lo_nested_struct) = NEW zpru_s_json_schema_prop( type       = 'object'
+                                                          properties = REF #( lt_fields_3_4 ) ).
+
+    " Columns for the table row
+    DATA(lt_fields_5_6) = VALUE zpru_tt_json_schema_prop(
+                                    ( name = 'field5' type = 'boolean' description = 'Fifth field' )
+                                    ( name = 'field6' type = 'string'  description = 'Sixth field' ) ).
+
+    " The row template
+    DATA(lo_row_template) = NEW zpru_s_json_schema_prop( type       = 'object'
+                                                         properties = REF #( lt_fields_5_6 ) ).
+
+    " The actual table property
+    DATA(lo_nested_table) = NEW zpru_s_json_schema_prop( type  = 'array'
+                                                         items = lo_row_template ).
+
+    " Define root properties (field1, field2, and the two nested objects)
+    DATA(lt_root_props) = VALUE zpru_tt_json_schema_prop( type = 'string'
+                                                          ( name = 'field1' description = 'First field' )
+                                                          ( name = 'field2' description = 'Second field' ) ).
+
+    " Insert the complex types we built above
+    INSERT VALUE #( name       = 'nested_structure'
+                    type       = 'object'
+                    properties = lo_nested_struct->properties )
+           INTO TABLE lt_root_props.
+
+    INSERT VALUE #( name  = 'nested_table'
+                    type  = 'array'
+                    items = lo_nested_table->items )
+           INTO TABLE lt_root_props.
+
+    " Final Root Schema Assignment
+    DATA(ls_abap_schema) = VALUE zpru_s_json_schema( vschema              = 'http://json-schema.org/draft-07/schema#'
+                                                     title                = 'ZPRU_COMPLEX_OUTPUT'
+                                                     type                 = 'object'
+                                                     properties           = lt_root_props
+                                                     additionalproperties = abap_true ).
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    rv_json_shema = lo_util->create_json_schema( is_abap_schema = ls_abap_schema ).
+
+    " output
+
+    " {
+    "    "$schema":"http://json-schema.org/draft-07/schema#",
+    "    "title":"ZPRU_COMPLEX_OUTPUT",
+    "    "type":"object",
+    "    "properties":{
+    "       "field1":{
+    "          "type":"string",
+    "          "description":"First field"
+    "       },
+    "       "field2":{
+    "          "type":"string",
+    "          "description":"Second field"
+    "       },
+    "       "nested_structure":{
+    "          "type":"object",
+    "          "properties":{
+    "             "field3":{
+    "                "type":"string",
+    "                "description":"Third field"
+    "             },
+    "             "field4":{
+    "                "type":"integer",
+    "                "description":"Fourth field"
+    "             }
+    "          }
+    "       },
+    "       "nested_table":{
+    "          "type":"array",
+    "          "items":{
+    "             "type":"object",
+    "             "properties":{
+    "                "field5":{
+    "                   "type":"boolean",
+    "                   "description":"Fifth field"
+    "                },
+    "                "field6":{
+    "                   "type":"string",
+    "                   "description":"Sixth field"
+    "                }
+    "             }
+    "          }
+    "       }
+    "    },
+    "    "additionalProperties":true
+    " }
+    "
   ENDMETHOD.
 ENDCLASS.

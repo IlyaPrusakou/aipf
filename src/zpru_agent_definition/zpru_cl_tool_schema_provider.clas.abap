@@ -15,7 +15,7 @@ CLASS zpru_cl_tool_schema_provider DEFINITION
     METHODS get_input_json_schema ABSTRACT
       IMPORTING is_tool_master_data   TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(ro_json_schema) TYPE zpru_if_agent_frw=>ts_json.
+      RETURNING VALUE(rv_json_schema) TYPE zpru_if_agent_frw=>ts_json.
 
     METHODS get_output_abap_type ABSTRACT
       IMPORTING is_tool_master_data        TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
@@ -25,7 +25,7 @@ CLASS zpru_cl_tool_schema_provider DEFINITION
     METHODS get_output_json_schema ABSTRACT
       IMPORTING is_tool_master_data   TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(ro_json_schema) TYPE zpru_if_agent_frw=>ts_json.
+      RETURNING VALUE(rv_json_schema) TYPE zpru_if_agent_frw=>ts_json.
 
   PRIVATE SECTION.
 ENDCLASS.

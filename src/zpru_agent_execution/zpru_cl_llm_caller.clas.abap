@@ -10,10 +10,10 @@ INHERITING FROM zpru_cl_tool_executor ABSTRACT
     METHODS call_large_language_model_int
       ABSTRACT
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
-                io_input                TYPE REF TO data
+                is_input                TYPE REF TO data
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
                 io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider   OPTIONAL
-      EXPORTING eo_output               TYPE REF TO data
+      EXPORTING es_output               TYPE REF TO data
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
       RAISING   zpru_cx_agent_core.
@@ -55,10 +55,10 @@ CLASS zpru_cl_llm_caller IMPLEMENTATION.
     ENDIF.
 
     call_large_language_model_int( EXPORTING io_controller           = io_controller
-                                             io_input                = lr_input
+                                             is_input                = lr_input
                                              io_tool_schema_provider = lo_tool_schema_provider
                                              io_tool_info_provider   = lo_tool_info_provider
-                                   IMPORTING eo_output               = lr_output
+                                   IMPORTING es_output               = lr_output
                                              ev_error_flag           = ev_error_flag
                                              et_additional_step      = DATA(lt_additional_step) ).
 

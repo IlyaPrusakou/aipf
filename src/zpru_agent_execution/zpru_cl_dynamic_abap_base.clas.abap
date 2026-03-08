@@ -30,7 +30,7 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    lv_input = io_input->*.
+    lv_input = is_input->*.
 
     DATA(lv_invokation_metadata) = lo_util->search_node_in_json( iv_json           = lv_input
                                                                  iv_field_2_search = 'dynamic_tool' ).
@@ -153,9 +153,9 @@ CLASS zpru_cl_dynamic_abap_base IMPLEMENTATION.
                                                         iv_json_4_append  = lv_invokation_result_json
                                                         iv_json_target    = lv_input  ).
 
-      er_output = NEW string( lv_new_json ).
+      es_output = NEW string( lv_new_json ).
     ELSE.
-      er_output = NEW string( lv_input ).
+      es_output = NEW string( lv_input ).
     ENDIF.
   ENDMETHOD.
 ENDCLASS.
