@@ -150,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( messageuuid              = <ls_m1>-messageuuid
+                                                               ( MessageUUID              = <ls_m1>-MessageUUID
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -425,8 +425,8 @@ ENDCLASS.
 
 CLASS lcl_adf_abap_executor IMPLEMENTATION.
   METHOD execute_code_int.
-
-    DATA ls_input TYPE zpru_s_abap_executor_input.
+    DATA ls_input  TYPE zpru_s_abap_executor_input.
+    " TODO: variable is assigned but never used (ABAP cleaner)
     DATA ls_output TYPE zpru_s_abap_executor_output.
 
     ls_input = is_input->*.
@@ -436,19 +436,16 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     ENDIF.
 
     ls_output-abapexecutoroutput = `abap code has played`.
-
   ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
-
-    DATA ls_input TYPE zpru_s_knowledge_prvdr_input.
-    DATA ls_output TYPE zpru_s_knowledge_prvdr_input.
-  data lo_util type ref to zpru_if_agent_util.
-
-    FIELD-SYMBOLS <ls_inspection_protocol> TYPE zpru_s_dummy_inspection_prtcl.
+    DATA ls_input  TYPE zpru_s_knowledge_prvdr_input.
+    DATA ls_output TYPE zpru_s_knowledge_prvdr_output.
+    DATA ls_result TYPE zpru_s_dummy_inspection_prtcl.
+    DATA lo_util   TYPE REF TO zpru_if_agent_util.
 
     ls_input = is_input->*.
 
@@ -459,24 +456,22 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-
-*ls_output-knowledgeproviderinput =  lo_util->convert_to_stri
-
-
-
-
-
-    ASSIGN es_output->* TO <ls_inspection_protocol>.
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
-    ENDIF.
-
-    <ls_inspection_protocol> = VALUE zpru_s_dummy_inspection_prtcl(
+    ls_result = VALUE zpru_s_dummy_inspection_prtcl(
         inspectionprotocolname        = 'GR-2026-00892'
         inspectionprotocoldescription = 'Inbound Inspection: Steel Coil Batch X-9'
         inspectionprotocoldate        = lcl_common_algorithms=>get_timestamp( )
         inspectionprotocolperson      = 'John Doe'
         text                          = 'Visual inspection passed. Certificate of Analysis (CoA) attached and verified.' ).
+
+    lo_util->convert_to_string( EXPORTING ir_abap   = REF zpru_s_dummy_inspection_prtcl( ls_result )
+                                CHANGING  cr_string = ls_output-knowledgeprovideroutput ).
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_inspection_protocol>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <ls_inspection_protocol> = ls_output.
   ENDMETHOD.
 ENDCLASS.
 
@@ -484,6 +479,7 @@ ENDCLASS.
 CLASS lcl_adf_nested_agent IMPLEMENTATION.
   METHOD run_nested_agent_int.
     " test data
+    " TODO: variable is assigned but only used in commented-out code (ABAP cleaner)
     DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
         productid       = 'CHEM-772-L'
         productname     = 'Concentrated Sulfuric Acid 98%'
@@ -497,56 +493,60 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
         storagelocation = 'WH02'
         safetynotesraw  = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
 
-    DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
-    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
-    DATA ls_prompt         TYPE zpru_s_prompt.
-    DATA lo_util           TYPE REF TO zpru_if_agent_util.
-    DATA ls_final_response TYPE zpru_s_final_response.
-    DATA lv_json_input     TYPE zpru_if_agent_frw=>ts_json.
+*    DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
+*    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
+*    DATA ls_prompt         TYPE zpru_s_prompt.
+*    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+*    DATA ls_final_response TYPE zpru_s_final_response.
+*    DATA lv_json_input     TYPE zpru_if_agent_frw=>ts_json.
 
-    FIELD-SYMBOLS <ls_safety_request>  TYPE zpru_s_dummy_safety_req.
-    FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_dummy_safety_res.
+    FIELD-SYMBOLS <ls_safety_request> TYPE zpru_s_nested_agent_input.
+*    FIELD-SYMBOLS <ls_safety_response> TYPE ZPRU_S_NESTED_AGENT_output.
 
     ASSIGN is_input->* TO <ls_safety_request>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_safety_request> = ls_safety_request.
-    lo_nested_agent = NEW zpru_cl_unit_agent( ).
-
-    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
-    lo_util->convert_to_string( EXPORTING ir_abap   = is_input
-                                CHANGING  cr_string = lv_json_input ).
-
-    ls_prompt-string_content = lv_json_input.
-
-    lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
-                                              is_prompt              = ls_prompt
-                                              io_parent_controller   = io_controller
-                                    IMPORTING ev_final_response      = lv_final_response
-                                    " TODO: variable is assigned but never used (ABAP cleaner)
-                                              eo_executed_controller = DATA(lo_nested_controler) ).
-
-    ASSIGN es_output->* TO <ls_safety_response>.
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
+    IF <ls_safety_request> IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
-                              CHANGING  cr_abap   = ls_final_response ).
-
-    IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
-      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
-                                           iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
-    ELSE.
-      ev_error_flag = abap_true.
-      RETURN.
-    ENDIF.
-
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_response_content_json )
-                              CHANGING  cr_abap   = <ls_safety_response> ).
+*    <ls_safety_request> = ls_safety_request.
+*    lo_nested_agent = NEW zpru_cl_unit_agent( ).
+*
+*    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+*                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+*    lo_util->convert_to_string( EXPORTING ir_abap   = is_input
+*                                CHANGING  cr_string = lv_json_input ).
+*
+*    ls_prompt-string_content = lv_json_input.
+*
+*    lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
+*                                              is_prompt              = ls_prompt
+*                                              io_parent_controller   = io_controller
+*                                    IMPORTING ev_final_response      = lv_final_response
+*                                    " TODO: variable is assigned but never used (ABAP cleaner)
+*                                              eo_executed_controller = DATA(lo_nested_controler) ).
+*
+*    ASSIGN es_output->* TO <ls_safety_response>.
+*    IF sy-subrc <> 0.
+*      ev_error_flag = abap_true.
+*    ENDIF.
+*
+*    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
+*                              CHANGING  cr_abap   = ls_final_response ).
+*
+*    IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
+*      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
+*                                           iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+*    ELSE.
+*      ev_error_flag = abap_true.
+*      RETURN.
+*    ENDIF.
+*
+*    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_response_content_json )
+*                              CHANGING  cr_abap   = <ls_safety_response> ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -1063,7 +1063,6 @@ CLASS lcl_adf_tool_info_provider IMPLEMENTATION.
 
   METHOD set_tool_properties.
   ENDMETHOD.
-
 ENDCLASS.
 
 
@@ -1123,7 +1122,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_input_json_schema.
-
     CASE is_tool_master_data-toolname.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
         TRY.
@@ -1239,7 +1237,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_output_json_schema.
-
     CASE is_tool_master_data-toolname.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
         TRY.
@@ -1298,7 +1295,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
       WHEN OTHERS.
         RETURN.
     ENDCASE.
-
   ENDMETHOD.
 
   METHOD create_json_schema_example.
