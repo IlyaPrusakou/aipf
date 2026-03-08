@@ -5,15 +5,12 @@ CLASS zpru_cl_agent_util DEFINITION
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_agent_util.
+
   PROTECTED SECTION.
     METHODS add_json_2_writer
       IMPORTING iv_field_4_append TYPE string
                 iv_json_4_append  TYPE zpru_if_agent_frw=>ts_json
                 io_writer         TYPE REF TO if_sxml_writer.
-
-  PRIVATE SECTION.
-
-
 
 ENDCLASS.
 
@@ -209,12 +206,14 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
         DATA(lv_len) = strlen( rv_value ).
         DATA(lv_len2) = lv_len - 1.
 
-        IF lv_len >= 2 AND
-           rv_value(1) = '"' AND
-           rv_value+lv_len2 = '"' AND
-           NOT ( rv_value CS '{' OR rv_value CS '[' ).
+        IF         lv_len           >= 2
+           AND     rv_value(1)       = '"'
+           AND     rv_value+lv_len2  = '"'
+           AND NOT ( rv_value CS '{' OR rv_value CS '[' ).
 
-          rv_value = substring( val = rv_value off = 1 len = lv_len - 2 ).
+          rv_value = substring( val = rv_value
+                                off = 1
+                                len = lv_len - 2 ).
         ENDIF.
 
       CATCH cx_sxml_parse_error.
@@ -256,9 +255,9 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
+
   METHOD zpru_if_agent_util~append_json_to_json.
-    DATA lv_depth     TYPE i            VALUE 0.
-    DATA lv_recording TYPE abap_boolean VALUE abap_false.
+    DATA lv_depth TYPE i VALUE 0.
 
     DATA(lo_writer) = CAST if_sxml_writer( cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ) ).
     TRY.
@@ -297,10 +296,9 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
               lv_depth -= 1.
               " execute append here
               IF lv_depth = 0.
-                add_json_2_writer(
-                  iv_field_4_append = iv_field_4_append
-                  iv_json_4_append  = iv_json_4_append
-                  io_writer         = lo_writer ).
+                add_json_2_writer( iv_field_4_append = iv_field_4_append
+                                   iv_json_4_append  = iv_json_4_append
+                                   io_writer         = lo_writer ).
               ENDIF.
 
               lo_writer->close_element( ).
@@ -308,7 +306,8 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
           ENDCASE.
         ENDDO.
 
-        rv_new_json = cl_abap_conv_codepage=>create_in( )->convert( CAST cl_sxml_string_writer( lo_writer )->get_output( ) ).
+        rv_new_json = cl_abap_conv_codepage=>create_in( )->convert(
+                          CAST cl_sxml_string_writer( lo_writer )->get_output( ) ).
 
       CATCH cx_sxml_parse_error.
         RETURN.
@@ -316,7 +315,6 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD add_json_2_writer.
-    DATA lv_recording TYPE abap_boolean VALUE abap_false.
 
     TRY.
         DATA(lv_xml_to_parse) = cl_abap_conv_codepage=>create_out( )->convert( iv_json_4_append ).
@@ -342,12 +340,13 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
 
               DATA(lo_curr_open) = CAST if_sxml_open_element( lo_reader->read_current_node( ) ).
               IF lv_first_iteration = abap_true.
-                io_writer->write_attribute( name = 'name' value = iv_field_4_append ).
+                io_writer->write_attribute( name  = 'name'
+                                            value = iv_field_4_append ).
               ELSE.
                 DATA(lt_curr_attrs) = lo_curr_open->get_attributes( ).
                 LOOP AT lt_curr_attrs ASSIGNING FIELD-SYMBOL(<curr_attr>).
                   io_writer->write_attribute( name  = <curr_attr>->qname-name
-                                          value = <curr_attr>->get_value( ) ).
+                                              value = <curr_attr>->get_value( ) ).
                 ENDLOOP.
               ENDIF.
 
@@ -373,16 +372,20 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~unwrap_from_json_markdown.
+    " TODO: variable is assigned but never used (ABAP cleaner)
     DATA(lv_temp) = iv_markdown.
 
     "  using regex to handle the specific pattern:
-    rv_content = replace( val = iv_markdown sub = '```JSON '  with = '' ).
-    rv_content = replace( val = rv_content   sub = ' ```'      with = '' ).
+    rv_content = replace( val  = iv_markdown
+                          sub  = '```JSON '
+                          with = '' ).
+    rv_content = replace( val  = rv_content
+                          sub  = ' ```'
+                          with = '' ).
 
     " trim leading/trailing whitespace just in case
     rv_content = condense( rv_content ).
   ENDMETHOD.
-
 
   METHOD zpru_if_agent_util~wrap_to_TEXT_markdown.
     " concatenate with the required spaces: ```JSON [SPACE] content [SPACE] ```
@@ -390,30 +393,51 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~unwrap_from_TEXT_markdown.
+    " TODO: variable is assigned but never used (ABAP cleaner)
     DATA(lv_temp) = iv_markdown.
 
     "  using regex to handle the specific pattern:
-    rv_content = replace( val = iv_markdown sub = '```TEXT '  with = '' ).
-    rv_content = replace( val = rv_content   sub = ' ```'      with = '' ).
+    rv_content = replace( val  = iv_markdown
+                          sub  = '```TEXT '
+                          with = '' ).
+    rv_content = replace( val  = rv_content
+                          sub  = ' ```'
+                          with = '' ).
 
     " trim leading/trailing whitespace just in case
     rv_content = condense( rv_content ).
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~is_wrapped_in_json_markdown.
-" * is the wildcard in ABAP CP operator
-  " we use uppercase JSON specifically here
-  IF iv_content CP '```JSON * ```'.
-    rv_content_is_wrapped = abap_true.
-  ENDIF.
+    " * is the wildcard in ABAP CP operator
+    " we use uppercase JSON specifically here
+    IF iv_content CP '```JSON * ```'.
+      rv_content_is_wrapped = abap_true.
+    ENDIF.
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~is_wrapped_in_text_markdown.
-" * is the wildcard in ABAP CP operator
-  " we use uppercase JSON specifically here
-  IF iv_content CP '```TEXT * ```'.
-    rv_content_is_wrapped = abap_true.
-  ENDIF.
+    " * is the wildcard in ABAP CP operator
+    " we use uppercase JSON specifically here
+    IF iv_content CP '```TEXT * ```'.
+      rv_content_is_wrapped = abap_true.
+    ENDIF.
   ENDMETHOD.
 
+  METHOD zpru_if_agent_util~create_json_schema.
+    rv_json_shema = /ui2/cl_json=>serialize(
+                        data          = is_abap_schema
+                        assoc_arrays  = abap_true
+                        pretty_name   = /ui2/cl_json=>pretty_mode-low_case
+                        compress      = abap_true
+                        name_mappings = VALUE /ui2/cl_json=>name_mappings(
+                                                  ( abap = 'VSCHEMA'              json = '$schema' )
+                                                  ( abap = 'TITLE' json = 'title' )
+                                                  ( abap = 'DESCRIPTION' json = 'description' )
+                                                  ( abap = 'TYPE' json = 'type' )
+                                                  ( abap = 'REQUIRED' json = 'required' )
+                                                  ( abap = 'PROPERTIES' json = 'properties' )
+                                                  ( abap = 'ITEMS'                json = 'items' )
+                                                  ( abap = 'ADDITIONALPROPERTIES' json = 'additionalProperties' ) ) ).
+  ENDMETHOD.
 ENDCLASS.

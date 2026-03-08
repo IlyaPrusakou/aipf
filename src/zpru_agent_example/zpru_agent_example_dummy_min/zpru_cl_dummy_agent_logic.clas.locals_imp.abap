@@ -52,7 +52,6 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD process_thinking.
-
     DATA(lv_message) = io_decision_request->get_decision_request_string( ).
 
     DATA(lo_factory) = lcl_common_algorithms=>get_llm_api_factory( ).
@@ -494,17 +493,17 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
   METHOD run_nested_agent_int.
     " test data
     DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
-        product_id       = 'CHEM-772-L'
-        product_name     = 'Concentrated Sulfuric Acid 98%'
-        material_group   = '00105'
-        industry_sector  = 'C'
-        quantity         = '1200.000'
-        unit_of_measure  = 'KG'
-        is_hazardous     = 'X'
-        purchase_order   = '4500001234'
-        vendor_name      = 'Global ChemCorp Solutions'
-        storage_location = 'WH02'
-        safety_notes_raw = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
+        productid       = 'CHEM-772-L'
+        productname     = 'Concentrated Sulfuric Acid 98%'
+        materialgroup   = '00105'
+        industrysector  = 'C'
+        quantity        = '1200.000'
+        unitofmeasure   = 'KG'
+        ishazardous     = 'X'
+        purchaseorder   = '4500001234'
+        vendorname      = 'Global ChemCorp Solutions'
+        storagelocation = 'WH02'
+        safetynotesraw  = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
 
     DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
     DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
@@ -1072,17 +1071,176 @@ CLASS lcl_adf_tool_info_provider IMPLEMENTATION.
 
   METHOD set_tool_properties.
   ENDMETHOD.
+
+  METHOD create_json_schema_example.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
+
+    " Properties for the nested structure
+    DATA(lt_fields_3_4) = VALUE zpru_tt_json_schema_prop(
+                                    ( name = 'field3' type = 'string'  description = 'Third field' )
+                                    ( name = 'field4' type = 'integer' description = 'Fourth field' ) ).
+
+    " The nested structure itself is an 'object' type
+    DATA(lo_nested_struct) = NEW zpru_s_json_schema_prop( type       = 'object'
+                                                          properties = REF #( lt_fields_3_4 ) ).
+
+    " Columns for the table row
+    DATA(lt_fields_5_6) = VALUE zpru_tt_json_schema_prop(
+                                    ( name = 'field5' type = 'boolean' description = 'Fifth field' )
+                                    ( name = 'field6' type = 'string'  description = 'Sixth field' ) ).
+
+    " The row template
+    DATA(lo_row_template) = NEW zpru_s_json_schema_prop( type       = 'object'
+                                                         properties = REF #( lt_fields_5_6 ) ).
+
+    " The actual table property
+    DATA(lo_nested_table) = NEW zpru_s_json_schema_prop( type  = 'array'
+                                                         items = lo_row_template ).
+
+    " Define root properties (field1, field2, and the two nested objects)
+    DATA(lt_root_props) = VALUE zpru_tt_json_schema_prop( type = 'string'
+                                                          ( name = 'field1' description = 'First field' )
+                                                          ( name = 'field2' description = 'Second field' ) ).
+
+    " Insert the complex types we built above
+    INSERT VALUE #( name       = 'nested_structure'
+                    type       = 'object'
+                    properties = lo_nested_struct->properties )
+           INTO TABLE lt_root_props.
+
+    INSERT VALUE #( name  = 'nested_table'
+                    type  = 'array'
+                    items = lo_nested_table->items )
+           INTO TABLE lt_root_props.
+
+    " Final Root Schema Assignment
+    DATA(ls_abap_schema) = VALUE zpru_s_json_schema( vschema              = 'http://json-schema.org/draft-07/schema#'
+                                                     title                = 'ZPRU_COMPLEX_OUTPUT'
+                                                     type                 = 'object'
+                                                     properties           = lt_root_props
+                                                     additionalproperties = abap_true ).
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_util->create_json_schema( EXPORTING is_abap_schema = ls_abap_schema
+                                 RECEIVING
+                                 " TODO: variable is assigned but never used (ABAP cleaner)
+                                           rv_json_shema  = DATA(lv_json) ).
+  ENDMETHOD.
 ENDCLASS.
 
 
 CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
+    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
   METHOD get_input_json_schema.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
+    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    CASE is_tool_master_data-toolname.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-nested_agent.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-service_consumption_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-call_llm.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-dynamic_abap_code.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-infer_ml_model.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
+        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        IF sy-subrc <> 0.
+          RETURN.
+        ENDIF.
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
   METHOD get_output_json_schema.

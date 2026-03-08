@@ -1,6 +1,5 @@
 CLASS lcl_common_algorithms DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
-
     CLASS-METHODS get_last_thinkingstepnumber
       IMPORTING it_thinking_step                  TYPE zpru_tt_thinking_step
       RETURNING VALUE(rv_last_thinkingstepnumber) TYPE i.
@@ -10,10 +9,8 @@ CLASS lcl_common_algorithms DEFINITION CREATE PUBLIC.
 
     CLASS-METHODS get_llm_api_factory
       RETURNING VALUE(ro_llm_api_factory) TYPE REF TO if_aic_islm_compl_api_factory.
-
-  PROTECTED SECTION.
-  PRIVATE SECTION.
 ENDCLASS.
+
 
 CLASS lcl_adf_decision_provider DEFINITION INHERITING FROM zpru_cl_decision_provider CREATE PUBLIC.
   PROTECTED SECTION.
@@ -91,6 +88,7 @@ ENDCLASS.
 CLASS lcl_adf_http_request_tool DEFINITION INHERITING FROM zpru_cl_http_request_sender CREATE PUBLIC.
   PROTECTED SECTION.
     METHODS send_http_int REDEFINITION.
+
     METHODS get_http_client
       IMPORTING iv_url                TYPE string
       RETURNING VALUE(ro_http_client) TYPE REF TO if_web_http_client.
@@ -117,8 +115,10 @@ CLASS lcl_adf_call_llm_tool DEFINITION INHERITING FROM zpru_cl_llm_caller CREATE
              llm_finish_reason          TYPE aic_finish_reason=>type,
              llm_original_finish_reason TYPE string,
            END OF ts_result_payload.
+
   PROTECTED SECTION.
     METHODS call_large_language_model_int REDEFINITION.
+
     METHODS prepare_prompt
       IMPORTING io_llm_api           TYPE REF TO if_aic_completion_api
                 iv_system_role       TYPE string
@@ -146,8 +146,6 @@ CLASS lcl_adf_call_llm_tool DEFINITION INHERITING FROM zpru_cl_llm_caller CREATE
       EXPORTING eo_response   TYPE REF TO zpru_if_payload
                 ev_error_flag TYPE abap_boolean.
 
-
-
 ENDCLASS.
 
 
@@ -164,6 +162,7 @@ ENDCLASS.
 CLASS lcl_adf_user_tool DEFINITION INHERITING FROM zpru_cl_user_tool CREATE PUBLIC.
   PROTECTED SECTION.
     METHODS execute_user_tool_int REDEFINITION.
+
     METHODS process_dummy_email
       IMPORTING io_controller TYPE REF TO zpru_if_agent_controller
                 io_request    TYPE REF TO zpru_if_payload
@@ -197,6 +196,11 @@ CLASS lcl_adf_tool_info_provider DEFINITION INHERITING FROM zpru_cl_tool_info_pr
     METHODS get_main_tool_info  REDEFINITION.
     METHODS set_tool_properties REDEFINITION.
     METHODS set_tool_parameters REDEFINITION.
+
+    METHODS create_json_schema_example
+      IMPORTING is_abap_schema       TYPE zpru_s_json_schema
+      RETURNING VALUE(rv_json_shema) TYPE string
+      RAISING   zpru_cx_agent_core.
 ENDCLASS.
 
 

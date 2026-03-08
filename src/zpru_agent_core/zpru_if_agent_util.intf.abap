@@ -1,5 +1,11 @@
 INTERFACE zpru_if_agent_util
   PUBLIC.
+
+  METHODS create_json_schema
+    IMPORTING is_abap_schema       TYPE zpru_s_json_schema
+    RETURNING VALUE(rv_json_shema) TYPE string.
+
+
   METHODS copy_data_to_ref
     IMPORTING is_data TYPE any
     CHANGING  cr_data TYPE REF TO data.
