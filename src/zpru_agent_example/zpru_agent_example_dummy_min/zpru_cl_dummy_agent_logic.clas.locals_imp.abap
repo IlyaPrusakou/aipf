@@ -425,47 +425,14 @@ ENDCLASS.
 
 CLASS lcl_adf_abap_executor IMPLEMENTATION.
   METHOD execute_code_int.
-*  DATA: ls_header         TYPE bapi2017_gm_head_01,
-*        ls_code           TYPE bapi2017_gm_code,
-*        lt_items          TYPE TABLE OF bapi2017_gm_item_create,
-*        lt_return         TYPE TABLE OF bapiret2,
-*        lv_mat_doc        TYPE mblnr.
-*
-*
-*  ls_header-pstng_date = sy-datum.
-*  ls_header-doc_date   = sy-datum.
-*  ls_header-header_txt = |RMA:{ iv_rma_id }|.
-*
-*
-*  ls_code-gm_code = '01'.
-*
-*
-*  APPEND INITIAL LINE TO lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).
-*  <ls_item>-material  = iv_material.
-*  <ls_item>-plant     = iv_plant.
-*  <ls_item>-stge_loc  = iv_storage_location.
-*  <ls_item>-move_type = '651'.
-*  <ls_item>-entry_qnt = iv_quantity.
-*  <ls_item>-entry_uom = iv_uom.
-*
-*  CALL FUNCTION 'BAPI_GOODSMVT_CREATE'
-*    EXPORTING
-*      goodsmvt_header  = ls_header
-*      goodsmvt_code    = ls_code
-*    IMPORTING
-*      materialdocument = lv_mat_doc
-*    TABLES
-*      goodsmvt_item    = lt_items
-*      return           = lt_return.
-*
-*  IF lv_mat_doc IS NOT INITIAL.
-*    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = abap_true.
-*    ev_status = |SUCCESS: Material Document { lv_mat_doc } posted.|.
-*  ELSE.
-*
-*    ev_status = |FAILED: | && lt_return[ 1 ]-message.
-*  ENDIF.
-*
+
+    DATA ls_input TYPE zpru_s_abap_executor_input.
+    DATA ls_output TYPE zpru_s_abap_executor_output.
+
+*ls_input =
+
+
+
   ENDMETHOD.
 ENDCLASS.
 
@@ -474,7 +441,7 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
     FIELD-SYMBOLS <ls_inspection_protocol> TYPE zpru_s_dummy_inspection_prtcl.
 
-    ASSIGN eo_output->* TO <ls_inspection_protocol>.
+    ASSIGN es_output->* TO <ls_inspection_protocol>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
@@ -515,7 +482,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     FIELD-SYMBOLS <ls_safety_request>  TYPE zpru_s_dummy_safety_req.
     FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_dummy_safety_res.
 
-    ASSIGN io_input->* TO <ls_safety_request>.
+    ASSIGN is_input->* TO <ls_safety_request>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
@@ -525,7 +492,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
 
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
-    lo_util->convert_to_string( EXPORTING ir_abap   = io_input
+    lo_util->convert_to_string( EXPORTING ir_abap   = is_input
                                 CHANGING  cr_string = lv_json_input ).
 
     ls_prompt-string_content = lv_json_input.
@@ -537,7 +504,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
                                     " TODO: variable is assigned but never used (ABAP cleaner)
                                               eo_executed_controller = DATA(lo_nested_controler) ).
 
-    ASSIGN eo_output->* TO <ls_safety_response>.
+    ASSIGN es_output->* TO <ls_safety_response>.
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
@@ -1152,7 +1119,7 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
             RETURN.
         ENDTRY.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
-         TRY.
+        TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
@@ -1268,7 +1235,7 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
             RETURN.
         ENDTRY.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-http_request.
-         TRY.
+        TRY.
             rv_json_schema = create_json_schema_example( ).
           CATCH zpru_cx_agent_core.
             RETURN.
