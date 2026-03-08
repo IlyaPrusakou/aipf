@@ -27,14 +27,6 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
       ls_line = <ls_create>.
 
-      IF ls_line-runuuid IS INITIAL.
-        TRY.
-            ls_line-runuuid = cl_system_uuid=>create_uuid_x16_static( ).
-          CATCH cx_uuid_error.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-      ENDIF.
-
       lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_HEAD_CONTROL`
                            CHANGING  cs_data    = ls_line
                                      cs_control = ls_line-control ).
@@ -116,13 +108,6 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
     LOOP AT it_axc_query_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-queryuuid IS INITIAL.
-        TRY.
-            ls_line-queryuuid = cl_system_uuid=>create_uuid_x16_static( ).
-          CATCH cx_uuid_error.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-      ENDIF.
 
       lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_QUERY_CONTROL`
                            CHANGING  cs_data    = ls_line
@@ -214,13 +199,6 @@ CLASS zpru_cl_axc_precheck IMPLEMENTATION.
 
     LOOP AT it_axc_step_imp ASSIGNING FIELD-SYMBOL(<ls_create>).
       ls_line = <ls_create>.
-      IF ls_line-stepuuid IS INITIAL.
-        TRY.
-            ls_line-stepuuid = cl_system_uuid=>create_uuid_x16_static( ).
-          CATCH cx_uuid_error.
-            RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
-        ENDTRY.
-      ENDIF.
 
       lo_util->fill_flags( EXPORTING iv_name    = `ZPRU_IF_AXC_TYPE_AND_CONSTANT=>TS_STEP_CONTROL`
                            CHANGING  cs_data    = ls_line

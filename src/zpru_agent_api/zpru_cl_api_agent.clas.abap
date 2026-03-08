@@ -2150,12 +2150,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       ENDIF.
 
       APPEND INITIAL LINE TO et_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
-      TRY.
-          <ls_execution_step>-stepuuid = cl_system_uuid=>create_uuid_x16_static( ).
-        CATCH cx_uuid_error.
-          RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-      ENDTRY.
-
       <ls_execution_step>-stepnumber        = lo_axc_service->generate_step_number(
                                                   iv_query_uuid       = is_execution_query-queryuuid
                                                   iv_step_number_base = lv_step_number_base ).
@@ -2241,6 +2235,33 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                               CHANGING  cs_reported     = cs_axc_reported
                                         cs_failed       = cs_axc_failed
                                         cs_mapped       = cs_axc_mapped ).
+    lo_axc_service->read_step(
+      EXPORTING
+        it_step_read_k = VALUE #(  FOR <ls_k> IN cs_axc_mapped-step ( stepuuid = <ls_k>-stepuuid
+                                                                      control            = VALUE #(
+                                                                           stepuuid           = abap_true
+                                                                           stepnumber         = abap_true
+                                                                           queryuuid          = abap_true
+                                                                           runuuid            = abap_true
+                                                                           tooluuid           = abap_true
+                                                                           stepsequence       = abap_true
+                                                                           stepstatus         = abap_true
+                                                                           stepstartdatetime  = abap_true
+                                                                           stependdatetime    = abap_true
+                                                                           stepinputprompt    = abap_true
+                                                                           stepoutputresponse = abap_true ) ) )
+      IMPORTING
+        et_axc_step    = DATA(lt_all_steps) ).
+
+
+    LOOP AT et_execution_steps ASSIGNING  <ls_execution_step>.
+      ASSIGN lt_all_steps[  stepnumber = <ls_execution_step>-stepnumber ] TO FIELD-SYMBOL(<ls_step_read>).
+      IF sy-subrc <> 0.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+      <ls_execution_step>-stepuuid = <ls_step_read>-stepuuid.
+    ENDLOOP.
+
   ENDMETHOD.
 
   METHOD clear_internal_state.
@@ -2532,8 +2553,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD create_execution_header.
     GET TIME STAMP FIELD DATA(lv_now).
     TRY.
-        es_execution_header = VALUE #( runuuid          = cl_system_uuid=>create_uuid_x16_static( )
-                                       runid            = io_axc_service->generate_run_id( )
+        es_execution_header = VALUE #( runid            = io_axc_service->generate_run_id( )
                                        agentuuid        = iv_agent_uuid
                                        userid           = sy-uname
                                        runstartdatetime = lv_now
@@ -2548,6 +2568,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        CHANGING  cs_reported        = cs_axc_reported
                                                  cs_failed          = cs_axc_failed
                                                  cs_mapped          = cs_axc_mapped ).
+
+
+        es_execution_header-runuuid =  VALUE #( cs_axc_mapped-header[ 1 ]-runuuid  OPTIONAL ).
+
       CATCH cx_uuid_error.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
@@ -2613,14 +2637,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     IF lo_util->is_wrapped_in_json_markdown( iv_content = iv_decision_log ).
-      lv_decision_log = lo_util->unwrap_from_text_markdown( iv_markdown = iv_decision_log ).
+      lv_decision_log = lo_util->unwrap_from_json_markdown( iv_markdown = iv_decision_log ).
     ELSE.
       lv_decision_log = iv_decision_log.
     ENDIF.
 
     TRY.
         es_execution_query = VALUE #(
-            queryuuid          = cl_system_uuid=>create_uuid_x16_static( )
             querynumber        = io_axc_service->generate_query_number( iv_run_uuid = iv_run_uuid )
             runuuid            = iv_run_uuid
             querylanguage      = COND #( WHEN iv_langu IS NOT INITIAL THEN iv_langu ELSE sy-langu )
@@ -2643,6 +2666,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                    CHANGING  cs_reported      = cs_axc_reported
                                              cs_failed        = cs_axc_failed
                                              cs_mapped        = cs_axc_mapped ).
+
+        es_execution_query-queryuuid = VALUE #( cs_axc_mapped-query[ 1 ]-queryuuid OPTIONAL ).
+
       CATCH cx_uuid_error.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDTRY.
