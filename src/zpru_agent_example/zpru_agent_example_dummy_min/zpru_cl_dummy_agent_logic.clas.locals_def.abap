@@ -197,10 +197,6 @@ CLASS lcl_adf_tool_info_provider DEFINITION INHERITING FROM zpru_cl_tool_info_pr
     METHODS set_tool_properties REDEFINITION.
     METHODS set_tool_parameters REDEFINITION.
 
-    METHODS create_json_schema_example
-      IMPORTING is_abap_schema       TYPE zpru_s_json_schema
-      RETURNING VALUE(rv_json_shema) TYPE string
-      RAISING   zpru_cx_agent_core.
 ENDCLASS.
 
 
@@ -211,4 +207,7 @@ CLASS lcl_adf_schema_provider DEFINITION INHERITING FROM zpru_cl_tool_schema_pro
     METHODS get_input_json_schema  REDEFINITION.
     METHODS get_output_abap_type   REDEFINITION.
     METHODS get_output_json_schema REDEFINITION.
+    METHODS create_json_schema_example
+      RETURNING VALUE(rv_json_shema) TYPE string
+      RAISING   zpru_cx_agent_core.
 ENDCLASS.
