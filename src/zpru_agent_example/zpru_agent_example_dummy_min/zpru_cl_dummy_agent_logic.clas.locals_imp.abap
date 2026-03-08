@@ -1234,51 +1234,50 @@ ENDCLASS.
 
 CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
-    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
 
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+       ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_KNOWLEDGE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_CODE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_HTTP`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_SCM`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_LLM`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_LLM_CALL_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_DYN_CODE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_ML`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_USER_TOOL`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
@@ -1349,51 +1348,50 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
-    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
 
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_KNOWLEDGE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_CODE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_HTTP`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_SCM`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_LLM`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_DYN_CODE`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_ML`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
       WHEN `DUMMY_USER_TOOL`.
-        lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.

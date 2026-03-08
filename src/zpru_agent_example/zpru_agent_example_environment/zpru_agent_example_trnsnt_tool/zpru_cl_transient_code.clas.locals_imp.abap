@@ -46,9 +46,7 @@ ENDCLASS.
 
 CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
-    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
-
-    lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_INPUT` ).
+    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_INPUT` ).
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
@@ -63,9 +61,8 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
-    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
 
-    lo_struct_descr->describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_OUTPUT` ).
+    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_OUTPUT` ).
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
