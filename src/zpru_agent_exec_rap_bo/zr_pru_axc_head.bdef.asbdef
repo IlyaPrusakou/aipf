@@ -1,4 +1,4 @@
-managed implementation in class ZBP_R_PRU_AXC_HEAD unique;
+managed with additional save and cleanup implementation in class ZBP_R_PRU_AXC_HEAD unique;
 strict ( 2 );
 with draft;
 extensible;
@@ -31,7 +31,7 @@ authorization master ( global )
   draft action Resume;
   draft determine action Prepare;
 
-  determination GenerateID on modify { create; }
+  determination GenerateRunID on modify { create; }
 
   mapping for zpru_axc_head corresponding extensible
     {
@@ -61,13 +61,15 @@ authorization dependent by _executionheader
 {
 
   field ( numbering : managed ) AIPF7QueryUuid;
-  field ( readonly ) AIPF7QueryUuid, AIPF7RunUuid;
+  field ( readonly ) AIPF7QueryUuid, AIPF7RunUuid, AIPF7QueryNumber;
 
   update;
   delete;
 
   association _executionheader { with draft; }
   association _executionstep { create; with draft; }
+
+  determination GenerateQueryID on modify { create; }
 
   mapping for zpru_axc_query corresponding extensible
     {
@@ -103,6 +105,9 @@ authorization dependent by _executionheader
 
   association _executionquery { with draft; }
   association _executionheader { with draft; }
+
+
+  determination GenerateStepID on modify { create; }
 
   mapping for zpru_axc_step corresponding extensible
     {
