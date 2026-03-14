@@ -240,9 +240,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
 
           <ls_additional_steps>-stepuuid   = cl_system_uuid=>create_uuid_x16_static( ).
-
-          <ls_additional_steps>-stepnumber = lo_axc_service->generate_step_number(
-                                                 iv_query_uuid = is_current_step-queryuuid ).
           <ls_additional_steps>-queryuuid  = is_current_step-queryuuid.
           <ls_additional_steps>-runuuid    = is_current_step-runuuid.
           <ls_additional_steps>-tooluuid   = <ls_additional_tool>-tooluuid.
