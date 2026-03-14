@@ -1,9 +1,9 @@
-managed with additional save and cleanup implementation in class ZBP_R_PRU_AXC_HEAD unique;
+managed with unmanaged save and cleanup with full data implementation in class ZBP_R_PRU_AXC_HEAD unique;
 strict ( 2 );
 with draft;
 extensible;
 define behavior for ZR_PRU_AXC_HEAD alias executionHeader
-persistent table zpru_axc_head
+//persistent table zpru_axc_head
 extensible
 draft table zpru_axc_head_d
 etag master AIPF7LocalLastChanged
@@ -51,7 +51,7 @@ authorization master ( global )
 }
 
 define behavior for ZR_PRU_AXC_QUERY alias executionQuery
-persistent table zpru_axc_query
+//persistent table zpru_axc_query
 extensible
 draft table zpru_axc_query_d
 etag dependent by _executionheader
@@ -88,7 +88,7 @@ authorization dependent by _executionheader
 }
 
 define behavior for ZR_PRU_AXC_STEP alias executionStep
-persistent table zpru_axc_step
+//persistent table zpru_axc_step
 extensible
 draft table zpru_axc_step_d
 etag dependent by _executionheader

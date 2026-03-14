@@ -12,8 +12,8 @@ ENDCLASS.
 
 CLASS zpru_cl_test_data IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
-*    refresh_test_data( ).
-    greate_snro_intervals( ).
+    refresh_test_data( ).
+*    greate_snro_intervals( ).
   ENDMETHOD.
 
   METHOD refresh_test_data.

@@ -1,6 +1,15 @@
 CLASS lcl_buffer DEFINITION CREATE PUBLIC.
 
   PUBLIC SECTION.
+
+    TYPES: BEGIN OF ts_run_count,
+             numberrangelevel TYPE zpru_de_run_id,
+           END OF ts_run_count.
+
+    TYPES tt_run_count TYPE STANDARD TABLE OF ts_run_count WITH EMPTY KEY.
+
+    CLASS-DATA st_run_count TYPE tt_run_count.
+
     TYPES: BEGIN OF ts_query_count,
              AIPF7RunUuid     TYPE sysuuid_x16,
              AIPF7QueryUuid   TYPE sysuuid_x16,
@@ -46,23 +55,50 @@ CLASS lhc_zr_pru_axc_head IMPLEMENTATION.
 
   METHOD GenerateRunID.
     DATA lv_number      TYPE cl_numberrange_runtime=>nr_number.
+    DATA lv_number_buffered      TYPE cl_numberrange_runtime=>nr_number.
     DATA lt_update_root TYPE TABLE FOR UPDATE zr_pru_axc_head\\executionHeader.
+
+    TRY.
+        cl_numberrange_runtime=>number_status(
+          EXPORTING
+            nr_range_nr = '01'
+            object      = 'ZPRU_AXCHD'
+          IMPORTING
+            number      = lv_number ).
+
+        IF lv_number IS NOT INITIAL.
+          SORT lcl_buffer=>st_run_count BY numberrangelevel DESCENDING.
+          lv_number_buffered = VALUE #( lcl_buffer=>st_run_count[ 1 ]-numberrangelevel OPTIONAL ).
+          IF lv_number_buffered < lv_number.
+            APPEND INITIAL LINE TO lcl_buffer=>st_run_count ASSIGNING FIELD-SYMBOL(<ls_query_count>).
+            <ls_query_count>-numberrangelevel = lv_number_buffered.
+          ENDIF.
+        ENDIF.
+
+      CATCH cx_nr_object_not_found
+           cx_number_ranges.
+        ASSERT 1 = 2.
+    ENDTRY.
+
+    IF  lcl_buffer=>st_run_count IS NOT INITIAL.
+      SORT  lcl_buffer=>st_run_count BY numberrangelevel DESCENDING.
+      lv_number = VALUE #( lcl_buffer=>st_run_count[ 1 ]-numberrangelevel OPTIONAL ).
+    ELSE.
+      lv_number = '00000000000000000000'.
+    ENDIF.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key>).
 
-      TRY.
-          cl_numberrange_runtime=>number_get( EXPORTING nr_range_nr = '01'
-                                                        object      = 'ZPRU_AXCHD'
-                                              IMPORTING number      = lv_number ).
-        CATCH cx_nr_object_not_found
-              cx_number_ranges.
-          ASSERT 1 = 2.
-      ENDTRY.
+      lv_number = lv_number + 1.
 
       APPEND INITIAL LINE TO lt_update_root ASSIGNING FIELD-SYMBOL(<ls_update_root>).
       <ls_update_root>-%tky       = <ls_key>-%tky.
       <ls_update_root>-AIPF7RunID = lv_number.
       <ls_update_root>-%control-AIPF7RunID = if_abap_behv=>mk-on.
+
+      APPEND INITIAL LINE TO lcl_buffer=>st_run_count ASSIGNING FIELD-SYMBOL(<ls_run_count>).
+      <ls_run_count>-numberrangelevel = lv_number.
+
     ENDLOOP.
 
     IF lt_update_root IS NOT INITIAL.
@@ -297,9 +333,121 @@ ENDCLASS.
 
 CLASS lsc_zr_pru_axc_head IMPLEMENTATION.
   METHOD save_modified.
+
+    TYPES: BEGIN OF ts_head_key,
+             runuuid TYPE sysuuid_x16,
+           END OF ts_head_key.
+
+    DATA lt_head_del_key TYPE STANDARD TABLE OF ts_head_key WITH EMPTY KEY.
+    DATA lt_head_mod_tab       TYPE TABLE OF zpru_axc_head WITH EMPTY KEY.
+    DATA lt_head_buffer       TYPE TABLE OF zpru_axc_head WITH EMPTY KEY.
+    DATA lo_head_struct TYPE REF TO cl_abap_structdescr.
+*    DATA lt_del_tab       TYPE lcl_buffer=>tt_root_db_keys.
+*    DATA lt_mod_child_tab TYPE TABLE OF zpru_po_item WITH EMPTY KEY.
+*    DATA lt_del_child_tab TYPE lcl_buffer=>tt_child_db_keys.
+
+
+    lt_head_mod_tab = CORRESPONDING #( create-executionheader MAPPING FROM ENTITY ).
+
+    SELECT *
+    FROM zpru_axc_head
+    FOR ALL ENTRIES IN @update-executionheader
+    WHERE runuuid = @update-executionheader-aipf7runuuid
+    INTO TABLE @DATA(lt_head_db).
+
+
+    lo_head_struct ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_AXC_HEAD` ).
+    DATA(lt_head_symbols) = lo_head_struct->get_symbols( ).
+
+    lt_head_buffer = CORRESPONDING #( update-executionheader MAPPING FROM ENTITY ).
+
+    LOOP AT lt_head_buffer  ASSIGNING FIELD-SYMBOL(<ls_head_buffer>).
+
+      ASSIGN lt_head_db[ runuuid = <ls_head_buffer>-runuuid ] TO FIELD-SYMBOL(<ls_head_db>).
+      IF sy-subrc <> 0.
+        ASSERT 1 = 2.
+      ENDIF.
+
+      ASSIGN update-executionheader[ KEY id
+                                     COMPONENTS
+                                     aipf7runuuid = <ls_head_buffer>-runuuid ] TO FIELD-SYMBOL(<ls_head_control>).
+      IF sy-subrc <> 0.
+        ASSERT 1 = 2.
+      ENDIF.
+
+      APPEND INITIAL LINE TO lt_head_mod_tab ASSIGNING FIELD-SYMBOL(<ls_head_mod>).
+      <ls_head_mod> = <ls_head_db>.
+
+      LOOP AT lt_head_symbols ASSIGNING FIELD-SYMBOL(<ls_head_symbol>).
+
+        data(lv_aipf7_field) = |AIPF7{ <ls_head_symbol>-name }|.
+
+        ASSIGN COMPONENT lv_aipf7_field OF STRUCTURE <ls_head_control>-%control TO FIELD-SYMBOL(<lv_control>).
+        IF sy-subrc <> 0.
+          ASSERT 1 = 2.
+        ENDIF.
+
+        IF <lv_control> <> if_abap_behv=>mk-on.
+          CONTINUE.
+        ENDIF.
+
+        ASSIGN COMPONENT <ls_head_symbol>-name OF STRUCTURE <ls_head_mod> TO FIELD-SYMBOL(<lv_head_target>).
+        IF sy-subrc <> 0.
+          ASSERT 1 = 2.
+        ENDIF.
+
+        ASSIGN COMPONENT <ls_head_symbol>-name OF STRUCTURE <ls_head_buffer> TO FIELD-SYMBOL(<lv_head_source>).
+        IF sy-subrc <> 0.
+          ASSERT 1 = 2.
+        ENDIF.
+
+        IF <lv_head_target> <> <lv_head_source>.
+          <lv_head_target> = <lv_head_source>.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
+
+
+
+
+*    MODIFY zpru_axc_head FROM TABLE @( CORRESPONDING #( lt_mod_tab ) ).
+*
+*
+*    IF line_exists( lcl_buffer=>root_buffer[ deleted = abap_true ] ).
+*      LOOP AT lcl_buffer=>root_buffer ASSIGNING FIELD-SYMBOL(<ls_del>) WHERE     deleted  = abap_true
+*                                                                             AND is_draft = if_abap_behv=>mk-off.
+*        APPEND VALUE #( purchase_order_id = <ls_del>-instance-purchaseorderid ) TO lt_del_tab.
+*      ENDLOOP.
+*      DELETE zpru_purc_order FROM TABLE @( CORRESPONDING #( lt_del_tab ) ). " qqq use on your  database tables
+*
+*    ENDIF.
+*
+*    IF line_exists( lcl_buffer=>child_buffer[ changed = abap_true ] ).
+*      LOOP AT lcl_buffer=>child_buffer ASSIGNING FIELD-SYMBOL(<ls_mod_child>) WHERE     changed  = abap_true
+*                                                                                    AND is_draft = if_abap_behv=>mk-off.
+*        APPEND CORRESPONDING #( <ls_mod_child>-instance MAPPING FROM ENTITY ) TO lt_mod_child_tab.
+*      ENDLOOP.
+*
+*      MODIFY zpru_po_item FROM TABLE @( CORRESPONDING #( lt_mod_child_tab ) ). " qqq use on your  database tables
+*    ENDIF.
+*
+*    IF line_exists( lcl_buffer=>child_buffer[ deleted = abap_true ] ).
+*      LOOP AT lcl_buffer=>child_buffer ASSIGNING FIELD-SYMBOL(<ls_del_child>) WHERE     deleted  = abap_true
+*                                                                                    AND is_draft = if_abap_behv=>mk-off.
+*        APPEND VALUE #( purchase_order_id = <ls_del_child>-instance-purchaseorderid
+*                        item_id           = <ls_del_child>-instance-itemid  ) TO lt_del_child_tab.
+*      ENDLOOP.
+*      DELETE zpru_po_item FROM TABLE @( CORRESPONDING #( lt_del_child_tab ) ). " qqq use on your  database tables
+*    ENDIF.
+*
+*
+*
+
+
   ENDMETHOD.
 
   METHOD cleanup.
+    CLEAR lcl_buffer=>st_run_count.
     CLEAR lcl_buffer=>st_query_count.
     CLEAR lcl_buffer=>st_step_count.
   ENDMETHOD.
