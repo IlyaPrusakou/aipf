@@ -2123,7 +2123,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lv_content             TYPE string.
     DATA lv_tool_prompt_message TYPE string.
     DATA lo_axc_service         TYPE REF TO zpru_if_axc_service.
-    DATA lv_step_number_base    TYPE zpru_de_step_number.
     DATA lt_message_in          TYPE zpru_if_short_memory_provider=>tt_message.
     DATA lo_util                TYPE REF TO zpru_if_agent_util.
 
@@ -2150,9 +2149,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       ENDIF.
 
       APPEND INITIAL LINE TO et_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
-      <ls_execution_step>-stepnumber        = lo_axc_service->generate_step_number(
-                                                  iv_query_uuid       = is_execution_query-queryuuid
-                                                  iv_step_number_base = lv_step_number_base ).
       <ls_execution_step>-queryuuid         = is_execution_query-queryuuid.
       <ls_execution_step>-runuuid           = is_execution_header-runuuid.
       <ls_execution_step>-tooluuid          = <ls_tool_master_data>-tooluuid.
@@ -2203,14 +2199,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_input ).
 
       lv_count += 1.
-      lv_step_number_base = <ls_execution_step>-stepnumber.
     ENDLOOP.
 
     io_short_memory->save_message( lt_message_in ).
 
     lo_axc_service->cba_step( EXPORTING it_axc_step_imp = VALUE #( FOR <ls_s> IN et_execution_steps
                                                                    ( stepuuid           = <ls_s>-stepuuid
-                                                                     stepnumber         = <ls_s>-stepnumber
                                                                      queryuuid          = <ls_s>-queryuuid
                                                                      runuuid            = <ls_s>-runuuid
                                                                      tooluuid           = <ls_s>-tooluuid
@@ -2222,7 +2216,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                      stepoutputresponse = <ls_s>-stepoutputresponse
                                                                      control            = VALUE #(
                                                                          stepuuid           = abap_true
-                                                                         stepnumber         = abap_true
                                                                          queryuuid          = abap_true
                                                                          runuuid            = abap_true
                                                                          tooluuid           = abap_true
@@ -2255,11 +2248,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
 
     LOOP AT et_execution_steps ASSIGNING  <ls_execution_step>.
-      ASSIGN lt_all_steps[  stepnumber = <ls_execution_step>-stepnumber ] TO FIELD-SYMBOL(<ls_step_read>).
+      ASSIGN lt_all_steps[  stepsequence = <ls_execution_step>-stepsequence ] TO FIELD-SYMBOL(<ls_step_read>).
       IF sy-subrc <> 0.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
       ENDIF.
       <ls_execution_step>-stepuuid = <ls_step_read>-stepuuid.
+      <ls_execution_step>-stepnumber = <ls_step_read>-stepnumber.
     ENDLOOP.
 
   ENDMETHOD.
@@ -2553,12 +2547,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD create_execution_header.
     GET TIME STAMP FIELD DATA(lv_now).
     TRY.
-        es_execution_header = VALUE #( runid            = io_axc_service->generate_run_id( )
-                                       agentuuid        = iv_agent_uuid
+        es_execution_header = VALUE #( agentuuid        = iv_agent_uuid
                                        userid           = sy-uname
                                        runstartdatetime = lv_now
                                        control          = VALUE #( runuuid          = abap_true
-                                                                   runid            = abap_true
                                                                    agentuuid        = abap_true
                                                                    userid           = abap_true
                                                                    runstartdatetime = abap_true
@@ -2569,8 +2561,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                  cs_failed          = cs_axc_failed
                                                  cs_mapped          = cs_axc_mapped ).
 
+        io_axc_service->read_header(
+          EXPORTING
+            it_head_read_k = VALUE #( FOR <ls_k> IN cs_axc_mapped-header ( runuuid = <ls_k>-runuuid
+                                                                           control-runid = abap_true ) )
+          IMPORTING
+            et_axc_head    = DATA(lt_axc_head) ).
 
-        es_execution_header-runuuid =  VALUE #( cs_axc_mapped-header[ 1 ]-runuuid  OPTIONAL ).
+        es_execution_header-runuuid =  VALUE #( lt_axc_head[ 1 ]-runuuid  OPTIONAL ).
+        es_execution_header-runid = VALUE #( lt_axc_head[ 1 ]-runid  OPTIONAL ).
 
       CATCH cx_uuid_error.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -2644,7 +2643,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     TRY.
         es_execution_query = VALUE #(
-            querynumber        = io_axc_service->generate_query_number( iv_run_uuid = iv_run_uuid )
             runuuid            = iv_run_uuid
             querylanguage      = COND #( WHEN iv_langu IS NOT INITIAL THEN iv_langu ELSE sy-langu )
             querystatus        = zpru_if_axc_type_and_constant=>sc_query_status-new
@@ -2652,7 +2650,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             queryinputprompt   = lv_query
             querydecisionlog   = lv_decision_log
             control            = VALUE #( queryuuid           = abap_true
-                                          querynumber         = abap_true
                                           runuuid             = abap_true
                                           querylanguage       = abap_true
                                           querystatus         = abap_true
@@ -2667,7 +2664,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                              cs_failed        = cs_axc_failed
                                              cs_mapped        = cs_axc_mapped ).
 
-        es_execution_query-queryuuid = VALUE #( cs_axc_mapped-query[ 1 ]-queryuuid OPTIONAL ).
+        io_axc_service->read_query(
+          EXPORTING
+            it_query_read_k = VALUE #( ( queryuuid = VALUE #( cs_axc_mapped-query[ 1 ]-queryuuid OPTIONAL )
+                                         control-queryuuid = abap_true
+                                         control-querynumber = abap_true ) )
+          IMPORTING
+            et_axc_query    = DATA(lt_axc_query) ).
+
+        es_execution_query-queryuuid = VALUE #( lt_axc_query[ 1 ]-queryuuid OPTIONAL ).
+        es_execution_query-querynumber = VALUE #( lt_axc_query[ 1 ]-querynumber OPTIONAL ).
 
       CATCH cx_uuid_error.
         RAISE EXCEPTION NEW zpru_cx_agent_core( ).
