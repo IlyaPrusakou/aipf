@@ -2173,7 +2173,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         lv_tool_prompt_message = lv_content.
       ENDIF.
 
-      ls_json_type_2-step_number        = <ls_execution_step>-stepnumber.
+      ls_json_type_2-step_number        = <ls_execution_step>-stepnumber. " qqq we don't know step number there
       ls_json_type_2-query_number       = is_execution_query-querynumber.
       ls_json_type_2-run_id             = is_execution_header-runid.
       ls_json_type_2-execution_sequence = <ls_execution_step>-stepsequence.
@@ -2193,7 +2193,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           agentuuid        = is_agent-agentuuid
           runuuid          = is_execution_header-runuuid
           queryuuid        = is_execution_query-queryuuid
-          stepuuid         = <ls_execution_step>-stepuuid
+          stepuuid         = <ls_execution_step>-stepuuid " qqq we don't know step there
           messagedatetime  = lv_now
           content          = lv_content
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_input ).

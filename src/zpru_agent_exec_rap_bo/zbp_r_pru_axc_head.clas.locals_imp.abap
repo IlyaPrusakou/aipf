@@ -63,11 +63,11 @@ CLASS lhc_zr_pru_axc_head IMPLEMENTATION.
                                                IMPORTING number      = lv_number ).
 
         IF lv_number IS NOT INITIAL.
-          SORT lcl_buffer=>st_run_count BY NumberRangeLevel DESCENDING.
-          lv_number_buffered = VALUE #( lcl_buffer=>st_run_count[ 1 ]-NumberRangeLevel OPTIONAL ).
+          SORT lcl_buffer=>st_run_count BY numberrangelevel DESCENDING.
+          lv_number_buffered = VALUE #( lcl_buffer=>st_run_count[ 1 ]-numberrangelevel OPTIONAL ).
           IF lv_number_buffered < lv_number.
             APPEND INITIAL LINE TO lcl_buffer=>st_run_count ASSIGNING FIELD-SYMBOL(<ls_query_count>).
-            <ls_query_count>-NumberRangeLevel = lv_number_buffered.
+            <ls_query_count>-numberrangelevel = lv_number.
           ENDIF.
         ENDIF.
 
@@ -77,8 +77,8 @@ CLASS lhc_zr_pru_axc_head IMPLEMENTATION.
     ENDTRY.
 
     IF lcl_buffer=>st_run_count IS NOT INITIAL.
-      SORT lcl_buffer=>st_run_count BY NumberRangeLevel DESCENDING.
-      lv_number = VALUE #( lcl_buffer=>st_run_count[ 1 ]-NumberRangeLevel OPTIONAL ).
+      SORT lcl_buffer=>st_run_count BY numberrangelevel DESCENDING.
+      lv_number = VALUE #( lcl_buffer=>st_run_count[ 1 ]-numberrangelevel OPTIONAL ).
     ELSE.
       lv_number = '00000000000000000000'.
     ENDIF.
@@ -93,7 +93,7 @@ CLASS lhc_zr_pru_axc_head IMPLEMENTATION.
       <ls_update_root>-%control-aipf7runid = if_abap_behv=>mk-on.
 
       APPEND INITIAL LINE TO lcl_buffer=>st_run_count ASSIGNING FIELD-SYMBOL(<ls_run_count>).
-      <ls_run_count>-NumberRangeLevel = lv_number.
+      <ls_run_count>-numberrangelevel = lv_number.
 
     ENDLOOP.
 
