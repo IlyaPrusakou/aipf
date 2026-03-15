@@ -113,7 +113,7 @@ CLASS lcl_adf_service_cons_mdl_tool DEFINITION INHERITING FROM zpru_cl_service_m
       EXPORTING es_output               TYPE REF TO data
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
-      RAISING   zpru_cx_agent_core .
+      RAISING   zpru_cx_agent_core.
 ENDCLASS.
 
 
@@ -217,7 +217,9 @@ CLASS lcl_adf_schema_provider DEFINITION INHERITING FROM zpru_cl_tool_schema_pro
     METHODS get_input_json_schema  REDEFINITION.
     METHODS get_output_abap_type   REDEFINITION.
     METHODS get_output_json_schema REDEFINITION.
+
     METHODS create_json_schema_example
-      RETURNING VALUE(rv_json_shema) TYPE string
+      EXPORTING ev_json_schema    TYPE zpru_if_agent_frw=>ts_json
+                es_json_structure TYPE zpru_s_json_schema
       RAISING   zpru_cx_agent_core.
 ENDCLASS.

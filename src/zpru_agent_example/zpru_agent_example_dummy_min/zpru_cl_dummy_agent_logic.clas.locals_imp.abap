@@ -150,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( messageuuid              = <ls_m1>-messageuuid
+                                                               ( MessageUUID              = <ls_m1>-MessageUUID
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -225,18 +225,15 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    cs_final_response_body-structureddata = VALUE #( ( name = 'name1'
-                                                       value = 'value1' ) ).
+    cs_final_response_body-structureddata   = VALUE #( ( name  = 'name1'
+                                                         value = 'value1' ) ).
     cs_final_response_body-suggestedactions = VALUE #( (  actionname = 'Do something next' ) ).
-    cs_final_response_body-responsecontent = `Nested final response`.
+    cs_final_response_body-responsecontent  = `Nested final response`.
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
-
     cs_reasoning_trace-rationalsummary = 'Rational Trace'.
     cs_reasoning_trace-confidencescore = `70.00`.
-
-
   ENDMETHOD.
 
   METHOD set_model_id.
@@ -1047,10 +1044,6 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
 
     <ls_output> = ls_output.
 
-
-
-
-
 *    IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
 *
 *      process_dummy_email( EXPORTING io_controller = io_controller
@@ -1234,10 +1227,9 @@ ENDCLASS.
 
 CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_abap_type.
-
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
-       ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
+        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_INPUT` ).
         IF sy-subrc <> 0.
           RETURN.
         ENDIF.
@@ -1290,55 +1282,66 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
+
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_KNOWLEDGE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_CODE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_HTTP`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_SCM`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_LLM`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_DYN_CODE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_ML`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_USER_TOOL`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
@@ -1348,7 +1351,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
-
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
         ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
@@ -1404,55 +1406,65 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
     CASE is_tool_master_data-toolname.
       WHEN `NESTED_AGENT`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
+
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_KNOWLEDGE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_CODE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_HTTP`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_SCM`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_LLM`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_DYN_CODE`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_ML`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
       WHEN `DUMMY_USER_TOOL`.
         TRY.
-            rv_json_schema = create_json_schema_example( ).
+            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                                  es_json_structure = es_json_structure ).
           CATCH zpru_cx_agent_core.
             RETURN.
         ENDTRY.
@@ -1463,6 +1475,9 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
 
   METHOD create_json_schema_example.
     DATA lo_util TYPE REF TO zpru_if_agent_util.
+
+    CLEAR: ev_json_schema,
+           es_json_structure.
 
     " Properties for the nested structure
     DATA(lt_fields_3_4) = VALUE zpru_tt_json_schema_prop(
@@ -1509,10 +1524,12 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
                                                      properties           = lt_root_props
                                                      additionalproperties = abap_true ).
 
+    es_json_structure = ls_abap_schema.
+
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    rv_json_shema = lo_util->create_json_schema( is_abap_schema = ls_abap_schema ).
+    ev_json_schema = lo_util->create_json_schema( is_abap_schema = ls_abap_schema ).
 
     " output
 

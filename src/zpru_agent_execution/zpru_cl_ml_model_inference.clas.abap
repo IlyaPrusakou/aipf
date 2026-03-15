@@ -43,6 +43,7 @@ CLASS zpru_cl_ml_model_inference IMPLEMENTATION.
     preprocess_tool_execution( EXPORTING io_request              = io_request
                                          is_tool_master_data     = is_tool_master_data
                                          is_execution_step       = is_execution_step
+                                         io_controller           = io_controller
                                IMPORTING ev_error_flag           = ev_error_flag
                                          er_output               = lr_output
                                          er_input                = lr_input

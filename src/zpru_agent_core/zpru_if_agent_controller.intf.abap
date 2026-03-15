@@ -36,6 +36,7 @@ INTERFACE zpru_if_agent_controller
            parent_controller  TYPE REF TO zpru_if_agent_controller,
            current_controller TYPE REF TO zpru_if_agent_controller,
            direct_children    TYPE tt_controllers,
+           KEY_VALUE_PAIRS    TYPE zpru_tt_key_value,
          END OF ts_input_output.
 
   TYPES tt_input_output TYPE STANDARD TABLE OF ts_input_output WITH EMPTY KEY.

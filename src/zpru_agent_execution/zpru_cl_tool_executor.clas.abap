@@ -11,6 +11,7 @@ CLASS zpru_cl_tool_executor DEFINITION
       IMPORTING io_request              TYPE REF TO zpru_if_payload
                 is_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
                 is_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+                io_controller           TYPE REF TO zpru_if_agent_controller
       EXPORTING ev_error_flag           TYPE abap_boolean
                 er_output               TYPE REF TO data
                 er_input                TYPE REF TO data
@@ -20,6 +21,22 @@ CLASS zpru_cl_tool_executor DEFINITION
                 eo_structure_input      TYPE REF TO cl_abap_structdescr
                 eo_util                 TYPE REF TO zpru_if_agent_util
       RAISING   zpru_cx_agent_core.
+
+    METHODS map_prev_out_2_next_in
+      IMPORTING
+        io_request                   TYPE REF TO zpru_if_payload
+        iv_input_string              TYPE string
+        is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+        is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+        is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+        is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+        io_controller                TYPE REF TO zpru_if_agent_controller
+        io_util                      TYPE REF TO zpru_if_agent_util
+        io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
+        it_key_value_pair            TYPE  zpru_tt_key_value
+      CHANGING
+        cr_input                     TYPE REF TO data
+      .
 
     METHODS prepare_additional_steps
       IMPORTING is_current_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step
@@ -138,10 +155,10 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     lv_wrong_info_provider = abap_false.
     lv_wrong_agent_tool_comb = abap_false.
 
-    data(lv_count) = 1.
+    DATA(lv_count) = 1.
     LOOP AT it_step_4_validate ASSIGNING FIELD-SYMBOL(<ls_step_4_validate>).
 
-      IF not line_exists( lt_fixed_values[ low = <ls_step_4_validate>-steptype ] ).
+      IF NOT line_exists( lt_fixed_values[ low = <ls_step_4_validate>-steptype ] ).
         lv_wrong_step_type = abap_true.
         ls_last_step = <ls_step_4_validate>.
         EXIT.
@@ -250,7 +267,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           CLEAR: lv_temp_tool_uuid,
                  lv_temp_agent_uuid.
 
-        lv_count = lv_count + 1.
+          lv_count = lv_count + 1.
         CATCH cx_uuid_error.
           RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
       ENDTRY.
@@ -301,6 +318,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
     DATA lv_input_string         TYPE string.
+    DATA lv_prev_sequence TYPE zpru_de_step_sequence.
 
     ev_error_flag = abap_false.
 
@@ -344,8 +362,52 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       lv_input_string = io_request->get_data( )->*.
     ENDIF.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
-                              CHANGING  cr_abap   = lr_input->* ).
+    LOOP AT  io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
+      DATA(lv_min_seq) = <ls_search_min_seq>-stepsequence.
+      EXIT.
+    ENDLOOP.
+
+
+    IF is_execution_step-stepsequence > lv_min_seq.
+      lv_prev_sequence = is_execution_step-stepsequence - 1.
+      ASSIGN io_controller->mt_execution_steps[ KEY sequence
+                                                COMPONENTS stepsequence = lv_prev_sequence ] TO FIELD-SYMBOL(<ls_prev_step>).
+      IF sy-subrc <> 0.
+        ev_error_flag = abap_true.
+        RETURN.
+      ENDIF.
+
+      ASSIGN  io_controller->mt_run_context[ execution_step = <ls_prev_step> ] TO FIELD-SYMBOL(<ls_prev_tool>).
+      IF sy-subrc <> 0.
+        ev_error_flag = abap_true.
+        RETURN.
+      ENDIF.
+
+    ELSE.
+      " DO SOMETHING
+    ENDIF.
+
+    SORT io_controller->mt_input_output BY number DESCENDING.
+
+    " qqqq
+    map_prev_out_2_next_in(
+      EXPORTING
+        io_request                   = io_request
+        iv_input_string              = lv_input_string
+        is_curr_tool_master_data     = is_tool_master_data
+        is_curr_execution_step       = is_execution_step
+        is_prev_tool_master_data     = <ls_prev_tool>-tool_master_data
+        is_prev_execution_step       = <ls_prev_step>
+        io_controller                = io_controller
+        io_util                      = lo_util
+        io_curr_tool_schema_provider = lo_tool_schema_provider
+        it_key_value_pair            = VALUE #( io_controller->mt_input_output[ lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
+      CHANGING
+        cr_input                     = lr_input  ).
+
+
+*    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
+*                              CHANGING  cr_abap   = lr_input->* ).
 
     er_input = lr_input.
 
@@ -378,12 +440,13 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA(ls_input_json_schema) = io_tool_schema_provider->input_json_schema( is_tool_master_data = is_tool_master_data
-                                                                             is_execution_step   = is_execution_step ).
+    io_tool_schema_provider->input_json_schema( EXPORTING is_tool_master_data = is_tool_master_data
+                                                          is_execution_step   = is_execution_step
+                                                IMPORTING ev_json_schema      = DATA(ls_input_json_schema) ).
 
-    DATA(ls_output_json_schema) = io_tool_schema_provider->output_json_schema(
-                                      is_tool_master_data = is_tool_master_data
-                                      is_execution_step   = is_execution_step ).
+    io_tool_schema_provider->output_json_schema( EXPORTING is_tool_master_data = is_tool_master_data
+                                                           is_execution_step   = is_execution_step
+                                                 IMPORTING ev_json_schema      = DATA(ls_output_json_schema) ).
 
     <ls_current_run_context>-abap_input_schema  = io_structure_input.
     <ls_current_run_context>-json_input_schema  = ls_input_json_schema.
@@ -394,4 +457,18 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     <ls_current_run_context>-abap_request       = ir_input.
     <ls_current_run_context>-json_request       = io_request->get_data( )->*.
   ENDMETHOD.
+
+  METHOD map_prev_out_2_next_in.
+
+
+
+
+
+
+
+
+
+
+  ENDMETHOD.
+
 ENDCLASS.
