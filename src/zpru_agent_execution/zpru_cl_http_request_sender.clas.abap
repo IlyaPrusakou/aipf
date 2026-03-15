@@ -1,37 +1,35 @@
 CLASS zpru_cl_http_request_sender DEFINITION
   PUBLIC
-INHERITING FROM zpru_cl_tool_executor ABSTRACT
-  CREATE PUBLIC .
+  INHERITING FROM zpru_cl_tool_executor ABSTRACT
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
+    INTERFACES zpru_if_http_request_sender.
 
-    INTERFACES zpru_if_http_request_sender .
   PROTECTED SECTION.
     METHODS send_http_int
       ABSTRACT
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
                 is_input                TYPE REF TO data
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
-                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider   OPTIONAL
+                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider OPTIONAL
       EXPORTING es_output               TYPE REF TO data
+                et_key_value_pairs      TYPE zpru_tt_key_value
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
       RAISING   zpru_cx_agent_core.
+
   PRIVATE SECTION.
 ENDCLASS.
 
 
-
 CLASS zpru_cl_http_request_sender IMPLEMENTATION.
-
-
   METHOD zpru_if_http_request_sender~send_http.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
     DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lr_input                TYPE REF TO data.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
-    DATA lv_output_json          TYPE zpru_if_agent_frw=>ts_json.
 
     CLEAR: et_additional_steps,
            et_additional_tools.
@@ -55,16 +53,14 @@ CLASS zpru_cl_http_request_sender IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    send_http_int(
-      EXPORTING
-        io_controller           = io_controller
-        is_input                = lr_input
-        io_tool_schema_provider = lo_tool_schema_provider
-        io_tool_info_provider   = lo_tool_info_provider
-      IMPORTING
-        es_output               = lr_output
-        ev_error_flag           = ev_error_flag
-        et_additional_step      = DATA(lt_additional_step) ).
+    send_http_int( EXPORTING io_controller           = io_controller
+                             is_input                = lr_input
+                             io_tool_schema_provider = lo_tool_schema_provider
+                             io_tool_info_provider   = lo_tool_info_provider
+                   IMPORTING es_output               = lr_output
+                             et_key_value_pairs      = et_key_value_pairs
+                             ev_error_flag           = ev_error_flag
+                             et_additional_step      = DATA(lt_additional_step) ).
 
     IF ev_error_flag = abap_true.
       RETURN.
@@ -78,20 +74,17 @@ CLASS zpru_cl_http_request_sender IMPLEMENTATION.
                                           et_additional_tools = et_additional_tools ).
     ENDIF.
 
-    postprocess_tool_execution(
-      EXPORTING
-        io_util                 = lo_util
-        ir_output               = lr_output
-        ir_input                = lr_input
-        io_controller           = io_controller
-        is_tool_master_data     = is_tool_master_data
-        is_execution_step       = is_execution_step
-        io_tool_schema_provider = lo_tool_schema_provider
-        io_structure_output     = lo_structure_output
-        io_structure_input      = lo_structure_input
-        io_request              = io_request
-      IMPORTING
-        eo_response             = eo_response
-        ev_error_flag           = ev_error_flag ).
+    postprocess_tool_execution( EXPORTING io_util                 = lo_util
+                                          ir_output               = lr_output
+                                          ir_input                = lr_input
+                                          io_controller           = io_controller
+                                          is_tool_master_data     = is_tool_master_data
+                                          is_execution_step       = is_execution_step
+                                          io_tool_schema_provider = lo_tool_schema_provider
+                                          io_structure_output     = lo_structure_output
+                                          io_structure_input      = lo_structure_input
+                                          io_request              = io_request
+                                IMPORTING eo_response             = eo_response
+                                          ev_error_flag           = ev_error_flag ).
   ENDMETHOD.
 ENDCLASS.

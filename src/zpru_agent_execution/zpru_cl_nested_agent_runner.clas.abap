@@ -1,20 +1,20 @@
 CLASS zpru_cl_nested_agent_runner DEFINITION
   PUBLIC
-INHERITING FROM zpru_cl_tool_executor ABSTRACT
-  CREATE PUBLIC .
+  INHERITING FROM zpru_cl_tool_executor ABSTRACT
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
+    INTERFACES zpru_if_nested_agent_runner.
 
-    INTERFACES zpru_if_nested_agent_runner .
   PROTECTED SECTION.
-
     METHODS run_nested_agent_int
       ABSTRACT
       IMPORTING io_controller           TYPE REF TO zpru_if_agent_controller
                 is_input                TYPE REF TO data
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
-                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider   OPTIONAL
+                io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider OPTIONAL
       EXPORTING es_output               TYPE REF TO data
+                et_key_value_pairs      TYPE zpru_TT_key_value
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
                 eo_nested_controller    TYPE REF TO zpru_if_agent_controller
@@ -24,17 +24,13 @@ INHERITING FROM zpru_cl_tool_executor ABSTRACT
 ENDCLASS.
 
 
-
 CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
-
-
   METHOD zpru_if_nested_agent_runner~run_nested_agent.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
     DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lr_input                TYPE REF TO data.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
-    DATA lv_output_json          TYPE zpru_if_agent_frw=>ts_json.
 
     CLEAR: et_additional_steps,
            et_additional_tools.
@@ -63,6 +59,7 @@ CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
                                     io_tool_schema_provider = lo_tool_schema_provider
                                     io_tool_info_provider   = lo_tool_info_provider
                           IMPORTING es_output               = lr_output
+                                    et_key_value_pairs      = et_key_value_pairs
                                     ev_error_flag           = ev_error_flag
                                     et_additional_step      = DATA(lt_additional_step)
                                     eo_nested_controller    = DATA(lo_nested_controler) ).
@@ -73,13 +70,12 @@ CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
 
     IF lo_nested_controler IS BOUND.
 
-      ASSIGN   io_controller->mt_input_output[ current_controller->mv_query_uuid = is_execution_step-queryuuid ] TO FIELD-SYMBOL(<ls_current_input_output>).
+      ASSIGN io_controller->mt_input_output[ current_controller->mv_query_uuid = is_execution_step-queryuuid ] TO FIELD-SYMBOL(<ls_current_input_output>).
       IF sy-subrc = 0.
         APPEND INITIAL LINE TO <ls_current_input_output>-direct_children ASSIGNING FIELD-SYMBOL(<ls_child_controller>).
         <ls_child_controller> = lo_nested_controler.
       ENDIF.
     ENDIF.
-
 
     IF lt_additional_step IS NOT INITIAL.
       prepare_additional_steps( EXPORTING is_current_step     = is_execution_step
@@ -89,21 +85,17 @@ CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
                                           et_additional_tools = et_additional_tools ).
     ENDIF.
 
-    postprocess_tool_execution(
-      EXPORTING
-        io_util                 = lo_util
-        ir_output               = lr_output
-        ir_input                = lr_input
-        io_controller           = io_controller
-        is_tool_master_data     = is_tool_master_data
-        is_execution_step       = is_execution_step
-        io_tool_schema_provider = lo_tool_schema_provider
-        io_structure_output     = lo_structure_output
-        io_structure_input      = lo_structure_input
-        io_request              = io_request
-      IMPORTING
-        eo_response             = eo_response
-        ev_error_flag           = ev_error_flag ).
-
+    postprocess_tool_execution( EXPORTING io_util                 = lo_util
+                                          ir_output               = lr_output
+                                          ir_input                = lr_input
+                                          io_controller           = io_controller
+                                          is_tool_master_data     = is_tool_master_data
+                                          is_execution_step       = is_execution_step
+                                          io_tool_schema_provider = lo_tool_schema_provider
+                                          io_structure_output     = lo_structure_output
+                                          io_structure_input      = lo_structure_input
+                                          io_request              = io_request
+                                IMPORTING eo_response             = eo_response
+                                          ev_error_flag           = ev_error_flag ).
   ENDMETHOD.
 ENDCLASS.

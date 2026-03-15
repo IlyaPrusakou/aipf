@@ -490,16 +490,16 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD map_prev_out_2_next_in.
-    io_curr_tool_schema_provider->input_json_schema( EXPORTING is_tool_master_data = is_curr_tool_master_data
-                                                               is_execution_step   = is_curr_execution_step
-                                                     IMPORTING es_json_structure   = DATA(ls_json_structure) ).
+    DATA(lo_input_structure) = io_curr_tool_schema_provider->input_rtts_schema(
+                                   is_tool_master_data = is_curr_tool_master_data
+                                   is_execution_step   = is_curr_execution_step ).
 
     ASSIGN cr_input->* TO FIELD-SYMBOL(<ls_structure>).
     IF sy-subrc <> 0.
       RETURN. " error
     ENDIF.
 
-    traverse_tree_json( EXPORTING io_request                   = io_request
+    traverse_tree_abap( EXPORTING io_request                   = io_request
                                   iv_input_string              = iv_input_string
                                   is_curr_tool_master_data     = is_curr_tool_master_data
                                   is_curr_execution_step       = is_curr_execution_step
@@ -509,7 +509,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                   io_util                      = io_util
                                   io_curr_tool_schema_provider = io_curr_tool_schema_provider
                                   it_key_value_pair            = it_key_value_pair
-                                  it_property                  = ls_json_structure-properties
+                                  io_abap_struct               = lo_input_structure
                         CHANGING  cr_input                     = <ls_structure> ).
   ENDMETHOD.
 
@@ -578,7 +578,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD traverse_tree_abap.
-*    DATA lo_table_line TYPE  REF TO cl_abap_datadescr.
     DATA lo_structure TYPE REF TO cl_abap_structdescr.
 
     IF io_abap_struct IS NOT INSTANCE OF cl_abap_structdescr.
@@ -632,24 +631,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         WHEN TYPE cl_abap_tabledescr.
 
           CONTINUE.
-
-*          lo_table_line = CAST cl_abap_tabledescr( <ls_component>-type )->get_table_line_type( ).
-*
-*           traverse_tree_abap(
-*            EXPORTING
-*              io_request                   = io_request
-*              iv_input_string              = iv_input_string
-*              is_curr_tool_master_data     = is_curr_tool_master_data
-*              is_curr_execution_step       = is_curr_execution_step
-*              is_prev_tool_master_data     = is_prev_tool_master_data
-*              is_prev_execution_step       = is_prev_execution_step
-*              io_controller                = io_controller
-*              io_util                      = io_util
-*              io_curr_tool_schema_provider = io_curr_tool_schema_provider
-*              it_key_value_pair            = it_key_value_pair
-*              io_abap_struct               = CAST #( lo_table_line )
-*            CHANGING
-*              cr_input                     = cr_input ).
 
       ENDCASE.
     ENDLOOP.

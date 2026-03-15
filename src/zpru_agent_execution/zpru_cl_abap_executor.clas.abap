@@ -14,7 +14,7 @@ CLASS zpru_cl_abap_executor DEFINITION
                 io_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider OPTIONAL
                 io_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider OPTIONAL
       EXPORTING es_output               TYPE REF TO data
-                et_key_value_pairs      TYPE zpru_TT_key_value
+                et_key_value_pairs      TYPE zpru_tt_key_value
                 ev_error_flag           TYPE abap_boolean
                 et_additional_step      TYPE zpru_tt_additional_step
       RAISING   zpru_cx_agent_core.
@@ -57,6 +57,7 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
                                 io_tool_schema_provider = lo_tool_schema_provider
                                 io_tool_info_provider   = lo_tool_info_provider
                       IMPORTING es_output               = lr_output
+                                et_key_value_pairs      = et_key_value_pairs
                                 ev_error_flag           = ev_error_flag
                                 et_additional_step      = DATA(lt_additional_step) ).
 
