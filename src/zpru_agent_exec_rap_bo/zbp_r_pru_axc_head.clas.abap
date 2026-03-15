@@ -1,15 +1,16 @@
-class ZBP_R_PRU_AXC_HEAD definition
-  public
-  abstract
-  final
-  for behavior of ZR_PRU_AXC_HEAD .
+CLASS zbp_r_pru_axc_head DEFINITION
+  PUBLIC
+  ABSTRACT
+  FINAL
+  FOR BEHAVIOR OF zr_pru_axc_head .
 
-public section.
-protected section.
-private section.
+  PUBLIC SECTION.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
 ENDCLASS.
 
 
 
-CLASS ZBP_R_PRU_AXC_HEAD IMPLEMENTATION.
+CLASS zbp_r_pru_axc_head IMPLEMENTATION.
 ENDCLASS.

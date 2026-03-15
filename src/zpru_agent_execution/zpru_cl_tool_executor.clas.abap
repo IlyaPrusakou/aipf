@@ -138,9 +138,10 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     lv_wrong_info_provider = abap_false.
     lv_wrong_agent_tool_comb = abap_false.
 
+    data(lv_count) = 1.
     LOOP AT it_step_4_validate ASSIGNING FIELD-SYMBOL(<ls_step_4_validate>).
 
-      IF line_exists( lt_fixed_values[ low = <ls_step_4_validate>-steptype ] ).
+      IF not line_exists( lt_fixed_values[ low = <ls_step_4_validate>-steptype ] ).
         lv_wrong_step_type = abap_true.
         ls_last_step = <ls_step_4_validate>.
         EXIT.
@@ -228,7 +229,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           ENDIF.
 
           IF     <ls_existing_agent> IS NOT ASSIGNED
-             AND <ls_existing_tool>  IS NOT ASSIGNED.
+             OR <ls_existing_tool>  IS NOT ASSIGNED.
             <ls_additional_tool>-toolistransient = abap_true.
           ENDIF.
 
@@ -239,17 +240,17 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
 
+          " temp step uuid will used inside method miniloop to map additional step to newly generated stepuuid
           <ls_additional_steps>-stepuuid   = cl_system_uuid=>create_uuid_x16_static( ).
-
-          <ls_additional_steps>-stepnumber = lo_axc_service->generate_step_number(
-                                                 iv_query_uuid = is_current_step-queryuuid ).
           <ls_additional_steps>-queryuuid  = is_current_step-queryuuid.
           <ls_additional_steps>-runuuid    = is_current_step-runuuid.
           <ls_additional_steps>-tooluuid   = <ls_additional_tool>-tooluuid.
+          <ls_additional_steps>-stepsequence = lv_count.
 
           CLEAR: lv_temp_tool_uuid,
                  lv_temp_agent_uuid.
 
+        lv_count = lv_count + 1.
         CATCH cx_uuid_error.
           RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
       ENDTRY.

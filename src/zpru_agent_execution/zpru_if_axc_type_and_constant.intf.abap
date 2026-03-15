@@ -63,7 +63,8 @@ INTERFACE zpru_if_axc_type_and_constant
   TYPES ts_axc_step            TYPE zpru_s_axc_step.
   TYPES tt_axc_head            TYPE STANDARD TABLE OF ts_axc_head WITH EMPTY KEY.
   TYPES tt_axc_query           TYPE STANDARD TABLE OF ts_axc_query WITH EMPTY KEY.
-  TYPES tt_axc_step            TYPE STANDARD TABLE OF ts_axc_step WITH EMPTY KEY.
+  TYPES tt_axc_step            TYPE STANDARD TABLE OF ts_axc_step WITH EMPTY KEY
+                               with NON-UNIQUE SORTED KEY sequence coMPONENTS stepsequence.
 
   TYPES: BEGIN OF ts_head_control,
            runuuid          TYPE abap_boolean,
