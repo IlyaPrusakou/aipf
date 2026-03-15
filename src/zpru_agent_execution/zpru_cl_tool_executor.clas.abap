@@ -23,38 +23,45 @@ CLASS zpru_cl_tool_executor DEFINITION
       RAISING   zpru_cx_agent_core.
 
     METHODS map_prev_out_2_next_in
-      IMPORTING
-        io_request                   TYPE REF TO zpru_if_payload
-        iv_input_string              TYPE string
-        is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
-        is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-        is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
-        is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-        io_controller                TYPE REF TO zpru_if_agent_controller
-        io_util                      TYPE REF TO zpru_if_agent_util
-        io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
-        it_key_value_pair            TYPE  zpru_tt_key_value
-      CHANGING
-        cr_input                     TYPE REF TO data
-      .
+      IMPORTING io_request                   TYPE REF TO zpru_if_payload
+                iv_input_string              TYPE string
+                is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                io_controller                TYPE REF TO zpru_if_agent_controller
+                io_util                      TYPE REF TO zpru_if_agent_util
+                io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
+                it_key_value_pair            TYPE  zpru_tt_key_value
+      CHANGING  cr_input                     TYPE REF TO data.
 
-    METHODS traverse_tree
-      IMPORTING
-        io_request                   TYPE REF TO zpru_if_payload
-        iv_input_string              TYPE string
-        is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
-        is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-        is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
-        is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-        io_controller                TYPE REF TO zpru_if_agent_controller
-        io_util                      TYPE REF TO zpru_if_agent_util
-        io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
-        it_key_value_pair            TYPE  zpru_tt_key_value
-        it_property                  TYPE zpru_tt_json_schema_prop
-      CHANGING
-        cr_input                     TYPE data .
+    METHODS traverse_tree_json
+      IMPORTING io_request                   TYPE REF TO zpru_if_payload
+                iv_input_string              TYPE string
+                is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                io_controller                TYPE REF TO zpru_if_agent_controller
+                io_util                      TYPE REF TO zpru_if_agent_util
+                io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
+                it_key_value_pair            TYPE  zpru_tt_key_value
+                it_property                  TYPE zpru_tt_json_schema_prop
+      CHANGING  cr_input                     TYPE data.
 
-
+    METHODS traverse_tree_abap
+      IMPORTING io_request                   TYPE REF TO zpru_if_payload
+                iv_input_string              TYPE string
+                is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                io_controller                TYPE REF TO zpru_if_agent_controller
+                io_util                      TYPE REF TO zpru_if_agent_util
+                io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
+                it_key_value_pair            TYPE  zpru_tt_key_value
+                io_abap_struct               TYPE REF TO cl_abap_datadescr
+      CHANGING  cr_input                     TYPE data.
 
 
 
@@ -265,7 +272,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
             <ls_additional_tool>-agentuuid = lv_temp_agent_uuid.
           ENDIF.
 
-          IF     <ls_existing_agent> IS NOT ASSIGNED
+          IF    <ls_existing_agent> IS NOT ASSIGNED
              OR <ls_existing_tool>  IS NOT ASSIGNED.
             <ls_additional_tool>-toolistransient = abap_true.
           ENDIF.
@@ -278,16 +285,16 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           APPEND INITIAL LINE TO et_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_steps>).
 
           " temp step uuid will used inside method miniloop to map additional step to newly generated stepuuid
-          <ls_additional_steps>-stepuuid   = cl_system_uuid=>create_uuid_x16_static( ).
-          <ls_additional_steps>-queryuuid  = is_current_step-queryuuid.
-          <ls_additional_steps>-runuuid    = is_current_step-runuuid.
-          <ls_additional_steps>-tooluuid   = <ls_additional_tool>-tooluuid.
+          <ls_additional_steps>-stepuuid     = cl_system_uuid=>create_uuid_x16_static( ).
+          <ls_additional_steps>-queryuuid    = is_current_step-queryuuid.
+          <ls_additional_steps>-runuuid      = is_current_step-runuuid.
+          <ls_additional_steps>-tooluuid     = <ls_additional_tool>-tooluuid.
           <ls_additional_steps>-stepsequence = lv_count.
 
           CLEAR: lv_temp_tool_uuid,
                  lv_temp_agent_uuid.
 
-          lv_count = lv_count + 1.
+          lv_count += 1.
         CATCH cx_uuid_error.
           RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
       ENDTRY.
@@ -338,7 +345,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     DATA lr_output               TYPE REF TO data.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
     DATA lv_input_string         TYPE string.
-    DATA lv_prev_sequence TYPE zpru_de_step_sequence.
+    DATA lv_prev_sequence        TYPE zpru_de_step_sequence.
 
     ev_error_flag = abap_false.
 
@@ -382,11 +389,10 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       lv_input_string = io_request->get_data( )->*.
     ENDIF.
 
-    LOOP AT  io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
+    LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
       DATA(lv_min_seq) = <ls_search_min_seq>-stepsequence.
       EXIT.
     ENDLOOP.
-
 
     IF is_execution_step-stepsequence > lv_min_seq.
       lv_prev_sequence = is_execution_step-stepsequence - 1.
@@ -397,7 +403,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         RETURN.
       ENDIF.
 
-      ASSIGN  io_controller->mt_run_context[ execution_step = <ls_prev_step> ] TO FIELD-SYMBOL(<ls_prev_tool>).
+      ASSIGN io_controller->mt_run_context[ execution_step = <ls_prev_step> ] TO FIELD-SYMBOL(<ls_prev_tool>).
       IF sy-subrc <> 0.
         ev_error_flag = abap_true.
         RETURN.
@@ -424,7 +430,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         it_key_value_pair            = VALUE #( io_controller->mt_input_output[ lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
       CHANGING
         cr_input                     = lr_input  ).
-
 
 *    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
 *                              CHANGING  cr_abap   = lr_input->* ).
@@ -479,43 +484,34 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD map_prev_out_2_next_in.
-
-    io_curr_tool_schema_provider->input_json_schema(
-    EXPORTING
-      is_tool_master_data =   is_curr_tool_master_data
-      is_execution_step   =   is_curr_execution_step
-    IMPORTING
-      es_json_structure   = DATA(ls_json_structure)
-  ).
+    io_curr_tool_schema_provider->input_json_schema( EXPORTING is_tool_master_data = is_curr_tool_master_data
+                                                               is_execution_step   = is_curr_execution_step
+                                                     IMPORTING es_json_structure   = DATA(ls_json_structure) ).
 
     ASSIGN cr_input->* TO FIELD-SYMBOL(<ls_structure>).
     IF sy-subrc <> 0.
       RETURN. " error
     ENDIF.
 
-    traverse_tree( EXPORTING io_request                   = io_request
-                             iv_input_string              = iv_input_string
-                             is_curr_tool_master_data     = is_curr_tool_master_data
-                             is_curr_execution_step       = is_curr_execution_step
-                             is_prev_tool_master_data     = is_prev_tool_master_data
-                             is_prev_execution_step       = is_prev_execution_step
-                             io_controller                = io_controller
-                             io_util                      = io_util
-                             io_curr_tool_schema_provider = io_curr_tool_schema_provider
-                             it_key_value_pair            = it_key_value_pair
-                             it_property                  = ls_json_structure-properties
-                   CHANGING  cr_input                     = <ls_structure> ).
-
+    traverse_tree_json( EXPORTING io_request                   = io_request
+                                  iv_input_string              = iv_input_string
+                                  is_curr_tool_master_data     = is_curr_tool_master_data
+                                  is_curr_execution_step       = is_curr_execution_step
+                                  is_prev_tool_master_data     = is_prev_tool_master_data
+                                  is_prev_execution_step       = is_prev_execution_step
+                                  io_controller                = io_controller
+                                  io_util                      = io_util
+                                  io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                  it_key_value_pair            = it_key_value_pair
+                                  it_property                  = ls_json_structure-properties
+                        CHANGING  cr_input                     = <ls_structure> ).
   ENDMETHOD.
 
-  METHOD traverse_tree.
-
-
-    FIELD-SYMBOLS: <ls_item> TYPE zpru_s_json_schema_prop.
+  METHOD traverse_tree_json.
+    FIELD-SYMBOLS <ls_item>      TYPE zpru_s_json_schema_prop.
     FIELD-SYMBOLS <lt_neste_obj> TYPE zpru_tt_json_schema_prop.
 
-
-    LOOP AT it_property  ASSIGNING FIELD-SYMBOL(<ls_prop>).
+    LOOP AT it_property ASSIGNING FIELD-SYMBOL(<ls_prop>).
 
       IF <ls_prop>-type <> `object` AND <ls_prop>-type <> `array`.
 
@@ -524,7 +520,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           CONTINUE.
         ENDIF.
 
-        ASSIGN COMPONENT  <ls_prop>-name OF STRUCTURE  cr_input TO FIELD-SYMBOL(<lv_target>).
+        ASSIGN COMPONENT <ls_prop>-name OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
         IF sy-subrc <> 0.
           CONTINUE.
         ENDIF.
@@ -537,18 +533,18 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           CONTINUE.
         ENDIF.
 
-          traverse_tree( EXPORTING io_request                   = io_request
-                                   iv_input_string              = iv_input_string
-                                   is_curr_tool_master_data     = is_curr_tool_master_data
-                                   is_curr_execution_step       = is_curr_execution_step
-                                   is_prev_tool_master_data     = is_prev_tool_master_data
-                                   is_prev_execution_step       = is_prev_execution_step
-                                   io_controller                = io_controller
-                                   io_util                      = io_util
-                                   io_curr_tool_schema_provider = io_curr_tool_schema_provider
-                                   it_key_value_pair            = it_key_value_pair
-                                   it_property                  = <lt_neste_obj>
-                         CHANGING  cr_input                     = cr_input ).
+        traverse_tree_json( EXPORTING io_request                   = io_request
+                                      iv_input_string              = iv_input_string
+                                      is_curr_tool_master_data     = is_curr_tool_master_data
+                                      is_curr_execution_step       = is_curr_execution_step
+                                      is_prev_tool_master_data     = is_prev_tool_master_data
+                                      is_prev_execution_step       = is_prev_execution_step
+                                      io_controller                = io_controller
+                                      io_util                      = io_util
+                                      io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                      it_key_value_pair            = it_key_value_pair
+                                      it_property                  = <lt_neste_obj>
+                            CHANGING  cr_input                     = cr_input ).
       ELSEIF <ls_prop>-type <> `array`.
 
         ASSIGN <ls_prop>-items->* TO <ls_item>.
@@ -556,23 +552,95 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
           CONTINUE.
         ENDIF.
 
-        traverse_tree( EXPORTING io_request                   = io_request
-                                 iv_input_string              = iv_input_string
-                                 is_curr_tool_master_data     = is_curr_tool_master_data
-                                 is_curr_execution_step       = is_curr_execution_step
-                                 is_prev_tool_master_data     = is_prev_tool_master_data
-                                 is_prev_execution_step       = is_prev_execution_step
-                                 io_controller                = io_controller
-                                 io_util                      = io_util
-                                 io_curr_tool_schema_provider = io_curr_tool_schema_provider
-                                 it_key_value_pair            = it_key_value_pair
-                                 it_property                  = <ls_item>-properties->*
-                       CHANGING  cr_input                     = cr_input ).
+        traverse_tree_json( EXPORTING io_request                   = io_request
+                                      iv_input_string              = iv_input_string
+                                      is_curr_tool_master_data     = is_curr_tool_master_data
+                                      is_curr_execution_step       = is_curr_execution_step
+                                      is_prev_tool_master_data     = is_prev_tool_master_data
+                                      is_prev_execution_step       = is_prev_execution_step
+                                      io_controller                = io_controller
+                                      io_util                      = io_util
+                                      io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                      it_key_value_pair            = it_key_value_pair
+                                      it_property                  = <ls_item>-properties->*
+                            CHANGING  cr_input                     = cr_input ).
 
       ELSE.
         CONTINUE.
       ENDIF.
     ENDLOOP.
+  ENDMETHOD.
+  METHOD traverse_tree_abap.
+
+    DATA lo_table_line TYPE  REF TO cl_abap_datadescr.
+    DATA lo_structure TYPE  REF TO cl_abap_structdescr.
+
+
+    FIELD-SYMBOLS <ls_item>      TYPE zpru_s_json_schema_prop.
+    FIELD-SYMBOLS <lt_neste_obj> TYPE zpru_tt_json_schema_prop.
+
+    IF io_abap_struct IS not INSTANCE OF cl_abap_structdescr.
+      RETURN.
+    ENDIF.
+
+    lo_structure ?= io_abap_struct.
+
+    DATA(lt_components) = lo_structure->get_components( ).
+
+    LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
+      CASE TYPE OF <ls_component>-type.
+        WHEN TYPE cl_abap_elemdescr.
+          ASSIGN it_key_value_pair[ name = <ls_component>-name ] TO FIELD-SYMBOL(<lv_source>).
+          IF sy-subrc <> 0.
+            CONTINUE.
+          ENDIF.
+
+          ASSIGN COMPONENT <ls_component>-name  OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
+          IF sy-subrc <> 0.
+            CONTINUE.
+          ENDIF.
+          <lv_target> = <lv_source>.
+        WHEN TYPE cl_abap_structdescr.
+
+          traverse_tree_abap(
+            EXPORTING
+              io_request                   = io_request
+              iv_input_string              = iv_input_string
+              is_curr_tool_master_data     = is_curr_tool_master_data
+              is_curr_execution_step       = is_curr_execution_step
+              is_prev_tool_master_data     = is_prev_tool_master_data
+              is_prev_execution_step       = is_prev_execution_step
+              io_controller                = io_controller
+              io_util                      = io_util
+              io_curr_tool_schema_provider = io_curr_tool_schema_provider
+              it_key_value_pair            = it_key_value_pair
+              io_abap_struct               = CAST #( <ls_component>-type )
+            CHANGING
+              cr_input                     = cr_input ).
+
+        WHEN TYPE cl_abap_tabledescr.
+
+          lo_table_line = CAST cl_abap_tabledescr( <ls_component>-type )->get_table_line_type( ).
+
+           traverse_tree_abap(
+            EXPORTING
+              io_request                   = io_request
+              iv_input_string              = iv_input_string
+              is_curr_tool_master_data     = is_curr_tool_master_data
+              is_curr_execution_step       = is_curr_execution_step
+              is_prev_tool_master_data     = is_prev_tool_master_data
+              is_prev_execution_step       = is_prev_execution_step
+              io_controller                = io_controller
+              io_util                      = io_util
+              io_curr_tool_schema_provider = io_curr_tool_schema_provider
+              it_key_value_pair            = it_key_value_pair
+              io_abap_struct               = CAST #( lo_table_line )
+            CHANGING
+              cr_input                     = cr_input ).
+
+      ENDCASE.
+    ENDLOOP.
+
   ENDMETHOD.
 
 ENDCLASS.
