@@ -12,7 +12,8 @@ CLASS zpru_cl_nested_http_schm_prvdr DEFINITION
     METHODS get_output_json_schema REDEFINITION.
 
     METHODS create_json_schema_example
-      RETURNING VALUE(rv_json_shema) TYPE string
+      EXPORTING ev_json_schema    TYPE zpru_if_agent_frw=>ts_json
+                es_json_structure TYPE zpru_s_json_schema
       RAISING   zpru_cx_agent_core.
 
   PRIVATE SECTION.
@@ -21,7 +22,6 @@ ENDCLASS.
 
 CLASS zpru_cl_nested_http_schm_prvdr IMPLEMENTATION.
   METHOD get_input_abap_type.
-
     ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_HTTP_INPUT` ).
     IF sy-subrc <> 0.
       RETURN.
@@ -29,15 +29,20 @@ CLASS zpru_cl_nested_http_schm_prvdr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_input_json_schema.
+    CLEAR: ev_json_schema,
+           es_json_structure.
+
     TRY.
-        rv_json_schema = create_json_schema_example( ).
+
+        create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                              es_json_structure = es_json_structure ).
+
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
   ENDMETHOD.
 
   METHOD get_output_abap_type.
-
     ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_HTTP_OUTPUT` ).
     IF sy-subrc <> 0.
       RETURN.
@@ -46,7 +51,9 @@ CLASS zpru_cl_nested_http_schm_prvdr IMPLEMENTATION.
 
   METHOD get_output_json_schema.
     TRY.
-        rv_json_schema = create_json_schema_example( ).
+        create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
+                                              es_json_structure = es_json_structure ).
+
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
@@ -54,6 +61,9 @@ CLASS zpru_cl_nested_http_schm_prvdr IMPLEMENTATION.
 
   METHOD create_json_schema_example.
     DATA lo_util TYPE REF TO zpru_if_agent_util.
+
+    CLEAR: es_json_structure,
+           ev_json_schema.
 
     " Properties for the nested structure
     DATA(lt_fields_3_4) = VALUE zpru_tt_json_schema_prop(
@@ -100,10 +110,12 @@ CLASS zpru_cl_nested_http_schm_prvdr IMPLEMENTATION.
                                                      properties           = lt_root_props
                                                      additionalproperties = abap_true ).
 
+    es_json_structure = ls_abap_schema.
+
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    rv_json_shema = lo_util->create_json_schema( is_abap_schema = ls_abap_schema ).
+    ev_json_schema = lo_util->create_json_schema( is_abap_schema = ls_abap_schema ).
 
     " output
 
