@@ -1325,9 +1325,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
         <ls_step_all>-stepuuid   = <ls_step_source>-stepuuid.
         <ls_step_all>-stepnumber = <ls_step_source>-stepnumber.
-
       ENDLOOP.
-
     ENDIF.
 
     CLEAR lt_step_update_imp.
@@ -1768,7 +1766,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       GET TIME STAMP FIELD DATA(lv_now).
 
-      APPEND INITIAL LINE TO ct_step_create_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_cre>). " CHANGE TO STEP CREATE
+      APPEND INITIAL LINE TO ct_step_create_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_cre>).
       <ls_step_2_cre>-queryuuid         = is_execution_query-queryuuid.
       <ls_step_2_cre>-runuuid           = is_execution_header-runuuid.
       <ls_step_2_cre>-tooluuid          = <ls_add_exec_step>-tooluuid.
@@ -1806,8 +1804,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_step_2_upd>-stepsequence = lv_count_before.
       <ls_step_2_upd>-control-stepsequence = abap_true.
 
+      " refresh old sequence
+      <ls_step_after>-stepsequence = lv_count_before.
+
       APPEND INITIAL LINE TO ct_step_all ASSIGNING <ls_step_all>.
-      <ls_step_all> = CORRESPONDING #( <ls_step_2_upd> ).
+      <ls_step_all> = CORRESPONDING #( <ls_step_after> ).
 
     ENDLOOP.
 
