@@ -849,6 +849,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       lv_error_flag = abap_false.
 
+      IF lo_output IS NOT BOUND.
+        lo_output = get_payload( ).
+      ENDIF.
+
       execute_tool_logic( EXPORTING is_agent            = is_agent
                                     io_controller       = lo_controller
                                     io_input            = lo_input
@@ -1341,7 +1345,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     LOOP AT lt_new_steps ASSIGNING FIELD-SYMBOL(<ls_new_step>).
 
-      ASSIGN lt_step_all[ stepsequence = <ls_step_all>-stepsequence ] TO FIELD-SYMBOL(<ls_step_all>).
+      ASSIGN lt_step_all[ key sequence components stepsequence = <ls_step_all>-stepsequence ] TO FIELD-SYMBOL(<ls_step_all>).
       IF sy-subrc <> 0.
         CONTINUE.
       ENDIF.
@@ -1431,6 +1435,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       lv_error_flag = abap_false.
 
       GET TIME STAMP FIELD DATA(lv_now).
+
+      IF lo_output IS NOT BOUND.
+        lo_output = get_payload( ).
+      ENDIF.
 
       execute_tool_logic( EXPORTING is_agent            = is_agent
                                     io_controller       = lo_controller
@@ -1893,13 +1901,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     DATA(lv_input_tool_prompt_message) = lv_content.
 
+    CLEAR ls_json_type.
+    CLEAR lv_content.
     ls_json_type-user      = sy-uname.
     ls_json_type-topic     = `TOOL_OUTPUT_PROMPT`.
     ls_json_type-timestamp = lv_now.
     ls_json_type-content   = iv_output_prompt.
 
-    CLEAR ls_json_type.
-    CLEAR lv_content.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
                                 CHANGING  cr_string = lv_content ).
 
@@ -1914,6 +1922,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ls_json_type_2-input_prompt  = lv_input_tool_prompt_message.
     ls_json_type_2-output_prompt = lv_output_tool_prompt_message.
     ls_json_type_2-error         = iv_error_flag.
+    ls_json_type_2-timestamp     = lv_now.
 
     CLEAR lv_content.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type_2 )
