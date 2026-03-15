@@ -99,6 +99,7 @@ CLASS zpru_cl_api_agent DEFINITION
                 is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step
       EXPORTING eo_response         TYPE REF TO zpru_if_payload
+                et_key_value_pairs  TYPE zpru_tt_key_value
                 ev_error_flag       TYPE abap_boolean
                 et_additional_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
                 et_additional_tools TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
@@ -510,8 +511,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -560,7 +561,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -639,8 +640,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -859,9 +860,21 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     is_tool_master_data = <ls_tool_master_data>
                                     is_execution_step   = <ls_execution_step>
                           IMPORTING eo_response         = lo_output
+                                    et_key_value_pairs  = DATA(lt_key_value_pairs)
                                     ev_error_flag       = lv_error_flag
                                     et_additional_steps = DATA(lt_additional_steps)
                                     et_additional_tools = DATA(lt_additional_tools) ).
+
+      SORT lo_controller->mt_input_output BY number ASCENDING.
+      ASSIGN lo_controller->mt_input_output[ number = lines( lo_controller->mt_input_output ) ] TO <ls_input_output>.
+      IF sy-subrc <> 0.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+
+      LOOP AT lt_key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value_returned>).
+        APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+        <ls_key_value> = <ls_key_value_returned>.
+      ENDLOOP.
 
       IF     lt_additional_steps IS NOT INITIAL
          AND lt_additional_tools IS NOT INITIAL.
@@ -1446,9 +1459,21 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     is_tool_master_data = <ls_additional_tool>
                                     is_execution_step   = <ls_new_step>
                           IMPORTING eo_response         = lo_output
+                                    et_key_value_pairs  = DATA(lt_key_value_pairs)
                                     ev_error_flag       = lv_error_flag
                                     et_additional_steps = DATA(lt_additional_steps)
                                     et_additional_tools = DATA(lt_additional_tools) ).
+
+      SORT lo_controller->mt_input_output BY number ASCENDING.
+      ASSIGN lo_controller->mt_input_output[ number = lines( lo_controller->mt_input_output ) ] TO <ls_input_output>.
+      IF sy-subrc <> 0.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+
+      LOOP AT lt_key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value_returned>).
+        APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+        <ls_key_value> = <ls_key_value_returned>.
+      ENDLOOP.
 
       IF     lt_additional_steps IS NOT INITIAL
          AND lt_additional_tools IS NOT INITIAL.
@@ -1575,6 +1600,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
     DATA lo_executor      TYPE REF TO zpru_if_tool_executor.
 
+    CLEAR: et_additional_steps, et_additional_tools, et_key_value_pairs, ev_error_flag.
+
     CREATE OBJECT lo_tool_provider TYPE (is_tool_master_data-toolprovider).
     lo_executor = lo_tool_provider->get_tool( is_agent            = is_agent
                                               io_controller       = io_controller
@@ -1591,7 +1618,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                             is_execution_step   = is_execution_step
                                                   IMPORTING eo_response         = eo_response
                                                   " TODO: variable is assigned but never used (ABAP cleaner)
-                                                            et_key_value_pairs  = DATA(lt_key_value_pairs)
+                                                            et_key_value_pairs  = et_key_value_pairs
                                                             ev_error_flag       = ev_error_flag
                                                             et_additional_steps = et_additional_steps
                                                             et_additional_tools = et_additional_tools ).
@@ -1603,7 +1630,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                  is_tool_master_data = is_tool_master_data
                                                                  is_execution_step   = is_execution_step
                                                        IMPORTING eo_response         = eo_response
-                                                                 et_key_value_pairs  = lt_key_value_pairs
+                                                                 et_key_value_pairs  = et_key_value_pairs
                                                                  ev_error_flag       = ev_error_flag
                                                                  et_additional_steps = et_additional_steps
                                                                  et_additional_tools = et_additional_tools ).
@@ -1615,7 +1642,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                   is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step
                                                         IMPORTING eo_response         = eo_response
-                                                                  et_key_value_pairs  = lt_key_value_pairs
+                                                                  et_key_value_pairs  = et_key_value_pairs
                                                                   ev_error_flag       = ev_error_flag
                                                                   et_additional_steps = et_additional_steps
                                                                   et_additional_tools = et_additional_tools ).
@@ -1627,7 +1654,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                   is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step
                                                         IMPORTING eo_response         = eo_response
-                                                                  et_key_value_pairs  = lt_key_value_pairs
+                                                                  et_key_value_pairs  = et_key_value_pairs
                                                                   ev_error_flag       = ev_error_flag
                                                                   et_additional_steps = et_additional_steps
                                                                   et_additional_tools = et_additional_tools ).
@@ -1639,7 +1666,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                      is_tool_master_data = is_tool_master_data
                                                                      is_execution_step   = is_execution_step
                                                            IMPORTING eo_response         = eo_response
-                                                                     et_key_value_pairs  = lt_key_value_pairs
+                                                                     et_key_value_pairs  = et_key_value_pairs
                                                                      ev_error_flag       = ev_error_flag
                                                                      et_additional_steps = et_additional_steps
                                                                      et_additional_tools = et_additional_tools ).
@@ -1651,7 +1678,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                          is_tool_master_data = is_tool_master_data
                                                          is_execution_step   = is_execution_step
                                                IMPORTING eo_response         = eo_response
-                                                         et_key_value_pairs  = lt_key_value_pairs
+                                                         et_key_value_pairs  = et_key_value_pairs
                                                          ev_error_flag       = ev_error_flag
                                                          et_additional_steps = et_additional_steps
                                                          et_additional_tools = et_additional_tools ).
@@ -1663,7 +1690,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                      is_tool_master_data = is_tool_master_data
                                                                      is_execution_step   = is_execution_step
                                                            IMPORTING eo_response         = eo_response
-                                                                     et_key_value_pairs  = lt_key_value_pairs
+                                                                     et_key_value_pairs  = et_key_value_pairs
                                                                      ev_error_flag       = ev_error_flag
                                                                      et_additional_steps = et_additional_steps
                                                                      et_additional_tools = et_additional_tools ).
@@ -1675,7 +1702,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                  is_tool_master_data = is_tool_master_data
                                                                  is_execution_step   = is_execution_step
                                                        IMPORTING eo_response         = eo_response
-                                                                 et_key_value_pairs  = lt_key_value_pairs
+                                                                 et_key_value_pairs  = et_key_value_pairs
                                                                  ev_error_flag       = ev_error_flag
                                                                  et_additional_steps = et_additional_steps
                                                                  et_additional_tools = et_additional_tools ).
@@ -1686,7 +1713,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                             is_tool_master_data = is_tool_master_data
                                                                             is_execution_step   = is_execution_step
                                                                   IMPORTING eo_response         = eo_response
-                                                                            et_key_value_pairs  = lt_key_value_pairs
+                                                                            et_key_value_pairs  = et_key_value_pairs
                                                                             ev_error_flag       = ev_error_flag
                                                                             et_additional_steps = et_additional_steps
                                                                             et_additional_tools = et_additional_tools ).

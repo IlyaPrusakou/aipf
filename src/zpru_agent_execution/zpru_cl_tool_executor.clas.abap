@@ -421,7 +421,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     SORT io_controller->mt_input_output BY number DESCENDING.
 
-    " qqqq
     map_prev_out_2_next_in(
       EXPORTING
         io_request                   = io_request
@@ -437,17 +436,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       CHANGING
         cr_input                     = lr_input  ).
 
-*    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
-*                              CHANGING  cr_abap   = lr_input->* ).
-
     er_input = lr_input.
 
-    DATA(lo_structure_output) = lo_tool_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
-                                                                             is_execution_step   = is_execution_step  ).
 
-    eo_structure_output = lo_structure_output.
+    eo_structure_output ?= cl_abap_typedescr=>describe_by_name( p_name = 'ZPRU_S_KEY_VALUE' ).
 
-    CREATE DATA lr_output TYPE HANDLE lo_structure_output.
+    CREATE DATA lr_output TYPE ('ZPRU_TT_KEY_VALUE').
 
     er_output = lr_output.
   ENDMETHOD.
@@ -578,7 +572,11 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD traverse_tree_abap.
+
+    " WORKS ONLY WITH FLAT STRUCTURES
+
     DATA lo_structure TYPE REF TO cl_abap_structdescr.
+    DATA lt_key_value_pairs TYPE zpru_tt_key_value.
 
     IF io_abap_struct IS NOT INSTANCE OF cl_abap_structdescr.
       RETURN.
@@ -587,6 +585,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     lo_structure ?= io_abap_struct.
 
     DATA(lt_components) = lo_structure->get_components( ).
+
+    io_util->convert_to_abap(
+      EXPORTING
+        ir_string = REF #( iv_input_string )
+      CHANGING
+        cr_abap   = lt_key_value_pairs ).
 
     LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
       CASE TYPE OF <ls_component>-type.
@@ -603,9 +607,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
             CONTINUE.
           ENDIF.
 
-          ASSIGN it_key_value_pair[ name = lv_name ] TO FIELD-SYMBOL(<lv_source>).
+          ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<lv_source>).
           IF sy-subrc <> 0.
-            CONTINUE.
+            ASSIGN it_key_value_pair[ name = lv_name ] TO <lv_source>.
+            IF sy-subrc <> 0.
+              CONTINUE.
+            ENDIF.
           ENDIF.
 
           ASSIGN COMPONENT <ls_component>-name OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
