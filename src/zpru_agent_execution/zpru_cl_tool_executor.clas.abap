@@ -38,6 +38,26 @@ CLASS zpru_cl_tool_executor DEFINITION
         cr_input                     TYPE REF TO data
       .
 
+    METHODS traverse_tree
+      IMPORTING
+        io_request                   TYPE REF TO zpru_if_payload
+        iv_input_string              TYPE string
+        is_curr_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+        is_curr_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+        is_prev_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+        is_prev_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+        io_controller                TYPE REF TO zpru_if_agent_controller
+        io_util                      TYPE REF TO zpru_if_agent_util
+        io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
+        it_key_value_pair            TYPE  zpru_tt_key_value
+        it_property                  TYPE zpru_tt_json_schema_prop
+      CHANGING
+        cr_input                     TYPE data .
+
+
+
+
+
     METHODS prepare_additional_steps
       IMPORTING is_current_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step
                 it_step_4_validate  TYPE zpru_tt_additional_step
@@ -460,15 +480,99 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
   METHOD map_prev_out_2_next_in.
 
+    io_curr_tool_schema_provider->input_json_schema(
+    EXPORTING
+      is_tool_master_data =   is_curr_tool_master_data
+      is_execution_step   =   is_curr_execution_step
+    IMPORTING
+      es_json_structure   = DATA(ls_json_structure)
+  ).
+
+    ASSIGN cr_input->* TO FIELD-SYMBOL(<ls_structure>).
+    IF sy-subrc <> 0.
+      RETURN. " error
+    ENDIF.
+
+    traverse_tree( EXPORTING io_request                   = io_request
+                             iv_input_string              = iv_input_string
+                             is_curr_tool_master_data     = is_curr_tool_master_data
+                             is_curr_execution_step       = is_curr_execution_step
+                             is_prev_tool_master_data     = is_prev_tool_master_data
+                             is_prev_execution_step       = is_prev_execution_step
+                             io_controller                = io_controller
+                             io_util                      = io_util
+                             io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                             it_key_value_pair            = it_key_value_pair
+                             it_property                  = ls_json_structure-properties
+                   CHANGING  cr_input                     = <ls_structure> ).
+
+  ENDMETHOD.
+
+  METHOD traverse_tree.
 
 
+    FIELD-SYMBOLS: <ls_item> TYPE zpru_s_json_schema_prop.
+    FIELD-SYMBOLS <lt_neste_obj> TYPE zpru_tt_json_schema_prop.
 
 
+    LOOP AT it_property  ASSIGNING FIELD-SYMBOL(<ls_prop>).
 
+      IF <ls_prop>-type <> `object` AND <ls_prop>-type <> `array`.
 
+        ASSIGN it_key_value_pair[ name = <ls_prop>-name ] TO FIELD-SYMBOL(<lv_source>).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
 
+        ASSIGN COMPONENT  <ls_prop>-name OF STRUCTURE  cr_input TO FIELD-SYMBOL(<lv_target>).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+        <lv_target> = <lv_source>.
 
+      ELSEIF <ls_prop>-type = `object`.
 
+        ASSIGN <ls_prop>-properties->* TO <lt_neste_obj>.
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+          traverse_tree( EXPORTING io_request                   = io_request
+                                   iv_input_string              = iv_input_string
+                                   is_curr_tool_master_data     = is_curr_tool_master_data
+                                   is_curr_execution_step       = is_curr_execution_step
+                                   is_prev_tool_master_data     = is_prev_tool_master_data
+                                   is_prev_execution_step       = is_prev_execution_step
+                                   io_controller                = io_controller
+                                   io_util                      = io_util
+                                   io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                   it_key_value_pair            = it_key_value_pair
+                                   it_property                  = <lt_neste_obj>
+                         CHANGING  cr_input                     = cr_input ).
+      ELSEIF <ls_prop>-type <> `array`.
+
+        ASSIGN <ls_prop>-items->* TO <ls_item>.
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        traverse_tree( EXPORTING io_request                   = io_request
+                                 iv_input_string              = iv_input_string
+                                 is_curr_tool_master_data     = is_curr_tool_master_data
+                                 is_curr_execution_step       = is_curr_execution_step
+                                 is_prev_tool_master_data     = is_prev_tool_master_data
+                                 is_prev_execution_step       = is_prev_execution_step
+                                 io_controller                = io_controller
+                                 io_util                      = io_util
+                                 io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                 it_key_value_pair            = it_key_value_pair
+                                 it_property                  = <ls_item>-properties->*
+                       CHANGING  cr_input                     = cr_input ).
+
+      ELSE.
+        CONTINUE.
+      ENDIF.
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.
