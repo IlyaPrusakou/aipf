@@ -63,8 +63,6 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_abap_struct               TYPE REF TO cl_abap_datadescr
       CHANGING  cr_input                     TYPE data.
 
-
-
     METHODS prepare_additional_steps
       IMPORTING is_current_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step
                 it_step_4_validate  TYPE zpru_tt_additional_step
@@ -86,6 +84,14 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_request              TYPE REF TO zpru_if_payload
       EXPORTING eo_response             TYPE REF TO zpru_if_payload
                 ev_error_flag           TYPE abap_boolean.
+
+    METHODS get_component_mapping
+      IMPORTING iv_struct_name           TYPE string
+                is_curr_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_curr_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+                is_prev_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
+                is_prev_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step   OPTIONAL
+      EXPORTING ev_context_name          TYPE string.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -570,16 +576,12 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
   METHOD traverse_tree_abap.
+*    DATA lo_table_line TYPE  REF TO cl_abap_datadescr.
+    DATA lo_structure TYPE REF TO cl_abap_structdescr.
 
-    DATA lo_table_line TYPE  REF TO cl_abap_datadescr.
-    DATA lo_structure TYPE  REF TO cl_abap_structdescr.
-
-
-    FIELD-SYMBOLS <ls_item>      TYPE zpru_s_json_schema_prop.
-    FIELD-SYMBOLS <lt_neste_obj> TYPE zpru_tt_json_schema_prop.
-
-    IF io_abap_struct IS not INSTANCE OF cl_abap_structdescr.
+    IF io_abap_struct IS NOT INSTANCE OF cl_abap_structdescr.
       RETURN.
     ENDIF.
 
@@ -590,57 +592,76 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
       CASE TYPE OF <ls_component>-type.
         WHEN TYPE cl_abap_elemdescr.
-          ASSIGN it_key_value_pair[ name = <ls_component>-name ] TO FIELD-SYMBOL(<lv_source>).
+
+          get_component_mapping( EXPORTING iv_struct_name           = <ls_component>-name
+                                           is_curr_tool_master_data = is_curr_tool_master_data
+                                           is_curr_execution_step   = is_curr_execution_step
+                                           is_prev_tool_master_data = is_prev_tool_master_data
+                                           is_prev_execution_step   = is_prev_execution_step
+                                 IMPORTING ev_context_name          = DATA(lv_name) ).
+
+          IF lv_name IS INITIAL.
+            CONTINUE.
+          ENDIF.
+
+          ASSIGN it_key_value_pair[ name = lv_name ] TO FIELD-SYMBOL(<lv_source>).
           IF sy-subrc <> 0.
             CONTINUE.
           ENDIF.
 
-          ASSIGN COMPONENT <ls_component>-name  OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
+          ASSIGN COMPONENT <ls_component>-name OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
           IF sy-subrc <> 0.
             CONTINUE.
           ENDIF.
           <lv_target> = <lv_source>.
         WHEN TYPE cl_abap_structdescr.
 
-          traverse_tree_abap(
-            EXPORTING
-              io_request                   = io_request
-              iv_input_string              = iv_input_string
-              is_curr_tool_master_data     = is_curr_tool_master_data
-              is_curr_execution_step       = is_curr_execution_step
-              is_prev_tool_master_data     = is_prev_tool_master_data
-              is_prev_execution_step       = is_prev_execution_step
-              io_controller                = io_controller
-              io_util                      = io_util
-              io_curr_tool_schema_provider = io_curr_tool_schema_provider
-              it_key_value_pair            = it_key_value_pair
-              io_abap_struct               = CAST #( <ls_component>-type )
-            CHANGING
-              cr_input                     = cr_input ).
+          traverse_tree_abap( EXPORTING io_request                   = io_request
+                                        iv_input_string              = iv_input_string
+                                        is_curr_tool_master_data     = is_curr_tool_master_data
+                                        is_curr_execution_step       = is_curr_execution_step
+                                        is_prev_tool_master_data     = is_prev_tool_master_data
+                                        is_prev_execution_step       = is_prev_execution_step
+                                        io_controller                = io_controller
+                                        io_util                      = io_util
+                                        io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                        it_key_value_pair            = it_key_value_pair
+                                        io_abap_struct               = CAST #( <ls_component>-type )
+                              CHANGING  cr_input                     = cr_input ).
 
         WHEN TYPE cl_abap_tabledescr.
 
-          lo_table_line = CAST cl_abap_tabledescr( <ls_component>-type )->get_table_line_type( ).
+          CONTINUE.
 
-           traverse_tree_abap(
-            EXPORTING
-              io_request                   = io_request
-              iv_input_string              = iv_input_string
-              is_curr_tool_master_data     = is_curr_tool_master_data
-              is_curr_execution_step       = is_curr_execution_step
-              is_prev_tool_master_data     = is_prev_tool_master_data
-              is_prev_execution_step       = is_prev_execution_step
-              io_controller                = io_controller
-              io_util                      = io_util
-              io_curr_tool_schema_provider = io_curr_tool_schema_provider
-              it_key_value_pair            = it_key_value_pair
-              io_abap_struct               = CAST #( lo_table_line )
-            CHANGING
-              cr_input                     = cr_input ).
+*          lo_table_line = CAST cl_abap_tabledescr( <ls_component>-type )->get_table_line_type( ).
+*
+*           traverse_tree_abap(
+*            EXPORTING
+*              io_request                   = io_request
+*              iv_input_string              = iv_input_string
+*              is_curr_tool_master_data     = is_curr_tool_master_data
+*              is_curr_execution_step       = is_curr_execution_step
+*              is_prev_tool_master_data     = is_prev_tool_master_data
+*              is_prev_execution_step       = is_prev_execution_step
+*              io_controller                = io_controller
+*              io_util                      = io_util
+*              io_curr_tool_schema_provider = io_curr_tool_schema_provider
+*              it_key_value_pair            = it_key_value_pair
+*              io_abap_struct               = CAST #( lo_table_line )
+*            CHANGING
+*              cr_input                     = cr_input ).
 
       ENDCASE.
     ENDLOOP.
-
   ENDMETHOD.
 
+  METHOD get_component_mapping.
+    " TODO: parameter IS_CURR_TOOL_MASTER_DATA is never used (ABAP cleaner)
+    " TODO: parameter IS_CURR_EXECUTION_STEP is never used (ABAP cleaner)
+    " TODO: parameter IS_PREV_TOOL_MASTER_DATA is never used (ABAP cleaner)
+    " TODO: parameter IS_PREV_EXECUTION_STEP is never used (ABAP cleaner)
+
+    CLEAR ev_context_name.
+    ev_context_name = iv_struct_name.
+  ENDMETHOD.
 ENDCLASS.
