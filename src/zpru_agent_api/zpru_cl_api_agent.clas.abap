@@ -510,8 +510,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -560,7 +560,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -639,8 +639,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -823,7 +823,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     <ls_input_output>-execution_steps = it_execution_steps.
 
     DATA(lv_count) = 1.
-    LOOP AT it_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>).
+    LOOP AT it_execution_steps ASSIGNING FIELD-SYMBOL(<ls_execution_step>) USING KEY sequence.
 
       ASSIGN it_agent_tools[ tooluuid = <ls_execution_step>-tooluuid ] TO FIELD-SYMBOL(<ls_tool_master_data>).
       IF sy-subrc <> 0.
@@ -1390,7 +1390,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     DATA(lv_count) = 1.
-    LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_step>).
+    LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_step>) USING KEY sequence.
 
       ASSIGN it_additional_tools[ tooluuid = <ls_additional_step>-tooluuid ] TO FIELD-SYMBOL(<ls_additional_tool>).
       IF sy-subrc <> 0.

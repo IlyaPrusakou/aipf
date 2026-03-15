@@ -458,8 +458,8 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
 
     " borrowed tool
     APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).
-    <ls_add_step>-tooluuid           = `76D88C8092D91FE186C3A6B9F02AFBDF`. " renew after data replication
-    <ls_add_step>-agentuuid          = `76D88C8092D91FE186C3A6B9F02A9BDF`. " renew after data replication
+    <ls_add_step>-tooluuid           = `1AF42792E6DC1FE187F880BE37E634D7`. " renew after data replication
+    <ls_add_step>-agentuuid          = `1AF42792E6DC1FE187F880BE37E5D4D7`. " renew after data replication
     <ls_add_step>-toolname           = `NESTED_ABAP`.
     <ls_add_step>-toolprovider       = `ZPRU_CL_NESTED_CODE`.
     <ls_add_step>-steptype           = `B`.
@@ -468,8 +468,8 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
 
     " tool from this agent
     APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
-    <ls_add_step>-tooluuid           = `76D88C8092D91FE186C3A6B9F02B5BDF`. " renew after data replication
-    <ls_add_step>-agentuuid          = `76D88C8092D91FE186C3A6B9F02ABBDF`. " renew after data replication
+    <ls_add_step>-tooluuid           = `1AF42792E6DC1FE187F880BE37E614D7`. " renew after data replication
+    <ls_add_step>-agentuuid          = `1AF42792E6DC1FE187F880BE37E5F4D7`. " renew after data replication
     <ls_add_step>-toolname           = `NESTED_AGENT`.
     <ls_add_step>-toolprovider       = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
     <ls_add_step>-steptype           = `B`.
