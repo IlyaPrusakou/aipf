@@ -23,6 +23,11 @@ CLASS zpru_cl_api_agent DEFINITION
     DATA mv_output_response      TYPE zpru_if_agent_frw=>ts_json.
     DATA mv_output_response_prev TYPE zpru_if_agent_frw=>ts_json.
 
+    METHODS write_2_data_board
+      IMPORTING it_key_value_pairs TYPE zpru_tt_key_value
+                io_controller      TYPE REF TO zpru_if_agent_controller
+      RAISING   zpru_cx_agent_core.
+
     METHODS get_payload
       RETURNING VALUE(ro_payload) TYPE REF TO zpru_if_payload
       RAISING   zpru_cx_agent_core.
@@ -511,8 +516,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -561,7 +566,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -640,8 +645,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -865,16 +870,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     et_additional_steps = DATA(lt_additional_steps)
                                     et_additional_tools = DATA(lt_additional_tools) ).
 
-      SORT lo_controller->mt_input_output BY number ASCENDING.
-      ASSIGN lo_controller->mt_input_output[ number = lines( lo_controller->mt_input_output ) ] TO <ls_input_output>.
-      IF sy-subrc <> 0.
-        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-      ENDIF.
-
-      LOOP AT lt_key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value_returned>).
-        APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
-        <ls_key_value> = <ls_key_value_returned>.
-      ENDLOOP.
+      write_2_data_board( it_key_value_pairs = lt_key_value_pairs
+                          io_controller      = lo_controller ).
 
       IF     lt_additional_steps IS NOT INITIAL
          AND lt_additional_tools IS NOT INITIAL.
@@ -1464,16 +1461,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                     et_additional_steps = DATA(lt_additional_steps)
                                     et_additional_tools = DATA(lt_additional_tools) ).
 
-      SORT lo_controller->mt_input_output BY number ASCENDING.
-      ASSIGN lo_controller->mt_input_output[ number = lines( lo_controller->mt_input_output ) ] TO <ls_input_output>.
-      IF sy-subrc <> 0.
-        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-      ENDIF.
-
-      LOOP AT lt_key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value_returned>).
-        APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
-        <ls_key_value> = <ls_key_value_returned>.
-      ENDLOOP.
+      write_2_data_board( it_key_value_pairs = lt_key_value_pairs
+                          io_controller      = lo_controller ).
 
       IF     lt_additional_steps IS NOT INITIAL
          AND lt_additional_tools IS NOT INITIAL.
@@ -1600,7 +1589,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
     DATA lo_executor      TYPE REF TO zpru_if_tool_executor.
 
-    CLEAR: et_additional_steps, et_additional_tools, et_key_value_pairs, ev_error_flag.
+    CLEAR: et_additional_steps,
+           et_additional_tools,
+           et_key_value_pairs,
+           ev_error_flag.
 
     CREATE OBJECT lo_tool_provider TYPE (is_tool_master_data-toolprovider).
     lo_executor = lo_tool_provider->get_tool( is_agent            = is_agent
@@ -1611,17 +1603,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     CASE is_tool_master_data-steptype.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
-        CAST zpru_if_abap_executor( lo_executor )->execute_code(
-                                                  EXPORTING io_controller       = io_controller
-                                                            io_request          = io_input
-                                                            is_tool_master_data = is_tool_master_data
-                                                            is_execution_step   = is_execution_step
-                                                  IMPORTING eo_response         = eo_response
-                                                  " TODO: variable is assigned but never used (ABAP cleaner)
-                                                            et_key_value_pairs  = et_key_value_pairs
-                                                            ev_error_flag       = ev_error_flag
-                                                            et_additional_steps = et_additional_steps
-                                                            et_additional_tools = et_additional_tools ).
+        CAST zpru_if_abap_executor( lo_executor )->execute_code( EXPORTING io_controller       = io_controller
+                                                                           io_request          = io_input
+                                                                           is_tool_master_data = is_tool_master_data
+                                                                           is_execution_step   = is_execution_step
+                                                                 IMPORTING eo_response         = eo_response
+                                                                           et_key_value_pairs  = et_key_value_pairs
+                                                                           ev_error_flag       = ev_error_flag
+                                                                           et_additional_steps = et_additional_steps
+                                                                           et_additional_tools = et_additional_tools ).
 
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-knowledge_source.
         CAST zpru_if_knowledge_provider( lo_executor )->lookup_knowledge(
@@ -2884,5 +2874,50 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   METHOD get_payload.
     ro_payload ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_PAYLOAD`
                                                            iv_context = zpru_if_agent_frw=>cs_context-standard ).
+  ENDMETHOD.
+
+  METHOD write_2_data_board.
+    DATA lv_string_type TYPE string.
+
+    IF io_controller IS NOT BOUND.
+      RETURN.
+    ENDIF.
+
+    SORT io_controller->mt_input_output BY number ASCENDING.
+    ASSIGN io_controller->mt_input_output[ number = lines( io_controller->mt_input_output ) ] TO FIELD-SYMBOL(<ls_input_output>).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    DATA(lv_count) = 1.
+    LOOP AT it_key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value_returned>).
+
+      DATA(lt_data_records) = VALUE zpru_tt_key_value( FOR <ls_k>
+                                                       IN <ls_input_output>-key_value_pairs
+                                                       WHERE ( name = <ls_key_value_returned>-name )
+                                                       ( <ls_k> ) ).
+
+      IF lt_data_records IS NOT INITIAL.
+        SORT lt_data_records BY counter DESCENDING.
+        DATA(ls_record) = VALUE #( lt_data_records[ 1 ] OPTIONAL ).
+        lv_count = ls_record-counter + 1.
+
+        IF <ls_key_value_returned>-type->absolute_name <> ls_record-type->absolute_name.
+          RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+        ENDIF.
+      ENDIF.
+
+      IF <ls_key_value_returned>-type IS NOT BOUND.
+        <ls_key_value_returned>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lv_string_type ).
+      ENDIF.
+
+      APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+      <ls_key_value>-name    = <ls_key_value_returned>-name.
+      <ls_key_value>-counter = lv_count.
+      <ls_key_value>-type    = <ls_key_value_returned>-type.
+      <ls_key_value>-value   = <ls_key_value_returned>-value.
+
+      lv_count = 1.
+    ENDLOOP.
   ENDMETHOD.
 ENDCLASS.
