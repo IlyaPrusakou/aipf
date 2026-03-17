@@ -461,6 +461,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     ENDIF.
 
     <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
 
     " borrowed tool
     APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).

@@ -4,7 +4,7 @@ CLASS zpru_cl_nested_http DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-
+    INTERFACES zpru_if_tool_provider.
   PROTECTED SECTION.
     METHODS send_http_int REDEFINITION.
 
@@ -14,8 +14,8 @@ ENDCLASS.
 
 CLASS zpru_cl_nested_http IMPLEMENTATION.
   METHOD send_http_int.
-    DATA ls_input  TYPE ZPRU_S_NESTED_http_INPUT.
-    DATA ls_output TYPE ZPRU_S_NESTED_http_output.
+    DATA ls_input  TYPE zpru_s_nested_http_input.
+    DATA ls_output TYPE zpru_s_nested_http_output.
 
     ls_input = is_input->*.
 
@@ -32,4 +32,8 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
 
     <ls_output> = ls_output.
   ENDMETHOD.
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
+
 ENDCLASS.

@@ -4,7 +4,7 @@ CLASS zpru_cl_nested_code DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-
+    INTERFACES zpru_if_tool_provider.
   PROTECTED SECTION.
     METHODS execute_code_int REDEFINITION.
 
@@ -14,8 +14,8 @@ ENDCLASS.
 
 CLASS zpru_cl_nested_code IMPLEMENTATION.
   METHOD execute_code_int.
-    DATA ls_input  TYPE ZPRU_S_NESTED_ABAP_INPUT.
-    DATA ls_output TYPE ZPRU_S_NESTED_ABAP_output.
+    DATA ls_input  TYPE zpru_s_nested_abap_input.
+    DATA ls_output TYPE zpru_s_nested_abap_output.
 
     ls_input = is_input->*.
 
@@ -32,4 +32,8 @@ CLASS zpru_cl_nested_code IMPLEMENTATION.
 
     <ls_output> = ls_output.
   ENDMETHOD.
+  METHOD zpru_if_tool_provider~get_tool.
+    ro_executor = me.
+  ENDMETHOD.
+
 ENDCLASS.
