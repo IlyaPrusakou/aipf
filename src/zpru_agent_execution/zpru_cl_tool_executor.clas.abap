@@ -401,6 +401,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     ENDLOOP.
 
     IF is_execution_step-stepsequence > lv_min_seq.
+
+      " NOT FIRST TOOL INPUT --- ALWAYS ZPRU_TT_KEY_VALUE
       lv_prev_sequence = is_execution_step-stepsequence - 1.
       ASSIGN io_controller->mt_execution_steps[ KEY sequence
                                                 COMPONENTS stepsequence = lv_prev_sequence ] TO FIELD-SYMBOL(<ls_prev_step>).
@@ -414,10 +416,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         ev_error_flag = abap_true.
         RETURN.
       ENDIF.
-
-    ELSE.
-      " DO SOMETHING
-    ENDIF.
 
     SORT io_controller->mt_input_output BY number DESCENDING.
 
@@ -436,8 +434,19 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       CHANGING
         cr_input                     = lr_input  ).
 
-    er_input = lr_input.
+   ELSE.
 
+   " FIRST TOOL INPUT --- UNIQUE TOOL PROVIDER STRUCTURE
+   lo_util->convert_to_abap(
+     EXPORTING
+       ir_string = REF #( lv_input_string )
+     CHANGING
+       cr_abap   = lr_input
+   ).
+
+    ENDIF.
+
+    er_input = lr_input.
 
     eo_structure_output ?= cl_abap_typedescr=>describe_by_name( p_name = 'ZPRU_S_KEY_VALUE' ).
 
