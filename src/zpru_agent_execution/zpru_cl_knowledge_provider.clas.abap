@@ -67,11 +67,12 @@ CLASS zpru_cl_knowledge_provider IMPLEMENTATION.
     ENDIF.
 
     IF lt_additional_step IS NOT INITIAL.
-      prepare_additional_steps( EXPORTING is_current_step     = is_execution_step
-                                          it_step_4_validate  = lt_additional_step
-                                          io_controller       = io_controller
-                                IMPORTING et_additional_steps = et_additional_steps
-                                          et_additional_tools = et_additional_tools ).
+      prepare_additional_steps( EXPORTING is_current_step          = is_execution_step
+                                          is_curr_tool_master_data = is_tool_master_data
+                                          it_step_4_validate       = lt_additional_step
+                                          io_controller            = io_controller
+                                IMPORTING et_additional_steps      = et_additional_steps
+                                          et_additional_tools      = et_additional_tools ).
     ENDIF.
 
     postprocess_tool_execution( EXPORTING io_util                 = lo_util

@@ -67,6 +67,7 @@ CLASS zpru_cl_abap_executor IMPLEMENTATION.
 
     IF lt_additional_step IS NOT INITIAL.
       prepare_additional_steps( EXPORTING is_current_step     = is_execution_step
+                                          is_curr_tool_master_data = is_tool_master_data
                                           it_step_4_validate  = lt_additional_step
                                           io_controller       = io_controller
                                 IMPORTING et_additional_steps = et_additional_steps

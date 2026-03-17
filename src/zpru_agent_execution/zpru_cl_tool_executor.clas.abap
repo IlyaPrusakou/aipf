@@ -64,11 +64,12 @@ CLASS zpru_cl_tool_executor DEFINITION
       CHANGING  cr_input                     TYPE data.
 
     METHODS prepare_additional_steps
-      IMPORTING is_current_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step
-                it_step_4_validate  TYPE zpru_tt_additional_step
-                io_controller       TYPE REF TO zpru_if_agent_controller
-      EXPORTING et_additional_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
-                et_additional_tools TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+      IMPORTING is_current_step          TYPE zpru_if_axc_type_and_constant=>ts_axc_step
+                is_curr_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
+                it_step_4_validate       TYPE zpru_tt_additional_step
+                io_controller            TYPE REF TO zpru_if_agent_controller
+      EXPORTING et_additional_steps      TYPE zpru_if_axc_type_and_constant=>tt_axc_step
+                et_additional_tools      TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
       RAISING   zpru_cx_agent_core.
 
     METHODS postprocess_tool_execution
@@ -145,7 +146,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_a> IN it_step_4_validate
                                                                      ( agentuuid         = <ls_a>-agentuuid
                                                                        control-agentuuid = abap_true ) )
-                                IMPORTING et_agent        = DATA(lt_existing_agent) ).
+                                IMPORTING et_agent        = DATA(lt_existing_agent) ). " qqq check output result!!
 
     lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agentuuid         = io_controller->mv_agent_uuid
                                                                        control-agentname = abap_true  ) )
@@ -283,8 +284,9 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
             <ls_additional_tool>-toolistransient = abap_true.
           ENDIF.
 
-          IF     <ls_existing_agent> IS ASSIGNED
-             AND <ls_existing_tool>  IS ASSIGNED.
+          IF     <ls_existing_agent>                IS ASSIGNED
+             AND <ls_existing_tool>                 IS ASSIGNED
+             AND is_curr_tool_master_data-agentuuid <> <ls_existing_agent>-agentuuid.
             <ls_additional_tool>-toolisborrowed = abap_true.
           ENDIF.
 
@@ -299,6 +301,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
           CLEAR: lv_temp_tool_uuid,
                  lv_temp_agent_uuid.
+          UNASSIGN: <ls_existing_agent>, <ls_existing_tool>.
 
           lv_count += 1.
         CATCH cx_uuid_error.
@@ -417,32 +420,29 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         RETURN.
       ENDIF.
 
-    SORT io_controller->mt_input_output BY number DESCENDING.
+      SORT io_controller->mt_input_output BY number DESCENDING.
 
-    map_prev_out_2_next_in(
-      EXPORTING
-        io_request                   = io_request
-        iv_input_string              = lv_input_string
-        is_curr_tool_master_data     = is_tool_master_data
-        is_curr_execution_step       = is_execution_step
-        is_prev_tool_master_data     = <ls_prev_tool>-tool_master_data
-        is_prev_execution_step       = <ls_prev_step>
-        io_controller                = io_controller
-        io_util                      = lo_util
-        io_curr_tool_schema_provider = lo_tool_schema_provider
-        it_key_value_pair            = VALUE #( io_controller->mt_input_output[ lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
-      CHANGING
-        cr_input                     = lr_input  ).
+      map_prev_out_2_next_in(
+        EXPORTING
+          io_request                   = io_request
+          iv_input_string              = lv_input_string
+          is_curr_tool_master_data     = is_tool_master_data
+          is_curr_execution_step       = is_execution_step
+          is_prev_tool_master_data     = <ls_prev_tool>-tool_master_data
+          is_prev_execution_step       = <ls_prev_step>
+          io_controller                = io_controller
+          io_util                      = lo_util
+          io_curr_tool_schema_provider = lo_tool_schema_provider
+          it_key_value_pair            = VALUE #( io_controller->mt_input_output[
+                                                      lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
+        CHANGING
+          cr_input                     = lr_input  ).
 
-   ELSE.
+    ELSE.
 
-   " FIRST TOOL INPUT --- UNIQUE TOOL PROVIDER STRUCTURE
-   lo_util->convert_to_abap(
-     EXPORTING
-       ir_string = REF #( lv_input_string )
-     CHANGING
-       cr_abap   = lr_input
-   ).
+      " FIRST TOOL INPUT --- UNIQUE TOOL PROVIDER STRUCTURE
+      lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
+                                CHANGING  cr_abap   = lr_input ).
 
     ENDIF.
 
@@ -581,10 +581,9 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD traverse_tree_abap.
-
     " WORKS ONLY WITH FLAT STRUCTURES
 
-    DATA lo_structure TYPE REF TO cl_abap_structdescr.
+    DATA lo_structure       TYPE REF TO cl_abap_structdescr.
     DATA lt_key_value_pairs TYPE zpru_tt_key_value.
 
     IF io_abap_struct IS NOT INSTANCE OF cl_abap_structdescr.
@@ -595,11 +594,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     DATA(lt_components) = lo_structure->get_components( ).
 
-    io_util->convert_to_abap(
-      EXPORTING
-        ir_string = REF #( iv_input_string )
-      CHANGING
-        cr_abap   = lt_key_value_pairs ).
+    io_util->convert_to_abap( EXPORTING ir_string = REF #( iv_input_string )
+                              CHANGING  cr_abap   = lt_key_value_pairs ).
 
     LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
       CASE TYPE OF <ls_component>-type.
