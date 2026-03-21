@@ -155,7 +155,7 @@ CLASS zpru_cl_api_agent DEFINITION
                 it_agent_tools            TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller             TYPE REF TO zpru_if_agent_controller
                 iv_input_query            TYPE string
-                is_input_prompt         TYPE zpru_s_prompt
+                is_input_prompt           TYPE zpru_s_prompt
                 io_decision_provider      TYPE REF TO zpru_if_decision_provider
                 io_system_prompt_provider TYPE REF TO zpru_if_prompt_provider
                 io_short_memory           TYPE REF TO zpru_if_short_memory_provider
@@ -1399,11 +1399,29 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       lo_controller->mv_max_number_of_loops = lv_number_of_loops.
     ENDIF.
 
-    lo_controller->mv_real_number_of_loops += 1.
+    IF lo_controller->mo_parent_controller IS BOUND.
+      DATA(lv_stop_search) = abap_false.
 
-    IF lo_controller->mv_real_number_of_loops = lo_controller->mv_max_number_of_loops.
-      CLEAR lo_controller->mv_real_number_of_loops.
-      RETURN.
+      WHILE lv_stop_search = abap_false.
+        DATA(lo_parent) = lo_controller->mo_parent_controller.
+        IF lo_parent->mo_parent_controller IS NOT BOUND.
+          DATA(lo_root_controller) = lo_controller->mo_parent_controller.
+          lv_stop_search = abap_true.
+        ENDIF.
+      ENDWHILE.
+
+      lo_root_controller->mv_real_number_of_loops += 1.
+      IF lo_root_controller->mv_real_number_of_loops = lo_root_controller->mv_max_number_of_loops.
+        CLEAR lo_root_controller->mv_real_number_of_loops.
+        RETURN.
+      ENDIF.
+
+    ELSE.
+      lo_controller->mv_real_number_of_loops += 1.
+      IF lo_controller->mv_real_number_of_loops = lo_controller->mv_max_number_of_loops.
+        CLEAR lo_controller->mv_real_number_of_loops.
+        RETURN.
+      ENDIF.
     ENDIF.
 
     DATA(lv_count) = 1.
@@ -2030,6 +2048,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
             content   TYPE string,
           END OF ls_json_type.
 
+    DATA: BEGIN OF ls_parsed_query,
+            user      TYPE string,
+            topic     TYPE string,
+            timestamp TYPE timestampl,
+            content   TYPE string,
+          END OF ls_parsed_query.
+
     DATA: BEGIN OF ls_json_type_2,
             agent_name        TYPE string,
             decision_provider TYPE string,
@@ -2078,7 +2103,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       lv_unwrapped_query = iv_input_query.
     ENDIF.
 
-    lo_query->set_data( ir_data = NEW string( lv_unwrapped_query )  ).
+    lo_utility->convert_to_abap(
+      EXPORTING
+        ir_string = REF #( lv_unwrapped_query )
+      CHANGING
+        cr_abap   = ls_parsed_query ).
+
+    lo_query->set_data( ir_data = NEW string( ls_parsed_query-content )  ).
 
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -2911,7 +2942,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
-      IF <ls_key_value_returned>-type IS iniTIAL.
+      IF <ls_key_value_returned>-type IS INITIAL.
         <ls_key_value_returned>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
       ENDIF.
 
