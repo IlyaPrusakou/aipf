@@ -33,27 +33,27 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN5`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES5`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'NESTED HTTP'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `nested http code has played`.
 
    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 5.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -63,7 +63,7 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 5.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -84,7 +84,7 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -102,7 +102,7 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.

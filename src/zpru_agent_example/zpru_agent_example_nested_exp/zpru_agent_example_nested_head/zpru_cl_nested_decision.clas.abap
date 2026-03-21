@@ -221,13 +221,13 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
       CLEAR: lt_absolute_name, lt_key_value_condensed, ls_key_value_source.
       LOOP AT GROUP <ls_group_key> ASSIGNING FIELD-SYMBOL(<ls_member>).
         APPEND INITIAL LINE TO lt_absolute_name ASSIGNING FIELD-SYMBOL(<lv_absolute_name>).
-        <lv_absolute_name> = <ls_member>-type->absolute_name.
+        <lv_absolute_name> = <ls_member>-type.
       ENDLOOP.
 
       LOOP AT lt_absolute_name ASSIGNING <lv_absolute_name>.
         lt_key_value_condensed = VALUE #( FOR <ls_in> IN lt_key_value
                                           WHERE ( name = <ls_group_key>-name AND
-                                                  type->absolute_name = <lv_absolute_name> )
+                                                  type = <lv_absolute_name> )
                                                   ( <ls_in> ) ).
         IF lt_key_value_condensed IS INITIAL.
           CONTINUE.
@@ -248,7 +248,7 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
 
         lo_abap_datadescr ?= cl_abap_datadescr=>describe_by_data( p_data = <lv_target_field> ).
 
-        IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type->absolute_name.
+        IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type.
           CONTINUE.
         ENDIF.
         <lv_target_field> = ls_key_value_source-value.

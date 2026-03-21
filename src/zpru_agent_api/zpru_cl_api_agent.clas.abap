@@ -2902,13 +2902,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         DATA(ls_record) = VALUE #( lt_data_records[ 1 ] OPTIONAL ).
         lv_count = ls_record-counter + 1.
 
-        IF <ls_key_value_returned>-type->absolute_name <> ls_record-type->absolute_name.
+        IF <ls_key_value_returned>-type <> ls_record-type.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
         ENDIF.
       ENDIF.
 
-      IF <ls_key_value_returned>-type IS NOT BOUND.
-        <ls_key_value_returned>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lv_string_type ).
+      IF <ls_key_value_returned>-type IS iniTIAL.
+        <ls_key_value_returned>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
       ENDIF.
 
       APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
