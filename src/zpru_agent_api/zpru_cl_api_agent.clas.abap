@@ -2917,7 +2917,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_key_value>-type    = <ls_key_value_returned>-type.
       <ls_key_value>-value   = <ls_key_value_returned>-value.
 
-      lv_count += 1.
+      lv_count = 1.
     ENDLOOP.
   ENDMETHOD.
 ENDCLASS.
