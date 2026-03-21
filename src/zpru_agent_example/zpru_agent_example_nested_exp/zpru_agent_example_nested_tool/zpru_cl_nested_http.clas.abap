@@ -82,7 +82,7 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 5.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 5 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -100,7 +100,7 @@ CLASS zpru_cl_nested_http IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 5.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 5 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.

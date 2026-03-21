@@ -503,7 +503,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 1.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1. "QQQ DONT ADD 1
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 1 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -521,7 +521,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 1.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 1 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -636,7 +636,7 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 2.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 2 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -654,7 +654,7 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 2.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 2 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -871,7 +871,7 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 7.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 7 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -889,7 +889,7 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 7.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 7 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1041,7 +1041,7 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 8.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 8 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1059,7 +1059,7 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 8.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 8 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1237,7 +1237,7 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 9.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 9 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1255,7 +1255,7 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 9.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 9 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1481,7 +1481,7 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 10.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 10 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1499,7 +1499,7 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 10.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 10 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1589,7 +1589,7 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 11.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 11 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
@@ -1607,7 +1607,7 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 11.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 11 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
