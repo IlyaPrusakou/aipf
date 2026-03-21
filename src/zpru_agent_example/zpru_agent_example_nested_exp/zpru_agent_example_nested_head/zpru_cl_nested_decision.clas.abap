@@ -88,6 +88,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_abap-storagebin = `MY_BIN3`.
         ENDIF.
 
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_outbounddeliveryheader>).
+        IF sy-subrc = 0.
+          ls_nested_abap-outbounddeliveryheader = <ls_outbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_outbounddeliveryitems>).
+        IF sy-subrc = 0.
+          ls_nested_abap-outbounddeliveryitems = <ls_outbounddeliveryitems>.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_abap>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -111,6 +121,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_llm-storagebin = `MY_BIN3`.
         ENDIF.
 
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO <ls_outbounddeliveryheader>.
+        IF sy-subrc = 0.
+          ls_nested_llm-outbounddeliveryheader = <ls_outbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO <ls_outbounddeliveryitems>.
+        IF sy-subrc = 0.
+          ls_nested_llm-outbounddeliveryitems = <ls_outbounddeliveryitems>.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_llm>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -132,6 +152,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_http-resource  = <lv_resource>.
         ELSE.
           ls_nested_http-resource  = `MY_RES3`.
+        ENDIF.
+
+        ASSIGN COMPONENT 'INBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_inbounddeliveryheader>).
+        IF sy-subrc = 0.
+          ls_nested_http-inbounddeliveryheader = <ls_inbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'INBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_inbounddeliveryitems>).
+        IF sy-subrc = 0.
+          ls_nested_http-inbounddeliveryitems = <ls_inbounddeliveryitems>.
         ENDIF.
 
         ASSIGN er_first_tool_input->* TO <ls_nested_http>.

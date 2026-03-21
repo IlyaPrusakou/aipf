@@ -753,6 +753,38 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
       <ls_key_value>-value  = <lv_resource>.
     ENDIF.
 
+    ASSIGN COMPONENT 'INBOUNDDELIVERYHEADER' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<ls_inbounddeliveryheader>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'INBOUNDDELIVERYHEADER'.
+      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = <ls_inbounddeliveryheader> ).
+      <ls_key_value>-value  = <ls_inbounddeliveryheader>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<ls_outbounddeliveryheader>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'OUTBOUNDDELIVERYHEADER'.
+      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = <ls_outbounddeliveryheader> ).
+      <ls_key_value>-value  = <ls_outbounddeliveryheader>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'INBOUNDDELIVERYITEMS' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lt_inbounddeliveryitems>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'INBOUNDDELIVERYITEMS'.
+      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = <lt_inbounddeliveryitems> ).
+      <ls_key_value>-value  = <lt_inbounddeliveryitems>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lt_outbounddeliveryitems>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'OUTBOUNDDELIVERYITEMS'.
+      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = <lt_outbounddeliveryitems> ).
+      <ls_key_value>-value  = <lt_outbounddeliveryitems>.
+    ENDIF.
+
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'NESTED_AGENT'.
     <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
