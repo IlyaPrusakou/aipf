@@ -23,6 +23,12 @@ CLASS zpru_cl_api_agent DEFINITION
     DATA mv_output_response      TYPE zpru_if_agent_frw=>ts_json.
     DATA mv_output_response_prev TYPE zpru_if_agent_frw=>ts_json.
 
+    METHODS is_execute_miniloop
+      IMPORTING io_controller               TYPE REF TO zpru_if_agent_controller
+                is_agent                    TYPE zpru_if_adf_type_and_constant=>ts_agent
+      RETURNING VALUE(rv_continue_miniloop) TYPE abap_boolean
+      RAISING   zpru_cx_agent_core.
+
     METHODS write_2_data_board
       IMPORTING it_key_value_pairs TYPE zpru_tt_key_value
                 io_controller      TYPE REF TO zpru_if_agent_controller
@@ -1288,7 +1294,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_output           TYPE REF TO zpru_if_payload.
     DATA lo_last_output      TYPE REF TO zpru_if_payload.
     DATA lo_axc_service      TYPE REF TO zpru_if_axc_service.
-    DATA lo_agty_service     TYPE REF TO zpru_if_agty_service.
     DATA lt_query_update_imp TYPE zpru_if_axc_type_and_constant=>tt_query_update_imp.
     DATA lt_step_update_imp  TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp.
     DATA lt_step_create_imp  TYPE zpru_if_axc_type_and_constant=>tt_step_create_imp.
@@ -1299,6 +1304,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_short_memory     TYPE REF TO zpru_if_short_memory_provider.
     DATA ls_mapped           TYPE zpru_if_agent_frw=>ts_axc_mapped.
 
+    DATA(lo_controller) = get_controller( ).
+
+    IF is_execute_miniloop( io_controller = lo_controller
+                            is_agent      = is_agent ) = abap_false.
+      RETURN.
+    ENDIF.
+
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
@@ -1306,8 +1318,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                              IMPORTING eo_short_memory = lo_short_memory
                              CHANGING  cs_reported     = cs_adf_reported
                                        cs_failed       = cs_adf_failed ).
-
-    DATA(lo_controller) = get_controller( ).
 
     DATA(lt_step_all) = lo_controller->mt_execution_steps.
     DELETE lt_step_all WHERE stepsequence > is_current_step-stepsequence.
@@ -1381,48 +1391,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
 
     <ls_input_output>-execution_steps = lt_step_all.
-
-    lo_agty_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGTY_SERVICE`
-                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    IF lo_controller->mv_max_number_of_loops IS INITIAL.
-      lo_agty_service->read_agent_type(
-        EXPORTING it_agty_read_k = VALUE #( ( agenttype                   = is_agent-agenttype
-                                              control-maximumnumberofloop = abap_true ) )
-        IMPORTING et_agty        = DATA(lt_agty) ).
-
-      DATA(lv_number_of_loops) = VALUE #( lt_agty[ 1 ]-maximumnumberofloop OPTIONAL ).
-      IF lv_number_of_loops IS INITIAL.
-        lv_number_of_loops = 4.
-      ENDIF.
-
-      lo_controller->mv_max_number_of_loops = lv_number_of_loops.
-    ENDIF.
-
-    IF lo_controller->mo_parent_controller IS BOUND.
-      DATA(lv_stop_search) = abap_false.
-
-      WHILE lv_stop_search = abap_false.
-        DATA(lo_parent) = lo_controller->mo_parent_controller.
-        IF lo_parent->mo_parent_controller IS NOT BOUND.
-          DATA(lo_root_controller) = lo_controller->mo_parent_controller.
-          lv_stop_search = abap_true.
-        ENDIF.
-      ENDWHILE.
-
-      lo_root_controller->mv_real_number_of_loops += 1.
-      IF lo_root_controller->mv_real_number_of_loops = lo_root_controller->mv_max_number_of_loops.
-        CLEAR lo_root_controller->mv_real_number_of_loops.
-        RETURN.
-      ENDIF.
-
-    ELSE.
-      lo_controller->mv_real_number_of_loops += 1.
-      IF lo_controller->mv_real_number_of_loops = lo_controller->mv_max_number_of_loops.
-        CLEAR lo_controller->mv_real_number_of_loops.
-        RETURN.
-      ENDIF.
-    ENDIF.
 
     DATA(lv_count) = 1.
     LOOP AT it_additional_steps ASSIGNING FIELD-SYMBOL(<ls_additional_step>) USING KEY sequence.
@@ -2103,11 +2071,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       lv_unwrapped_query = iv_input_query.
     ENDIF.
 
-    lo_utility->convert_to_abap(
-      EXPORTING
-        ir_string = REF #( lv_unwrapped_query )
-      CHANGING
-        cr_abap   = ls_parsed_query ).
+    lo_utility->convert_to_abap( EXPORTING ir_string = REF #( lv_unwrapped_query )
+                                 CHANGING  cr_abap   = ls_parsed_query ).
 
     lo_query->set_data( ir_data = NEW string( ls_parsed_query-content )  ).
 
@@ -2954,5 +2919,55 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       lv_count = 1.
     ENDLOOP.
+  ENDMETHOD.
+
+  METHOD is_execute_miniloop.
+    DATA lo_agty_service TYPE REF TO zpru_if_agty_service.
+
+    rv_continue_miniloop = abap_true.
+
+    lo_agty_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGTY_SERVICE`
+                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    IF io_controller->mv_max_number_of_loops IS INITIAL.
+      lo_agty_service->read_agent_type(
+        EXPORTING it_agty_read_k = VALUE #( ( agenttype                   = is_agent-agenttype
+                                              control-maximumnumberofloop = abap_true ) )
+        IMPORTING et_agty        = DATA(lt_agty) ).
+
+      DATA(lv_number_of_loops) = VALUE #( lt_agty[ 1 ]-maximumnumberofloop OPTIONAL ).
+      IF lv_number_of_loops IS INITIAL.
+        lv_number_of_loops = 4.
+      ENDIF.
+
+      io_controller->mv_max_number_of_loops = lv_number_of_loops.
+    ENDIF.
+
+    IF io_controller->mo_parent_controller IS BOUND.
+      DATA(lv_stop_search) = abap_false.
+
+      WHILE lv_stop_search = abap_false.
+        DATA(lo_parent) = io_controller->mo_parent_controller.
+        IF lo_parent->mo_parent_controller IS NOT BOUND.
+          DATA(lo_root_controller) = io_controller->mo_parent_controller.
+          lv_stop_search = abap_true.
+        ENDIF.
+      ENDWHILE.
+
+      lo_root_controller->mv_real_number_of_loops += 1.
+      IF lo_root_controller->mv_real_number_of_loops = lo_root_controller->mv_max_number_of_loops.
+        CLEAR lo_root_controller->mv_real_number_of_loops.
+        rv_continue_miniloop = abap_false.
+        RETURN.
+      ENDIF.
+
+    ELSE.
+      io_controller->mv_real_number_of_loops += 1.
+      IF io_controller->mv_real_number_of_loops = io_controller->mv_max_number_of_loops.
+        CLEAR io_controller->mv_real_number_of_loops.
+        rv_continue_miniloop = abap_false.
+        RETURN.
+      ENDIF.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
