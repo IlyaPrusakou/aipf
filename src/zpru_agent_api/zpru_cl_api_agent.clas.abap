@@ -155,6 +155,7 @@ CLASS zpru_cl_api_agent DEFINITION
                 it_agent_tools            TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller             TYPE REF TO zpru_if_agent_controller
                 iv_input_query            TYPE string
+                is_input_prompt         TYPE zpru_s_prompt
                 io_decision_provider      TYPE REF TO zpru_if_decision_provider
                 io_system_prompt_provider TYPE REF TO zpru_if_prompt_provider
                 io_short_memory           TYPE REF TO zpru_if_short_memory_provider
@@ -381,6 +382,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        it_agent_tools            = lt_agent_tools
                                        io_controller             = lo_controller
                                        iv_input_query            = mv_input_query
+                                       is_input_prompt           = ms_input_prompt
                                        io_decision_provider      = lo_decision_provider
                                        io_system_prompt_provider = lo_system_prompt_provider
                                        io_short_memory           = lo_short_memory
@@ -1187,6 +1189,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                        it_agent_tools            = lt_agent_tools
                                        io_controller             = lo_controller
                                        iv_input_query            = is_input_query-string_content
+                                       is_input_prompt           = is_input_query
                                        io_decision_provider      = lo_decision_provider
                                        io_system_prompt_provider = lo_system_prompt_provider
                                        io_short_memory           = lo_short_memory
@@ -2128,6 +2131,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     io_decision_provider->call_decision_engine( EXPORTING is_agent               = is_agent
                                                           it_tool                = it_agent_tools
                                                           io_controller          = io_controller
+                                                          is_input_prompt        = is_input_prompt
                                                           io_input               = lo_query
                                                           io_system_prompt       = io_system_prompt_provider
                                                           io_short_memory        = io_short_memory

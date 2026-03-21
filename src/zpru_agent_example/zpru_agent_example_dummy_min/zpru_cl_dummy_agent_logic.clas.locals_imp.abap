@@ -705,6 +705,8 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_input )
                                 CHANGING  cr_string = ls_prompt-string_content ).
 
+    ls_prompt-type = cl_abap_datadescr=>describe_by_data( p_data = ls_input )->absolute_name.
+
     lo_nested_agent = NEW zpru_cl_unit_agent( ).
 
     lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'

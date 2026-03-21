@@ -30,6 +30,7 @@ CLASS zpru_cl_tmlp_use_interfaces IMPLEMENTATION.
                                                           it_tool                = it_tool
                                                           io_controller          = io_controller
                                                           io_input               = io_input
+                                                          is_input_prompt        = is_input_prompt
                                                           io_system_prompt       = io_system_prompt
                                                           io_short_memory        = io_short_memory
                                                           io_long_memory         = io_long_memory

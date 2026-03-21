@@ -31,7 +31,7 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
     DATA ls_nested_http TYPE zpru_s_nested_http_input.
     DATA ls_nested_llm TYPE zpru_s_nested_llm_input.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
-    DATA lr_nested_prompt    TYPE REF TO data.
+    DATA lr_nested_prompt    TYPE REF TO string.
     DATA lv_input TYPE string.
 
     FIELD-SYMBOLS <ls_nested_abap_input> TYPE any.
@@ -56,6 +56,8 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
     IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_input ) = abap_true.
       lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
     ENDIF.
+
+    CREATE DATA lr_nested_prompt.
 
     ASSIGN lr_nested_prompt->* TO FIELD-SYMBOL(<ls_input>).
     IF sy-subrc <> 0.

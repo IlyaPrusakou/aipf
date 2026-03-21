@@ -12,6 +12,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 it_tool                TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller          TYPE REF TO zpru_if_agent_controller
                 io_input               TYPE REF TO zpru_if_payload
+                is_input_prompt        TYPE zpru_s_prompt
                 io_system_prompt       TYPE REF TO zpru_if_prompt_provider       OPTIONAL
                 io_short_memory        TYPE REF TO zpru_if_short_memory_provider OPTIONAL
                 io_long_memory         TYPE REF TO zpru_if_long_memory_provider  OPTIONAL
@@ -25,6 +26,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 it_tool                    TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
+                is_input_prompt            TYPE zpru_s_prompt
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider OPTIONAL
                 io_short_memory            TYPE REF TO zpru_if_short_memory_provider OPTIONAL
                 io_long_memory             TYPE REF TO zpru_if_long_memory_provider OPTIONAL
@@ -41,10 +43,11 @@ CLASS zpru_cl_decision_provider DEFINITION
                 it_tool                TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller          TYPE REF TO zpru_if_agent_controller
                 io_input               TYPE REF TO zpru_if_payload
-                io_system_prompt       TYPE REF TO zpru_if_prompt_provider       OPTIONAL
+                is_input_prompt        TYPE zpru_s_prompt
+                io_system_prompt       TYPE REF TO zpru_if_prompt_provider OPTIONAL
                 io_short_memory        TYPE REF TO zpru_if_short_memory_provider OPTIONAL
-                io_long_memory         TYPE REF TO zpru_if_long_memory_provider  OPTIONAL
-                io_agent_info_provider TYPE REF TO zpru_if_agent_info_provider   OPTIONAL
+                io_long_memory         TYPE REF TO zpru_if_long_memory_provider OPTIONAL
+                io_agent_info_provider TYPE REF TO zpru_if_agent_info_provider OPTIONAL
       EXPORTING et_rag_data            TYPE zpru_tt_rag_header
                 ev_user_data           TYPE zpru_de_json
       CHANGING  cs_decision_log        TYPE zpru_s_decision_log
@@ -55,6 +58,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 it_tool                    TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
+                is_input_prompt            TYPE zpru_s_prompt
                 io_decision_request        TYPE REF TO zpru_if_decision_request
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider            OPTIONAL
                 io_short_memory            TYPE REF TO zpru_if_short_memory_provider      OPTIONAL
@@ -78,6 +82,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 it_execution_plan          TYPE zpru_if_decision_provider=>tt_execution_plan
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
+                is_input_prompt            TYPE zpru_s_prompt
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider            OPTIONAL
                 io_short_memory            TYPE REF TO zpru_if_short_memory_provider      OPTIONAL
                 io_long_memory             TYPE REF TO zpru_if_long_memory_provider       OPTIONAL
@@ -128,7 +133,6 @@ ENDCLASS.
 
 CLASS zpru_cl_decision_provider IMPLEMENTATION.
   METHOD zpru_if_decision_provider~call_decision_engine.
-
     DATA: BEGIN OF ls_json_type,
             user      TYPE string,
             topic     TYPE string,
@@ -136,7 +140,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
             content   TYPE string,
           END OF ls_json_type.
 
-    DATA lv_content TYPE string.
+    DATA lv_content              TYPE string.
     DATA ls_decision_log         TYPE zpru_s_decision_log.
     DATA lv_decision_log_string  TYPE string.
     DATA lv_first_input_string   TYPE string.
@@ -161,6 +165,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                     it_tool                = it_tool
                                     io_controller          = io_controller
                                     io_input               = io_input
+                                    is_input_prompt        = is_input_prompt
                                     io_system_prompt       = io_system_prompt
                                     io_short_memory        = io_short_memory
                                     io_long_memory         = io_long_memory
@@ -181,6 +186,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                              it_tool                    = it_tool
                              io_controller              = io_controller
                              io_input                   = io_input
+                             is_input_prompt            = is_input_prompt
                              io_system_prompt           = io_system_prompt
                              io_short_memory            = io_short_memory
                              io_long_memory             = io_long_memory
@@ -200,6 +206,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                     it_tool                = it_tool
                                     io_controller          = io_controller
                                     io_input               = io_input
+                                    is_input_prompt        = is_input_prompt
                                     io_system_prompt       = io_system_prompt
                                     io_short_memory        = io_short_memory
                                     io_long_memory         = io_long_memory
@@ -238,7 +245,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
       ENDIF.
 
       APPEND INITIAL LINE TO ls_decision_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
-      <ls_tool_metadata> = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ).
+      <ls_tool_metadata> = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ). " qqq add empty lines if return nothing
 
     ENDLOOP.
 
@@ -251,11 +258,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_decision_request-ragdata               = lt_rag_data.
     ls_decision_request-userdata              = lv_user_data.
 
-    lo_util->convert_to_abap(
-      EXPORTING
-        ir_string = io_input->get_data( )
-      CHANGING
-        cr_abap   = ls_json_type ).
+    lo_util->convert_to_abap( EXPORTING ir_string = io_input->get_data( )
+                              CHANGING  cr_abap   = ls_json_type ).
 
     IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_json_type-content ) = abap_true.
       lv_content = lo_util->unwrap_from_json_markdown( iv_markdown = ls_json_type-content ).
@@ -269,13 +273,13 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     ls_decision_request-userprompt = lv_content.
 
-
     lo_decision_request->zpru_if_payload~set_data( ir_data = NEW zpru_s_decision_request( ls_decision_request ) ).
 
     process_thinking( EXPORTING is_agent                   = is_agent
                                 it_tool                    = it_tool
                                 io_controller              = io_controller
                                 io_input                   = io_input
+                                is_input_prompt            = is_input_prompt
                                 io_decision_request        = lo_decision_request
                                 io_system_prompt           = io_system_prompt
                                 io_short_memory            = io_short_memory
@@ -334,10 +338,11 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     prepare_first_tool_input( EXPORTING is_agent                   = is_agent
                                         it_tool                    = it_tool
-                                        is_first_tool             = <ls_first_tool>
+                                        is_first_tool              = <ls_first_tool>
                                         it_execution_plan          = lt_execution_plan
                                         io_controller              = io_controller
                                         io_input                   = io_input
+                                        is_input_prompt            = is_input_prompt
                                         io_system_prompt           = io_system_prompt
                                         io_short_memory            = io_short_memory
                                         io_long_memory             = io_long_memory
