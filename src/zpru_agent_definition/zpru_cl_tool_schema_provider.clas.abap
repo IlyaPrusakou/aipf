@@ -15,7 +15,8 @@ CLASS zpru_cl_tool_schema_provider DEFINITION
     METHODS get_input_json_schema ABSTRACT
       IMPORTING is_tool_master_data   TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(rv_json_schema) TYPE zpru_if_agent_frw=>ts_json.
+    EXPORTING eV_json_schema      TYPE zpru_if_agent_frw=>ts_json
+              eS_json_structure   TYPE zpru_s_json_schema.
 
     METHODS get_output_abap_type ABSTRACT
       IMPORTING is_tool_master_data        TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
@@ -25,7 +26,8 @@ CLASS zpru_cl_tool_schema_provider DEFINITION
     METHODS get_output_json_schema ABSTRACT
       IMPORTING is_tool_master_data   TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step     TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(rv_json_schema) TYPE zpru_if_agent_frw=>ts_json.
+    EXPORTING eV_json_schema      TYPE zpru_if_agent_frw=>ts_json
+              eS_json_structure   TYPE zpru_s_json_schema.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -33,8 +35,16 @@ ENDCLASS.
 
 CLASS zpru_cl_tool_schema_provider IMPLEMENTATION.
   METHOD zpru_if_tool_schema_provider~input_json_schema.
-    ro_json_schema = get_input_json_schema( is_tool_master_data = is_tool_master_data
-                                            is_execution_step   = is_execution_step ).
+
+  get_input_json_schema(
+    EXPORTING
+      is_tool_master_data = is_tool_master_data
+      is_execution_step   = is_execution_step
+    IMPORTING
+      ev_json_schema      = ev_json_schema
+      es_json_structure   = es_json_structure
+  ).
+
   ENDMETHOD.
 
   METHOD zpru_if_tool_schema_provider~input_rtts_schema.
@@ -43,8 +53,14 @@ CLASS zpru_cl_tool_schema_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_tool_schema_provider~output_json_schema.
-    ro_json_schema = get_output_json_schema( is_tool_master_data = is_tool_master_data
-                                             is_execution_step   = is_execution_step ).
+  get_OUTPUT_json_schema(
+    EXPORTING
+      is_tool_master_data = is_tool_master_data
+      is_execution_step   = is_execution_step
+    IMPORTING
+      ev_json_schema      = ev_json_schema
+      es_json_structure   = es_json_structure
+  ).
   ENDMETHOD.
 
   METHOD zpru_if_tool_schema_provider~output_rtts_schema.

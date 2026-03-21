@@ -8,6 +8,7 @@ INTERFACE zpru_if_nested_agent_runner
       is_execution_step          TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
     EXPORTING
       eo_response              TYPE REF TO zpru_if_payload
+        et_key_value_pairs  type zpru_tt_key_value
       ev_error_flag            TYPE abap_boolean
       et_additional_steps TYPE zpru_if_axc_type_and_constant=>tt_axc_step
       et_additional_tools TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
