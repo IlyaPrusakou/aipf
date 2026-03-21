@@ -41,7 +41,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    ASSIGN er_first_tool_input->* TO <ls_first_input>.
+    ASSIGN er_first_tool_input->* TO <ls_first_input>. " qqq add data to new fields
     <ls_first_input>-abapexecutorinput = 'BS01'.
 
     APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
@@ -76,18 +76,18 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
                                    sequence = 2 )
                                  ( toolname = 'DUMMY_ML'
                                    sequence = 3 )
-                                 ( toolname = 'DUMMY_DYN_CODE'
-                                   sequence = 4 )
+*                                 ( toolname = 'DUMMY_DYN_CODE' " qqq need to be checked and reworked
+*                                   sequence = 4 )
                                  ( toolname = 'DUMMY_SCM'
-                                   sequence = 5 )
+                                   sequence = 4 )
                                  ( toolname = 'DUMMY_HTTP'
-                                   sequence = 6 )
+                                   sequence = 5 )
                                  ( toolname = 'DUMMY_LLM'
-                                   sequence = 7 )
+                                   sequence = 6 )
                                  ( toolname = 'DUMMY_KNOWLEDGE'
-                                   sequence = 8 )
+                                   sequence = 7 )
                                  ( toolname = 'DUMMY_USER_TOOL'
-                                   sequence = 9 ) ).
+                                   sequence = 8 ) ).
 
     APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
     <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber(
@@ -454,22 +454,22 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-abapexecutorinput.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN1`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES1`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'ABAP'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `abap code has played`.
 
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
@@ -477,7 +477,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 1.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -487,7 +487,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 1.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -503,12 +503,12 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 1.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 1 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -521,12 +521,12 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 1.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 1 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -593,27 +593,27 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN2`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES2`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'KNOWLEDGE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `knowledge code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 2.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -623,7 +623,7 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 2.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -636,12 +636,12 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 2.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 2 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -654,12 +654,12 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 2.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 2 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -705,6 +705,8 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #( ls_input )
                                 CHANGING  cr_string = ls_prompt-string_content ).
 
+    ls_prompt-type = cl_abap_datadescr=>describe_by_data( p_data = ls_input )->absolute_name.
+
     lo_nested_agent = NEW zpru_cl_unit_agent( ).
 
     lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
@@ -726,14 +728,19 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody )
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_final_response-finalresponsebody-responsecontent ) = abap_true.
+      ls_final_response-finalresponsebody-responsecontent = lo_util->unwrap_from_json_markdown(
+          iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+    ENDIF.
+
+    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody-responsecontent )
                               CHANGING  cr_abap   = ls_nested_agent_response ).
 
     ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lv_warehouse>).
     IF sy-subrc = 0.
       APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
       <ls_key_value>-name   = 'WAREHOUSE'.
-      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
       <ls_key_value>-value  = <lv_warehouse>.
     ENDIF.
 
@@ -741,7 +748,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     IF sy-subrc = 0.
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name   = 'STORAGEBIN'.
-      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
       <ls_key_value>-value  = <lv_storagebin>.
     ENDIF.
 
@@ -749,13 +756,45 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     IF sy-subrc = 0.
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name   = 'RESOURCE'.
-      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
       <ls_key_value>-value  = <lv_resource>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'INBOUNDDELIVERYHEADER' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<ls_inbounddeliveryheader>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'INBOUNDDELIVERYHEADER'.
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = <ls_inbounddeliveryheader> )->absolute_name.
+      <ls_key_value>-value  = <ls_inbounddeliveryheader>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<ls_outbounddeliveryheader>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'OUTBOUNDDELIVERYHEADER'.
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = <ls_outbounddeliveryheader> )->absolute_name.
+      <ls_key_value>-value  = <ls_outbounddeliveryheader>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'INBOUNDDELIVERYITEMS' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lt_inbounddeliveryitems>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'INBOUNDDELIVERYITEMS'.
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = <lt_inbounddeliveryitems> )->absolute_name.
+      <ls_key_value>-value  = <lt_inbounddeliveryitems>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lt_outbounddeliveryitems>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+      <ls_key_value>-name   = 'OUTBOUNDDELIVERYITEMS'.
+      <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = <lt_outbounddeliveryitems> )->absolute_name.
+      <ls_key_value>-value  = <lt_outbounddeliveryitems>.
     ENDIF.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'NESTED_AGENT'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `nested agent code has played`.
 
     ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
@@ -791,27 +830,27 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN7`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES7`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'DUMMY HTTP'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `dummy http code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 7.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -821,7 +860,7 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 7.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -837,12 +876,12 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 7.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 7 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -855,12 +894,12 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 7.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 7 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -961,27 +1000,27 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN8`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES8`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'DUMMY MDL'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `dummy mdl code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 8.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -991,7 +1030,7 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 8.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -1007,12 +1046,12 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 8.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 8 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1025,12 +1064,12 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 8.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 8 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1157,27 +1196,27 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN9`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES9`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'DUMMY LLM'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `dummy llm code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 9.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -1187,7 +1226,7 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 9.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -1203,12 +1242,12 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 9.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 9 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1221,12 +1260,12 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 9.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 9 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1401,27 +1440,27 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN10`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES10`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'DUMMY ML'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `dummy ml code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 10.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -1431,7 +1470,7 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 10.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -1447,12 +1486,12 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 10.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 10 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1465,12 +1504,12 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 10.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 10 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1509,27 +1548,27 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name   = 'WAREHOUSE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
     <ls_key_value>-value  = ls_input-warehouse.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'STORAGEBIN'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin )->absolute_name.
     <ls_key_value>-value  = `MY_BIN11`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'RESOURCE'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_resource )->absolute_name.
     <ls_key_value>-value  = `MY_RES11`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'DUMMY USER'.
-    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) )->absolute_name.
     <ls_key_value>-value  = `dummy user code has played`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'OUTBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_outbound_header )->absolute_name.
 
     ls_outbound_header-outboundnumber = 11.
     ls_outbound_header-deliveryname   = 'OUTBOUND_DELIVERY_1'.
@@ -1539,7 +1578,7 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name  = 'INBOUNDDELIVERYHEADER'.
-    <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header ).
+    <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = ls_inbound_header )->absolute_name.
 
     ls_inbound_header-inboundnumber = 11.
     ls_inbound_header-deliveryname  = 'INBOUND_DELIVERY_1'.
@@ -1555,12 +1594,12 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 11.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ).
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 11 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'INBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_inbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_inbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.
@@ -1573,12 +1612,12 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_outbound_items ASSIGNING FIELD-SYMBOL(<ls_outbound_item>).
       <ls_outbound_item>-deliveryname = 'OUTBOUND_DELIVERY_1'.
       <ls_outbound_item>-outboundnumber = 11.
-      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ) + 1.
+      <ls_outbound_item>-itemnumber = lines( lt_outbound_items ).
       <ls_outbound_item>-itemname = |OUTBOUND_ITEM_{ 11 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
       <ls_key_value>-name  = 'OUTBOUNDDELIVERYITEMS'.
-      <ls_key_value>-type ?= cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items ).
+      <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lt_outbound_items )->absolute_name.
       lo_util->convert_to_string( EXPORTING ir_abap   = REF #( lt_outbound_items )
                                   CHANGING  cr_string = <ls_key_value>-value ).
     ENDIF.

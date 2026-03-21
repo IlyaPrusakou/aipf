@@ -57,6 +57,8 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
       lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
     ENDIF.
 
+    CREATE DATA lr_nested_prompt TYPE (is_input_prompt-type).
+
     ASSIGN lr_nested_prompt->* TO FIELD-SYMBOL(<ls_input>).
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -88,6 +90,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_abap-storagebin = `MY_BIN3`.
         ENDIF.
 
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_outbounddeliveryheader>).
+        IF sy-subrc = 0.
+          ls_nested_abap-outbounddeliveryheader = <ls_outbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_outbounddeliveryitems>).
+        IF sy-subrc = 0.
+          ls_nested_abap-outbounddeliveryitems = <ls_outbounddeliveryitems>.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_abap>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -111,6 +123,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_llm-storagebin = `MY_BIN3`.
         ENDIF.
 
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO <ls_outbounddeliveryheader>.
+        IF sy-subrc = 0.
+          ls_nested_llm-outbounddeliveryheader = <ls_outbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'OUTBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO <ls_outbounddeliveryitems>.
+        IF sy-subrc = 0.
+          ls_nested_llm-outbounddeliveryitems = <ls_outbounddeliveryitems>.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_llm>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -132,6 +154,16 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
           ls_nested_http-resource  = <lv_resource>.
         ELSE.
           ls_nested_http-resource  = `MY_RES3`.
+        ENDIF.
+
+        ASSIGN COMPONENT 'INBOUNDDELIVERYHEADER' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_inbounddeliveryheader>).
+        IF sy-subrc = 0.
+          ls_nested_http-inbounddeliveryheader = <ls_inbounddeliveryheader>.
+        ENDIF.
+
+        ASSIGN COMPONENT 'INBOUNDDELIVERYITEMS' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<ls_inbounddeliveryitems>).
+        IF sy-subrc = 0.
+          ls_nested_http-inbounddeliveryitems = <ls_inbounddeliveryitems>.
         ENDIF.
 
         ASSIGN er_first_tool_input->* TO <ls_nested_http>.
@@ -191,13 +223,13 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
       CLEAR: lt_absolute_name, lt_key_value_condensed, ls_key_value_source.
       LOOP AT GROUP <ls_group_key> ASSIGNING FIELD-SYMBOL(<ls_member>).
         APPEND INITIAL LINE TO lt_absolute_name ASSIGNING FIELD-SYMBOL(<lv_absolute_name>).
-        <lv_absolute_name> = <ls_member>-type->absolute_name.
+        <lv_absolute_name> = <ls_member>-type.
       ENDLOOP.
 
       LOOP AT lt_absolute_name ASSIGNING <lv_absolute_name>.
         lt_key_value_condensed = VALUE #( FOR <ls_in> IN lt_key_value
                                           WHERE ( name = <ls_group_key>-name AND
-                                                  type->absolute_name = <lv_absolute_name> )
+                                                  type = <lv_absolute_name> )
                                                   ( <ls_in> ) ).
         IF lt_key_value_condensed IS INITIAL.
           CONTINUE.
@@ -218,10 +250,17 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
 
         lo_abap_datadescr ?= cl_abap_datadescr=>describe_by_data( p_data = <lv_target_field> ).
 
-        IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type->absolute_name.
+        IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type.
           CONTINUE.
         ENDIF.
-        <lv_target_field> = ls_key_value_source-value.
+
+        IF lo_abap_datadescr IS INSTANCE OF cl_abap_structdescr OR
+           lo_abap_datadescr IS INSTANCE OF cl_abap_tabledescr.
+          lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_key_value_source-value )
+                                    CHANGING  cr_abap   = <lv_target_field> ).
+        ELSE.
+          <lv_target_field> = ls_key_value_source-value.
+        ENDIF.
       ENDLOOP.
     ENDLOOP.
 
