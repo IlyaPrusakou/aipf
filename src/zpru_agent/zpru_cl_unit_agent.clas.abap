@@ -20,10 +20,11 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
     ENDTRY.
 
     TRY.
-        lo_api_agent->setup_agent( EXPORTING iv_agent_name = iv_agent_name
-                                            io_parent_controller = io_parent_controller
-                                  IMPORTING es_agent      = DATA(ls_agent)
-                                            et_tools      = DATA(lt_tools) ).
+        lo_api_agent->setup_agent( EXPORTING iv_agent_name        = iv_agent_name
+                                             io_parent_controller = io_parent_controller
+                                   IMPORTING es_agent             = DATA(ls_agent)
+                                   " TODO: variable is assigned but never used (ABAP cleaner)
+                                             et_tools             = DATA(lt_tools) ).
 
         lo_api_agent->set_input_query( is_input_query = is_prompt
                                        iv_agent_uuid  = ls_agent-agentuuid ).
@@ -34,12 +35,12 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
 
         lo_api_agent->run( EXPORTING iv_run_uuid       = lv_built_run_uuid
                                      iv_query_uuid     = lv_built_query_uuid
-                           IMPORTING
-                           " TODO: variable is assigned but never used (ABAP cleaner)
-                                     eo_final_response = DATA(lo_final_response) ).
+                           IMPORTING eo_final_response = DATA(lo_final_response) ).
+
+        ev_final_response = lo_final_response->get_data( )->*.
 
 *        lo_api_agent->save_execution( iv_do_commit = abap_true ).
-      CATCH zpru_cx_agent_core.
+      CATCH zpru_cx_agent_core.  " QQQ
     ENDTRY.
   ENDMETHOD.
 ENDCLASS.

@@ -57,7 +57,7 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
       lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
     ENDIF.
 
-    CREATE DATA lr_nested_prompt type (is_input_prompt-type).
+    CREATE DATA lr_nested_prompt TYPE (is_input_prompt-type).
 
     ASSIGN lr_nested_prompt->* TO FIELD-SYMBOL(<ls_input>).
     IF sy-subrc <> 0.
@@ -253,7 +253,14 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
         IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type.
           CONTINUE.
         ENDIF.
-        <lv_target_field> = ls_key_value_source-value.
+
+        IF lo_abap_datadescr IS INSTANCE OF cl_abap_structdescr OR
+           lo_abap_datadescr IS INSTANCE OF cl_abap_tabledescr.
+          lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_key_value_source-value )
+                                    CHANGING  cr_abap   = <lv_target_field> ).
+        ELSE.
+          <lv_target_field> = ls_key_value_source-value.
+        ENDIF.
       ENDLOOP.
     ENDLOOP.
 

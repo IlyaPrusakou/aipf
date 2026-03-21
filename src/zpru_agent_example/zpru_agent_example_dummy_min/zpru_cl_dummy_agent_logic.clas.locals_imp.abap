@@ -728,7 +728,12 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody )
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_final_response-finalresponsebody-responsecontent ) = abap_true.
+      ls_final_response-finalresponsebody-responsecontent = lo_util->unwrap_from_json_markdown(
+          iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+    ENDIF.
+
+    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody-responsecontent )
                               CHANGING  cr_abap   = ls_nested_agent_response ).
 
     ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lv_warehouse>).
