@@ -442,7 +442,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         RETURN.
       ENDIF.
 
-      ASSIGN io_controller->mt_run_context[ execution_step = <ls_prev_step> ] TO FIELD-SYMBOL(<ls_prev_tool>).
+      ASSIGN io_controller->mt_run_context[ execution_step-stepuuid = <ls_prev_step>-stepuuid ] TO FIELD-SYMBOL(<ls_prev_tool>).
       IF sy-subrc <> 0.
         ev_error_flag = abap_true.
         RETURN.
