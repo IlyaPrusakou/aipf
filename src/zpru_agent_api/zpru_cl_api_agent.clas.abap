@@ -180,7 +180,7 @@ CLASS zpru_cl_api_agent DEFINITION
       CHANGING  ct_execution_plan   TYPE zpru_if_decision_provider=>tt_execution_plan
                 cs_axc_reported     TYPE zpru_if_agent_frw=>ts_axc_reported OPTIONAL
                 cs_axc_failed       TYPE zpru_if_agent_frw=>ts_axc_failed OPTIONAL
-                cs_axc_mapped       TYPE zpru_if_agent_frw=>ts_axc_mapped OPTIONAL     " qqq
+                cs_axc_mapped       TYPE zpru_if_agent_frw=>ts_axc_mapped OPTIONAL
       RAISING   zpru_cx_agent_core.
 
     METHODS resequence_steps
@@ -516,8 +516,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -566,7 +566,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -645,8 +645,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -1355,7 +1355,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     LOOP AT lt_new_steps ASSIGNING FIELD-SYMBOL(<ls_new_step>).
 
-      ASSIGN lt_step_all[ KEY sequence COMPONENTS stepsequence = <ls_step_all>-stepsequence ] TO FIELD-SYMBOL(<ls_step_all>).
+      ASSIGN lt_step_all[ KEY sequence COMPONENTS stepsequence = <ls_new_step>-stepsequence ] TO FIELD-SYMBOL(<ls_step_all>).
       IF sy-subrc <> 0.
         CONTINUE.
       ENDIF.
@@ -2917,7 +2917,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_key_value>-type    = <ls_key_value_returned>-type.
       <ls_key_value>-value   = <ls_key_value_returned>-value.
 
-      lv_count = 1.
+      lv_count += 1.
     ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

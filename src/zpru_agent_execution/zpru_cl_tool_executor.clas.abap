@@ -143,14 +143,42 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         RAISE SHORTDUMP NEW zpru_cx_agent_core( ).
     ENDTRY.
 
-    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_a> IN it_step_4_validate
-                                                                     ( agentuuid         = <ls_a>-agentuuid
-                                                                       control-agentuuid = abap_true ) )
-                                IMPORTING et_agent        = DATA(lt_existing_agent) ). " qqq check output result!!
+    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_a>
+                                                                     IN it_step_4_validate
+                                                                     WHERE ( agentuuid IS NOT INITIAL )
+                                                                     ( agentuuid                    = <ls_a>-agentuuid
+                                                                       control-agentuuid            = abap_true
+                                                                       control-agentname            = abap_true
+                                                                       control-agenttype            = abap_true
+                                                                       control-decisionprovider     = abap_true
+                                                                       control-shortmemoryprovider  = abap_true
+                                                                       control-longmemoryprovider   = abap_true
+                                                                       control-agentinfoprovider    = abap_true
+                                                                       control-systempromptprovider = abap_true
+                                                                       control-agentstatus          = abap_true
+                                                                       control-createdby            = abap_true
+                                                                       control-createdat            = abap_true
+                                                                       control-changedby            = abap_true
+                                                                       control-lastchanged          = abap_true
+                                                                       control-locallastchanged     = abap_true ) )
+                                IMPORTING et_agent        = DATA(lt_existing_agent) ).
 
-    lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( ( agentuuid         = io_controller->mv_agent_uuid
-                                                                       control-agentname = abap_true  ) )
-                                IMPORTING et_agent        = DATA(lt_current_agent) ).
+    lo_adf_service->read_agent(
+      EXPORTING it_agent_read_k = VALUE #( ( agentuuid                    = io_controller->mv_agent_uuid
+                                             control-agentname            = abap_true
+                                             control-agenttype            = abap_true
+                                             control-decisionprovider     = abap_true
+                                             control-shortmemoryprovider  = abap_true
+                                             control-longmemoryprovider   = abap_true
+                                             control-agentinfoprovider    = abap_true
+                                             control-systempromptprovider = abap_true
+                                             control-agentstatus          = abap_true
+                                             control-createdby            = abap_true
+                                             control-createdat            = abap_true
+                                             control-changedby            = abap_true
+                                             control-lastchanged          = abap_true
+                                             control-locallastchanged     = abap_true  ) )
+      IMPORTING et_agent        = DATA(lt_current_agent) ).
 
     DATA(ls_current_agent) = VALUE #( lt_current_agent[ 1 ] OPTIONAL ).
 
