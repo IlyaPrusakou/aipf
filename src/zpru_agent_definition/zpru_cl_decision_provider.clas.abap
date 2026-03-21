@@ -74,6 +74,8 @@ CLASS zpru_cl_decision_provider DEFINITION
     METHODS prepare_first_tool_input ABSTRACT
       IMPORTING is_agent                   TYPE zpru_if_adf_type_and_constant=>ts_agent
                 it_tool                    TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+                is_first_tool              TYPE zpru_if_decision_provider=>ts_execution_plan
+                it_execution_plan          TYPE zpru_if_decision_provider=>tt_execution_plan
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider            OPTIONAL
@@ -332,6 +334,8 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     prepare_first_tool_input( EXPORTING is_agent                   = is_agent
                                         it_tool                    = it_tool
+                                        is_first_tool             = <ls_first_tool>
+                                        it_execution_plan          = lt_execution_plan
                                         io_controller              = io_controller
                                         io_input                   = io_input
                                         io_system_prompt           = io_system_prompt

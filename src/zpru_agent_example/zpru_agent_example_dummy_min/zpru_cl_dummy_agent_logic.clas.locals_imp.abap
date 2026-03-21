@@ -511,9 +511,63 @@ ENDCLASS.
 CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
   METHOD lookup_knowledge_int.
     DATA ls_input  TYPE zpru_s_knowledge_prvdr_input.
-    DATA ls_output TYPE zpru_s_knowledge_prvdr_output.
-    DATA ls_result TYPE zpru_s_dummy_inspection_prtcl.
-    DATA lo_util   TYPE REF TO zpru_if_agent_util.
+    DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
+
+    ls_input = is_input->*.
+
+    IF ls_input IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN2`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES2`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'KNOWLEDGE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `knowledge code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+    ENDIF.
+
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+CLASS lcl_adf_nested_agent IMPLEMENTATION.
+  METHOD run_nested_agent_int.
+    DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
+    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+    DATA ls_prompt         TYPE zpru_s_prompt.
+    DATA ls_input TYPE zpru_s_nested_agent_input.
+    DATA ls_safety_response TYPE zpru_s_nested_agent_output.
+    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
+
+
+    DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -524,93 +578,141 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    ls_result = VALUE zpru_s_dummy_inspection_prtcl(
-        inspectionprotocolname        = 'GR-2026-00892'
-        inspectionprotocoldescription = 'Inbound Inspection: Steel Coil Batch X-9'
-        inspectionprotocoldate        = lcl_common_algorithms=>get_timestamp( )
-        inspectionprotocolperson      = 'John Doe'
-        text                          = 'Visual inspection passed. Certificate of Analysis (CoA) attached and verified.' ).
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_input )
+      CHANGING
+        cr_string        = ls_prompt-string_content ).
 
-    lo_util->convert_to_string( EXPORTING ir_abap   = REF zpru_s_dummy_inspection_prtcl( ls_result )
-                                CHANGING  cr_string = ls_output-knowledgeprovideroutput ).
-
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_inspection_protocol>).
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
-    ENDIF.
-
-    <ls_inspection_protocol> = ls_output.
-  ENDMETHOD.
-ENDCLASS.
-
-
-CLASS lcl_adf_nested_agent IMPLEMENTATION.
-  METHOD run_nested_agent_int.
-    DATA lo_nested_agent   TYPE REF TO zpru_if_unit_agent.
-    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
-    DATA ls_prompt         TYPE zpru_s_prompt.
-    DATA lo_util           TYPE REF TO zpru_if_agent_util.
-    DATA ls_final_response TYPE zpru_s_final_response.
-    DATA lv_safety_request TYPE string.
-
-    FIELD-SYMBOLS <ls_tool_input>      TYPE zpru_s_nested_agent_input.
-    FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_nested_agent_output.
-
-    ASSIGN is_input->* TO <ls_tool_input>.
-    IF sy-subrc <> 0.
-      ev_error_flag = abap_true.
-    ENDIF.
-
-    IF <ls_tool_input> IS INITIAL.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
 
     lo_nested_agent = NEW zpru_cl_unit_agent( ).
-
-    " example data
-    DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
-        productid       = 'CHEM-772-L'
-        productname     = 'Concentrated Sulfuric Acid 98%'
-        materialgroup   = '00105'
-        industrysector  = 'C'
-        quantity        = '1200.000'
-        unitofmeasure   = 'KG'
-        ishazardous     = 'X'
-        purchaseorder   = '4500001234'
-        vendorname      = 'Global ChemCorp Solutions'
-        storagelocation = 'WH02'
-        safetynotesraw  = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
-
-    lv_safety_request = |{ lv_safety_request } productid: { ls_safety_request-productid } { cl_abap_char_utilities=>newline }|.
-
-    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
-                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    ls_prompt-string_content = lv_safety_request.
 
     lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
                                               is_prompt              = ls_prompt
                                               io_parent_controller   = io_controller
                                     IMPORTING ev_final_response      = lv_final_response
-                                    " TODO: variable is assigned but never used (ABAP cleaner)
                                               eo_executed_controller = DATA(lo_nested_controler) ).
 
-    ASSIGN es_output->* TO <ls_safety_response>.
+    lo_util->convert_to_abap(
+      EXPORTING
+        ir_string = REF #( lv_final_response )
+      CHANGING
+        cr_abap   = ls_safety_response ).
+
+
+    ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE ls_safety_response TO FIELD-SYMBOL(<lv_warehouse>).
+    IF sy-subrc = 0.
+      APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+      <ls_key_value>-name   = 'WAREHOUSE'.
+      <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+      <ls_key_value>-value  = <lv_warehouse>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'STORAGEBIN' OF STRUCTURE ls_safety_response TO FIELD-SYMBOL(<lv_STORAGEBIN>).
+    IF sy-subrc = 0.
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = <lv_STORAGEBIN>.
+    ENDIF.
+
+    ASSIGN COMPONENT 'RESOURCE' OF STRUCTURE ls_safety_response TO FIELD-SYMBOL(<lv_RESOURCE>).
+    IF sy-subrc = 0.
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = <lv_RESOURCE>.
+    ENDIF.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'NESTED_AGENT'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `nested agent code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
-                              CHANGING  cr_abap   = ls_final_response ).
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
 
-    IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
-      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
-                                           iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
-    ELSE.
-      lv_response_content_json = ls_final_response-finalresponsebody-responsecontent.
-    ENDIF.
 
-    <ls_safety_response>-nestedagentoutput = lv_response_content_json.
+
+
+
+
+
+
+
+
+
+
+
+
+*    DATA lv_final_response TYPE zpru_if_agent_frw=>ts_json.
+*    DATA ls_prompt         TYPE zpru_s_prompt.
+*    DATA lo_util           TYPE REF TO zpru_if_agent_util.
+*    DATA ls_final_response TYPE zpru_s_final_response.
+*    DATA lv_safety_request TYPE string.
+*
+*    FIELD-SYMBOLS <ls_tool_input>      TYPE zpru_s_nested_agent_input.
+*    FIELD-SYMBOLS <ls_safety_response> TYPE zpru_s_nested_agent_output.
+*
+*    ASSIGN is_input->* TO <ls_tool_input>.
+*    IF sy-subrc <> 0.
+*      ev_error_flag = abap_true.
+*    ENDIF.
+*
+*    IF <ls_tool_input> IS INITIAL.
+*      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+*    ENDIF.
+*
+*    lo_nested_agent = NEW zpru_cl_unit_agent( ).
+*
+*    " example data
+*    DATA(ls_safety_request) = VALUE zpru_s_dummy_safety_req(
+*        productid       = 'CHEM-772-L'
+*        productname     = 'Concentrated Sulfuric Acid 98%'
+*        materialgroup   = '00105'
+*        industrysector  = 'C'
+*        quantity        = '1200.000'
+*        unitofmeasure   = 'KG'
+*        ishazardous     = 'X'
+*        purchaseorder   = '4500001234'
+*        vendorname      = 'Global ChemCorp Solutions'
+*        storagelocation = 'WH02'
+*        safetynotesraw  = 'Drums show slight surface condensation. MSDS rev 2025 attached.' ).
+*
+*    lv_safety_request = |{ lv_safety_request } productid: { ls_safety_request-productid } { cl_abap_char_utilities=>newline }|.
+*
+
+*
+*    ls_prompt-string_content = lv_safety_request.
+*
+*    lo_nested_agent->execute_agent( EXPORTING iv_agent_name          = 'NESTED_AGENT'
+*                                              is_prompt              = ls_prompt
+*                                              io_parent_controller   = io_controller
+*                                    IMPORTING ev_final_response      = lv_final_response
+*                                    " TODO: variable is assigned but never used (ABAP cleaner)
+*                                              eo_executed_controller = DATA(lo_nested_controler) ).
+*
+*    ASSIGN es_output->* TO <ls_safety_response>.
+*    IF sy-subrc <> 0.
+*      ev_error_flag = abap_true.
+*    ENDIF.
+*
+*    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
+*                              CHANGING  cr_abap   = ls_final_response ).
+*
+*    IF lo_util->is_wrapped_in_json_markdown( ls_final_response-finalresponsebody-responsecontent ) = abap_true.
+*      DATA(lv_response_content_json) = lo_util->unwrap_from_json_markdown(
+*                                           iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
+*    ELSE.
+*      lv_response_content_json = ls_final_response-finalresponsebody-responsecontent.
+*    ENDIF.
+*
+*    <ls_safety_response>-nestedagentoutput = lv_response_content_json.
   ENDMETHOD.
 ENDCLASS.
 

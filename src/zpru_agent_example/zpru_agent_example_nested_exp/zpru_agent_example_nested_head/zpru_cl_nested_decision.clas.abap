@@ -26,14 +26,78 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD prepare_first_tool_input.
-    FIELD-SYMBOLS <ls_nested_abap_input> TYPE zpru_s_nested_abap_input.
+
+    DATA ls_nested_abap TYPE zpru_s_nested_abap_input.
+    DATA ls_nested_http TYPE zpru_s_nested_http_input.
+    DATA ls_nested_llm TYPE zpru_s_nested_llm_input.
+    DATA lo_util                 TYPE REF TO zpru_if_agent_util.
+    DATA ls_nested_prompt    TYPE zpru_s_nested_agent_input.
+    DATA lv_input TYPE string.
+
+    FIELD-SYMBOLS <ls_nested_abap_input> TYPE any.
+    FIELD-SYMBOLS <ls_nested_abap> TYPE zpru_s_nested_abap_input.
+    FIELD-SYMBOLS <ls_nested_http> TYPE zpru_s_nested_http_input.
+    FIELD-SYMBOLS <ls_nested_llm> TYPE zpru_s_nested_llm_input.
 
     ASSIGN er_first_tool_input->* TO <ls_nested_abap_input>.
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    <ls_nested_abap_input>-nestedabapinput = `Nested ABAP input`.
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lv_input = io_input->get_data( )->*.
+
+    IF lo_util->is_wrapped_in_json_markdown( iv_content = lv_input ) = abap_true.
+      lv_input = lo_util->unwrap_from_json_markdown( iv_markdown = lv_input ).
+    ENDIF.
+
+    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_input ) = abap_true.
+      lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
+    ENDIF.
+
+
+    lo_util->convert_to_abap(
+      EXPORTING
+        ir_string = REF #( lv_input )
+      CHANGING
+        cr_abap   = ls_nested_prompt ).
+
+
+    CASE is_first_tool-toolname.
+
+      WHEN 'NESTED_ABAP'.
+        ls_nested_abap-warehouse = ls_nested_prompt-warehouse.
+        ls_nested_abap-storagebin = ls_nested_prompt-storagebin.
+        ASSIGN er_first_tool_input->* TO <ls_nested_abap>.
+        IF sy-subrc <> 0.
+          RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+        ENDIF.
+        <ls_nested_abap> = ls_nested_abap.
+
+      WHEN 'NESTED_LLM'.
+        ls_nested_llm-warehouse = ls_nested_prompt-warehouse.
+        ls_nested_llm-storagebin = ls_nested_prompt-storagebin.
+        ASSIGN er_first_tool_input->* TO <ls_nested_llm>.
+        IF sy-subrc <> 0.
+          RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+        ENDIF.
+        <ls_nested_llm> = ls_nested_llm.
+
+      WHEN 'NESTED_HTTP'.
+        ls_nested_http-warehouse = ls_nested_prompt-warehouse.
+        ls_nested_http-resource = `MY_RES3`.
+        ASSIGN er_first_tool_input->* TO <ls_nested_http>.
+        IF sy-subrc <> 0.
+          RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+        ENDIF.
+        <ls_nested_http> = ls_nested_http.
+
+      WHEN OTHERS.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDCASE.
+
   ENDMETHOD.
 
   METHOD process_thinking.
