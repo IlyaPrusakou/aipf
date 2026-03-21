@@ -31,7 +31,7 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
     DATA ls_nested_http TYPE zpru_s_nested_http_input.
     DATA ls_nested_llm TYPE zpru_s_nested_llm_input.
     DATA lo_util                 TYPE REF TO zpru_if_agent_util.
-    DATA ls_nested_prompt    TYPE zpru_s_nested_agent_input.
+    DATA lr_nested_prompt    TYPE REF TO data.
     DATA lv_input TYPE string.
 
     FIELD-SYMBOLS <ls_nested_abap_input> TYPE any.
@@ -57,19 +57,37 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
       lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
     ENDIF.
 
+    ASSIGN lr_nested_prompt->* TO FIELD-SYMBOL(<ls_input>).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
     lo_util->convert_to_abap(
       EXPORTING
         ir_string = REF #( lv_input )
       CHANGING
-        cr_abap   = ls_nested_prompt ).
+        cr_abap   = <ls_input> ).
 
 
     CASE is_first_tool-toolname.
 
       WHEN 'NESTED_ABAP'.
-        ls_nested_abap-warehouse = ls_nested_prompt-warehouse.
-        ls_nested_abap-storagebin = ls_nested_prompt-storagebin.
+        ls_nested_abap-nestedabapinput = `nested first abap input`.
+
+        ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<lv_warehouse>).
+        IF sy-subrc = 0.
+          ls_nested_abap-warehouse = <lv_warehouse>.
+        ELSE.
+          ls_nested_abap-warehouse = `BS01`.
+        ENDIF.
+
+        ASSIGN COMPONENT 'STORAGEBIN' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<lv_storagebin>).
+        IF sy-subrc = 0.
+          ls_nested_abap-storagebin = <lv_storagebin>.
+        ELSE.
+          ls_nested_abap-storagebin = `MY_BIN3`.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_abap>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -77,8 +95,22 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
         <ls_nested_abap> = ls_nested_abap.
 
       WHEN 'NESTED_LLM'.
-        ls_nested_llm-warehouse = ls_nested_prompt-warehouse.
-        ls_nested_llm-storagebin = ls_nested_prompt-storagebin.
+        ls_nested_llm-nestedllminput = `nested first llm input`.
+
+        ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE <ls_input> TO <lv_warehouse>.
+        IF sy-subrc = 0.
+          ls_nested_llm-warehouse = <lv_warehouse>.
+        ELSE.
+          ls_nested_llm-warehouse = `BS01`.
+        ENDIF.
+
+        ASSIGN COMPONENT 'STORAGEBIN' OF STRUCTURE <ls_input> TO <lv_storagebin>.
+        IF sy-subrc = 0.
+          ls_nested_llm-storagebin = <lv_storagebin>.
+        ELSE.
+          ls_nested_llm-storagebin = `MY_BIN3`.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_llm>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -86,8 +118,22 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
         <ls_nested_llm> = ls_nested_llm.
 
       WHEN 'NESTED_HTTP'.
-        ls_nested_http-warehouse = ls_nested_prompt-warehouse.
-        ls_nested_http-resource = `MY_RES3`.
+        ls_nested_http-nestedhttpinput = `nested first http input`.
+
+        ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE <ls_input> TO <lv_warehouse>.
+        IF sy-subrc = 0.
+          ls_nested_http-warehouse = <lv_warehouse>.
+        ELSE.
+          ls_nested_http-warehouse = `BS01`.
+        ENDIF.
+
+        ASSIGN COMPONENT 'RESOURCE' OF STRUCTURE <ls_input> TO FIELD-SYMBOL(<lv_resource>).
+        IF sy-subrc = 0.
+          ls_nested_http-resource  = <lv_resource>.
+        ELSE.
+          ls_nested_http-resource  = `MY_RES3`.
+        ENDIF.
+
         ASSIGN er_first_tool_input->* TO <ls_nested_http>.
         IF sy-subrc <> 0.
           RAISE EXCEPTION NEW zpru_cx_agent_core( ).
@@ -118,11 +164,73 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD set_final_response_content.
-    IF iv_last_output <> `Nested http has played`.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
 
-    cs_final_response_body-responsecontent = `Nested final response`.
+    DATA lt_key_value TYPE zpru_tt_key_value.
+    DATA lo_util                 TYPE REF TO zpru_if_agent_util.
+    DATA ls_final_output TYPE zpru_s_nested_agent_output.
+    DATA lo_abap_datadescr TYPE REF TO cl_abap_datadescr.
+    DATA lt_absolute_name TYPE string_table.
+    DATA lt_key_value_condensed TYPE zpru_tt_key_value.
+    DATA ls_key_value_source TYPE zpru_s_key_value.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+
+    lo_util->convert_to_abap(
+      EXPORTING
+        ir_string =    REF #( iv_last_output )
+      CHANGING
+        cr_abap   = lt_key_value ).
+
+
+    LOOP AT lt_key_value ASSIGNING FIELD-SYMBOL(<lv_group>)
+                         GROUP BY ( name = <lv_group>-name )
+                         ASSIGNING FIELD-SYMBOL(<ls_group_key>).
+
+      CLEAR: lt_absolute_name, lt_key_value_condensed, ls_key_value_source.
+      LOOP AT GROUP <ls_group_key> ASSIGNING FIELD-SYMBOL(<ls_member>).
+        APPEND INITIAL LINE TO lt_absolute_name ASSIGNING FIELD-SYMBOL(<lv_absolute_name>).
+        <lv_absolute_name> = <ls_member>-type->absolute_name.
+      ENDLOOP.
+
+      LOOP AT lt_absolute_name ASSIGNING <lv_absolute_name>.
+        lt_key_value_condensed = VALUE #( FOR <ls_in> IN lt_key_value
+                                          WHERE ( name = <ls_group_key>-name AND
+                                                  type->absolute_name = <lv_absolute_name> )
+                                                  ( <ls_in> ) ).
+        IF lt_key_value_condensed IS INITIAL.
+          CONTINUE.
+        ENDIF.
+
+        SORT lt_key_value_condensed BY counter DESCENDING.
+        ls_key_value_source = VALUE #( lt_key_value_condensed[ 1 ] OPTIONAL ).
+
+
+        IF ls_key_value_source IS INITIAL.
+          CONTINUE.
+        ENDIF.
+
+        ASSIGN COMPONENT ls_key_value_source-name OF STRUCTURE ls_final_output TO FIELD-SYMBOL(<lv_target_field>).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
+
+        lo_abap_datadescr ?= cl_abap_datadescr=>describe_by_data( p_data = <lv_target_field> ).
+
+        IF lo_abap_datadescr->absolute_name <> ls_key_value_source-type->absolute_name.
+          CONTINUE.
+        ENDIF.
+        <lv_target_field> = ls_key_value_source-value.
+      ENDLOOP.
+    ENDLOOP.
+
+    lo_util->convert_to_string(
+      EXPORTING
+        ir_abap          = REF #( ls_final_output )
+      CHANGING
+        cr_string        = cs_final_response_body-responsecontent ).
+
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
