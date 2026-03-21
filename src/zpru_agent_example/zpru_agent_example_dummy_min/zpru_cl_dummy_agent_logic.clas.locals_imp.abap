@@ -76,18 +76,18 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
                                    sequence = 2 )
                                  ( toolname = 'DUMMY_ML'
                                    sequence = 3 )
-                                 ( toolname = 'DUMMY_DYN_CODE'
-                                   sequence = 4 )
+*                                 ( toolname = 'DUMMY_DYN_CODE' " qqq need to be checked and reworked
+*                                   sequence = 4 )
                                  ( toolname = 'DUMMY_SCM'
-                                   sequence = 5 )
+                                   sequence = 4 )
                                  ( toolname = 'DUMMY_HTTP'
-                                   sequence = 6 )
+                                   sequence = 5 )
                                  ( toolname = 'DUMMY_LLM'
-                                   sequence = 7 )
+                                   sequence = 6 )
                                  ( toolname = 'DUMMY_KNOWLEDGE'
-                                   sequence = 8 )
+                                   sequence = 7 )
                                  ( toolname = 'DUMMY_USER_TOOL'
-                                   sequence = 9 ) ).
+                                   sequence = 8 ) ).
 
     APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
     <ls_thinking_step>-thinkingstepnumber   = lcl_common_algorithms=>get_last_thinkingstepnumber(
