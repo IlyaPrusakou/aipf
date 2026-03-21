@@ -649,7 +649,15 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       IF sy-subrc <> 0.
         CONTINUE.
       ENDIF.
-      <lv_target> = <ls_source>-value.
+
+      IF <ls_component>-type IS INSTANCE OF cl_abap_structdescr OR
+         <ls_component>-type IS INSTANCE OF cl_abap_tabledescr.
+        io_util->convert_to_abap( EXPORTING ir_string = REF #( <ls_source>-value )
+                           CHANGING  cr_abap   = <lv_target> ).
+      ELSE.
+        <lv_target> = <ls_source>-value.
+
+      ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
