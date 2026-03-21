@@ -626,53 +626,30 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                               CHANGING  cr_abap   = lt_key_value_pairs ).
 
     LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
-      CASE TYPE OF <ls_component>-type.
-        WHEN TYPE cl_abap_elemdescr.
+      get_component_mapping( EXPORTING iv_struct_name           = <ls_component>-name
+                                       is_curr_tool_master_data = is_curr_tool_master_data
+                                       is_curr_execution_step   = is_curr_execution_step
+                                       is_prev_tool_master_data = is_prev_tool_master_data
+                                       is_prev_execution_step   = is_prev_execution_step
+                             IMPORTING ev_context_name          = DATA(lv_name) ).
 
-          get_component_mapping( EXPORTING iv_struct_name           = <ls_component>-name
-                                           is_curr_tool_master_data = is_curr_tool_master_data
-                                           is_curr_execution_step   = is_curr_execution_step
-                                           is_prev_tool_master_data = is_prev_tool_master_data
-                                           is_prev_execution_step   = is_prev_execution_step
-                                 IMPORTING ev_context_name          = DATA(lv_name) ).
+      IF lv_name IS INITIAL.
+        CONTINUE.
+      ENDIF.
 
-          IF lv_name IS INITIAL.
-            CONTINUE.
-          ENDIF.
-
-          ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<lv_source>).
-          IF sy-subrc <> 0.
-            ASSIGN it_key_value_pair[ name = lv_name ] TO <lv_source>.
-            IF sy-subrc <> 0.
-              CONTINUE.
-            ENDIF.
-          ENDIF.
-
-          ASSIGN COMPONENT <ls_component>-name OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
-          IF sy-subrc <> 0.
-            CONTINUE.
-          ENDIF.
-          <lv_target> = <lv_source>.
-        WHEN TYPE cl_abap_structdescr.
-
-          traverse_tree_abap( EXPORTING io_request                   = io_request
-                                        iv_input_string              = iv_input_string
-                                        is_curr_tool_master_data     = is_curr_tool_master_data
-                                        is_curr_execution_step       = is_curr_execution_step
-                                        is_prev_tool_master_data     = is_prev_tool_master_data
-                                        is_prev_execution_step       = is_prev_execution_step
-                                        io_controller                = io_controller
-                                        io_util                      = io_util
-                                        io_curr_tool_schema_provider = io_curr_tool_schema_provider
-                                        it_key_value_pair            = it_key_value_pair
-                                        io_abap_struct               = CAST #( <ls_component>-type )
-                              CHANGING  cr_input                     = cr_input ).
-
-        WHEN TYPE cl_abap_tabledescr.
-
+      ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<ls_source>).
+      IF sy-subrc <> 0.
+        ASSIGN it_key_value_pair[ name = lv_name ] TO <ls_source>.
+        IF sy-subrc <> 0.
           CONTINUE.
+        ENDIF.
+      ENDIF.
 
-      ENDCASE.
+      ASSIGN COMPONENT <ls_component>-name OF STRUCTURE cr_input TO FIELD-SYMBOL(<lv_target>).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+      <lv_target> = <ls_source>-value.
     ENDLOOP.
   ENDMETHOD.
 
