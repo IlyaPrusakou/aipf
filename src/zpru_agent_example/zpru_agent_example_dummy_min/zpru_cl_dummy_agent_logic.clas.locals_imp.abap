@@ -150,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( MessageUUID              = <ls_m1>-MessageUUID
+                                                               ( messageuuid              = <ls_m1>-messageuuid
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -438,6 +438,8 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     DATA ls_input  TYPE zpru_s_abap_executor_input.
     DATA lt_output TYPE zpru_tt_key_value.
     DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -449,6 +451,16 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
     <ls_key_value>-name   = 'WAREHOUSE'.
     <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
     <ls_key_value>-value  = ls_input-abapexecutorinput.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN1`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES1`.
 
     APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
     <ls_key_value>-name   = 'ABAP'.

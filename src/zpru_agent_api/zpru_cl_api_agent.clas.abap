@@ -1373,7 +1373,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_controller->mt_execution_steps = lt_step_all.
 
     ASSIGN lo_controller->mt_input_output[ number = lines( lo_controller->mt_input_output ) ] TO FIELD-SYMBOL(<ls_input_output>).
-    IF sy-subrc = 0.
+    IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
