@@ -41,7 +41,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    ASSIGN er_first_tool_input->* TO <ls_first_input>.
+    ASSIGN er_first_tool_input->* TO <ls_first_input>. " qqq add data to new fields
     <ls_first_input>-abapexecutorinput = 'BS01'.
 
     APPEND INITIAL LINE TO cs_decision_log-thinkingsteps ASSIGNING FIELD-SYMBOL(<ls_thinking_step>).
@@ -503,7 +503,7 @@ CLASS lcl_adf_abap_executor IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_inbound_items ASSIGNING FIELD-SYMBOL(<ls_inbound_item>).
       <ls_inbound_item>-deliveryname = 'INBOUND_DELIVERY_1'.
       <ls_inbound_item>-inboundnumber = 1.
-      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1.
+      <ls_inbound_item>-itemnumber = lines( lt_inbound_items ) + 1. "QQQ DONT ADD 1
       <ls_inbound_item>-itemname = |INBOUND_ITEM_{ 1 }|.
 
       APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
