@@ -659,9 +659,10 @@ ENDCLASS.
 CLASS lcl_adf_http_request_tool IMPLEMENTATION.
   METHOD send_http_int.
     DATA ls_input            TYPE zpru_s_http_request_input.
-    DATA ls_output           TYPE zpru_s_http_request_output.
-    DATA lo_input_from_http  TYPE REF TO zpru_if_payload.
-    DATA lo_output_from_http TYPE REF TO zpru_if_payload.
+     DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -669,29 +670,33 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_input_from_http ?= zpru_cl_agent_service_mngr=>get_service(
-                              iv_service = `ZPRU_IF_PAYLOAD`
-                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-    lo_input_from_http->set_data( ir_data = REF #( is_input ) ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN7`.
 
-    lo_output_from_http ?= zpru_cl_agent_service_mngr=>get_service(
-                               iv_service = `ZPRU_IF_PAYLOAD`
-                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES7`.
 
-    send_via_url( EXPORTING io_controller = io_controller
-                            io_request    = lo_input_from_http
-                  IMPORTING eo_response   = lo_output_from_http
-                            ev_error_flag = ev_error_flag ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'DUMMY HTTP'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `dummy http code has played`.
 
-    ls_output-httprequestoutput = lo_output_from_http->get_data( )->*.
-
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
   ENDMETHOD.
 
   METHOD send_via_url.
@@ -762,9 +767,10 @@ ENDCLASS.
 CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
   METHOD consume_service_model_int.
     DATA ls_input           TYPE zpru_s_mdl_consume_input.
-    DATA ls_output          TYPE zpru_s_mdl_consume_output.
-    " TODO: variable is assigned but never used (ABAP cleaner)
-    DATA lo_output_from_mdl TYPE REF TO zpru_if_payload.
+     DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -772,26 +778,33 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_output_from_mdl ?= zpru_cl_agent_service_mngr=>get_service(
-                              iv_service = `ZPRU_IF_PAYLOAD`
-                              iv_context = zpru_if_agent_frw=>cs_context-standard ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-*    consume_mdl( EXPORTING io_controller           = io_controller
-*                           is_input                = is_input
-*                           io_tool_schema_provider = io_tool_schema_provider
-*                           io_tool_info_provider   = io_tool_info_provider
-*                 IMPORTING es_output               = es_output
-*                           ev_error_flag           = ev_error_flag
-*                           et_additional_step      = et_additional_step ).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN8`.
 
-    ls_output-mdlconsumeoutput = `MDL has played`.
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES8`.
 
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'DUMMY MDL'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `dummy mdl code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
   ENDMETHOD.
 
   METHOD consume_mdl.
@@ -886,7 +899,10 @@ ENDCLASS.
 CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
   METHOD call_large_language_model_int.
     DATA ls_input  TYPE zpru_s_llm_call_input.
-    DATA ls_output TYPE zpru_s_llm_call_output.
+    DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -894,35 +910,33 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_output-llmcalloutput = `Main LLM has played`.
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN9`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES9`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'DUMMY LLM'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `dummy llm code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
-
-*    DATA lo_llm_api TYPE REF TO if_aic_completion_api.
-*    DATA lo_message TYPE REF TO if_aic_message_container.
-
-*    preprocess_llm_request( EXPORTING iv_islm_scenario = `MY_GEMINI_3`
-*                                      io_controller    = io_controller
-*                                      io_request       = io_request
-*                            IMPORTING eo_message       = lo_message
-*                                      eo_llm_api       = lo_llm_api
-*                                      ev_error_flag    = ev_error_flag ).
-
-*    IF ev_error_flag = abap_true.
-*      RETURN.
-*    ENDIF.
-
-*    process_llm_request( EXPORTING io_controller = io_controller
-*                                   io_request    = io_request
-*                                   io_message    = lo_message
-*                                   io_llm_api    = lo_llm_api
-*                         IMPORTING eo_response   = eo_response
-*                                   ev_error_flag = ev_error_flag ).
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
   ENDMETHOD.
 
   METHOD prepare_prompt.
@@ -1067,7 +1081,10 @@ ENDCLASS.
 CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
   METHOD get_ml_inference_int.
     DATA ls_input  TYPE zpru_s_ml_inference_input.
-    DATA ls_output TYPE zpru_s_ml_inference_output.
+     DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -1075,14 +1092,33 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_output-mlinferenceoutput = `Main ML inference has played`.
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN10`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES10`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'DUMMY ML'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `dummy ml code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
   ENDMETHOD.
 ENDCLASS.
 
@@ -1090,7 +1126,10 @@ ENDCLASS.
 CLASS lcl_adf_user_tool IMPLEMENTATION.
   METHOD execute_user_tool_int.
     DATA ls_input  TYPE zpru_s_user_tool_input.
-    DATA ls_output TYPE zpru_s_user_tool_output.
+      DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -1098,29 +1137,33 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_output-usertooloutput = `Main User tool has played`.
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN11`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES11`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'DUMMY USER'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `dummy user code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
-
-*    IF zpru_cl_logic_switch=>get_logic( ) = abap_true.
-*
-*      process_dummy_email( EXPORTING io_controller = io_controller
-*                                     io_request    = io_request
-*                           IMPORTING eo_response   = eo_response
-*                                     ev_error_flag = ev_error_flag ).
-*
-*    ELSE.
-*      process_prod_email( EXPORTING io_controller = io_controller
-*                                    io_request    = io_request
-*                          IMPORTING eo_response   = eo_response
-*                                    ev_error_flag = ev_error_flag ).
-*
-*    ENDIF.
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
   ENDMETHOD.
 
   METHOD process_dummy_email.

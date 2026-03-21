@@ -16,7 +16,10 @@ CLASS zpru_cl_nested_llm IMPLEMENTATION.
 
   METHOD call_large_language_model_int.
     DATA ls_input  TYPE zpru_s_nested_llm_input.
-    DATA ls_output TYPE zpru_s_nested_llm_output.
+    DATA lt_output TYPE zpru_tt_key_value.
+    DATA lv_lgnum  TYPE char4.
+    DATA lv_storage_bin TYPE char16.
+    DATA lv_resource TYPE char16.
 
     ls_input = is_input->*.
 
@@ -24,14 +27,33 @@ CLASS zpru_cl_nested_llm IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    ls_output-nestedllmoutput = `Nested llm has played`.
+    APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
+    <ls_key_value>-name   = 'WAREHOUSE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum ).
+    <ls_key_value>-value  = ls_input-warehouse.
 
-    ASSIGN es_output->* TO FIELD-SYMBOL(<ls_output>).
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'STORAGEBIN'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_storage_bin ).
+    <ls_key_value>-value  = `MY_BIN6`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'RESOURCE'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = lv_resource ).
+    <ls_key_value>-value  = `MY_RES6`.
+
+    APPEND INITIAL LINE TO lt_output ASSIGNING <ls_key_value>.
+    <ls_key_value>-name   = 'NESTED LLM'.
+    <ls_key_value>-type  ?= cl_abap_typedescr=>describe_by_data( p_data = VALUE string( ) ).
+    <ls_key_value>-value  = `nested llm code has played`.
+
+    ASSIGN es_output->* TO FIELD-SYMBOL(<lt_output>).
     IF sy-subrc <> 0.
       ev_error_flag = abap_true.
     ENDIF.
 
-    <ls_output> = ls_output.
+    <lt_output> = lt_output.
+    et_key_value_pairs = lt_output.
 
     " tool from this agent
     APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).
