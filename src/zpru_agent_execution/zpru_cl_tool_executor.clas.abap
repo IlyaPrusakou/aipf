@@ -637,7 +637,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<ls_source>).
+      ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<ls_source>). " qqq you use type and max counter
       IF sy-subrc <> 0.
         ASSIGN it_key_value_pair[ name = lv_name ] TO <ls_source>.
         IF sy-subrc <> 0.
