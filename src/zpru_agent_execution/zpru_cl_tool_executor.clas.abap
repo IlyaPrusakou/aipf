@@ -609,10 +609,14 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD traverse_tree_abap.
+    " TODO: parameter IO_REQUEST is never used (ABAP cleaner)
+    " TODO: parameter IO_CONTROLLER is never used (ABAP cleaner)
+    " TODO: parameter IO_CURR_TOOL_SCHEMA_PROVIDER is never used (ABAP cleaner)
+
     " WORKS ONLY WITH FLAT STRUCTURES
 
-    DATA lo_structure       TYPE REF TO cl_abap_structdescr.
-    DATA lt_key_value_pairs TYPE zpru_tt_key_value.
+    DATA lo_structure           TYPE REF TO cl_abap_structdescr.
+    DATA lt_key_value_prev_step TYPE zpru_tt_key_value.
 
     IF io_abap_struct IS NOT INSTANCE OF cl_abap_structdescr.
       RETURN.
@@ -623,7 +627,9 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
     DATA(lt_components) = lo_structure->get_components( ).
 
     io_util->convert_to_abap( EXPORTING ir_string = REF #( iv_input_string )
-                              CHANGING  cr_abap   = lt_key_value_pairs ).
+                              CHANGING  cr_abap   = lt_key_value_prev_step ).
+
+    DATA(lt_key_value_all_fields) = it_key_value_pair.
 
     LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
       get_component_mapping( EXPORTING iv_struct_name           = <ls_component>-name
@@ -637,9 +643,38 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      ASSIGN lt_key_value_pairs[ name = lv_name ] TO FIELD-SYMBOL(<ls_source>). " qqq you use type and max counter
+      DATA(lv_max_prev) = 0.
+      LOOP AT lt_key_value_prev_step ASSIGNING FIELD-SYMBOL(<ls_group_prev>)
+           GROUP BY ( name = <ls_group_prev>-name
+                      type = <ls_group_prev>-type ) ASSIGNING FIELD-SYMBOL(<ls_prev_k>).
+        LOOP AT GROUP <ls_prev_k> ASSIGNING FIELD-SYMBOL(<ls_member_prev>).
+          IF lv_max_prev < <ls_member_prev>-counter.
+            lv_max_prev = <ls_member_prev>-counter. " usually stay as zero
+          ENDIF.
+        ENDLOOP.
+      ENDLOOP.
+
+      ASSIGN lt_key_value_prev_step[ KEY counter
+                                     COMPONENTS name    = lv_name
+                                                type    = <ls_component>-type->absolute_name
+                                                counter = lv_max_prev ] TO FIELD-SYMBOL(<ls_source>).
       IF sy-subrc <> 0.
-        ASSIGN it_key_value_pair[ name = lv_name ] TO <ls_source>.
+
+        DATA(lv_max_all) = 0.
+        LOOP AT lt_key_value_all_fields ASSIGNING FIELD-SYMBOL(<ls_group_all>)
+             GROUP BY ( name = <ls_group_all>-name
+                        type = <ls_group_all>-type ) ASSIGNING FIELD-SYMBOL(<ls_all_k>).
+          LOOP AT GROUP <ls_all_k> ASSIGNING FIELD-SYMBOL(<ls_member_all>).
+            IF lv_max_all < <ls_member_all>-counter.
+              lv_max_all = <ls_member_all>-counter.
+            ENDIF.
+          ENDLOOP.
+        ENDLOOP.
+
+        ASSIGN lt_key_value_all_fields[ KEY counter
+                                        COMPONENTS name    = lv_name
+                                                   type    = <ls_component>-type->absolute_name
+                                                   counter = lv_max_all ] TO <ls_source>.
         IF sy-subrc <> 0.
           CONTINUE.
         ENDIF.
@@ -650,10 +685,10 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      IF <ls_component>-type IS INSTANCE OF cl_abap_structdescr OR
-         <ls_component>-type IS INSTANCE OF cl_abap_tabledescr.
+      IF    <ls_component>-type IS INSTANCE OF cl_abap_structdescr
+         OR <ls_component>-type IS INSTANCE OF cl_abap_tabledescr.
         io_util->convert_to_abap( EXPORTING ir_string = REF #( <ls_source>-value )
-                           CHANGING  cr_abap   = <lv_target> ).
+                                  CHANGING  cr_abap   = <lv_target> ).
       ELSE.
         <lv_target> = <ls_source>-value.
 
