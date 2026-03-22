@@ -2946,12 +2946,15 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     IF io_controller->mo_parent_controller IS BOUND.
       DATA(lv_stop_search) = abap_false.
 
+      data(lo_current_controller) = io_controller.
+
       WHILE lv_stop_search = abap_false.
-        DATA(lo_parent) = io_controller->mo_parent_controller.
+        DATA(lo_parent) = lo_current_controller->mo_parent_controller.
         IF lo_parent->mo_parent_controller IS NOT BOUND.
-          DATA(lo_root_controller) = io_controller->mo_parent_controller.
+          DATA(lo_root_controller) = lo_current_controller->mo_parent_controller.
           lv_stop_search = abap_true.
         ENDIF.
+        lo_current_controller = lo_parent.
       ENDWHILE.
 
       lo_root_controller->mv_real_number_of_loops += 1.

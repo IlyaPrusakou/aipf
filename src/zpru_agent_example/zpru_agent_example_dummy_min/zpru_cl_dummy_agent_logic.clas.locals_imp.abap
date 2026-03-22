@@ -723,7 +723,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     ENDIF.
 
     APPEND INITIAL LINE TO <ls_last_input_output>-direct_children ASSIGNING FIELD-SYMBOL(<lo_child_controller>).
-    <lo_child_controller> = lo_nested_controler.
+    <lo_child_controller> = lo_nested_controler. " qqq initial ref returned
 
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
@@ -832,6 +832,9 @@ CLASS lcl_adf_http_request_tool IMPLEMENTATION.
     IF ls_input IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
@@ -1001,6 +1004,9 @@ CLASS lcl_adf_service_cons_mdl_tool IMPLEMENTATION.
     IF ls_input IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
@@ -1194,6 +1200,9 @@ CLASS lcl_adf_call_llm_tool IMPLEMENTATION.
     IF ls_input IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
@@ -1438,6 +1447,9 @@ CLASS lcl_adf_ml_model_inference IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
     <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
@@ -1543,6 +1555,9 @@ CLASS lcl_adf_user_tool IMPLEMENTATION.
     IF ls_input IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
