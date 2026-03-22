@@ -68,7 +68,7 @@ CLASS zpru_cl_nested_agent_runner IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    IF lo_nested_controler IS BOUND. "qqq inside example implementation we add controller already
+    IF lo_nested_controler IS BOUND.
 
       ASSIGN io_controller->mt_input_output[ current_controller->mv_query_uuid = is_execution_step-queryuuid ] TO FIELD-SYMBOL(<ls_current_input_output>).
       IF sy-subrc = 0.

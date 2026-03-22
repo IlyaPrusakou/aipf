@@ -35,7 +35,8 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
 
         lo_api_agent->run( EXPORTING iv_run_uuid       = lv_built_run_uuid
                                      iv_query_uuid     = lv_built_query_uuid
-                           IMPORTING eo_final_response = DATA(lo_final_response) ).
+                           IMPORTING eo_final_response = DATA(lo_final_response)
+                                     eo_executed_controller = eo_executed_controller ).
 
         ev_final_response = lo_final_response->get_data( )->*.
 

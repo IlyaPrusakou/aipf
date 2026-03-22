@@ -244,9 +244,11 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      APPEND INITIAL LINE TO ls_decision_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
-      <ls_tool_metadata> = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ). " qqq add empty lines if return nothing
-
+      DATA(ls_tool_metadata) = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ).
+      IF ls_tool_metadata IS NOT INITIAL.
+        APPEND INITIAL LINE TO ls_decision_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
+        <ls_tool_metadata> = ls_tool_metadata.
+      ENDIF.
     ENDLOOP.
 
     ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt(
@@ -469,37 +471,38 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
 
-    DATA(ls_last_step) = VALUE #( io_controller->mt_execution_steps[ stepsequence = lv_last_step_sequence ] OPTIONAL ).
+    DATA(ls_last_step) = VALUE #( io_controller->mt_execution_steps[ KEY sequence
+                                                                     COMPONENTS stepsequence = lv_last_step_sequence ] OPTIONAL ).
     IF ls_last_step IS NOT INITIAL.
       DATA(ls_last_step_context) = VALUE #( io_controller->mt_run_context[
-                                                execution_step-stepsequence = ls_last_step-stepsequence ] OPTIONAL ).
+                                                execution_step-stepuuid = ls_last_step-stepuuid ] OPTIONAL ).
+
+      set_final_response_content( EXPORTING iv_run_uuid            = iv_run_uuid
+                                            iv_query_uuid          = iv_query_uuid
+                                            io_controller          = io_controller
+                                            iv_last_output         = lv_last_output
+                                            is_last_step           = ls_last_step_context
+                                  CHANGING  cs_final_response_body = ls_final_response-finalresponsebody  ).
+
+      set_final_response_metadata( EXPORTING iv_run_uuid        = iv_run_uuid
+                                             iv_query_uuid      = iv_query_uuid
+                                             io_controller      = io_controller
+                                             io_last_output     = io_last_output
+                                   CHANGING  cs_reasoning_trace = ls_final_response-reasoning_trace ).
+
+      lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
+                                  CHANGING  cr_string = lv_final_response_json ).
+
+      lv_final_response_json = lo_util->wrap_to_json_markdown( iv_content = lv_final_response_json ).
+
+      IF eo_final_response IS NOT BOUND.
+        eo_final_response ?= zpru_cl_agent_service_mngr=>get_service(
+                                 iv_service = `ZPRU_IF_PAYLOAD`
+                                 iv_context = zpru_if_agent_frw=>cs_context-standard ).
+      ENDIF.
+
+      eo_final_response->set_data( ir_data = NEW zpru_de_json( lv_final_response_json ) ).
     ENDIF.
-
-    set_final_response_content( EXPORTING iv_run_uuid            = iv_run_uuid
-                                          iv_query_uuid          = iv_query_uuid
-                                          io_controller          = io_controller
-                                          iv_last_output         = lv_last_output
-                                          is_last_step           = ls_last_step_context
-                                CHANGING  cs_final_response_body = ls_final_response-finalresponsebody  ).
-
-    set_final_response_metadata( EXPORTING iv_run_uuid        = iv_run_uuid
-                                           iv_query_uuid      = iv_query_uuid
-                                           io_controller      = io_controller
-                                           io_last_output     = io_last_output
-                                 CHANGING  cs_reasoning_trace = ls_final_response-reasoning_trace ).
-
-    lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
-                                CHANGING  cr_string = lv_final_response_json ).
-
-    lv_final_response_json = lo_util->wrap_to_json_markdown( iv_content = lv_final_response_json ).
-
-    IF eo_final_response IS NOT BOUND.
-      eo_final_response ?= zpru_cl_agent_service_mngr=>get_service(
-                               iv_service = `ZPRU_IF_PAYLOAD`
-                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
-    ENDIF.
-
-    eo_final_response->set_data( ir_data = NEW zpru_de_json( lv_final_response_json ) ).
   ENDMETHOD.
 
   METHOD get_timestamp.

@@ -1738,6 +1738,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RETURN.
     ENDLOOP.
 
+    LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_upd_context_step_status>).
+      <ls_upd_context_step_status>-stepstatus = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+    ENDLOOP.
+
     GET TIME STAMP FIELD DATA(lv_now).
 
     APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
@@ -1747,6 +1751,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     <ls_query_2_upd>-queryenddatetime = lv_now.
     <ls_query_2_upd>-control-querystatus      = abap_true.
     <ls_query_2_upd>-control-queryenddatetime = abap_true.
+
+    lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
+                                  CHANGING  cs_reported         = cs_axc_reported
+                                            cs_failed           = cs_axc_failed ).
 
     CREATE OBJECT lo_decision_provider TYPE (is_agent-decisionprovider).
 
@@ -1768,13 +1776,17 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         lv_final_response = eo_final_response->get_data( )->*.
       ENDIF.
 
+      CLEAR: lt_query_update_imp.
+      APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING <ls_query_2_upd>.
+      <ls_query_2_upd>-queryuuid        = is_execution_query-queryuuid.
+      <ls_query_2_upd>-runuuid          = is_execution_query-runuuid.
       <ls_query_2_upd>-queryoutputresponse = lv_final_response.
       <ls_query_2_upd>-control-queryoutputresponse = abap_true.
-    ENDIF.
 
-    lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
+      lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
                                   CHANGING  cs_reported         = cs_axc_reported
                                             cs_failed           = cs_axc_failed ).
+    ENDIF.
 
     ls_json_type-user      = sy-uname.
     ls_json_type-topic     = `FINAL_RESPONSE`.
@@ -2946,7 +2958,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     IF io_controller->mo_parent_controller IS BOUND.
       DATA(lv_stop_search) = abap_false.
 
-      data(lo_current_controller) = io_controller.
+      DATA(lo_current_controller) = io_controller.
 
       WHILE lv_stop_search = abap_false.
         DATA(lo_parent) = lo_current_controller->mo_parent_controller.

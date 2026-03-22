@@ -221,9 +221,6 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD set_final_response_content.
-    IF iv_last_output <> `Main User tool has played`.
-      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
-    ENDIF.
 
     cs_final_response_body-structureddata   = VALUE #( ( name  = 'name1'
                                                          value = 'value1' ) ).
@@ -591,6 +588,9 @@ CLASS lcl_adf_knowledge_provider IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
     APPEND INITIAL LINE TO lt_output ASSIGNING FIELD-SYMBOL(<ls_key_value>).
     <ls_key_value>-name  = 'WAREHOUSE'.
     <ls_key_value>-type  = cl_abap_typedescr=>describe_by_data( p_data = lv_lgnum )->absolute_name.
@@ -713,7 +713,7 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
                                               is_prompt              = ls_prompt
                                               io_parent_controller   = io_controller
                                     IMPORTING ev_final_response      = lv_final_response
-                                              eo_executed_controller = DATA(lo_nested_controler) ).
+                                              eo_executed_controller = eo_nested_controller ).
 
     SORT io_controller->mt_input_output BY number DESCENDING.
 
@@ -721,9 +721,6 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
     IF sy-subrc <> 0.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
-
-    APPEND INITIAL LINE TO <ls_last_input_output>-direct_children ASSIGNING FIELD-SYMBOL(<lo_child_controller>).
-    <lo_child_controller> = lo_nested_controler. " qqq initial ref returned
 
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
