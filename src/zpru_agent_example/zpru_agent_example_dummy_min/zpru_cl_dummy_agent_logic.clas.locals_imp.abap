@@ -254,6 +254,8 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
 
     cs_final_response_body-suggestedactions = VALUE #( (  actionname = 'Do something next' ) ).
 
+    cs_final_response_body-type = cl_abap_datadescr=>describe_by_data( p_data = cs_final_response_body-structureddata )->absolute_name.
+
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
