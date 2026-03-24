@@ -160,9 +160,4 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD get_input_json_schema.
   ENDMETHOD.
 
-  METHOD get_output_abap_type.
-  ENDMETHOD.
-
-  METHOD get_output_json_schema.
-  ENDMETHOD.
 ENDCLASS.

@@ -8,8 +8,6 @@ CLASS zpru_cl_nested_llm_schm_prvdr DEFINITION
   PROTECTED SECTION.
     METHODS get_input_abap_type    REDEFINITION.
     METHODS get_input_json_schema  REDEFINITION.
-    METHODS get_output_abap_type   REDEFINITION.
-    METHODS get_output_json_schema REDEFINITION.
 
     METHODS create_json_schema_example
       EXPORTING ev_json_schema    TYPE zpru_if_agent_frw=>ts_json
@@ -34,23 +32,6 @@ CLASS zpru_cl_nested_llm_schm_prvdr IMPLEMENTATION.
 
     TRY.
 
-        create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                              es_json_structure = es_json_structure ).
-
-      CATCH zpru_cx_agent_core.
-        RETURN.
-    ENDTRY.
-  ENDMETHOD.
-
-  METHOD get_output_abap_type.
-    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_LLM_OUTPUT` ).
-    IF sy-subrc <> 0.
-      RETURN.
-    ENDIF.
-  ENDMETHOD.
-
-  METHOD get_output_json_schema.
-    TRY.
         create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
                                               es_json_structure = es_json_structure ).
 

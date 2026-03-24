@@ -254,6 +254,8 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
 
     cs_final_response_body-suggestedactions = VALUE #( (  actionname = 'Do something next' ) ).
 
+    cs_final_response_body-type = cl_abap_datadescr=>describe_by_data( p_data = cs_final_response_body-structureddata )->absolute_name.
+
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
@@ -1887,129 +1889,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
       WHEN `NESTED_AGENT`.
         TRY.
 
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_KNOWLEDGE`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_CODE`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_HTTP`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_SCM`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_LLM`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_DYN_CODE`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_ML`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN `DUMMY_USER_TOOL`.
-        TRY.
-            create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                                  es_json_structure = es_json_structure ).
-          CATCH zpru_cx_agent_core.
-            RETURN.
-        ENDTRY.
-      WHEN OTHERS.
-        RETURN.
-    ENDCASE.
-  ENDMETHOD.
-
-  METHOD get_output_abap_type.
-    CASE is_tool_master_data-toolname.
-      WHEN `NESTED_AGENT`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_KNOWLEDGE`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_KNOWLEDGE_PRVDR_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_CODE`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ABAP_EXECUTOR_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_HTTP`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_HTTP_REQUEST_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_SCM`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_MDL_CONSUME_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_LLM`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_LLM_CALL_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_DYN_CODE`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_DYNAMIC_TOOL_PARAM` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_ML`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_ML_INFERENCE_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN `DUMMY_USER_TOOL`.
-        ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_AGENT_OUTPUT` ).
-        IF sy-subrc <> 0.
-          RETURN.
-        ENDIF.
-      WHEN OTHERS.
-        RETURN.
-    ENDCASE.
-  ENDMETHOD.
-
-  METHOD get_output_json_schema.
-    CASE is_tool_master_data-toolname.
-      WHEN `NESTED_AGENT`.
-        TRY.
             create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
                                                   es_json_structure = es_json_structure ).
 
