@@ -150,23 +150,6 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
     ENDTRY.
   ENDMETHOD.
 
-  METHOD get_output_abap_type.
-    ro_structure_schema ?= cl_abap_structdescr=>describe_by_name( p_name = `ZPRU_S_NESTED_ABAP_OUTPUT` ).
-    IF sy-subrc <> 0.
-      RETURN.
-    ENDIF.
-  ENDMETHOD.
-
-  METHOD get_output_json_schema.
-    TRY.
-        create_json_schema_example( IMPORTING ev_json_schema    = ev_json_schema
-                                              es_json_structure = es_json_structure ).
-
-      CATCH zpru_cx_agent_core.
-        RETURN.
-    ENDTRY.
-  ENDMETHOD.
-
   METHOD create_json_schema_example.
     DATA lo_util TYPE REF TO zpru_if_agent_util.
 

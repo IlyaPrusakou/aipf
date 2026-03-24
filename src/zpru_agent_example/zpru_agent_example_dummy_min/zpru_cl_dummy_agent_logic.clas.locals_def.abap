@@ -215,8 +215,6 @@ CLASS lcl_adf_schema_provider DEFINITION INHERITING FROM zpru_cl_tool_schema_pro
   PROTECTED SECTION.
     METHODS get_input_abap_type    REDEFINITION.
     METHODS get_input_json_schema  REDEFINITION.
-    METHODS get_output_abap_type   REDEFINITION.
-    METHODS get_output_json_schema REDEFINITION.
 
     METHODS create_json_schema_example
       EXPORTING ev_json_schema    TYPE zpru_if_agent_frw=>ts_json
