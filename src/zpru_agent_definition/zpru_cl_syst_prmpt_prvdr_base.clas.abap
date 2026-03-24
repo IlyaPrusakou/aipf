@@ -79,6 +79,5 @@ CLASS zpru_cl_syst_prmpt_prvdr_base IMPLEMENTATION.
                                                                         json = lv_arbitrary_text_title ) )
                                 CHANGING  cr_string        = rv_system_prompt ).
 
-    rv_system_prompt = lo_util->wrap_to_json_markdown( iv_content = rv_system_prompt ).
   ENDMETHOD.
 ENDCLASS.

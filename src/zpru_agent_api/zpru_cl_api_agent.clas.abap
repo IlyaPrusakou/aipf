@@ -1769,12 +1769,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                             cs_adf_failed     = cs_adf_failed   ).
     IF eo_final_response IS BOUND.
 
-      IF lo_util->is_wrapped_in_json_markdown( iv_content = eo_final_response->get_data( )->* ).
-        lv_final_response = lo_util->unwrap_from_json_markdown(
-                                iv_markdown = eo_final_response->get_data( )->* ).
-      ELSE.
         lv_final_response = eo_final_response->get_data( )->*.
-      ENDIF.
 
       CLEAR: lt_query_update_imp.
       APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING <ls_query_2_upd>.
@@ -2077,11 +2072,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_decision_log = get_payload( ).
 
-    IF lo_utility->is_wrapped_in_text_markdown( iv_content = iv_input_query ) = abap_true.
-      lv_unwrapped_query = lo_utility->unwrap_from_text_markdown( iv_markdown = iv_input_query ).
-    ELSE.
       lv_unwrapped_query = iv_input_query.
-    ENDIF.
 
     lo_utility->convert_to_abap( EXPORTING ir_string = REF #( lv_unwrapped_query )
                                  CHANGING  cr_abap   = ls_parsed_query ).
@@ -2606,15 +2597,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_util = get_utility( ).
 
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = is_input_query-string_content ) = abap_true.
-      lv_content = lo_util->unwrap_from_json_markdown( iv_markdown = is_input_query-string_content ).
-    ELSE.
       lv_content = is_input_query-string_content.
-    ENDIF.
-
-    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_content ) = abap_false.
-      lv_content = lo_util->wrap_to_text_markdown( iv_content = lv_content ).
-    ENDIF.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -2763,17 +2746,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ev_decision_log_msg = lv_content.
 
-    IF io_utility->is_wrapped_in_text_markdown( iv_content = iv_input_query ).
-      lv_query = io_utility->unwrap_from_text_markdown( iv_markdown = iv_input_query ).
-    ELSE.
       lv_query = iv_input_query.
-    ENDIF.
-
-    IF io_utility->is_wrapped_in_json_markdown( iv_content = iv_decision_log ).
-      lv_decision_log = io_utility->unwrap_from_json_markdown( iv_markdown = iv_decision_log ).
-    ELSE.
       lv_decision_log = iv_decision_log.
-    ENDIF.
 
     TRY.
         es_execution_query = VALUE #(

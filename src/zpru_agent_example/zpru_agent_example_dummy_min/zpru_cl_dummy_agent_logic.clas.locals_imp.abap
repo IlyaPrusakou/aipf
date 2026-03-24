@@ -150,7 +150,7 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
     et_episodic_message_memory = io_long_memory->retrieve_message(
                                      it_mmsg_read_k = VALUE #( FOR <ls_m1>
                                                                IN lt_mmsg_k
-                                                               ( MessageUUID              = <ls_m1>-MessageUUID
+                                                               ( messageuuid              = <ls_m1>-messageuuid
                                                                  control-messageuuid      = abap_true
                                                                  control-content          = abap_true
                                                                  control-messagetype      = abap_true
@@ -222,10 +222,38 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
 
   METHOD set_final_response_content.
 
-    cs_final_response_body-structureddata   = VALUE #( ( name  = 'name1'
-                                                         value = 'value1' ) ).
+    DATA lt_last_output_abap TYPE zpru_tt_key_value.
+    DATA lo_util TYPE REF TO zpru_if_agent_util.
+
+    lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
+                                                        iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_util->convert_to_abap(
+      EXPORTING
+        ir_string = NEW string( iv_last_output )
+      CHANGING
+        cr_abap   = lt_last_output_abap ).
+
+    LOOP AT lt_last_output_abap ASSIGNING FIELD-SYMBOL(<ls_last_key_value>).
+      APPEND INITIAL LINE TO cs_final_response_body-structureddata ASSIGNING FIELD-SYMBOL(<ls_structureddata>).
+      <ls_structureddata>-name  = <ls_last_key_value>-name.
+      <ls_structureddata>-value = <ls_last_key_value>-value.
+    ENDLOOP.
+
+    SORT io_controller->mt_input_output BY number DESCENDING.
+    DATA(lt_freshest_context) = VALUE #( io_controller->mt_input_output[ 1 ]-key_value_pairs OPTIONAL ).
+
+    LOOP AT lt_freshest_context ASSIGNING FIELD-SYMBOL(<ls_context>).
+      APPEND INITIAL LINE TO cs_final_response_body-structureddata ASSIGNING <ls_structureddata>.
+      <ls_structureddata>-name  = <ls_context>-name.
+      <ls_structureddata>-value = <ls_context>-value.
+    ENDLOOP.
+
+    lo_util->convert_to_string( EXPORTING ir_abap   = REF #( cs_final_response_body-structureddata )
+                                CHANGING  cr_string = cs_final_response_body-responsecontent ).
+
     cs_final_response_body-suggestedactions = VALUE #( (  actionname = 'Do something next' ) ).
-    cs_final_response_body-responsecontent  = `Nested final response`.
+
   ENDMETHOD.
 
   METHOD set_final_response_metadata.
@@ -724,11 +752,6 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
 
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
                               CHANGING  cr_abap   = ls_final_response ).
-
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_final_response-finalresponsebody-responsecontent ) = abap_true.
-      ls_final_response-finalresponsebody-responsecontent = lo_util->unwrap_from_json_markdown(
-          iv_markdown = ls_final_response-finalresponsebody-responsecontent ).
-    ENDIF.
 
     lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody-responsecontent )
                               CHANGING  cr_abap   = ls_nested_agent_response ).
