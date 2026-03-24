@@ -263,15 +263,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util->convert_to_abap( EXPORTING ir_string = io_input->get_data( )
                               CHANGING  cr_abap   = ls_json_type ).
 
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = ls_json_type-content ) = abap_true.
-      lv_content = lo_util->unwrap_from_json_markdown( iv_markdown = ls_json_type-content ).
-    ELSE.
       lv_content = ls_json_type-content.
-    ENDIF.
-
-    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_content ) = abap_true.
-      lv_content = lo_util->unwrap_from_text_markdown( iv_markdown = lv_content ).
-    ENDIF.
 
     ls_decision_request-userprompt = lv_content.
 
@@ -372,8 +364,6 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util->convert_to_string( EXPORTING ir_abap   = lr_first_input
                                 CHANGING  cr_string = lv_first_input_string ).
 
-    lv_first_input_string = lo_util->wrap_to_json_markdown( iv_content = lv_first_input_string ).
-
     eo_first_tool_input->set_data( ir_data = NEW string( lv_first_input_string ) ).
 
     ls_decision_log-resultcomment = set_result_comment( ).
@@ -385,8 +375,6 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
     lo_util->convert_to_string( EXPORTING ir_abap   = REF #(  ls_decision_log )
                                 CHANGING  cr_string = lv_decision_log_string ).
-
-    lv_decision_log_string = lo_util->wrap_to_json_markdown( iv_content = lv_decision_log_string ).
 
     eo_decision_log->set_data( ir_data = NEW string( lv_decision_log_string ) ).
   ENDMETHOD.
@@ -453,16 +441,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    IF lo_util->is_wrapped_in_text_markdown( iv_content = io_last_output->get_data( )->* ) = abap_true.
-      lv_last_output = lo_util->unwrap_from_text_markdown(
-                           iv_markdown = io_last_output->get_data( )->* ).
-    ELSE.
       lv_last_output = io_last_output->get_data( )->*.
-    ENDIF.
-
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = lv_last_output ).
-      lv_last_output = lo_util->unwrap_from_json_markdown( iv_markdown = lv_last_output ).
-    ENDIF.
 
     LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_step_candidate>)
          WHERE stepstatus = zpru_if_axc_type_and_constant=>sc_step_status-complete.
@@ -492,8 +471,6 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
 
       lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
                                   CHANGING  cr_string = lv_final_response_json ).
-
-      lv_final_response_json = lo_util->wrap_to_json_markdown( iv_content = lv_final_response_json ).
 
       IF eo_final_response IS NOT BOUND.
         eo_final_response ?= zpru_cl_agent_service_mngr=>get_service(

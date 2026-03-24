@@ -49,14 +49,6 @@ CLASS zpru_cl_nested_decision IMPLEMENTATION.
 
     lv_input = io_input->get_data( )->*.
 
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = lv_input ) = abap_true.
-      lv_input = lo_util->unwrap_from_json_markdown( iv_markdown = lv_input ).
-    ENDIF.
-
-    IF lo_util->is_wrapped_in_text_markdown( iv_content = lv_input ) = abap_true.
-      lv_input = lo_util->unwrap_from_text_markdown( iv_markdown = lv_input ).
-    ENDIF.
-
     CREATE DATA lr_nested_prompt TYPE (is_input_prompt-type).
 
     ASSIGN lr_nested_prompt->* TO FIELD-SYMBOL(<ls_input>).

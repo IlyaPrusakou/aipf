@@ -413,18 +413,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     CREATE DATA lr_input TYPE HANDLE lo_structure_input.
 
-    IF lo_util->is_wrapped_in_text_markdown( iv_content = io_request->get_data( )->* ) = abap_true.
-      ev_error_flag = abap_true.
-      RETURN.
-    ENDIF.
-
-    " unwrap json
-    IF lo_util->is_wrapped_in_json_markdown( iv_content = io_request->get_data( )->* ) = abap_true.
-      lv_input_string = lo_util->unwrap_from_json_markdown(
-                            iv_markdown = io_request->get_data( )->* ).
-    ELSE.
       lv_input_string = io_request->get_data( )->*.
-    ENDIF.
 
     LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
       DATA(lv_min_seq) = <ls_search_min_seq>-stepsequence.
@@ -490,9 +479,6 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     io_util->convert_to_string( EXPORTING ir_abap   = ir_output
                                 CHANGING  cr_string = lv_output_json ).
-
-    " wrap into json
-    lv_output_json = io_util->wrap_to_json_markdown( iv_content = lv_output_json ).
 
     eo_response->set_data( NEW zpru_if_agent_frw=>ts_json( lv_output_json ) ).
 
