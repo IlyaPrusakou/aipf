@@ -72,6 +72,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 iv_user_data               TYPE zpru_de_json                              OPTIONAL
       EXPORTING et_execution_plan          TYPE zpru_if_decision_provider=>tt_execution_plan
                 ev_langu                   TYPE sylangu
+                ev_thinking_output         type string
       CHANGING  cs_decision_log            TYPE zpru_s_decision_log
       RAISING   zpru_cx_agent_core.
 
@@ -83,6 +84,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
                 is_input_prompt            TYPE zpru_s_prompt
+                iv_thinking_output         type string
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider            OPTIONAL
                 io_short_memory            TYPE REF TO zpru_if_short_memory_provider      OPTIONAL
                 io_long_memory             TYPE REF TO zpru_if_long_memory_provider       OPTIONAL
@@ -287,6 +289,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                 iv_user_data               = lv_user_data
                       IMPORTING et_execution_plan          = DATA(lt_execution_plan)
                                 ev_langu                   = DATA(lv_langu)
+                                ev_thinking_output         = data(lv_thinking_output)
                       CHANGING  cs_decision_log            = ls_decision_log ).
 
     APPEND INITIAL LINE TO ls_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
@@ -337,6 +340,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                         io_controller              = io_controller
                                         io_input                   = io_input
                                         is_input_prompt            = is_input_prompt
+                                        iv_thinking_output         = lv_thinking_output
                                         io_system_prompt           = io_system_prompt
                                         io_short_memory            = io_short_memory
                                         io_long_memory             = io_long_memory
