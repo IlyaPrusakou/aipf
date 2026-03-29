@@ -1,5 +1,7 @@
 # AIPF - Agent Integration Processing Framework
 
+You may try out stable version on branch 'playground'.
+
 The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 **So far AIPF is under heavy development!!!**
