@@ -752,11 +752,11 @@ CLASS lcl_adf_nested_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_final_response )
-                              CHANGING  cr_abap   = ls_final_response ).
-
-    lo_util->convert_to_abap( EXPORTING ir_string = REF #( ls_final_response-finalresponsebody-responsecontent )
-                              CHANGING  cr_abap   = ls_nested_agent_response ).
+    CAST zpru_if_agent_base( lo_nested_agent )->get_response_content(
+      EXPORTING
+        iv_final_response = lv_final_response
+      IMPORTING
+        ed_response_body  = ls_nested_agent_response ).
 
     ASSIGN COMPONENT 'WAREHOUSE' OF STRUCTURE ls_nested_agent_response TO FIELD-SYMBOL(<lv_warehouse>).
     IF sy-subrc = 0.

@@ -1,9 +1,9 @@
 CLASS zpru_cl_unit_agent DEFINITION
-  PUBLIC FINAL
+  PUBLIC
+  INHERITING FROM zpru_cl_agent_base
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_unit_agent.
 ENDCLASS.
 
@@ -68,13 +68,13 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
   METHOD zpru_if_unit_agent~run_execution.
     DATA lo_api_agent TYPE REF TO zpru_if_api_agent.
 
-    IF iv_built_query_uuid IS INITIAL OR
-    iv_built_run_uuid IS INITIAL.
+    IF    iv_built_query_uuid IS INITIAL
+       OR iv_built_run_uuid   IS INITIAL.
       RETURN.
     ENDIF.
 
     lo_api_agent ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
     lo_api_agent->run( EXPORTING iv_run_uuid            = iv_built_run_uuid
                                  iv_query_uuid          = iv_built_query_uuid
@@ -82,6 +82,5 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                  eo_executed_controller = eo_executed_controller ).
 
     ev_final_response = lo_final_response->get_data( )->*.
-
   ENDMETHOD.
 ENDCLASS.
