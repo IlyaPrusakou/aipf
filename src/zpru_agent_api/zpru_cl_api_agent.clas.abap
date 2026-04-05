@@ -2903,14 +2903,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
-      IF <ls_key_value_returned>-type IS INITIAL.
-        <ls_key_value_returned>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
-      ENDIF.
-
       APPEND INITIAL LINE TO <ls_input_output>-key_value_pairs ASSIGNING FIELD-SYMBOL(<ls_key_value>).
       <ls_key_value>-name    = <ls_key_value_returned>-name.
       <ls_key_value>-counter = lv_count.
-      <ls_key_value>-type    = <ls_key_value_returned>-type.
+
+      IF <ls_key_value>-type IS INITIAL.
+        <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
+      ELSE.
+        <ls_key_value>-type    = <ls_key_value_returned>-type.
+      ENDIF.
+
       <ls_key_value>-value   = <ls_key_value_returned>-value.
 
       lv_count = 1.
@@ -3171,6 +3173,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     CALL TRANSFORMATION id
          SOURCE XML lv_content
-         RESULT model = lo_api_class.
+         RESULT model = ro_api.
   ENDMETHOD.
 ENDCLASS.
