@@ -382,7 +382,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     TRY.
         lo_pre ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_MMSG_PRECHECK`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
@@ -398,7 +398,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     TRY.
         lo_pre ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_MMSG_PRECHECK`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
@@ -414,7 +414,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     TRY.
         lo_pre ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_MMSG_PRECHECK`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
@@ -430,7 +430,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
 
     TRY.
         lo_pre ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_MMSG_PRECHECK`
-                                                           iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
       CATCH zpru_cx_agent_core.
         RETURN.
     ENDTRY.
