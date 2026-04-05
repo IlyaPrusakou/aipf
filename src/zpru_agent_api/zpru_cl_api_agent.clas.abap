@@ -2984,6 +2984,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lv_json_string  TYPE string.
     DATA lv_info_message TYPE string.
 
+    CLEAR: ev_environment_uuid.
+
     CALL TRANSFORMATION id
          SOURCE model = me
          RESULT XML lv_json_string
@@ -3018,9 +3020,13 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                            iv_service = `ZPRU_IF_MMSG_SERVICE`
                            iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
     TRY.
+
+        ev_environment_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+
+
         lo_mmsg_service->create_mmsg(
           EXPORTING it_mmsg_create_imp = VALUE #(
-              ( messageuuid              = cl_system_uuid=>create_uuid_x16_static( )
+              ( messageuuid              = ev_environment_uuid
                 content                  = get_utility( )->serialize_json_2_xstring( lv_json_string )
                 messagetype              = zpru_if_short_memory_provider=>cs_msg_type-env
                 messagecontentid         = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT|
@@ -3117,21 +3123,25 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_mmsg_service ?= zpru_cl_agent_service_mngr=>get_service(
                            iv_service = `ZPRU_IF_MMSG_SERVICE`
                            iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+    IF iv_environment_uuid IS INITIAL.
+      lo_mmsg_service->query_mmsg(
+        EXPORTING it_agent_uuid   = VALUE #( ( sign   = `I`
+                                               option = `EQ`
+                                               low    = ls_axc_head-agentuuid ) )
+                  it_run_uuid     = VALUE #( ( sign   = `I`
+                                               option = `EQ`
+                                               low    = iv_built_run_uuid ) )
+                  it_query_uuid   = VALUE #( ( sign   = `I`
+                                               option = `EQ`
+                                               low    = iv_built_query_uuid ) )
+                  it_message_type = VALUE #( ( sign   = `I`
+                                               option = `EQ`
+                                               low    = zpru_if_short_memory_provider=>cs_msg_type-env ) )
+        IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
 
-    lo_mmsg_service->query_mmsg(
-      EXPORTING it_agent_uuid   = VALUE #( ( sign   = `I`
-                                             option = `EQ`
-                                             low    = ls_axc_head-agentuuid ) )
-                it_run_uuid     = VALUE #( ( sign   = `I`
-                                             option = `EQ`
-                                             low    = iv_built_run_uuid ) )
-                it_query_uuid   = VALUE #( ( sign   = `I`
-                                             option = `EQ`
-                                             low    = iv_built_query_uuid ) )
-                it_message_type = VALUE #( ( sign   = `I`
-                                             option = `EQ`
-                                             low    = zpru_if_short_memory_provider=>cs_msg_type-env ) )
-      IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
+    ELSE.
+      lt_mmsg_k = VALUE #( ( messageuuid = iv_environment_uuid ) ).
+    ENDIF.
 
     lo_mmsg_service->read_mmsg( EXPORTING it_mmsg_read_k = VALUE #( FOR <ls_k> IN lt_mmsg_k
                                                                     ( messageuuid              = <ls_k>-messageuuid

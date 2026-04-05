@@ -16,11 +16,13 @@ INTERFACE zpru_if_unit_agent
               iv_is_rap_context    TYPE abap_boolean DEFAULT abap_false
     EXPORTING ev_built_run_uuid    TYPE sysuuid_x16
               ev_built_query_uuid  TYPE sysuuid_x16
+              ev_environment_uuid type sysuuid_x16
     RAISING   zpru_cx_agent_core.
 
   METHODS run_execution
     IMPORTING iv_built_run_uuid      TYPE sysuuid_x16
               iv_built_query_uuid    TYPE sysuuid_x16
+              iv_environment_uuid type sysuuid_x16  opTIONAL
               iv_is_rap_context    TYPE abap_boolean DEFAULT abap_false
     EXPORTING ev_final_response      TYPE zpru_if_agent_frw=>ts_json
               eo_executed_controller TYPE REF TO zpru_if_agent_controller

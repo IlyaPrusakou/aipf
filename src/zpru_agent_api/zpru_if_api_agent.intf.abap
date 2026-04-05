@@ -88,6 +88,7 @@ INTERFACE zpru_if_api_agent
   METHODS restore_environment
     IMPORTING iv_built_run_uuid   TYPE sysuuid_x16
               iv_built_query_uuid TYPE sysuuid_x16
+              iv_environment_uuid type sysuuid_x16 opTIONAL
     RETURNING VALUE(ro_api)       TYPE REF TO zpru_if_api_agent
     RAISING   zpru_cx_agent_core.
 
@@ -95,6 +96,8 @@ INTERFACE zpru_if_api_agent
     IMPORTING iv_agent_uuid       TYPE sysuuid_x16
               iv_built_run_uuid   TYPE sysuuid_x16
               iv_built_query_uuid TYPE sysuuid_x16
+   expORTING
+              ev_environment_uuid type sysuuid_x16
     RAISING   zpru_cx_agent_core.
 
   METHODS set_rap_context_flag
