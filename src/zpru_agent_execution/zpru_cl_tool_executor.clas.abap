@@ -368,7 +368,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
       TRY.
-          io_controller->mo_short_memory->save_message( lt_message_in ).
+          io_controller->mo_short_memory->save_message( it_message = lt_message_in
+                                                        io_controller = io_controller ).
         CATCH zpru_cx_agent_core.
           RETURN.
       ENDTRY.

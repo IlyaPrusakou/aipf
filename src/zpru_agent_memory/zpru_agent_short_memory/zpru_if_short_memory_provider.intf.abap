@@ -16,13 +16,14 @@ INTERFACE zpru_if_short_memory_provider
   TYPES tt_message TYPE STANDARD TABLE OF ts_message WITH EMPTY KEY.
 
   METHODS flush_memory
-    importing iv_all_messages TYPE abap_bool
-    exporting eo_output   type ref to zpru_if_payload
+    IMPORTING iv_all_messages TYPE abap_bool
+    EXPORTING eo_output       TYPE REF TO zpru_if_payload
     RAISING   zpru_cx_agent_core.
 
   METHODS save_message
-    IMPORTING it_message TYPE tt_message
-    exporting eo_output   type ref to zpru_if_payload
+    IMPORTING it_message    TYPE tt_message
+              io_controller TYPE REF TO zpru_if_agent_controller
+    EXPORTING eo_output     TYPE REF TO zpru_if_payload
     RAISING   zpru_cx_agent_core.
 
   METHODS get_history

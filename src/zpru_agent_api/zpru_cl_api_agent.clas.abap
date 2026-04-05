@@ -5,6 +5,7 @@ CLASS zpru_cl_api_agent DEFINITION
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_frw.
     INTERFACES zpru_if_api_agent.
+    INTERFACES if_serializable_object.
 
   PROTECTED SECTION.
     TYPES: BEGIN OF ts_map_tempuuid_2_finaluuid,
@@ -980,7 +981,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_last_output->set_data( ir_data = NEW string( lv_last_output ) ).
 
     IF lt_message IS NOT INITIAL.
-      lo_short_memory->save_message( it_message = lt_message ).
+      lo_short_memory->save_message(  it_message = lt_message
+                                   io_controller = get_controller( ) ).
     ENDIF.
 
     IF lt_step_update_imp IS NOT INITIAL.
@@ -1552,7 +1554,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_last_output->set_data( ir_data = NEW string( lv_last_output ) ).
 
     IF lt_message IS NOT INITIAL.
-      lo_short_memory->save_message( it_message = lt_message ).
+      lo_short_memory->save_message( it_message = lt_message
+                                   io_controller = get_controller( ) ).
     ENDIF.
 
     IF lt_step_update_imp IS NOT INITIAL.
@@ -1769,7 +1772,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                             cs_adf_failed     = cs_adf_failed   ).
     IF eo_final_response IS BOUND.
 
-        lv_final_response = eo_final_response->get_data( )->*.
+      lv_final_response = eo_final_response->get_data( )->*.
 
       CLEAR: lt_query_update_imp.
       APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING <ls_query_2_upd>.
@@ -1820,7 +1823,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           content          = lv_content
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
-    io_short_memory->save_message( it_message = lt_message ).
+    io_short_memory->save_message( it_message = lt_message
+                                   io_controller = get_controller( ) ).
   ENDMETHOD.
 
   METHOD resequence_steps.
@@ -2072,7 +2076,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_decision_log = get_payload( ).
 
-      lv_unwrapped_query = iv_input_query.
+    lv_unwrapped_query = iv_input_query.
 
     lo_utility->convert_to_abap( EXPORTING ir_string = REF #( lv_unwrapped_query )
                                  CHANGING  cr_abap   = ls_parsed_query ).
@@ -2125,7 +2129,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                       content          = lv_content
                                       messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
-    io_short_memory->save_message( lt_message_in ).
+    io_short_memory->save_message( it_message = lt_message_in
+                                   io_controller = get_controller( ) ).
 
     io_decision_provider->call_decision_engine( EXPORTING is_agent               = is_agent
                                                           it_tool                = it_agent_tools
@@ -2215,7 +2220,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                content          = lv_content
                                messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
-    io_short_memory->save_message( lt_message_in ).
+    io_short_memory->save_message( it_message = lt_message_in
+                                   io_controller = get_controller( )  ).
   ENDMETHOD.
 
   METHOD construct_execution_steps.
@@ -2386,7 +2392,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ENDLOOP.
 
-    io_short_memory->save_message( lt_message_in ).
+    io_short_memory->save_message( it_message = lt_message_in
+                                   io_controller = get_controller( ) ).
 
     SORT et_execution_steps BY stepsequence ASCENDING.
   ENDMETHOD.
@@ -2550,7 +2557,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ENDLOOP.
 
-    io_short_memory->save_message( lt_message ).
+    io_short_memory->save_message( it_message = lt_message
+                                   io_controller = get_controller( ) ).
   ENDMETHOD.
 
   METHOD fetch_agent_definition_by_uuid.
@@ -2597,7 +2605,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     lo_util = get_utility( ).
 
-      lv_content = is_input_query-string_content.
+    lv_content = is_input_query-string_content.
 
     GET TIME STAMP FIELD DATA(lv_now).
 
@@ -2661,7 +2669,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                             content          = lv_content
                             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
-    io_short_memory->save_message( lt_message ).
+    io_short_memory->save_message( it_message = lt_message
+                                   io_controller = get_controller( ) ).
   ENDMETHOD.
 
   METHOD initialize_run_controller.
@@ -2746,8 +2755,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ev_decision_log_msg = lv_content.
 
-      lv_query = iv_input_query.
-      lv_decision_log = iv_decision_log.
+    lv_query = iv_input_query.
+    lv_decision_log = iv_decision_log.
 
     TRY.
         es_execution_query = VALUE #(
@@ -2827,7 +2836,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           messagedatetime  = lv_now
           content          = lv_content
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
-    io_short_memory->save_message( lt_message_in ).
+    io_short_memory->save_message( it_message = lt_message_in
+                                   io_controller = get_controller( ) ).
   ENDMETHOD.
 
   METHOD prepare_controller_4_return.
@@ -2959,4 +2969,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       ENDIF.
     ENDIF.
   ENDMETHOD.
+
+  METHOD zpru_if_api_agent~post_environment.
+
+    get_short_memory(
+      EXPORTING
+        iv_agent_uuid   = iv_agent_uuid
+      IMPORTING
+        eo_short_memory = DATA(lo_short_memory) ).
+
+    CALL TRANSFORMATION id SOURCE instance = me RESULT XML DATA(lv_serialized_api).
+
+    lo_short_memory->flush_memory(
+      EXPORTING
+        iv_all_messages = abap_true ).
+
+  ENDMETHOD.
+
+  METHOD zpru_if_api_agent~set_rap_context_flag.
+    DATA(lo_controller) =  get_controller( ).
+    lo_controller->mv_is_rap = iv_is_rap_context.
+  ENDMETHOD.
+
 ENDCLASS.

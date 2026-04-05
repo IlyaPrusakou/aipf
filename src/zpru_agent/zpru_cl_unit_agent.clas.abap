@@ -63,6 +63,9 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
     lo_api_agent->build_execution( EXPORTING iv_agent_uuid       = ls_agent-agentuuid
                                    IMPORTING ev_built_run_uuid   = ev_built_run_uuid
                                              ev_built_query_uuid = ev_built_query_uuid  ).
+
+    lo_api_agent->post_environment( iv_agent_uuid = ls_agent-agentuuid ).
+
   ENDMETHOD.
 
   METHOD zpru_if_unit_agent~run_execution.

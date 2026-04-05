@@ -112,7 +112,8 @@ CLASS zpru_cl_tmlp_use_base_classes IMPLEMENTATION.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
     lo_short_memory = zpru_cl_tmlp_use_base_classes=>zpru_if_agent_singleton_meth~get_short_memory( ).
-    lo_short_memory->save_message( it_message = it_message ).
+    lo_short_memory->save_message( it_message = it_message
+                                   io_controller = io_controller ).
   ENDMETHOD.
 
   METHOD zpru_if_short_memory_provider~set_discard_strategy.
