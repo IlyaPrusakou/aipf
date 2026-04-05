@@ -60,6 +60,7 @@ CLASS zpru_cl_mmsg_service IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
       <ls_create_in>-%cid        = <ls_create>-messageuuid.
       <ls_create_in>-AIPF7MessageUUID = <ls_create>-messageuuid.
+      <ls_create_in>-%control-AIPF7MessageUUID = if_abap_behv=>mk-on.
       <ls_create_in>-AIPF7Content     = COND #( WHEN <ls_create>-control-content = abap_true THEN <ls_create>-content ).
       <ls_create_in>-%control-AIPF7Content = COND #( WHEN <ls_create>-control-content = abap_true THEN if_abap_behv=>mk-on ).
       <ls_create_in>-AIPF7MessageType = COND #( WHEN <ls_create>-control-messagetype = abap_true
