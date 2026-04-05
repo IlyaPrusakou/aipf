@@ -10,6 +10,7 @@ INTERFACE zpru_if_short_memory_provider
       step_output TYPE zpru_de_message_type VALUE 'O',
       response    TYPE zpru_de_message_type VALUE 'R',
       info        TYPE zpru_de_message_type VALUE 'I',
+      ENV         TYPE zpru_de_message_type VALUE 'E',
     END OF cs_msg_type.
 
   TYPES ts_message TYPE zpru_s_mem_msg_ext.

@@ -132,12 +132,8 @@ CLASS zpru_cl_short_memory_base IMPLEMENTATION.
 
     ENDLOOP.
 
-    IF io_controller->mv_is_rap = abap_false.
-      zpru_if_short_memory_provider~flush_memory( EXPORTING iv_all_messages = abap_false
-                                                   IMPORTING eo_output = lo_discard_output ).
-    ELSE.
-      RETURN.
-    ENDIF.
+    zpru_if_short_memory_provider~flush_memory( EXPORTING iv_all_messages = abap_false
+                                                 IMPORTING eo_output = lo_discard_output ).
 
   ENDMETHOD.
 

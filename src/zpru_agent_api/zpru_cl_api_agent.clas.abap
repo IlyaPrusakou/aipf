@@ -2972,17 +2972,75 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
   METHOD zpru_if_api_agent~post_environment.
 
+    DATA lt_message TYPE zpru_if_short_memory_provider=>tt_message.
+    DATA lo_axc_service TYPE REF TO zpru_if_axc_service.
+
     get_short_memory(
       EXPORTING
         iv_agent_uuid   = iv_agent_uuid
       IMPORTING
         eo_short_memory = DATA(lo_short_memory) ).
 
-    CALL TRANSFORMATION id SOURCE instance = me RESULT XML DATA(lv_serialized_api).
+    DATA(lo_json_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
 
-    lo_short_memory->flush_memory(
+
+
+    DATA: lv_json_string TYPE string.
+    DATA lo_class TYPE REF TO zpru_cl_api_agent.
+
+    CALL TRANSFORMATION id
+      SOURCE model = me
+      RESULT XML lv_json_string
+      OPTIONS initial_components = 'suppress'.
+
+    fetch_agent_definition_by_uuid(
       EXPORTING
-        iv_all_messages = abap_true ).
+        iv_agent_uuid = iv_agent_uuid
+      IMPORTING
+        es_agent      = DATA(ls_agent)  ).
+
+    lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( runuuid = iv_built_run_uuid
+                                                                       control = VALUE #(
+                                                                           runuuid          = abap_true
+                                                                           runid            = abap_true
+                                                                           agentuuid        = abap_true
+                                                                           userid           = abap_true
+                                                                           runstartdatetime = abap_true
+                                                                           runenddatetime   = abap_true
+                                                                           createdby        = abap_true
+                                                                           createdat        = abap_true
+                                                                           changedby        = abap_true
+                                                                           lastchanged      = abap_true
+                                                                           locallastchanged = abap_true ) ) )
+                                 IMPORTING et_axc_head    = DATA(lt_axc_head) ).
+
+    GET TIME STAMP FIELD DATA(lv_now).
+
+    DATA(ls_run) = VALUE #( lt_axc_head[ 1 ] OPTIONAL ).
+
+    lo_short_memory->save_message(
+      EXPORTING
+        it_message    = VALUE #( (
+             messagecontentid = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT|
+              stage            = 'POST_ENVIRONMENT'
+              substage         = 'POST_ENVIRONMENT'
+              namespace        = |{ sy-uname }.{ ls_agent-agentname }.{ ls_run-runid }|
+              username         = sy-uname
+              agentuuid        = ls_agent-agentuuid
+              runuuid          = ls_run-runuuid
+              queryuuid        = iv_built_query_uuid
+              messagedatetime  = lv_now
+              content          = lv_json_string
+              messagetype      = zpru_if_short_memory_provider=>cs_msg_type-env ) )
+        io_controller = get_controller( )  ).
+
+    CALL TRANSFORMATION id
+      SOURCE XML lv_json_string
+      RESULT model = lo_class.
+
 
   ENDMETHOD.
 

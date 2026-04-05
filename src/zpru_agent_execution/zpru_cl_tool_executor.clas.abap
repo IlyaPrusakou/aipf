@@ -33,7 +33,8 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_util                      TYPE REF TO zpru_if_agent_util
                 io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
                 it_key_value_pair            TYPE  zpru_tt_key_value
-      CHANGING  cr_input                     TYPE REF TO data.
+      CHANGING  cr_input                     TYPE REF TO data
+      raiSING zpru_cx_agent_core.
 
     METHODS traverse_tree_json
       IMPORTING io_request                   TYPE REF TO zpru_if_payload
@@ -84,7 +85,8 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_structure_input      TYPE REF TO cl_abap_structdescr
                 io_request              TYPE REF TO zpru_if_payload
       EXPORTING eo_response             TYPE REF TO zpru_if_payload
-                ev_error_flag           TYPE abap_boolean.
+                ev_error_flag           TYPE abap_boolean
+                raiSING zpru_cx_agent_core.
 
     METHODS get_component_mapping
       IMPORTING iv_struct_name           TYPE string
