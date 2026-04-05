@@ -981,8 +981,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_last_output->set_data( ir_data = NEW string( lv_last_output ) ).
 
     IF lt_message IS NOT INITIAL.
-      lo_short_memory->save_message(  it_message = lt_message
-                                   io_controller = get_controller( ) ).
+      lo_short_memory->save_message( it_message    = lt_message
+                                     io_controller = get_controller( ) ).
     ENDIF.
 
     IF lt_step_update_imp IS NOT INITIAL.
@@ -1554,8 +1554,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_last_output->set_data( ir_data = NEW string( lv_last_output ) ).
 
     IF lt_message IS NOT INITIAL.
-      lo_short_memory->save_message( it_message = lt_message
-                                   io_controller = get_controller( ) ).
+      lo_short_memory->save_message( it_message    = lt_message
+                                     io_controller = get_controller( ) ).
     ENDIF.
 
     IF lt_step_update_imp IS NOT INITIAL.
@@ -1774,16 +1774,16 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
       lv_final_response = eo_final_response->get_data( )->*.
 
-      CLEAR: lt_query_update_imp.
+      CLEAR lt_query_update_imp.
       APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING <ls_query_2_upd>.
-      <ls_query_2_upd>-queryuuid        = is_execution_query-queryuuid.
-      <ls_query_2_upd>-runuuid          = is_execution_query-runuuid.
+      <ls_query_2_upd>-queryuuid           = is_execution_query-queryuuid.
+      <ls_query_2_upd>-runuuid             = is_execution_query-runuuid.
       <ls_query_2_upd>-queryoutputresponse = lv_final_response.
       <ls_query_2_upd>-control-queryoutputresponse = abap_true.
 
       lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
-                                  CHANGING  cs_reported         = cs_axc_reported
-                                            cs_failed           = cs_axc_failed ).
+                                    CHANGING  cs_reported         = cs_axc_reported
+                                              cs_failed           = cs_axc_failed ).
     ENDIF.
 
     ls_json_type-user      = sy-uname.
@@ -1823,7 +1823,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           content          = lv_content
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-step_output  ) ).
 
-    io_short_memory->save_message( it_message = lt_message
+    io_short_memory->save_message( it_message    = lt_message
                                    io_controller = get_controller( ) ).
   ENDMETHOD.
 
@@ -2129,7 +2129,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                       content          = lv_content
                                       messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
-    io_short_memory->save_message( it_message = lt_message_in
+    io_short_memory->save_message( it_message    = lt_message_in
                                    io_controller = get_controller( ) ).
 
     io_decision_provider->call_decision_engine( EXPORTING is_agent               = is_agent
@@ -2220,7 +2220,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                content          = lv_content
                                messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
 
-    io_short_memory->save_message( it_message = lt_message_in
+    io_short_memory->save_message( it_message    = lt_message_in
                                    io_controller = get_controller( )  ).
   ENDMETHOD.
 
@@ -2392,7 +2392,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ENDLOOP.
 
-    io_short_memory->save_message( it_message = lt_message_in
+    io_short_memory->save_message( it_message    = lt_message_in
                                    io_controller = get_controller( ) ).
 
     SORT et_execution_steps BY stepsequence ASCENDING.
@@ -2557,7 +2557,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ENDLOOP.
 
-    io_short_memory->save_message( it_message = lt_message
+    io_short_memory->save_message( it_message    = lt_message
                                    io_controller = get_controller( ) ).
   ENDMETHOD.
 
@@ -2669,7 +2669,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                             content          = lv_content
                             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
 
-    io_short_memory->save_message( it_message = lt_message
+    io_short_memory->save_message( it_message    = lt_message
                                    io_controller = get_controller( ) ).
   ENDMETHOD.
 
@@ -2836,7 +2836,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
           messagedatetime  = lv_now
           content          = lv_content
           messagetype      = zpru_if_short_memory_provider=>cs_msg_type-query ) ).
-    io_short_memory->save_message( it_message = lt_message_in
+    io_short_memory->save_message( it_message    = lt_message_in
                                    io_controller = get_controller( ) ).
   ENDMETHOD.
 
@@ -2971,33 +2971,26 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~post_environment.
+    DATA: BEGIN OF ls_json_type,
+            user      TYPE string,
+            topic     TYPE string,
+            timestamp TYPE timestampl,
+            content   TYPE string,
+          END OF ls_json_type.
 
-    DATA lt_message TYPE zpru_if_short_memory_provider=>tt_message.
-    DATA lo_axc_service TYPE REF TO zpru_if_axc_service.
-
-    get_short_memory(
-      EXPORTING
-        iv_agent_uuid   = iv_agent_uuid
-      IMPORTING
-        eo_short_memory = DATA(lo_short_memory) ).
-
-    DATA(lo_json_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
-
-
-
-    DATA: lv_json_string TYPE string.
-    DATA lo_class TYPE REF TO zpru_cl_api_agent.
+    DATA lo_axc_service  TYPE REF TO zpru_if_axc_service.
+    DATA lo_mmsg_service TYPE REF TO zpru_if_mmsg_service.
+    DATA ls_failed       TYPE zpru_if_agent_frw=>ts_mmsg_bndl_failed.
+    DATA lv_json_string  TYPE string.
+    DATA lv_info_message TYPE string.
 
     CALL TRANSFORMATION id
-      SOURCE model = me
-      RESULT XML lv_json_string
-      OPTIONS initial_components = 'suppress'.
+         SOURCE model = me
+         RESULT XML lv_json_string
+         OPTIONS initial_components = 'suppress'.
 
-    fetch_agent_definition_by_uuid(
-      EXPORTING
-        iv_agent_uuid = iv_agent_uuid
-      IMPORTING
-        es_agent      = DATA(ls_agent)  ).
+    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
+                                    IMPORTING es_agent      = DATA(ls_agent)  ).
 
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
@@ -3021,32 +3014,153 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     DATA(ls_run) = VALUE #( lt_axc_head[ 1 ] OPTIONAL ).
 
+    lo_mmsg_service ?= zpru_cl_agent_service_mngr=>get_service(
+                           iv_service = `ZPRU_IF_MMSG_SERVICE`
+                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+    TRY.
+        lo_mmsg_service->create_mmsg(
+          EXPORTING it_mmsg_create_imp = VALUE #(
+              ( messageuuid              = cl_system_uuid=>create_uuid_x16_static( )
+                content                  = get_utility( )->serialize_json_2_xstring( lv_json_string )
+                messagetype              = zpru_if_short_memory_provider=>cs_msg_type-env
+                messagecontentid         = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT|
+                stage                    = 'POST_ENVIRONMENT'
+                substage                 = 'POST_ENVIRONMENT'
+                namespace                = |{ sy-uname }.{ ls_agent-agentname }.{ ls_run-runid }|
+                username                 = sy-uname
+                agentuuid                = ls_agent-agentuuid
+                runuuid                  = ls_run-runuuid
+                queryuuid                = iv_built_query_uuid
+                messagedatetime          = lv_now
+                control-messageuuid      = abap_true
+                control-content          = abap_true
+                control-messagetype      = abap_true
+                control-messagecontentid = abap_true
+                control-stage            = abap_true
+                control-substage         = abap_true
+                control-namespace        = abap_true
+                control-username         = abap_true
+                control-agentuuid        = abap_true
+                control-runuuid          = abap_true
+                control-queryuuid        = abap_true
+                control-messagedatetime  = abap_true ) )
+          CHANGING  cs_failed          = ls_failed ).
+      CATCH cx_uuid_error.
+        ASSERT 1 = 2.
+    ENDTRY.
+
+    get_short_memory( EXPORTING iv_agent_uuid   = iv_agent_uuid
+                      IMPORTING eo_short_memory = DATA(lo_short_memory) ).
+
+    ls_json_type-user      = sy-uname.
+    ls_json_type-topic     = `POST_ENVIRONMENT`.
+    ls_json_type-timestamp = lv_now.
+    " TODO: check spelling: persistant (typo) -> persistent (ABAP cleaner)
+    ls_json_type-content   = `Environment is posted to persistent store`.
+
+    get_utility( )->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
+                                       CHANGING  cr_string = lv_info_message ).
+
     lo_short_memory->save_message(
-      EXPORTING
-        it_message    = VALUE #( (
-             messagecontentid = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT|
-              stage            = 'POST_ENVIRONMENT'
-              substage         = 'POST_ENVIRONMENT'
-              namespace        = |{ sy-uname }.{ ls_agent-agentname }.{ ls_run-runid }|
-              username         = sy-uname
-              agentuuid        = ls_agent-agentuuid
-              runuuid          = ls_run-runuuid
-              queryuuid        = iv_built_query_uuid
-              messagedatetime  = lv_now
-              content          = lv_json_string
-              messagetype      = zpru_if_short_memory_provider=>cs_msg_type-env ) )
+        it_message    = VALUE #( stage           = 'POST_ENVIRONMENT'
+                                 substage        = 'POST_ENVIRONMENT'
+                                 namespace       = |{ sy-uname }.{ ls_agent-agentname }.{ ls_run-runid }|
+                                 username        = sy-uname
+                                 agentuuid       = ls_agent-agentuuid
+                                 runuuid         = ls_run-runuuid
+                                 queryuuid       = iv_built_query_uuid
+                                 messagedatetime = lv_now
+                                 ( messagecontentid = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT|
+                                   content          = lv_json_string
+                                   messagetype      = zpru_if_short_memory_provider=>cs_msg_type-env )
+                                 ( messagecontentid = |{ lv_now }-{ sy-uname }-POST_ENVIRONMENT_INFO|
+                                   content          = lv_info_message
+                                   messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) )
         io_controller = get_controller( )  ).
-
-    CALL TRANSFORMATION id
-      SOURCE XML lv_json_string
-      RESULT model = lo_class.
-
-
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~set_rap_context_flag.
-    DATA(lo_controller) =  get_controller( ).
+    DATA(lo_controller) = get_controller( ).
     lo_controller->mv_is_rap = iv_is_rap_context.
   ENDMETHOD.
 
+  METHOD zpru_if_api_agent~restore_environment.
+    DATA lo_mmsg_service TYPE REF TO zpru_if_mmsg_service.
+    " TODO: variable is assigned but never used (ABAP cleaner)
+    DATA lo_api_class    TYPE REF TO zpru_if_api_agent.
+    DATA lo_axc_service  TYPE REF TO zpru_if_axc_service.
+
+    lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( runuuid = iv_built_run_uuid
+                                                                       control = VALUE #(
+                                                                           runuuid          = abap_true
+                                                                           runid            = abap_true
+                                                                           agentuuid        = abap_true
+                                                                           userid           = abap_true
+                                                                           runstartdatetime = abap_true
+                                                                           runenddatetime   = abap_true
+                                                                           createdby        = abap_true
+                                                                           createdat        = abap_true
+                                                                           changedby        = abap_true
+                                                                           lastchanged      = abap_true
+                                                                           locallastchanged = abap_true ) ) )
+                                 IMPORTING et_axc_head    = DATA(lt_axc_head) ).
+
+    DATA(ls_axc_head) = VALUE #( lt_axc_head[ 1 ] OPTIONAL ).
+
+    IF ls_axc_head IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    lo_mmsg_service ?= zpru_cl_agent_service_mngr=>get_service(
+                           iv_service = `ZPRU_IF_MMSG_SERVICE`
+                           iv_context = zpru_if_agent_frw=>cs_context-st_persistence_message ).
+
+    lo_mmsg_service->query_mmsg(
+      EXPORTING it_agent_uuid   = VALUE #( ( sign   = `I`
+                                             option = `EQ`
+                                             low    = ls_axc_head-agentuuid ) )
+                it_run_uuid     = VALUE #( ( sign   = `I`
+                                             option = `EQ`
+                                             low    = iv_built_run_uuid ) )
+                it_query_uuid   = VALUE #( ( sign   = `I`
+                                             option = `EQ`
+                                             low    = iv_built_query_uuid ) )
+                it_message_type = VALUE #( ( sign   = `I`
+                                             option = `EQ`
+                                             low    = zpru_if_short_memory_provider=>cs_msg_type-env ) )
+      IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
+
+    lo_mmsg_service->read_mmsg( EXPORTING it_mmsg_read_k = VALUE #( FOR <ls_k> IN lt_mmsg_k
+                                                                    ( messageuuid              = <ls_k>-messageuuid
+                                                                      control-messageuuid      = abap_true
+                                                                      control-content          = abap_true
+                                                                      control-messagetype      = abap_true
+                                                                      control-messagecontentid = abap_true
+                                                                      control-stage            = abap_true
+                                                                      control-substage         = abap_true
+                                                                      control-namespace        = abap_true
+                                                                      control-username         = abap_true
+                                                                      control-agentuuid        = abap_true
+                                                                      control-runuuid          = abap_true
+                                                                      control-queryuuid        = abap_true
+                                                                      control-stepuuid         = abap_true
+                                                                      control-messagedatetime  = abap_true
+                                                                      control-createdby        = abap_true
+                                                                      control-createdat        = abap_true
+                                                                      control-changedby        = abap_true
+                                                                      control-changedat        = abap_true  ) )
+                                IMPORTING et_mmsg        = DATA(lt_mmsg) ).
+
+    SORT lt_mmsg BY messagedatetime DESCENDING.
+    DATA(ls_environment_message) = VALUE #( lt_mmsg[ 1 ] OPTIONAL ).
+
+    DATA(lv_content) = get_utility( )->deserialize_xstring_2_json( ls_environment_message-content ).
+
+    CALL TRANSFORMATION id
+         SOURCE XML lv_content
+         RESULT model = lo_api_class.
+  ENDMETHOD.
 ENDCLASS.

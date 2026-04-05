@@ -68,22 +68,28 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                    IMPORTING ev_built_run_uuid   = ev_built_run_uuid
                                              ev_built_query_uuid = ev_built_query_uuid  ).
 
-    lo_api_agent->post_environment( iv_agent_uuid = ls_agent-agentuuid ).
-
+    lo_api_agent->post_environment( iv_agent_uuid       = ls_agent-agentuuid
+                                    iv_built_run_uuid   = ev_built_run_uuid
+                                    iv_built_query_uuid = ev_built_query_uuid ).
   ENDMETHOD.
 
   METHOD zpru_if_unit_agent~run_execution.
-    DATA lo_api_agent TYPE REF TO zpru_if_api_agent.
+    DATA lo_api_agent_creator TYPE REF TO zpru_if_api_agent.
+    DATA lo_api_agent         TYPE REF TO zpru_if_api_agent.
 
     IF    iv_built_query_uuid IS INITIAL
        OR iv_built_run_uuid   IS INITIAL.
       RETURN.
     ENDIF.
 
-    lo_api_agent ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+    lo_api_agent_creator ?= zpru_cl_agent_service_mngr=>get_service(
+                                iv_service = `ZPRU_IF_API_AGENT`
+                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-       lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
+    lo_api_agent = lo_api_agent_creator->restore_environment( iv_built_run_uuid   = iv_built_run_uuid
+                                                              iv_built_query_uuid = iv_built_query_uuid ).
+
+    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
 
     lo_api_agent->run( EXPORTING iv_run_uuid            = iv_built_run_uuid
                                  iv_query_uuid          = iv_built_query_uuid

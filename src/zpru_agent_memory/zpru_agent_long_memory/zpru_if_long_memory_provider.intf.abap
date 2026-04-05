@@ -3,50 +3,54 @@ INTERFACE zpru_if_long_memory_provider
 
   INTERFACES zpru_if_agent_frw.
 
-CONSTANTS: BEGIN OF cs_semantic_cat,
-             entity  TYPE zpru_de_semantic_cat VALUE 'E',
-             concept TYPE zpru_de_semantic_cat VALUE 'C',
-             rule    TYPE zpru_de_semantic_cat VALUE 'R',
-             domain  TYPE zpru_de_semantic_cat VALUE 'D',
-           END OF cs_semantic_cat.
+  CONSTANTS: BEGIN OF cs_semantic_cat,
+               entity  TYPE zpru_de_semantic_cat VALUE 'E',
+               concept TYPE zpru_de_semantic_cat VALUE 'C',
+               rule    TYPE zpru_de_semantic_cat VALUE 'R',
+               domain  TYPE zpru_de_semantic_cat VALUE 'D',
+             END OF cs_semantic_cat.
 
-CONSTANTS: BEGIN OF gc_semantic_rel,
-             " Hierarchical
-             parent_of    TYPE zpru_de_concept_relationship VALUE 1,  " PARENT_OF
-             child_of     TYPE zpru_de_concept_relationship VALUE 2,  " CHILD_OF
-             comprises    TYPE zpru_de_concept_relationship VALUE 3,  " COMPRISES
-             part_of      TYPE zpru_de_concept_relationship VALUE 4,  " PART_OF
-             " Logical & Inheritance
-             generalizes  TYPE zpru_de_concept_relationship VALUE 5,  " GENERALIZES
-             specializes  TYPE zpru_de_concept_relationship VALUE 6,  " SPECIALIZES
-             depends_on   TYPE zpru_de_concept_relationship VALUE 7,  " DEPENDS_ON
-             required_by  TYPE zpru_de_concept_relationship VALUE 8,  " REQUIRED_BY
-             " Process Flow
-             precedes     TYPE zpru_de_concept_relationship VALUE 9,  " PRECEDES
-             follows      TYPE zpru_de_concept_relationship VALUE 10, " FOLLOWS
-             " Associative
-             relates_to   TYPE zpru_de_concept_relationship VALUE 11, " RELATES_TO
-             conflicts    TYPE zpru_de_concept_relationship VALUE 12, " CONFLICTS_WITH
-             duplicates   TYPE zpru_de_concept_relationship VALUE 13, " DUPLICATES
-           END OF gc_semantic_rel.
+  CONSTANTS: BEGIN OF gc_semantic_rel,
+               " Hierarchical
+               parent_of   TYPE zpru_de_concept_relationship VALUE 1,  " PARENT_OF
+               child_of    TYPE zpru_de_concept_relationship VALUE 2,  " CHILD_OF
+               comprises   TYPE zpru_de_concept_relationship VALUE 3,  " COMPRISES
+               part_of     TYPE zpru_de_concept_relationship VALUE 4,  " PART_OF
+               " Logical & Inheritance
+               generalizes TYPE zpru_de_concept_relationship VALUE 5,  " GENERALIZES
+               specializes TYPE zpru_de_concept_relationship VALUE 6,  " SPECIALIZES
+               depends_on  TYPE zpru_de_concept_relationship VALUE 7,  " DEPENDS_ON
+               required_by TYPE zpru_de_concept_relationship VALUE 8,  " REQUIRED_BY
+               " Process Flow
+               precedes    TYPE zpru_de_concept_relationship VALUE 9,  " PRECEDES
+               follows     TYPE zpru_de_concept_relationship VALUE 10, " FOLLOWS
+               " Associative
+               relates_to  TYPE zpru_de_concept_relationship VALUE 11, " RELATES_TO
+               conflicts   TYPE zpru_de_concept_relationship VALUE 12, " CONFLICTS_WITH
+               duplicates  TYPE zpru_de_concept_relationship VALUE 13, " DUPLICATES
+             END OF gc_semantic_rel.
 
   METHODS retrieve_message
     IMPORTING it_mmsg_read_k    TYPE zpru_if_mmsg_crud=>tt_mmsg_read_k
-    RETURNING VALUE(et_mem_msg) TYPE ZPRU_TT_EXPORT_MEM_MSG.
+    RETURNING VALUE(et_mem_msg) TYPE zpru_tt_export_mem_msg
+    RAISING   zpru_cx_agent_core.
 
   METHODS save_messages
     IMPORTING io_input  TYPE REF TO zpru_if_payload
     EXPORTING eo_output TYPE REF TO zpru_if_payload
-              ev_error  TYPE abap_boolean.
+              ev_error  TYPE abap_boolean
+    RAISING   zpru_cx_agent_core.
 
   METHODS save_summary
     IMPORTING io_input  TYPE REF TO zpru_if_payload
     EXPORTING eo_output TYPE REF TO zpru_if_payload
-              ev_error  TYPE abap_boolean.
+              ev_error  TYPE abap_boolean
+    RAISING   zpru_cx_agent_core.
 
   METHODS retrieve_summary
     IMPORTING it_msum_read_k    TYPE zpru_if_msum_crud=>tt_msum_read_k
-    RETURNING VALUE(et_mem_sum) TYPE zpru_TT_export_mem_sum.
+    RETURNING VALUE(et_mem_sum) TYPE zpru_TT_export_mem_sum
+    RAISING   zpru_cx_agent_core.
 
   METHODS summarize_conversation
     IMPORTING io_input  TYPE REF TO zpru_if_payload
@@ -57,19 +61,22 @@ CONSTANTS: BEGIN OF gc_semantic_rel,
     IMPORTING io_msg_persistence TYPE REF TO zpru_if_long_mem_persistence.
 
   METHODS get_msg_persistence
-    RETURNING VALUE(ro_msg_persistence) TYPE REF TO zpru_if_long_mem_persistence.
+    RETURNING VALUE(ro_msg_persistence) TYPE REF TO zpru_if_long_mem_persistence
+    raiSING zpru_cx_agent_core.
 
   METHODS set_sum_persistence
     IMPORTING io_sum_persistence TYPE REF TO zpru_if_long_mem_persistence.
 
   METHODS get_sum_persistence
-    RETURNING VALUE(ro_sum_persistence) TYPE REF TO zpru_if_long_mem_persistence.
+    RETURNING VALUE(ro_sum_persistence) TYPE REF TO zpru_if_long_mem_persistence
+    raiSING zpru_cx_agent_core.
 
   METHODS set_summarization
     IMPORTING io_summarization TYPE REF TO zpru_if_summarization.
 
   METHODS get_summarization
-    RETURNING VALUE(ro_summarization) TYPE REF TO zpru_if_summarization.
+    RETURNING VALUE(ro_summarization) TYPE REF TO zpru_if_summarization
+    raISING zpru_cx_agent_core.
 
 
 ENDINTERFACE.

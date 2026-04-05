@@ -85,10 +85,16 @@ INTERFACE zpru_if_api_agent
               cs_adf_failed          TYPE zpru_if_agent_frw=>ts_adf_failed OPTIONAL
     RAISING   zpru_cx_agent_core.
 
+  METHODS restore_environment
+    IMPORTING iv_built_run_uuid   TYPE sysuuid_x16
+              iv_built_query_uuid TYPE sysuuid_x16
+    RETURNING VALUE(ro_api)       TYPE REF TO zpru_if_api_agent
+    RAISING   zpru_cx_agent_core.
+
   METHODS post_environment
-    IMPORTING iv_agent_uuid TYPE sysuuid_x16
-              Iv_built_run_uuid type sysuuid_x16 OPTIONAL
-              Iv_built_query_uuid type sysuuid_x16 OPTIONAL
+    IMPORTING iv_agent_uuid       TYPE sysuuid_x16
+              iv_built_run_uuid   TYPE sysuuid_x16
+              iv_built_query_uuid TYPE sysuuid_x16
     RAISING   zpru_cx_agent_core.
 
   METHODS set_rap_context_flag
