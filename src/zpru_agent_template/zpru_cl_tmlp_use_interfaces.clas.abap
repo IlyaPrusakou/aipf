@@ -3,6 +3,7 @@ CLASS zpru_cl_tmlp_use_interfaces DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    inTERFACES if_serializable_object.
     INTERFACES zpru_if_decision_provider.
     INTERFACES zpru_if_short_memory_provider.
     INTERFACES zpru_if_long_memory_provider.

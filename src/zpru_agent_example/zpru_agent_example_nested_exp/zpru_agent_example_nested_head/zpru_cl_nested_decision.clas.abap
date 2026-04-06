@@ -4,7 +4,6 @@ CLASS zpru_cl_nested_decision DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-
   PROTECTED SECTION.
     METHODS check_authorizations        REDEFINITION.
     METHODS recall_memory               REDEFINITION.

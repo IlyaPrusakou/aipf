@@ -370,7 +370,7 @@ CLASS lsc_zr_pru_axc_head IMPLEMENTATION.
 
       APPEND INITIAL LINE TO lt_head_mod_tab ASSIGNING FIELD-SYMBOL(<ls_head_mod>).
       <ls_head_mod> = CORRESPONDING #( <ls_head_create> MAPPING FROM ENTITY ).
-      <ls_head_create>-aipf7runid = lv_number.
+      <ls_head_mod>-runid = lv_number.
     ENDLOOP.
 
     " update header

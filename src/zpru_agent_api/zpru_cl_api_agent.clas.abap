@@ -2853,8 +2853,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD detach_run_from_controller.
+
+    DATA(lv_number_of_runs) = lines( io_controller->mt_run_history ).
+
     APPEND INITIAL LINE TO io_controller->mt_run_history ASSIGNING FIELD-SYMBOL(<ls_run_history>).
-    <ls_run_history>-count      = lines( io_controller->mt_run_history ) + 1.
+    <ls_run_history>-count      = lv_number_of_runs + 1.
     <ls_run_history>-run_uuid   = io_controller->mv_run_uuid.
     <ls_run_history>-query_uuid = io_controller->mv_query_uuid.
 
