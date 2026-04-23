@@ -6,14 +6,14 @@ CLASS zpru_cl_test_data DEFINITION
     INTERFACES if_oo_adt_classrun.
 
     CLASS-METHODS refresh_test_data.
-    CLASS-METHODS greate_snro_intervals.
+    CLASS-METHODS create_snro_intervals.
 ENDCLASS.
 
 
 CLASS zpru_cl_test_data IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
     refresh_test_data( ).
-*    greate_snro_intervals( ).
+*    create_snro_intervals( ).
   ENDMETHOD.
 
   METHOD refresh_test_data.
@@ -417,7 +417,7 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     COMMIT WORK.
   ENDMETHOD.
 
-  METHOD greate_snro_intervals.
+  METHOD create_snro_intervals.
     DATA lt_intervals      TYPE cl_numberrange_intervals=>nr_interval.
     " TODO: variable is assigned but never used (ABAP cleaner)
     DATA lt_saved_interval TYPE cl_numberrange_intervals=>nr_interval.
