@@ -72,7 +72,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 iv_user_data               TYPE zpru_de_json                              OPTIONAL
       EXPORTING et_execution_plan          TYPE zpru_if_decision_provider=>tt_execution_plan
                 ev_langu                   TYPE sylangu
-                ev_thinking_output         type string
+                ev_thinking_output         TYPE string
       CHANGING  cs_decision_log            TYPE zpru_s_decision_log
       RAISING   zpru_cx_agent_core.
 
@@ -84,7 +84,7 @@ CLASS zpru_cl_decision_provider DEFINITION
                 io_controller              TYPE REF TO zpru_if_agent_controller
                 io_input                   TYPE REF TO zpru_if_payload
                 is_input_prompt            TYPE zpru_s_prompt
-                iv_thinking_output         type string
+                iv_thinking_output         TYPE string
                 io_system_prompt           TYPE REF TO zpru_if_prompt_provider            OPTIONAL
                 io_short_memory            TYPE REF TO zpru_if_short_memory_provider      OPTIONAL
                 io_long_memory             TYPE REF TO zpru_if_long_memory_provider       OPTIONAL
@@ -239,19 +239,21 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_decision_request-agentmetadata = lo_agent_info_provider->get_abap_agent_info(
                                             iv_agent_uuid = is_agent-agentuuid ).
 
-    LOOP AT it_tool ASSIGNING FIELD-SYMBOL(<ls_tool>).
+    IF ls_decision_request-agentmetadata-agenttools IS INITIAL.
+      LOOP AT it_tool ASSIGNING FIELD-SYMBOL(<ls_tool>).
 
-      CREATE OBJECT lo_tool_info_provider TYPE (<ls_tool>-toolinfoprovider).
-      IF sy-subrc <> 0.
-        CONTINUE.
-      ENDIF.
+        CREATE OBJECT lo_tool_info_provider TYPE (<ls_tool>-toolinfoprovider).
+        IF sy-subrc <> 0.
+          CONTINUE.
+        ENDIF.
 
-      DATA(ls_tool_metadata) = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ).
-      IF ls_tool_metadata IS NOT INITIAL.
-        APPEND INITIAL LINE TO ls_decision_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
-        <ls_tool_metadata> = ls_tool_metadata.
-      ENDIF.
-    ENDLOOP.
+        DATA(ls_tool_metadata) = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_tool> ).
+        IF ls_tool_metadata IS NOT INITIAL.
+          APPEND INITIAL LINE TO ls_decision_request-agentmetadata-agenttools ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
+          <ls_tool_metadata> = ls_tool_metadata.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
 
     ls_decision_request-systemprompt          = lo_syst_prompt_provider->get_abap_system_prompt(
                                                     iv_agent_uuid = is_agent-agentuuid ).
@@ -263,9 +265,9 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_decision_request-userdata              = lv_user_data.
 
     lo_util->convert_to_abap( EXPORTING ir_string = io_input->get_data( )
-                              CHANGING  cr_abap   = ls_json_type ).
+                              CHANGING  cr_abap   = ls_json_type ). " qqq always different type
 
-      lv_content = ls_json_type-content.
+    lv_content = ls_json_type-content. " qqq just string, need to check how to handle
 
     ls_decision_request-userprompt = lv_content.
 
@@ -289,7 +291,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                 iv_user_data               = lv_user_data
                       IMPORTING et_execution_plan          = DATA(lt_execution_plan)
                                 ev_langu                   = DATA(lv_langu)
-                                ev_thinking_output         = data(lv_thinking_output)
+                                ev_thinking_output         = DATA(lv_thinking_output)
                       CHANGING  cs_decision_log            = ls_decision_log ).
 
     APPEND INITIAL LINE TO ls_decision_log-thinkingsteps ASSIGNING <ls_thinking_step>.
@@ -445,7 +447,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     lo_util ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGENT_UTIL`
                                                         iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-      lv_last_output = io_last_output->get_data( )->*.
+    lv_last_output = io_last_output->get_data( )->*.
 
     LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_step_candidate>)
          WHERE stepstatus = zpru_if_axc_type_and_constant=>sc_step_status-complete.
