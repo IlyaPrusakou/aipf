@@ -55,7 +55,8 @@ INTERFACE zpru_if_long_memory_provider
   METHODS summarize_conversation
     IMPORTING io_input  TYPE REF TO zpru_if_payload
     EXPORTING eo_output TYPE REF TO zpru_if_payload
-              ev_error  TYPE abap_boolean.
+              ev_error  TYPE abap_boolean
+    RAISING   zpru_cx_agent_core.
 
   METHODS set_msg_persistence
     IMPORTING io_msg_persistence TYPE REF TO zpru_if_long_mem_persistence.
