@@ -38,13 +38,20 @@ annotate entity ZC_PRU_AXC_STEP with
   @UI.selectionField: [ { position: 40 } ]
   AIPF7ToolUuid;
 
+
+  @EndUserText.label: 'ToolName'
+  @UI.identification: [ { position: 41, label: 'ToolName' } ]
+  @UI.lineItem: [ { position: 41, label: 'ToolName' } ]
+  @UI.selectionField: [ { position: 41 } ]
+  AIPF7ToolName;
+
   @EndUserText.label: 'ExecutionSeq'
   @UI.identification: [ { position: 50, label: 'ExecutionSeq' } ]
   @UI.lineItem: [ { position: 50, label: 'ExecutionSeq' } ]
   @UI.selectionField: [ { position: 50 } ]
   AIPF7StepSequence;
   
-  @EndUserText.label: 'StepStatus'
+  @EndUserText.label: 'StepStatus' 
   @UI.identification: [ { position: 60, label: 'StepStatus' } ]
   @UI.lineItem: [ { position: 60, label: 'StepStatus' } ]
   @UI.selectionField: [ { position: 60 } ]  
