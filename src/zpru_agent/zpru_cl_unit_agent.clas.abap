@@ -12,6 +12,9 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
   METHOD zpru_if_unit_agent~execute_agent.
     DATA lo_api_agent TYPE REF TO zpru_if_api_agent.
 
+    CLEAR: ev_built_query_uuid, ev_built_run_uuid, ev_final_response, eo_executed_controller.
+
+
     IF    iv_agent_name IS INITIAL
        OR is_prompt     IS INITIAL.
       RETURN.
@@ -33,12 +36,21 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                    IMPORTING ev_built_run_uuid   = DATA(lv_built_run_uuid)
                                              ev_built_query_uuid = DATA(lv_built_query_uuid)  ).
 
+    ev_built_run_uuid = lv_built_run_uuid.
+    ev_built_query_uuid = lv_built_query_uuid.
+
     lo_api_agent->run( EXPORTING iv_run_uuid            = lv_built_run_uuid
                                  iv_query_uuid          = lv_built_query_uuid
                        IMPORTING eo_final_response      = DATA(lo_final_response)
                                  eo_executed_controller = eo_executed_controller ).
 
     ev_final_response = lo_final_response->get_data( )->*.
+
+    IF iv_complete_run = abap_true.
+      lo_api_agent->complete_run( iv_run_uuid = ev_built_run_uuid ).
+    ENDIF.
+
+
   ENDMETHOD.
 
   METHOD zpru_if_unit_agent~plan_execution.
@@ -69,10 +81,10 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                    IMPORTING ev_built_run_uuid   = ev_built_run_uuid
                                              ev_built_query_uuid = ev_built_query_uuid  ).
 
-    lo_api_agent->post_environment( expoRTING iv_agent_uuid       = ls_agent-agentuuid
+    lo_api_agent->post_environment( EXPORTING iv_agent_uuid       = ls_agent-agentuuid
                                     iv_built_run_uuid   = ev_built_run_uuid
                                     iv_built_query_uuid = ev_built_query_uuid
-                                    iMPORTING
+                                    IMPORTING
                                     ev_environment_uuid = ev_environment_uuid ).
   ENDMETHOD.
 
@@ -101,5 +113,10 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
                                  eo_executed_controller = eo_executed_controller ).
 
     ev_final_response = lo_final_response->get_data( )->*.
+
+    IF iv_complete_run = abap_true.
+      lo_api_agent->complete_run( iv_run_uuid = iv_built_run_uuid ).
+    ENDIF.
+
   ENDMETHOD.
 ENDCLASS.
