@@ -3066,7 +3066,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ls_json_type-user      = sy-uname.
     ls_json_type-topic     = `POST_ENVIRONMENT`.
     ls_json_type-timestamp = lv_now.
-    " TODO: check spelling: persistant (typo) -> persistent (ABAP cleaner)
     ls_json_type-content   = `Environment is posted to persistent store`.
 
     get_utility( )->convert_to_string( EXPORTING ir_abap   = REF #( ls_json_type )
@@ -3178,4 +3177,21 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
          SOURCE XML lv_content
          RESULT model = ro_api.
   ENDMETHOD.
+
+  METHOD zpru_if_api_agent~complete_run.
+    DATA lo_axc_service      TYPE REF TO zpru_if_axc_service.
+
+    IF    iv_run_uuid    IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
+
+    lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+
+
+
+
+  ENDMETHOD.
+
 ENDCLASS.
