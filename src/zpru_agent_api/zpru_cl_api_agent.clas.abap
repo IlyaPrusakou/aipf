@@ -3179,19 +3179,154 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~complete_run.
-    DATA lo_axc_service      TYPE REF TO zpru_if_axc_service.
+    DATA lo_axc_service        TYPE REF TO zpru_if_axc_service.
+    DATA lt_head_update_imp    TYPE zpru_if_axc_type_and_constant=>tt_head_update_imp.
+    DATA lt_query_update_imp   TYPE zpru_if_axc_type_and_constant=>tt_query_update_imp.
+    DATA lt_step_update_imp    TYPE zpru_if_axc_type_and_constant=>tt_step_update_imp.
+    DATA lt_axc_head           TYPE zpru_if_axc_type_and_constant=>tt_axc_head.
+    DATA lt_axc_query          TYPE zpru_if_axc_type_and_constant=>tt_axc_query.
+    DATA lt_axc_step           TYPE zpru_if_axc_type_and_constant=>tt_axc_step.
+    DATA ls_axc_reported       TYPE zpru_if_agent_frw=>ts_axc_reported.
+    DATA ls_axc_failed         TYPE zpru_if_agent_frw=>ts_axc_failed.
 
-    IF    iv_run_uuid    IS INITIAL.
+    IF iv_run_uuid IS INITIAL.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
-                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
+    " 1. Read run header
+    lo_axc_service->read_header( EXPORTING it_head_read_k = VALUE #( ( runuuid = iv_run_uuid
+                                                                        control = VALUE #(
+                                                                            runuuid          = abap_true
+                                                                            runid            = abap_true
+                                                                            agentuuid        = abap_true
+                                                                            userid           = abap_true
+                                                                            runstartdatetime = abap_true
+                                                                            runenddatetime   = abap_true
+                                                                            createdby        = abap_true
+                                                                            createdat        = abap_true
+                                                                            changedby        = abap_true
+                                                                            lastchanged      = abap_true
+                                                                            locallastchanged = abap_true ) ) )
+                                  IMPORTING et_axc_head    = lt_axc_head
+                                  CHANGING  cs_reported    = ls_axc_reported
+                                            cs_failed      = ls_axc_failed ).
 
+    IF lt_axc_head IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
+    " 2. Read queries for the run
+    lo_axc_service->rba_query( EXPORTING it_rba_query_k = VALUE #( ( runuuid = iv_run_uuid
+                                                                      control = VALUE #(
+                                                                          runuuid             = abap_true
+                                                                          querynumber         = abap_true
+                                                                          queryuuid           = abap_true
+                                                                          querylanguage       = abap_true
+                                                                          querystatus         = abap_true
+                                                                          querystartdatetime  = abap_true
+                                                                          queryenddatetime    = abap_true
+                                                                          queryinputprompt    = abap_true
+                                                                          querydecisionlog    = abap_true
+                                                                          queryoutputresponse = abap_true ) ) )
+                                IMPORTING et_axc_query    = lt_axc_query
+                                CHANGING  cs_reported     = ls_axc_reported
+                                          cs_failed       = ls_axc_failed ).
 
+    IF lt_axc_query IS INITIAL.
+      RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+    ENDIF.
 
+    GET TIME STAMP FIELD DATA(lv_now).
+
+    " 4. Set end date time for run
+    APPEND INITIAL LINE TO lt_head_update_imp ASSIGNING FIELD-SYMBOL(<ls_head_2_upd>).
+    <ls_head_2_upd>-runuuid         = iv_run_uuid.
+    <ls_head_2_upd>-runenddatetime  = lv_now.
+    <ls_head_2_upd>-control-runuuid         = abap_true.
+    <ls_head_2_upd>-control-runenddatetime  = abap_true.
+
+    " Loop through each query
+    LOOP AT lt_axc_query ASSIGNING FIELD-SYMBOL(<ls_axc_query>).
+
+      " 3. Read steps for the query
+      lo_axc_service->rba_step( EXPORTING it_rba_step_k = VALUE #( ( queryuuid = <ls_axc_query>-queryuuid
+                                                                      control   = VALUE #(
+                                                                          stepuuid           = abap_true
+                                                                          stepnumber         = abap_true
+                                                                          queryuuid          = abap_true
+                                                                          runuuid            = abap_true
+                                                                          tooluuid           = abap_true
+                                                                          stepsequence       = abap_true
+                                                                          stepstatus         = abap_true
+                                                                          stepstartdatetime  = abap_true
+                                                                          stependdatetime    = abap_true
+                                                                          stepinputprompt    = abap_true
+                                                                          stepoutputresponse = abap_true ) ) )
+                                IMPORTING et_axc_step    = lt_axc_step
+                                CHANGING  cs_reported    = ls_axc_reported
+                                          cs_failed      = ls_axc_failed ).
+
+      " 5. Set query status as 'C' only if it is not 'E'
+      IF <ls_axc_query>-querystatus <> zpru_if_axc_type_and_constant=>sc_query_status-error.
+
+        " 7 & 8. Set step status as 'C' only if not 'E' and set stependdatetime
+        LOOP AT lt_axc_step ASSIGNING FIELD-SYMBOL(<ls_axc_step>).
+          IF <ls_axc_step>-stepstatus <> zpru_if_axc_type_and_constant=>sc_step_status-error.
+            APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
+            <ls_step_2_upd>-stepuuid        = <ls_axc_step>-stepuuid.
+            <ls_step_2_upd>-queryuuid       = <ls_axc_step>-queryuuid.
+            <ls_step_2_upd>-runuuid         = <ls_axc_step>-runuuid.
+            <ls_step_2_upd>-stepstatus      = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+            <ls_step_2_upd>-stependdatetime = lv_now.
+            <ls_step_2_upd>-control-stepstatus         = abap_true.
+            <ls_step_2_upd>-control-stependdatetime    = abap_true.
+          ENDIF.
+        ENDLOOP.
+
+        " 5 & 6. Set query status as 'C' and query end date time
+        APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
+        <ls_query_2_upd>-queryuuid        = <ls_axc_query>-queryuuid.
+        <ls_query_2_upd>-runuuid          = <ls_axc_query>-runuuid.
+        <ls_query_2_upd>-querystatus      = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+        <ls_query_2_upd>-queryenddatetime = lv_now.
+        <ls_query_2_upd>-control-querystatus      = abap_true.
+        <ls_query_2_upd>-control-queryenddatetime = abap_true.
+
+      ENDIF.
+    ENDLOOP.
+
+    " Persist header update
+    IF lt_head_update_imp IS NOT INITIAL.
+      lo_axc_service->update_header( EXPORTING it_head_update_imp = lt_head_update_imp
+                                     CHANGING  cs_reported        = ls_axc_reported
+                                               cs_failed          = ls_axc_failed ).
+      IF ls_axc_failed-header IS NOT INITIAL.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+    ENDIF.
+
+    " Persist query updates
+    IF lt_query_update_imp IS NOT INITIAL.
+      lo_axc_service->update_query( EXPORTING it_query_update_imp = lt_query_update_imp
+                                    CHANGING  cs_reported         = ls_axc_reported
+                                              cs_failed           = ls_axc_failed ).
+      IF ls_axc_failed-query IS NOT INITIAL.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+    ENDIF.
+
+    " Persist step updates
+    IF lt_step_update_imp IS NOT INITIAL.
+      lo_axc_service->update_step( EXPORTING it_step_update_imp = lt_step_update_imp
+                                   CHANGING  cs_reported        = ls_axc_reported
+                                             cs_failed          = ls_axc_failed ).
+      IF ls_axc_failed-step IS NOT INITIAL.
+        RAISE EXCEPTION NEW zpru_cx_agent_core( ).
+      ENDIF.
+    ENDIF.
   ENDMETHOD.
 
 ENDCLASS.
