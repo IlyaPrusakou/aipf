@@ -18,7 +18,11 @@ CLASS zpru_run_agent IMPLEMENTATION.
     ls_prompt-string_content = `Hello, it's my prompt`.
 
     lo_cl_unit_agent = NEW zpru_cl_unit_agent( ).
-    lo_cl_unit_agent->execute_agent( iv_agent_name = 'DUMMY_AGENT'
-                                     is_prompt     = ls_prompt ).
+    TRY.
+        lo_cl_unit_agent->execute_agent( iv_agent_name = 'DUMMY_AGENT'
+                                         is_prompt     = ls_prompt ).
+      CATCH zpru_cx_agent_core.
+    ENDTRY.
+
   ENDMETHOD.
 ENDCLASS.

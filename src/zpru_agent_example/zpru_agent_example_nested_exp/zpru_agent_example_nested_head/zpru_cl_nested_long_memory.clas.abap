@@ -4,6 +4,7 @@ CLASS zpru_cl_nested_long_memory DEFINITION INHERITING FROM zpru_cl_long_memory_
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

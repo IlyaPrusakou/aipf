@@ -4,6 +4,7 @@ CLASS zpru_cl_short_memory_base DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_frw.
+    INTERFACES if_serializable_object.
     INTERFACES zpru_if_short_memory_provider.
 
   PROTECTED SECTION.
