@@ -50,7 +50,6 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
       lo_api_agent->complete_run( iv_run_uuid = ev_built_run_uuid ).
     ENDIF.
 
-
   ENDMETHOD.
 
   METHOD zpru_if_unit_agent~plan_execution.
