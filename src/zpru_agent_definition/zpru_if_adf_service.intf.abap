@@ -8,6 +8,7 @@ INTERFACE zpru_if_adf_service
   TYPES tt_long_memory_provider   TYPE RANGE OF char30.
   TYPES tt_agent_info_provider    TYPE RANGE OF char30.
   TYPES tt_system_prompt_provider TYPE RANGE OF char30.
+  TYPES tt_agent_mapper            TYPE RANGE OF char30.
   TYPES tt_status                 TYPE RANGE OF zpru_de_adf_agent_status.
   TYPES tt_created_by             TYPE RANGE OF syuname.
   TYPES tt_created_at             TYPE RANGE OF timestampl.
@@ -29,6 +30,7 @@ INTERFACE zpru_if_adf_service
               it_long_memory_provider   TYPE tt_long_memory_provider   OPTIONAL
               it_agent_info_provider    TYPE tt_agent_info_provider    OPTIONAL
               it_system_prompt_provider TYPE tt_system_prompt_provider OPTIONAL
+              it_agent_mapper           type tt_agent_mapper           OPTIONAL
               it_status                 TYPE tt_status                 OPTIONAL
               it_created_by             TYPE tt_created_by             OPTIONAL
               it_created_at             TYPE tt_created_at             OPTIONAL

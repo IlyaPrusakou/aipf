@@ -2434,6 +2434,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-longmemoryprovider   = abap_true
                                                                    control-agentinfoprovider    = abap_true
                                                                    control-systempromptprovider = abap_true
+                                                                   control-agentmapper          = abap_true
                                                                    control-agentstatus          = abap_true
                                                                    control-createdby            = abap_true
                                                                    control-createdat            = abap_true
@@ -2574,6 +2575,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
                                                                    control-longmemoryprovider   = abap_true
                                                                    control-agentinfoprovider    = abap_true
                                                                    control-systempromptprovider = abap_true
+                                                                   control-agentmapper          = abap_true
                                                                    control-agentstatus          = abap_true
                                                                    control-createdby            = abap_true
                                                                    control-createdat            = abap_true
