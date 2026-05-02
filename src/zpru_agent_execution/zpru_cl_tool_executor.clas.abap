@@ -9,6 +9,7 @@ CLASS zpru_cl_tool_executor DEFINITION
   PROTECTED SECTION.
     METHODS preprocess_tool_execution
       IMPORTING io_request              TYPE REF TO zpru_if_payload
+                is_agent                TYPE zpru_if_adf_type_and_constant=>ts_agent
                 is_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool OPTIONAL
                 is_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
                 io_controller           TYPE REF TO zpru_if_agent_controller
@@ -382,6 +383,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
   METHOD preprocess_tool_execution.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
+    DATA lo_agent_mapper TYPE REF TO zpru_if_agent_mapper.
     DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lr_input                TYPE REF TO data.
     DATA lr_output               TYPE REF TO data.
@@ -418,54 +420,30 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     CREATE DATA lr_input TYPE HANDLE lo_structure_input.
 
-    lv_input_string = io_request->get_data( )->*.
+    CREATE OBJECT lo_agent_mapper TYPE (is_agent-agentmapper).
+    IF sy-subrc <> 0.
+      ev_error_flag = abap_true.
+      RETURN.
+    ENDIF.
 
-    LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
-      DATA(lv_min_seq) = <ls_search_min_seq>-stepsequence.
-      EXIT.
-    ENDLOOP.
-
-    IF is_execution_step-stepsequence > lv_min_seq.
-
-      " NOT FIRST TOOL INPUT --- ALWAYS ZPRU_TT_KEY_VALUE
-      lv_prev_sequence = is_execution_step-stepsequence - 1.
-      ASSIGN io_controller->mt_execution_steps[ KEY sequence
-                                                COMPONENTS stepsequence = lv_prev_sequence ] TO FIELD-SYMBOL(<ls_prev_step>).
-      IF sy-subrc <> 0.
-        ev_error_flag = abap_true.
-        RETURN.
-      ENDIF.
-
-      ASSIGN io_controller->mt_run_context[ execution_step-stepuuid = <ls_prev_step>-stepuuid ] TO FIELD-SYMBOL(<ls_prev_tool>).
-      IF sy-subrc <> 0.
-        ev_error_flag = abap_true.
-        RETURN.
-      ENDIF.
-
-      SORT io_controller->mt_input_output BY number DESCENDING.
-
-      map_prev_out_2_next_in(
-        EXPORTING
-          io_request                   = io_request
-          iv_input_string              = lv_input_string
-          is_curr_tool_master_data     = is_tool_master_data
-          is_curr_execution_step       = is_execution_step
-          is_prev_tool_master_data     = <ls_prev_tool>-tool_master_data
-          is_prev_execution_step       = <ls_prev_step>
-          io_controller                = io_controller
-          io_util                      = lo_util
-          io_curr_tool_schema_provider = lo_tool_schema_provider
-          it_key_value_pair            = VALUE #( io_controller->mt_input_output[
-                                                      lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
-        CHANGING
-          cr_input                     = lr_input  ).
-
-    ELSE.
-
-      " FIRST TOOL INPUT --- UNIQUE TOOL PROVIDER STRUCTURE
-      lo_util->convert_to_abap( EXPORTING ir_string = REF #( lv_input_string )
-                                CHANGING  cr_abap   = lr_input ).
-
+    lo_agent_mapper->map_tools_parameter(
+      EXPORTING
+        io_request                   = io_request
+        iv_input_string              = lv_input_string
+        is_curr_tool_master_data     = is_tool_master_data
+        is_curr_execution_step       = is_execution_step
+        io_controller                = io_controller
+        io_util                      = lo_util
+        io_curr_tool_schema_provider = lo_tool_schema_provider
+        it_key_value_pair            = VALUE #( io_controller->mt_input_output[
+                                                          lines( io_controller->mt_input_output ) ]-key_value_pairs OPTIONAL )
+      IMPORTING
+        ev_error_flag                = DATA(lv_mapping_error)
+      CHANGING
+        cr_input                     = lr_input ).
+    IF  lv_mapping_error = abap_true.
+      ev_error_flag = abap_true.
+      RETURN.
     ENDIF.
 
     er_input = lr_input.

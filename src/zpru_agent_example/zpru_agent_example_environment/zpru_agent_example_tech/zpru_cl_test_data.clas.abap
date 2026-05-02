@@ -229,6 +229,7 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
                           longmemoryprovider   = 'ZPRU_CL_NESTED_LONG_MEMORY'
                           agentinfoprovider    = 'ZPRU_CL_NESTED_AGENT_INFO'
                           systempromptprovider = 'ZPRU_CL_NESTED_SYSTEM_PROMPT'
+                          agentmapper          = 'ZPRU_CL_NESTED_MAPPER'
                           lastchanged          = '20260123211537.8743820'
                           locallastchanged     = '20260123204019.7685060'  )
                         ( agentuuid            = lv_agent_uuid2

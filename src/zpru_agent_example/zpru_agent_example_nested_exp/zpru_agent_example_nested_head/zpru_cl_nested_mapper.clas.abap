@@ -1,6 +1,6 @@
-CLASS zpru_cl_nested_short_memory DEFINITION
+CLASS zpru_cl_nested_mapper DEFINITION
   PUBLIC
-  INHERITING FROM zpru_cl_short_memory_base
+  INHERITING FROM zpru_cl_agent_mapper
   CREATE PUBLIC.
 
   PUBLIC SECTION.
@@ -12,7 +12,5 @@ CLASS zpru_cl_nested_short_memory DEFINITION
 ENDCLASS.
 
 
-CLASS zpru_cl_nested_short_memory IMPLEMENTATION.
-
-
+CLASS zpru_cl_nested_mapper IMPLEMENTATION.
 ENDCLASS.

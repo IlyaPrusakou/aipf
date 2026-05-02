@@ -1597,6 +1597,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-abap_code.
         CAST zpru_if_abap_executor( lo_executor )->execute_code( EXPORTING io_controller       = io_controller
                                                                            io_request          = io_input
+                                                                           is_agent            = is_agent
                                                                            is_tool_master_data = is_tool_master_data
                                                                            is_execution_step   = is_execution_step
                                                                  IMPORTING eo_response         = eo_response
@@ -1609,6 +1610,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_knowledge_provider( lo_executor )->lookup_knowledge(
                                                        EXPORTING io_controller       = io_controller
                                                                  io_request          = io_input
+                                                                 is_agent            = is_agent
                                                                  is_tool_master_data = is_tool_master_data
                                                                  is_execution_step   = is_execution_step
                                                        IMPORTING eo_response         = eo_response
@@ -1621,6 +1623,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_nested_agent_runner( lo_executor )->run_nested_agent(
                                                         EXPORTING io_controller       = io_controller
                                                                   io_request          = io_input
+                                                                  is_agent            = is_agent
                                                                   is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step
                                                         IMPORTING eo_response         = eo_response
@@ -1633,6 +1636,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_http_request_sender( lo_executor )->send_http(
                                                         EXPORTING io_controller       = io_controller
                                                                   io_request          = io_input
+                                                                  is_agent            = is_agent
                                                                   is_tool_master_data = is_tool_master_data
                                                                   is_execution_step   = is_execution_step
                                                         IMPORTING eo_response         = eo_response
@@ -1645,6 +1649,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_service_model_consumer( lo_executor )->consume_service_model(
                                                            EXPORTING io_controller       = io_controller
                                                                      io_request          = io_input
+                                                                     is_agent            = is_agent
                                                                      is_tool_master_data = is_tool_master_data
                                                                      is_execution_step   = is_execution_step
                                                            IMPORTING eo_response         = eo_response
@@ -1657,6 +1662,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_llm_caller( lo_executor )->call_large_language_model(
                                                EXPORTING io_controller       = io_controller
                                                          io_request          = io_input
+                                                         is_agent            = is_agent
                                                          is_tool_master_data = is_tool_master_data
                                                          is_execution_step   = is_execution_step
                                                IMPORTING eo_response         = eo_response
@@ -1669,6 +1675,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_dynamic_abap_processor( lo_executor )->process_dynamic_abap(
                                                            EXPORTING io_controller       = io_controller
                                                                      io_request          = io_input
+                                                                     is_agent            = is_agent
                                                                      is_tool_master_data = is_tool_master_data
                                                                      is_execution_step   = is_execution_step
                                                            IMPORTING eo_response         = eo_response
@@ -1681,6 +1688,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         CAST zpru_if_ml_model_inference( lo_executor )->get_machine_learning_inference(
                                                        EXPORTING io_controller       = io_controller
                                                                  io_request          = io_input
+                                                                 is_agent            = is_agent
                                                                  is_tool_master_data = is_tool_master_data
                                                                  is_execution_step   = is_execution_step
                                                        IMPORTING eo_response         = eo_response
@@ -1692,6 +1700,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       WHEN zpru_if_adf_type_and_constant=>cs_step_type-user_tool.
         CAST zpru_if_user_tool( lo_executor )->execute_user_tool( EXPORTING io_controller       = io_controller
                                                                             io_request          = io_input
+                                                                            is_agent            = is_agent
                                                                             is_tool_master_data = is_tool_master_data
                                                                             is_execution_step   = is_execution_step
                                                                   IMPORTING eo_response         = eo_response

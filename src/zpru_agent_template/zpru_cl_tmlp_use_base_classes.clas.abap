@@ -260,8 +260,6 @@ CLASS zpru_cl_tmlp_use_base_classes IMPLEMENTATION.
                                                     iv_input_string              = iv_input_string
                                                     is_curr_tool_master_data     = is_curr_tool_master_data
                                                     is_curr_execution_step       = is_curr_execution_step
-                                                    is_prev_tool_master_data     = is_prev_tool_master_data
-                                                    is_prev_execution_step       = is_prev_execution_step
                                                     io_controller                = io_controller
                                                     io_util                      = io_util
                                                     io_curr_tool_schema_provider = io_curr_tool_schema_provider
