@@ -33,7 +33,8 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_util                      TYPE REF TO zpru_if_agent_util
                 io_curr_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider
                 it_key_value_pair            TYPE  zpru_tt_key_value
-      CHANGING  cr_input                     TYPE REF TO data.
+      CHANGING  cr_input                     TYPE REF TO data
+      RAISING   zpru_cx_agent_core.
 
     METHODS traverse_tree_json
       IMPORTING io_request                   TYPE REF TO zpru_if_payload
@@ -84,7 +85,8 @@ CLASS zpru_cl_tool_executor DEFINITION
                 io_structure_input      TYPE REF TO cl_abap_structdescr
                 io_request              TYPE REF TO zpru_if_payload
       EXPORTING eo_response             TYPE REF TO zpru_if_payload
-                ev_error_flag           TYPE abap_boolean.
+                ev_error_flag           TYPE abap_boolean
+      RAISING   zpru_cx_agent_core.
 
     METHODS get_component_mapping
       IMPORTING iv_struct_name           TYPE string
@@ -368,7 +370,8 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                | "ADDITIONAL_STEP_ERROR" : "{ lv_additional_error }" \}|
             messagetype      = zpru_if_short_memory_provider=>cs_msg_type-info ) ).
       TRY.
-          io_controller->mo_short_memory->save_message( lt_message_in ).
+          io_controller->mo_short_memory->save_message( it_message = lt_message_in
+                                                        io_controller = io_controller ).
         CATCH zpru_cx_agent_core.
           RETURN.
       ENDTRY.
@@ -413,7 +416,7 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
 
     CREATE DATA lr_input TYPE HANDLE lo_structure_input.
 
-      lv_input_string = io_request->get_data( )->*.
+    lv_input_string = io_request->get_data( )->*.
 
     LOOP AT io_controller->mt_execution_steps ASSIGNING FIELD-SYMBOL(<ls_search_min_seq>) USING KEY sequence.
       DATA(lv_min_seq) = <ls_search_min_seq>-stepsequence.
@@ -633,6 +636,11 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
       LOOP AT lt_key_value_prev_step ASSIGNING FIELD-SYMBOL(<ls_group_prev>)
            GROUP BY ( name = <ls_group_prev>-name
                       type = <ls_group_prev>-type ) ASSIGNING FIELD-SYMBOL(<ls_prev_k>).
+
+        IF  <ls_prev_k>-name <>  lv_name.
+          CONTINUE.
+        ENDIF.
+
         LOOP AT GROUP <ls_prev_k> ASSIGNING FIELD-SYMBOL(<ls_member_prev>).
           IF lv_max_prev < <ls_member_prev>-counter.
             lv_max_prev = <ls_member_prev>-counter. " usually stay as zero
@@ -650,6 +658,11 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
         LOOP AT lt_key_value_all_fields ASSIGNING FIELD-SYMBOL(<ls_group_all>)
              GROUP BY ( name = <ls_group_all>-name
                         type = <ls_group_all>-type ) ASSIGNING FIELD-SYMBOL(<ls_all_k>).
+
+          IF  <ls_all_k>-name <> lv_name.
+            CONTINUE.
+          ENDIF.
+
           LOOP AT GROUP <ls_all_k> ASSIGNING FIELD-SYMBOL(<ls_member_all>).
             IF lv_max_all < <ls_member_all>-counter.
               lv_max_all = <ls_member_all>-counter.

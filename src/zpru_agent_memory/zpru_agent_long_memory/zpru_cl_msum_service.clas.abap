@@ -60,6 +60,7 @@ CLASS zpru_cl_msum_service IMPLEMENTATION.
       APPEND INITIAL LINE TO lt_create_in ASSIGNING FIELD-SYMBOL(<ls_create_in>).
       <ls_create_in>-%cid        = <ls_create>-summaryuuid.
       <ls_create_in>-aipf7summaryuuid = <ls_create>-summaryuuid.
+      <ls_create_in>-%control-aipf7summaryuuid = if_abap_behv=>mk-on.
       <ls_create_in>-aipf7content     = COND #( WHEN <ls_create>-control-content = abap_true THEN <ls_create>-content ).
       <ls_create_in>-%control-aipf7content = COND #( WHEN <ls_create>-control-content = abap_true THEN if_abap_behv=>mk-on ).
       <ls_create_in>-aipf7summarycontentid = COND #( WHEN <ls_create>-control-summarycontentid = abap_true THEN <ls_create>-summarycontentid ).

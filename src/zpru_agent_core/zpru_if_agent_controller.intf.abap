@@ -36,7 +36,7 @@ INTERFACE zpru_if_agent_controller
            parent_controller  TYPE REF TO zpru_if_agent_controller,
            current_controller TYPE REF TO zpru_if_agent_controller,
            direct_children    TYPE tt_controllers,
-           KEY_VALUE_PAIRS    TYPE zpru_tt_key_value,
+           key_value_pairs    TYPE zpru_tt_key_value,
          END OF ts_input_output.
 
   TYPES tt_input_output TYPE STANDARD TABLE OF ts_input_output WITH EMPTY KEY.
@@ -55,4 +55,5 @@ INTERFACE zpru_if_agent_controller
   DATA mv_max_number_of_loops TYPE i.
   DATA mv_real_number_of_loops TYPE i.
   DATA mt_run_history TYPE tt_run_history .
+  DATA mv_is_rap               TYPE abap_boolean.
 ENDINTERFACE.

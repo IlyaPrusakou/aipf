@@ -4,6 +4,8 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 **So far AIPF is under heavy development!!!**
 
+You may try out stable version on branch 'playground'.
+
 **Disclaimer**: SAP, ABAP, BTP, and BOPF are trademarks or registered trademarks of SAP SE in Germany and other countries. AIPF is an independent open-source project and is not affiliated with, sponsored by, or endorsed by SAP SE.
 
 ## Table of Contents
