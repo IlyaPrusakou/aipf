@@ -34,6 +34,8 @@ CLASS lcl_adf_syst_prompt_provider IMPLEMENTATION.
   ENDMETHOD.
 ENDCLASS.
 
+CLASS lcl_adf_agent_mapper IMPLEMENTATION.
+ENDCLASS.
 
 CLASS lcl_adf_abap_executor IMPLEMENTATION.
   METHOD zpru_if_abap_executor~execute_code.

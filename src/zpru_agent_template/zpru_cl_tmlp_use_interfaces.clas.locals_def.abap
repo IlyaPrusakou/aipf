@@ -33,6 +33,9 @@ CLASS lcl_adf_syst_prompt_provider DEFINITION CREATE PUBLIC.
     INTERFACES zpru_if_prompt_provider.
 ENDCLASS.
 
+CLASS lcl_adf_agent_mapper DEFINITION INHERITING FROM zpru_cl_agent_mapper CREATE PUBLIC.
+  PROTECTED SECTION.
+ENDCLASS.
 
 CLASS lcl_adf_abap_executor DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.

@@ -251,6 +251,25 @@ CLASS zpru_cl_dummy_agent_logic IMPLEMENTATION.
     rs_abap_system_prompt = lo_prompt_provider->get_abap_system_prompt( iv_agent_uuid = iv_agent_uuid ).
   ENDMETHOD.
 
+  METHOD zpru_if_agent_mapper~map_tools_parameter.
+    DATA lo_agent_mapper TYPE REF TO zpru_if_agent_mapper.
+
+    lo_agent_mapper = NEW lcl_adf_agent_mapper( ).
+
+    lo_agent_mapper->map_tools_parameter( EXPORTING io_request                   = io_request
+                                                    iv_input_string              = iv_input_string
+                                                    is_curr_tool_master_data     = is_curr_tool_master_data
+                                                    is_curr_execution_step       = is_curr_execution_step
+                                                    is_prev_tool_master_data     = is_prev_tool_master_data
+                                                    is_prev_execution_step       = is_prev_execution_step
+                                                    io_controller                = io_controller
+                                                    io_util                      = io_util
+                                                    io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                                    it_key_value_pair            = it_key_value_pair
+                                          IMPORTING ev_error_flag                = ev_error_flag
+                                          CHANGING  cr_input                     = cr_input ).
+  ENDMETHOD.
+
   METHOD zpru_if_tool_provider~get_tool.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
 

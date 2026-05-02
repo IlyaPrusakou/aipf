@@ -25,6 +25,11 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
     lt_agent_serv = VALUE #( CreatedBy = ''
                              CreatedAt = '0.0000000'
                              ChangedBy = ''
+                             ( Service          = 'ZPRU_IF_AGENT_MAPPER'
+                               Context          = 'STANDARD'
+                               Class            = 'ZPRU_CL_AGENT_MAPPER'
+                               LastChanged      = '20260125095408.0057390'
+                               LocalLastChanged = '20260125095408.0057390' )
                              ( Service          = 'ZPRU_IF_DECISION_REQUEST'
                                Context          = 'STANDARD'
                                Class            = 'ZPRU_CL_DECISION_REQUEST'
@@ -233,6 +238,7 @@ CLASS zpru_cl_test_data IMPLEMENTATION.
                           longmemoryprovider   = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
                           agentinfoprovider    = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
                           systempromptprovider = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
+                          agentmapper          = 'ZPRU_CL_DUMMY_AGENT_LOGIC'
                           lastchanged          = '20260123212025.9435130'
                           locallastchanged     = '20251228170556.0725850'  ) ).
     TRY.
