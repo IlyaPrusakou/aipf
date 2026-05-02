@@ -107,4 +107,16 @@ INTERFACE zpru_if_api_agent
     IMPORTING iv_run_uuid TYPE sysuuid_x16
     RAISING   zpru_cx_agent_core.
 
+  METHODS get_agent_definition
+    IMPORTING iv_agent_uuid       TYPE sysuuid_x16
+    EXPORTING es_agent_definition TYPE zpru_if_adf_type_and_constant=>ts_agent
+    RAISING   zpru_cx_agent_core.
+
+  METHODS get_agent_tools
+    IMPORTING iv_agent_uuid    TYPE sysuuid_x16
+    EXPORTING et_agent_tools   TYPE zpru_if_adf_type_and_constant=>tt_agent_tool
+              et_tool_metadata TYPE zpru_tt_tool_info
+              et_tool_metadata_json type string_table
+    RAISING   zpru_cx_agent_core.
+
 ENDINTERFACE.

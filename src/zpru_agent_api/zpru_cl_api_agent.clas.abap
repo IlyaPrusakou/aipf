@@ -525,8 +525,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -575,7 +575,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -654,8 +654,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -2864,7 +2864,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD detach_run_from_controller.
-
     DATA(lv_number_of_runs) = lines( io_controller->mt_run_history ).
 
     APPEND INITIAL LINE TO io_controller->mt_run_history ASSIGNING FIELD-SYMBOL(<ls_run_history>).
@@ -2924,10 +2923,10 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       IF <ls_key_value>-type IS INITIAL.
         <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
       ELSE.
-        <ls_key_value>-type    = <ls_key_value_returned>-type.
+        <ls_key_value>-type = <ls_key_value_returned>-type.
       ENDIF.
 
-      <ls_key_value>-value   = <ls_key_value_returned>-value.
+      <ls_key_value>-value = <ls_key_value_returned>-value.
 
       lv_count = 1.
     ENDLOOP.
@@ -3000,7 +2999,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lv_json_string  TYPE string.
     DATA lv_info_message TYPE string.
 
-    CLEAR: ev_environment_uuid.
+    CLEAR ev_environment_uuid.
 
     CALL TRANSFORMATION id
          SOURCE model = me
@@ -3038,7 +3037,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     TRY.
 
         ev_environment_uuid = cl_system_uuid=>create_uuid_x16_static( ).
-
 
         lo_mmsg_service->create_mmsg(
           EXPORTING it_mmsg_create_imp = VALUE #(
@@ -3107,8 +3105,6 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
   METHOD zpru_if_api_agent~restore_environment.
     DATA lo_mmsg_service TYPE REF TO zpru_if_mmsg_service.
-    " TODO: variable is assigned but never used (ABAP cleaner)
-    DATA lo_api_class    TYPE REF TO zpru_if_api_agent.
     DATA lo_axc_service  TYPE REF TO zpru_if_axc_service.
 
     lo_axc_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AXC_SERVICE`
@@ -3155,11 +3151,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
 
     ELSE.
-      lt_mmsg_k = VALUE #( ( messageuuid = iv_environment_uuid ) ).
+      lt_mmsg_k = VALUE #( ( MessageUUID = iv_environment_uuid ) ).
     ENDIF.
 
     lo_mmsg_service->read_mmsg( EXPORTING it_mmsg_read_k = VALUE #( FOR <ls_k> IN lt_mmsg_k
-                                                                    ( messageuuid              = <ls_k>-messageuuid
+                                                                    ( MessageUUID              = <ls_k>-MessageUUID
                                                                       control-messageuuid      = abap_true
                                                                       control-content          = abap_true
                                                                       control-messagetype      = abap_true
@@ -3251,8 +3247,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     GET TIME STAMP FIELD DATA(lv_now).
 
     APPEND INITIAL LINE TO lt_head_update_imp ASSIGNING FIELD-SYMBOL(<ls_head_2_upd>).
-    <ls_head_2_upd>-runuuid                = iv_run_uuid.
-    <ls_head_2_upd>-runenddatetime         = lv_now.
+    <ls_head_2_upd>-runuuid        = iv_run_uuid.
+    <ls_head_2_upd>-runenddatetime = lv_now.
     <ls_head_2_upd>-control-runenddatetime = abap_true.
 
     lo_axc_service->rba_step( EXPORTING it_rba_step_k = VALUE #( FOR <ls_qk1>
@@ -3277,9 +3273,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     LOOP AT lt_axc_query ASSIGNING FIELD-SYMBOL(<ls_axc_query>).
       IF <ls_axc_query>-querystatus <> zpru_if_axc_type_and_constant=>sc_query_status-error.
         APPEND INITIAL LINE TO lt_query_update_imp ASSIGNING FIELD-SYMBOL(<ls_query_2_upd>).
-        <ls_query_2_upd>-queryuuid                = <ls_axc_query>-queryuuid.
-        <ls_query_2_upd>-querystatus              = zpru_if_axc_type_and_constant=>sc_query_status-complete.
-        <ls_query_2_upd>-queryenddatetime         = lv_now.
+        <ls_query_2_upd>-queryuuid        = <ls_axc_query>-queryuuid.
+        <ls_query_2_upd>-querystatus      = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+        <ls_query_2_upd>-queryenddatetime = lv_now.
         <ls_query_2_upd>-control-querystatus      = abap_true.
         <ls_query_2_upd>-control-queryenddatetime = abap_true.
       ENDIF.
@@ -3288,9 +3284,9 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
            WHERE queryuuid = <ls_axc_query>-queryuuid.
         IF <ls_axc_step>-stepstatus <> zpru_if_axc_type_and_constant=>sc_step_status-error.
           APPEND INITIAL LINE TO lt_step_update_imp ASSIGNING FIELD-SYMBOL(<ls_step_2_upd>).
-          <ls_step_2_upd>-stepuuid                = <ls_axc_step>-stepuuid.
-          <ls_step_2_upd>-stepstatus              = zpru_if_axc_type_and_constant=>sc_step_status-complete.
-          <ls_step_2_upd>-stependdatetime         = lv_now.
+          <ls_step_2_upd>-stepuuid        = <ls_axc_step>-stepuuid.
+          <ls_step_2_upd>-stepstatus      = zpru_if_axc_type_and_constant=>sc_step_status-complete.
+          <ls_step_2_upd>-stependdatetime = lv_now.
           <ls_step_2_upd>-control-stepstatus      = abap_true.
           <ls_step_2_upd>-control-stependdatetime = abap_true.
         ENDIF.
@@ -3325,4 +3321,60 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+  METHOD zpru_if_api_agent~get_agent_definition.
+    CLEAR es_agent_definition.
+
+    IF iv_agent_uuid IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
+                                    IMPORTING es_agent      = es_agent_definition  ).
+  ENDMETHOD.
+
+  METHOD zpru_if_api_agent~get_agent_tools.
+    DATA lo_tool_info_provider TYPE REF TO zpru_if_tool_info_provider.
+    DATA lv_json               TYPE string.
+    DATA ls_abap_tool_info     TYPE zpru_s_tool_info.
+
+    CLEAR et_agent_tools.
+
+    IF iv_agent_uuid IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
+                                    IMPORTING eo_service    = DATA(lo_adf_service)
+                                              es_agent      = DATA(ls_agent_definition)  ).
+
+    identify_available_tools( EXPORTING it_agent_k = VALUE #( ( agentuuid  =  ls_agent_definition-agentuuid ) )
+                                        io_service = lo_adf_service
+                              IMPORTING et_tools   = et_agent_tools ).
+
+    LOOP AT et_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+      CREATE OBJECT lo_tool_info_provider TYPE (<ls_agent_tool>-toolinfoprovider).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      CLEAR ls_abap_tool_info.
+
+      ls_abap_tool_info = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_agent_tool> ).
+      IF ls_abap_tool_info IS INITIAL.
+        CONTINUE.
+      ENDIF.
+
+      APPEND INITIAL LINE TO et_tool_metadata ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
+      <ls_tool_metadata> = ls_abap_tool_info.
+
+      CLEAR lv_json.
+
+      lv_json = lo_tool_info_provider->get_tool_info( is_tool_master_data = <ls_agent_tool> ).
+
+      APPEND INITIAL LINE TO et_tool_metadata_json ASSIGNING FIELD-SYMBOL(<ls_tool_metadata_json>).
+      <ls_tool_metadata_json> = lv_json.
+
+    ENDLOOP.
+  ENDMETHOD.
 ENDCLASS.
