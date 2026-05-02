@@ -4,7 +4,7 @@ CLASS zpru_cl_nested_system_prompt DEFINITION INHERITING FROM zpru_cl_syst_prmpt
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+  INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS: set_primary_session_task REDEFINITION,
       set_technical_rules REDEFINITION,

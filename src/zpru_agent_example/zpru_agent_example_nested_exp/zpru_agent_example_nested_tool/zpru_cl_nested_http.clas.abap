@@ -5,6 +5,7 @@ CLASS zpru_cl_nested_http DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_provider.
+      INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS send_http_int REDEFINITION.
 

@@ -5,7 +5,7 @@ CLASS zpru_cl_nested_code DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_provider.
-
+    INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS execute_code_int REDEFINITION.
 

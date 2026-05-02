@@ -4,7 +4,7 @@ CLASS zpru_cl_nested_code_info_prvdr DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-
+   INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS get_main_tool_info  REDEFINITION.
     METHODS set_tool_properties REDEFINITION.
