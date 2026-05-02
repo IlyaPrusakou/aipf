@@ -123,7 +123,7 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
 
   METHOD zpru_if_agent_util~convert_to_abap.
     /ui2/cl_json=>deserialize( EXPORTING json          = ir_string->*
-                                         hex_as_base64 = abap_false
+                                         hex_as_base64 = iv_hex_as_base64
                                CHANGING  data          = cr_abap ).
   ENDMETHOD.
 
@@ -131,7 +131,7 @@ CLASS zpru_cl_agent_util IMPLEMENTATION.
     cr_string = /ui2/cl_json=>serialize( data          = ir_abap->*
                                          compress      = iv_compress
                                          name_mappings = it_name_mappings
-                                         hex_as_base64 = abap_false ).
+                                         hex_as_base64 = iv_hex_as_base64 ).
   ENDMETHOD.
 
   METHOD zpru_if_agent_util~search_node_in_json.
