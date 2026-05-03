@@ -111,9 +111,4 @@ CLASS lcl_adf_schema_provider IMPLEMENTATION.
   METHOD zpru_if_tool_schema_provider~input_rtts_schema.
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~output_json_schema.
-  ENDMETHOD.
-
-  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
-  ENDMETHOD.
 ENDCLASS.

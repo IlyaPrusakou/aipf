@@ -62,25 +62,4 @@ CLASS zpru_cl_transient_code IMPLEMENTATION.
                                                                        is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~output_json_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
-
-    CLEAR: ev_json_schema,
-           es_json_structure.
-
-    lo_input_schema_provider = NEW lcl_adf_schema_provider( ).
-
-    lo_input_schema_provider->output_json_schema( EXPORTING is_tool_master_data = is_tool_master_data
-                                                            is_execution_step   = is_execution_step
-                                                  IMPORTING ev_json_schema      = ev_json_schema
-                                                            es_json_structure   = es_json_structure ).
-  ENDMETHOD.
-
-  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
-
-    lo_input_schema_provider = NEW lcl_adf_schema_provider( ).
-    ro_structure_schema = lo_input_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
-                                                                        is_execution_step   = is_execution_step ).
-  ENDMETHOD.
 ENDCLASS.
