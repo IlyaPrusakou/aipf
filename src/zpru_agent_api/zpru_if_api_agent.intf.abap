@@ -2,7 +2,7 @@ INTERFACE zpru_if_api_agent
   PUBLIC.
 
   TYPES tv_agent_name TYPE char100.
-  TYPES tt_agent_uuid TYPE STANDARD TABLE OF sysuuid_x16 with EMPTY KEY.
+  TYPES tt_agent_uuid TYPE STANDARD TABLE OF sysuuid_x16 WITH EMPTY KEY.
 
   METHODS add_query_2_run
     IMPORTING iv_run_uuid          TYPE sysuuid_x16
@@ -109,8 +109,8 @@ INTERFACE zpru_if_api_agent
     RAISING   zpru_cx_agent_core.
 
   METHODS get_agent_definition
-    IMPORTING iv_agent_uuid       TYPE sysuuid_x16
-    EXPORTING es_agent_definition TYPE zpru_if_adf_type_and_constant=>ts_agent
+    IMPORTING it_agent_uuid TYPE tt_agent_uuid
+    EXPORTING et_agent_info TYPE zpru_tt_api_agent_info
     RAISING   zpru_cx_agent_core.
 
   METHODS get_agent_tools

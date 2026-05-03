@@ -3322,14 +3322,95 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~get_agent_definition.
-    CLEAR es_agent_definition.
+    DATA lo_adf_service         TYPE REF TO zpru_if_adf_service.
+    DATA lt_agent_read_k        TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k.
+    DATA lo_agty_service        TYPE REF TO zpru_if_agty_service.
+    DATA lo_agent_info_provider TYPE REF TO zpru_if_agent_info_provider.
+    DATA lo_prompt_provider     TYPE REF TO zpru_if_prompt_provider.
 
-    IF iv_agent_uuid IS INITIAL.
+    CLEAR et_agent_info.
+
+    IF it_agent_uuid IS INITIAL.
       RETURN.
     ENDIF.
 
-    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
-                                    IMPORTING es_agent      = es_agent_definition  ).
+    lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    LOOP AT it_agent_uuid ASSIGNING FIELD-SYMBOL(<lv_agent_uuid>).
+      APPEND INITIAL LINE TO lt_agent_read_k ASSIGNING FIELD-SYMBOL(<ls_agent_read_k>).
+      <ls_agent_read_k>-agentuuid                    = <lv_agent_uuid>.
+      <ls_agent_read_k>-control-agentuuid            = abap_true.
+      <ls_agent_read_k>-control-agentname            = abap_true.
+      <ls_agent_read_k>-control-agenttype            = abap_true.
+      <ls_agent_read_k>-control-decisionprovider     = abap_true.
+      <ls_agent_read_k>-control-shortmemoryprovider  = abap_true.
+      <ls_agent_read_k>-control-longmemoryprovider   = abap_true.
+      <ls_agent_read_k>-control-agentinfoprovider    = abap_true.
+      <ls_agent_read_k>-control-systempromptprovider = abap_true.
+      <ls_agent_read_k>-control-agentmapper          = abap_true.
+      <ls_agent_read_k>-control-agentstatus          = abap_true.
+      <ls_agent_read_k>-control-createdby            = abap_true.
+      <ls_agent_read_k>-control-createdat            = abap_true.
+      <ls_agent_read_k>-control-changedby            = abap_true.
+      <ls_agent_read_k>-control-lastchanged          = abap_true.
+      <ls_agent_read_k>-control-locallastchanged     = abap_true.
+    ENDLOOP.
+
+    lo_adf_service->read_agent( EXPORTING it_agent_read_k = lt_agent_read_k
+                                IMPORTING et_agent        = DATA(lt_agent) ).
+
+    IF lt_agent IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    lo_agty_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_AGTY_SERVICE`
+                                                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_agty_service->query_agent_type( EXPORTING it_agent_type = VALUE #( FOR <ls_ag>
+                                                                          IN lt_agent
+                                                                          ( sign   = `I`
+                                                                            option = `EQ`
+                                                                            low    = <ls_ag>-agenttype  ) )
+                                       IMPORTING et_agty_k     = DATA(lt_agent_type_key) ).
+
+    IF lt_agent_type_key IS NOT INITIAL.
+      lo_agty_service->read_agent_type(
+        EXPORTING it_agty_read_k = VALUE #( FOR <ls_agt>
+                                            IN lt_agent_type_key
+                                            ( agenttype                   = <ls_agt>-agenttype
+                                              control-agenttype           = abap_true
+                                              control-shortmemoryvolume   = abap_true
+                                              control-discardstrategy     = abap_true
+                                              control-summarystrategy     = abap_true
+                                              control-maximumnumberofloop = abap_true ) )
+        IMPORTING et_agty        = DATA(lt_agent_type) ).
+    ENDIF.
+
+    LOOP AT lt_agent ASSIGNING FIELD-SYMBOL(<ls_agent>).
+
+      APPEND INITIAL LINE TO et_agent_info ASSIGNING FIELD-SYMBOL(<ls_agent_info>).
+
+      <ls_agent_info>-agentuuid = <ls_agent>-agentuuid.
+      <ls_agent_info>-agent     = <ls_agent>.
+
+      ASSIGN lt_agent_type[ agenttype = <ls_agent>-agenttype ] TO FIELD-SYMBOL(<ls_agent_type>).
+      IF sy-subrc = 0.
+        <ls_agent_info>-agenttype = <ls_agent_type>.
+      ENDIF.
+
+      CREATE OBJECT lo_agent_info_provider TYPE (<ls_agent>-agentinfoprovider).
+      IF sy-subrc = 0.
+        <ls_agent_info>-agentinfo = lo_agent_info_provider->get_abap_agent_info( iv_agent_uuid = <ls_agent>-agentuuid ).
+      ENDIF.
+
+      CREATE OBJECT lo_prompt_provider TYPE (<ls_agent>-systempromptprovider).
+      IF sy-subrc = 0.
+        <ls_agent_info>-systemprompt = lo_prompt_provider->get_abap_system_prompt(
+                                           iv_agent_uuid = <ls_agent>-agentuuid ).
+      ENDIF.
+
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~get_agent_tools.
