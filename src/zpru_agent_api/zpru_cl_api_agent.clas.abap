@@ -3337,20 +3337,57 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
     DATA lo_structure_schema     TYPE REF TO cl_abap_structdescr.
     DATA lt_component_table      TYPE cl_abap_structdescr=>component_table.
+    DATA lo_adf_service          TYPE REF TO zpru_if_adf_service.
+    DATA lt_agent_read_k         TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k.
 
     CLEAR et_agent_tool_info.
 
-    IF iv_agent_uuid IS INITIAL.
+    IF it_agent_uuid IS INITIAL.
       RETURN.
     ENDIF.
 
-    fetch_agent_definition_by_uuid( EXPORTING iv_agent_uuid = iv_agent_uuid
-                                    IMPORTING eo_service    = DATA(lo_adf_service)
-                                              es_agent      = DATA(ls_agent_definition)  ).
+    lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
 
-    identify_available_tools( EXPORTING it_agent_k = VALUE #( ( agentuuid  =  ls_agent_definition-agentuuid ) )
-                                        io_service = lo_adf_service
-                              IMPORTING et_tools   = DATA(lt_agent_tools) ).
+    LOOP AT it_agent_uuid ASSIGNING FIELD-SYMBOL(<lv_agent_uuid>).
+      APPEND INITIAL LINE TO lt_agent_read_k ASSIGNING FIELD-SYMBOL(<ls_agent_read_k>).
+      <ls_agent_read_k>-agentuuid                    = <lv_agent_uuid>.
+      <ls_agent_read_k>-control-agentuuid            = abap_true.
+      <ls_agent_read_k>-control-agentname            = abap_true.
+      <ls_agent_read_k>-control-agenttype            = abap_true.
+      <ls_agent_read_k>-control-decisionprovider     = abap_true.
+      <ls_agent_read_k>-control-shortmemoryprovider  = abap_true.
+      <ls_agent_read_k>-control-longmemoryprovider   = abap_true.
+      <ls_agent_read_k>-control-agentinfoprovider    = abap_true.
+      <ls_agent_read_k>-control-systempromptprovider = abap_true.
+      <ls_agent_read_k>-control-agentmapper          = abap_true.
+      <ls_agent_read_k>-control-agentstatus          = abap_true.
+      <ls_agent_read_k>-control-createdby            = abap_true.
+      <ls_agent_read_k>-control-createdat            = abap_true.
+      <ls_agent_read_k>-control-changedby            = abap_true.
+      <ls_agent_read_k>-control-lastchanged          = abap_true.
+      <ls_agent_read_k>-control-locallastchanged     = abap_true.
+    ENDLOOP.
+
+    lo_adf_service->read_agent( EXPORTING it_agent_read_k = lt_agent_read_k
+                                IMPORTING et_agent        = DATA(lt_agent) ).
+
+    IF lt_agent IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( FOR <ls_k> IN lt_agent
+                                                                 ( agentuuid                  = <ls_k>-agentuuid
+                                                                   control-tooluuid           = abap_true
+                                                                   control-agentuuid          = abap_true
+                                                                   control-toolname           = abap_true
+                                                                   control-toolprovider       = abap_true
+                                                                   control-steptype           = abap_true
+                                                                   control-toolschemaprovider = abap_true
+                                                                   control-toolinfoprovider   = abap_true
+                                                                   control-toolisborrowed     = abap_true
+                                                                   control-toolistransient    = abap_true    ) )
+                              IMPORTING et_tool       = DATA(lt_agent_tools) ).
 
     LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
 
