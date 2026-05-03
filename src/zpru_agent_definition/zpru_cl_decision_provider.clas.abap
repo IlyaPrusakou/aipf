@@ -473,7 +473,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                              iv_query_uuid      = iv_query_uuid
                                              io_controller      = io_controller
                                              io_last_output     = io_last_output
-                                   CHANGING  cs_reasoning_trace = ls_final_response-reasoning_trace ).
+                                   CHANGING  cs_reasoning_trace = ls_final_response-reasoningtrace ).
 
       lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
                                   CHANGING  cr_string = lv_final_response_json ).

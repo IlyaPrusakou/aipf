@@ -56,4 +56,6 @@ INTERFACE zpru_if_agent_controller
   DATA mv_real_number_of_loops TYPE i.
   DATA mt_run_history TYPE tt_run_history .
   DATA mv_is_rap               TYPE abap_boolean.
+  DATA   mv_is_loop_execution   TYPE abap_boolean.
+
 ENDINTERFACE.

@@ -12,6 +12,8 @@ INTERFACE zpru_if_agent_base
     IMPORTING it_agentname       TYPE zpru_if_api_agent=>tt_agent_name
     EXPORTING et_agent_k         TYPE zpru_if_api_agent=>tt_agent_k
               et_tool_agent_link TYPE zpru_if_api_agent=>tt_tool_agent_link
+              et_agent  type zpru_if_api_agent=>tt_agent
+              et_tool type zpru_if_api_agent=>tt_agent_tool
               et_agent_info      TYPE zpru_tt_api_agent_info
               et_agent_tool_info TYPE zpru_tt_api_tool_info
     RAISING   zpru_cx_agent_core.

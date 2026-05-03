@@ -140,6 +140,10 @@ INTERFACE zpru_if_api_agent
     IMPORTING iv_is_rap_context TYPE abap_boolean
     RAISING   zpru_cx_agent_core.
 
+  METHODS set_loop_execution
+    IMPORTING iv_is_loop_execution TYPE abap_boolean
+    RAISING   zpru_cx_agent_core.
+
   METHODS complete_run
     IMPORTING iv_run_uuid TYPE sysuuid_x16
     RAISING   zpru_cx_agent_core.

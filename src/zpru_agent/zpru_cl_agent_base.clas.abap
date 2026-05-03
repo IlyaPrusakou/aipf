@@ -34,7 +34,9 @@ CLASS zpru_cl_agent_base IMPLEMENTATION.
     CLEAR: et_agent_info,
            et_agent_k,
            et_agent_tool_info,
-           et_tool_agent_link.
+           et_tool_agent_link,
+           et_agent,
+           et_tool.
 
     IF it_agentname IS INITIAL.
       RETURN.
@@ -48,7 +50,9 @@ CLASS zpru_cl_agent_base IMPLEMENTATION.
                                                                                    low    = <lv_ag> ) )
 
                                          IMPORTING et_agent_k         = et_agent_k
-                                                   et_tool_agent_link = et_tool_agent_link ).
+                                                   et_tool_agent_link = et_tool_agent_link
+                                                   et_agent           = et_agent
+                                                   et_tool            = et_tool ).
 
     lo_api_agent->get_agent_metadata( EXPORTING it_agent_uuid = VALUE #( FOR <lv_ag_k> IN et_agent_k
                                                                          (  <lv_ag_k>-agentuuid ) )

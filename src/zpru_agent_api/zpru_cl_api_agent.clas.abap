@@ -3104,6 +3104,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     lo_controller->mv_is_rap = iv_is_rap_context.
   ENDMETHOD.
 
+  METHOD zpru_if_api_agent~set_loop_execution.
+    DATA(lo_controller) = get_controller( ).
+    lo_controller->mv_is_loop_execution = iv_is_loop_execution.
+  ENDMETHOD.
+
   METHOD zpru_if_api_agent~restore_environment.
     DATA lo_mmsg_service TYPE REF TO zpru_if_mmsg_service.
     DATA lo_axc_service  TYPE REF TO zpru_if_axc_service.
