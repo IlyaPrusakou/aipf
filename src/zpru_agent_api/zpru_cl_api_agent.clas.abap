@@ -525,8 +525,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -575,7 +575,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -654,8 +654,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -3151,11 +3151,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
 
     ELSE.
-      lt_mmsg_k = VALUE #( ( messageuuid = iv_environment_uuid ) ).
+      lt_mmsg_k = VALUE #( ( MessageUUID = iv_environment_uuid ) ).
     ENDIF.
 
     lo_mmsg_service->read_mmsg( EXPORTING it_mmsg_read_k = VALUE #( FOR <ls_k> IN lt_mmsg_k
-                                                                    ( messageuuid              = <ls_k>-messageuuid
+                                                                    ( MessageUUID              = <ls_k>-MessageUUID
                                                                       control-messageuuid      = abap_true
                                                                       control-content          = abap_true
                                                                       control-messagetype      = abap_true
@@ -3333,14 +3333,12 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zpru_if_api_agent~get_agent_tools.
-    DATA lo_tool_info_provider TYPE REF TO zpru_if_tool_info_provider.
+    DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
-    DATA lo_structure_schema   TYPE REF TO cl_abap_structdescr.
-    DATA lt_component_table TYPE cl_abap_structdescr=>component_table.
-    DATA lv_json               TYPE string.
-    DATA ls_abap_tool_info     TYPE zpru_s_tool_info.
+    DATA lo_structure_schema     TYPE REF TO cl_abap_structdescr.
+    DATA lt_component_table      TYPE cl_abap_structdescr=>component_table.
 
-    CLEAR et_agent_tools.
+    CLEAR et_agent_tool_info.
 
     IF iv_agent_uuid IS INITIAL.
       RETURN.
@@ -3352,56 +3350,41 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     identify_available_tools( EXPORTING it_agent_k = VALUE #( ( agentuuid  =  ls_agent_definition-agentuuid ) )
                                         io_service = lo_adf_service
-                              IMPORTING et_tools   = et_agent_tools ).
+                              IMPORTING et_tools   = DATA(lt_agent_tools) ).
 
-    LOOP AT et_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+    LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+      APPEND INITIAL LINE TO et_agent_tool_info ASSIGNING FIELD-SYMBOL(<ls_agent_tool_info>).
+      <ls_agent_tool_info>-agentuuid = <ls_agent_tool>-agentuuid.
+      <ls_agent_tool_info>-tooluuid  = <ls_agent_tool>-tooluuid.
+      <ls_agent_tool_info>-agenttool = <ls_agent_tool>.
 
       CREATE OBJECT lo_tool_info_provider TYPE (<ls_agent_tool>-toolinfoprovider).
-      IF sy-subrc <> 0.
-        CONTINUE.
+      IF sy-subrc = 0.
+        <ls_agent_tool_info>-toolinfo = lo_tool_info_provider->get_abap_tool_info(
+                                            is_tool_master_data = <ls_agent_tool> ).
       ENDIF.
-
-      CLEAR ls_abap_tool_info.
-
-      ls_abap_tool_info = lo_tool_info_provider->get_abap_tool_info( is_tool_master_data = <ls_agent_tool> ).
-      IF ls_abap_tool_info IS INITIAL.
-        CONTINUE.
-      ENDIF.
-
-      APPEND INITIAL LINE TO et_tool_metadata ASSIGNING FIELD-SYMBOL(<ls_tool_metadata>).
-      <ls_tool_metadata> = ls_abap_tool_info.
-
-      CLEAR lv_json.
-
-      lv_json = lo_tool_info_provider->get_tool_info( is_tool_master_data = <ls_agent_tool> ).
-
-      APPEND INITIAL LINE TO et_tool_metadata_json ASSIGNING FIELD-SYMBOL(<ls_tool_metadata_json>).
-      <ls_tool_metadata_json> = lv_json.
-
 
       CREATE OBJECT lo_tool_schema_provider TYPE (<ls_agent_tool>-toolschemaprovider).
-      IF sy-subrc <> 0.
-        CONTINUE.
+      IF sy-subrc = 0.
+
+        CLEAR lo_structure_schema.
+        lo_structure_schema = lo_tool_schema_provider->input_rtts_schema( is_tool_master_data = <ls_agent_tool>  ).
+
+        CLEAR lt_component_table.
+        lt_component_table = lo_structure_schema->get_components( ).
+
+        LOOP AT lt_component_table ASSIGNING FIELD-SYMBOL(<ls_component_table>).
+          APPEND INITIAL LINE TO <ls_agent_tool_info>-toolinputcomponents ASSIGNING FIELD-SYMBOL(<ls_comp_target>).
+          <ls_comp_target>-name = <ls_component_table>-name.
+          <ls_comp_target>-type = <ls_component_table>-type->absolute_name.
+        ENDLOOP.
       ENDIF.
 
-      CLEAR: lo_structure_schema.
-      lo_structure_schema = lo_tool_schema_provider->input_rtts_schema( is_tool_master_data = <ls_agent_tool>  ).
+      lo_tool_schema_provider->input_json_schema( EXPORTING is_tool_master_data = <ls_agent_tool>
+                                                  IMPORTING es_json_structure   = DATA(ls_json_structure) ).
 
-      CLEAR: lt_component_table.
-      lt_component_table =  lo_structure_schema->get_components( ).
-
-      IF lt_component_table IS NOT INITIAL.
-        APPEND LINES OF lt_component_table TO et_component_table.
-      ENDIF.
-
-      lo_tool_schema_provider->input_json_schema(
-        EXPORTING
-          is_tool_master_data = <ls_agent_tool>
-        IMPORTING
-          ev_json_schema      = DATA(lv_json_schema)
-          es_json_structure   = DATA(ls_json_structure) ).
-
-" ADD FINAL RESULT
+      <ls_agent_tool_info>-toolinputschema = ls_json_structure.
 
     ENDLOOP.
   ENDMETHOD.
