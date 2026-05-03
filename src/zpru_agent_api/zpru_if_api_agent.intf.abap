@@ -2,7 +2,43 @@ INTERFACE zpru_if_api_agent
   PUBLIC.
 
   TYPES tv_agent_name TYPE char100.
+  TYPES tt_agent_name TYPE STANDARD TABLE OF tv_agent_name WITH EMPTY KEY.
   TYPES tt_agent_uuid TYPE STANDARD TABLE OF sysuuid_x16 WITH EMPTY KEY.
+
+  TYPES tt_agent_name_r             TYPE RANGE OF char100.
+  TYPES tt_agent_type_r             TYPE RANGE OF zpru_de_agent_type.
+  TYPES tt_decision_provider_r      TYPE RANGE OF char30.
+  TYPES tt_short_memory_provider_r  TYPE RANGE OF char30.
+  TYPES tt_long_memory_provider_r   TYPE RANGE OF char30.
+  TYPES tt_agent_info_provider_r    TYPE RANGE OF char30.
+  TYPES tt_system_prompt_provider_r TYPE RANGE OF char30.
+  TYPES tt_agent_mapper_r            TYPE RANGE OF char30.
+  TYPES tt_status_r                 TYPE RANGE OF zpru_de_adf_agent_status.
+
+  TYPES: BEGIN OF ts_agent_k,
+           agentuuid TYPE sysuuid_x16,
+         END OF ts_agent_k.
+
+  TYPES tt_agent_k TYPE STANDARD TABLE OF ts_agent_k WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_agent_tool_k,
+           tooluuid TYPE sysuuid_x16,
+         END OF ts_agent_tool_k.
+
+  TYPES tt_agent_tool_k TYPE STANDARD TABLE OF ts_agent_tool_k WITH EMPTY KEY.
+
+  TYPES: BEGIN OF ts_tool_agent_link.
+           INCLUDE TYPE zpru_if_adf_type_and_constant=>ts_agent_k.
+           INCLUDE TYPE zpru_if_adf_type_and_constant=>ts_agent_tool_k.
+  TYPES: END OF ts_tool_agent_link.
+
+  TYPES tt_tool_agent_link TYPE STANDARD TABLE OF ts_tool_agent_link WITH EMPTY KEY.
+
+  TYPES ts_agent        TYPE zpru_s_agent.
+  TYPES tt_agent        TYPE STANDARD TABLE OF ts_agent WITH EMPTY KEY.
+
+  TYPES ts_agent_tool   TYPE zpru_s_agent_tool.
+  TYPES tt_agent_tool   TYPE STANDARD TABLE OF ts_agent_tool WITH EMPTY KEY.
 
   METHODS add_query_2_run
     IMPORTING iv_run_uuid          TYPE sysuuid_x16
@@ -108,14 +144,34 @@ INTERFACE zpru_if_api_agent
     IMPORTING iv_run_uuid TYPE sysuuid_x16
     RAISING   zpru_cx_agent_core.
 
-  METHODS get_agent_definition
+  METHODS get_agent_metadata
     IMPORTING it_agent_uuid TYPE tt_agent_uuid
     EXPORTING et_agent_info TYPE zpru_tt_api_agent_info
     RAISING   zpru_cx_agent_core.
 
-  METHODS get_agent_tools
+  METHODS get_agent_tools_metadata
     IMPORTING it_agent_uuid      TYPE tt_agent_uuid
     EXPORTING et_agent_tool_info TYPE zpru_tt_api_tool_info
+    RAISING   zpru_cx_agent_core.
+
+  METHODS read_agent_definition
+    IMPORTING it_agent_name             TYPE tt_agent_name_r             OPTIONAL
+              it_agent_type             TYPE tt_agent_type_r             OPTIONAL
+              it_decision_provider      TYPE tt_decision_provider_r      OPTIONAL
+              it_short_memory_provider  TYPE tt_short_memory_provider_r  OPTIONAL
+              it_long_memory_provider   TYPE tt_long_memory_provider_r   OPTIONAL
+              it_agent_info_provider    TYPE tt_agent_info_provider_r    OPTIONAL
+              it_system_prompt_provider TYPE tt_system_prompt_provider_r OPTIONAL
+              it_agent_mapper           TYPE tt_agent_mapper_r           OPTIONAL
+              it_status                 TYPE tt_status_r                 OPTIONAL
+    EXPORTING et_agent_k                TYPE tt_agent_k
+              et_tool_agent_link        TYPE tt_tool_agent_link
+              et_agent                  TYPE tt_agent
+              et_tool                   TYPE tt_agent_tool
+    RAISING   zpru_cx_agent_core.
+
+  METHODS get_utility
+    RETURNING VALUE(ro_util) TYPE REF TO zpru_if_agent_util
     RAISING   zpru_cx_agent_core.
 
 ENDINTERFACE.

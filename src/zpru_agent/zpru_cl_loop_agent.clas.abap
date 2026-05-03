@@ -26,8 +26,7 @@ CLASS zpru_cl_loop_agent IMPLEMENTATION.
 *      RETURN.
 *    ENDIF.
 *
-*    lo_api_agent ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
-*                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+*    lo_api_agent = zpru_cl_agent_service_mngr=>get_agent_api( ).
 *
 *    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
 *

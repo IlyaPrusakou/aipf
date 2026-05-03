@@ -2,7 +2,7 @@ INTERFACE zpru_if_adf_service
   PUBLIC.
 
   TYPES tt_agent_name             TYPE RANGE OF char100.
-  TYPES tt_agent_TYPE             TYPE RANGE OF zpru_de_agent_type.
+  TYPES tt_agent_type             TYPE RANGE OF zpru_de_agent_type.
   TYPES tt_decision_provider      TYPE RANGE OF char30.
   TYPES tt_short_memory_provider  TYPE RANGE OF char30.
   TYPES tt_long_memory_provider   TYPE RANGE OF char30.
@@ -24,13 +24,13 @@ INTERFACE zpru_if_adf_service
 
   METHODS query_agent
     IMPORTING it_agent_name             TYPE tt_agent_name             OPTIONAL
-              It_agent_TYPE             TYPE tt_agent_TYPE             OPTIONAL
+              it_agent_type             TYPE tt_agent_type             OPTIONAL
               it_decision_provider      TYPE tt_decision_provider      OPTIONAL
               it_short_memory_provider  TYPE tt_short_memory_provider  OPTIONAL
               it_long_memory_provider   TYPE tt_long_memory_provider   OPTIONAL
               it_agent_info_provider    TYPE tt_agent_info_provider    OPTIONAL
               it_system_prompt_provider TYPE tt_system_prompt_provider OPTIONAL
-              it_agent_mapper           type tt_agent_mapper           OPTIONAL
+              it_agent_mapper           TYPE tt_agent_mapper           OPTIONAL
               it_status                 TYPE tt_status                 OPTIONAL
               it_created_by             TYPE tt_created_by             OPTIONAL
               it_created_at             TYPE tt_created_at             OPTIONAL
@@ -96,7 +96,7 @@ INTERFACE zpru_if_adf_service
 
   METHODS validate
     IMPORTING it_check_decision_provider_v TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
-              IT_check_SHORT_MEMORY_V      TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
+              it_check_short_memory_v      TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
               it_check_long_memory_v       TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
               it_check_agent_info_v        TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k OPTIONAL
     CHANGING  cs_reported                  TYPE zpru_if_agent_frw=>ts_adf_reported             OPTIONAL

@@ -1,6 +1,7 @@
 CLASS zpru_cl_api_agent DEFINITION
   PUBLIC
-  CREATE PUBLIC.
+  CREATE PRIVATE
+  GLOBAL FRIENDS zpru_cl_agent_service_mngr.
 
   PUBLIC SECTION.
     INTERFACES zpru_if_agent_frw.
@@ -525,8 +526,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-new
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-new
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -575,7 +576,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
+    IF ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -654,8 +655,8 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
-    IF    ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
-       OR ls_execution_query-QueryStatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
+    IF    ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-complete
+       OR ls_execution_query-querystatus = zpru_if_axc_type_and_constant=>sc_query_status-error.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
 
@@ -3151,11 +3152,11 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
         IMPORTING et_mmsg_k       = DATA(lt_mmsg_k) ).
 
     ELSE.
-      lt_mmsg_k = VALUE #( ( MessageUUID = iv_environment_uuid ) ).
+      lt_mmsg_k = VALUE #( ( messageuuid = iv_environment_uuid ) ).
     ENDIF.
 
     lo_mmsg_service->read_mmsg( EXPORTING it_mmsg_read_k = VALUE #( FOR <ls_k> IN lt_mmsg_k
-                                                                    ( MessageUUID              = <ls_k>-MessageUUID
+                                                                    ( messageuuid              = <ls_k>-messageuuid
                                                                       control-messageuuid      = abap_true
                                                                       control-content          = abap_true
                                                                       control-messagetype      = abap_true
@@ -3321,7 +3322,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-  METHOD zpru_if_api_agent~get_agent_definition.
+  METHOD zpru_if_api_agent~get_agent_metadata.
     DATA lo_adf_service         TYPE REF TO zpru_if_adf_service.
     DATA lt_agent_read_k        TYPE zpru_if_adf_type_and_constant=>tt_agent_read_k.
     DATA lo_agty_service        TYPE REF TO zpru_if_agty_service.
@@ -3413,7 +3414,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-  METHOD zpru_if_api_agent~get_agent_tools.
+  METHOD zpru_if_api_agent~get_agent_tools_metadata.
     DATA lo_tool_info_provider   TYPE REF TO zpru_if_tool_info_provider.
     DATA lo_tool_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
     DATA lo_structure_schema     TYPE REF TO cl_abap_structdescr.
@@ -3506,4 +3507,85 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
 
     ENDLOOP.
   ENDMETHOD.
+
+  METHOD zpru_if_api_agent~read_agent_definition.
+    DATA lo_adf_service TYPE REF TO zpru_if_adf_service.
+
+    CLEAR: et_agent,
+           et_agent_k,
+           et_tool,
+           et_tool_agent_link.
+
+    IF     it_agent_name             IS INITIAL
+       AND it_agent_type             IS INITIAL
+       AND it_decision_provider      IS INITIAL
+       AND it_short_memory_provider  IS INITIAL
+       AND it_long_memory_provider   IS INITIAL
+       AND it_agent_info_provider    IS INITIAL
+       AND it_system_prompt_provider IS INITIAL
+       AND it_agent_mapper           IS INITIAL
+       AND it_status                 IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    lo_adf_service ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_ADF_SERVICE`
+                                                               iv_context = zpru_if_agent_frw=>cs_context-standard ).
+
+    lo_adf_service->query_agent( EXPORTING it_agent_name             = it_agent_name
+                                           it_agent_type             = it_agent_type
+                                           it_decision_provider      = it_decision_provider
+                                           it_short_memory_provider  = it_short_memory_provider
+                                           it_long_memory_provider   = it_long_memory_provider
+                                           it_agent_info_provider    = it_agent_info_provider
+                                           it_system_prompt_provider = it_system_prompt_provider
+                                           it_agent_mapper           = it_agent_mapper
+                                           it_status                 = it_status
+                                 IMPORTING et_agent_k                = et_agent_k
+                                           et_tool_agent_link        = et_tool_agent_link ).
+
+    IF et_agent_k IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    IF et_agent IS SUPPLIED.
+      lo_adf_service->read_agent( EXPORTING it_agent_read_k = VALUE #( FOR <ls_k> IN et_agent_k
+                                                                       ( agentuuid                    = <ls_k>-agentuuid
+                                                                         control-agentuuid            = abap_true
+                                                                         control-agentname            = abap_true
+                                                                         control-agenttype            = abap_true
+                                                                         control-decisionprovider     = abap_true
+                                                                         control-shortmemoryprovider  = abap_true
+                                                                         control-longmemoryprovider   = abap_true
+                                                                         control-agentinfoprovider    = abap_true
+                                                                         control-systempromptprovider = abap_true
+                                                                         control-agentmapper          = abap_true
+                                                                         control-agentstatus          = abap_true
+                                                                         control-createdby            = abap_true
+                                                                         control-createdat            = abap_true
+                                                                         control-changedby            = abap_true
+                                                                         control-lastchanged          = abap_true
+                                                                         control-locallastchanged     = abap_true ) )
+                                  IMPORTING et_agent        = et_agent ).
+    ENDIF.
+
+    IF et_tool IS SUPPLIED.
+      lo_adf_service->rba_tool( EXPORTING it_rba_tool_k = VALUE #( FOR <ls_k> IN et_agent_k
+                                                                   ( agentuuid                  = <ls_k>-agentuuid
+                                                                     control-tooluuid           = abap_true
+                                                                     control-agentuuid          = abap_true
+                                                                     control-toolname           = abap_true
+                                                                     control-toolprovider       = abap_true
+                                                                     control-steptype           = abap_true
+                                                                     control-toolschemaprovider = abap_true
+                                                                     control-toolinfoprovider   = abap_true
+                                                                     control-toolisborrowed     = abap_true
+                                                                     control-toolistransient    = abap_true    ) )
+                                IMPORTING et_tool       = et_tool ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD zpru_if_api_agent~get_utility.
+    ro_util = get_utility( ).
+  ENDMETHOD.
+
 ENDCLASS.
