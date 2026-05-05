@@ -475,14 +475,9 @@ CLASS zpru_cl_tool_executor IMPLEMENTATION.
                                                           is_execution_step   = is_execution_step
                                                 IMPORTING ev_json_schema      = DATA(ls_input_json_schema) ).
 
-    io_tool_schema_provider->output_json_schema( EXPORTING is_tool_master_data = is_tool_master_data
-                                                           is_execution_step   = is_execution_step
-                                                 IMPORTING ev_json_schema      = DATA(ls_output_json_schema) ).
-
     <ls_current_run_context>-abap_input_schema  = io_structure_input.
     <ls_current_run_context>-json_input_schema  = ls_input_json_schema.
     <ls_current_run_context>-abap_output_schema = io_structure_output.
-    <ls_current_run_context>-json_output_schema = ls_output_json_schema.
     <ls_current_run_context>-abap_response      = ir_output.
     <ls_current_run_context>-json_response      = lv_output_json.
     <ls_current_run_context>-abap_request       = ir_input.
