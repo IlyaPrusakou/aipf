@@ -32,12 +32,12 @@ CLASS zpru_cl_loop_agent IMPLEMENTATION.
 
     lo_api_agent = zpru_cl_agent_service_mngr=>get_agent_api( ).
 
-    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
-    lo_api_agent->set_loop_execution( iv_is_loop_execution = abap_true ).
-
     lo_api_agent->setup_agent( EXPORTING iv_agent_name        = iv_agent_name
                                          io_parent_controller = io_parent_controller
                                IMPORTING es_agent             = DATA(ls_agent) ).
+
+    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
+    lo_api_agent->set_loop_execution( iv_is_loop_execution = abap_true ).
 
     ls_prompt = is_prompt.
 
