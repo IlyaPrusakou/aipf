@@ -12,25 +12,28 @@ CLASS zpru_cl_tool_info_provider DEFINITION
 
     METHODS get_main_tool_info ABSTRACT
       IMPORTING
-        is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
-        is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
+                is_tool_master_data TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
+                is_execution_step   TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
       EXPORTING
-        ev_toolname         TYPE char100
-        ev_tooldesciption   TYPE char100
-        ev_toolexplanation  TYPE string
-        ev_tooltype         TYPE zpru_de_adf_step_type.
+                ev_toolname         TYPE char100
+                ev_tooldesciption   TYPE char100
+                ev_toolexplanation  TYPE string
+                ev_tooltype         TYPE zpru_de_adf_step_type
+      RAISING   zpru_cx_agent_core.
 
     METHODS set_tool_properties ABSTRACT
       IMPORTING
                 is_tool_master_data     TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step       TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(rt_tool_property) TYPE zpru_tt_tool_property.
+      RETURNING VALUE(rt_tool_property) TYPE zpru_tt_tool_property
+      RAISING   zpru_cx_agent_core.
 
     METHODS set_tool_parameters ABSTRACT
       IMPORTING
                 is_tool_master_data  TYPE zpru_if_adf_type_and_constant=>ts_agent_tool
                 is_execution_step    TYPE zpru_if_axc_type_and_constant=>ts_axc_step OPTIONAL
-      RETURNING VALUE(rt_perameters) TYPE zpru_tt_param_info.
+      RETURNING VALUE(rt_perameters) TYPE zpru_tt_param_info
+      RAISING   zpru_cx_agent_core.
 
 
   PRIVATE SECTION.
