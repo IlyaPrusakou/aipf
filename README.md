@@ -2,9 +2,12 @@
 
 The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
-**So far AIPF is under heavy development!!!**
+[![Project Status: Alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#)
+[![ABAP](https://img.shields.io/badge/Language-ABAP-blue.svg)](#)
+[![Platform](https://img.shields.io/badge/Platform-SAP%20BTP%20%7C%20On--Premise-blue)](#)
+[![Built with: abapGit](https://img.shields.io/badge/built%20with-abapGit-green.svg)](https://abapgit.org)
 
-**Disclaimer**: SAP, ABAP, BTP, and BOPF are trademarks or registered trademarks of SAP SE in Germany and other countries. AIPF is an independent open-source project and is not affiliated with, sponsored by, or endorsed by SAP SE.
+> ⚠️ **Development Status (Pre-Release):** This repository contains a core logic for the **Agent Integration Processing Framework (AIPF)**. The framework is currently under active development. APIs, database schemas, and tool definitions are subject to change. Feedback and early contributions are highly welcome!
 
 ## Table of Contents
 * [Long Story Short](#long-story-short)
@@ -506,3 +509,15 @@ ls_agent_tool-toolinfoprovider   = `ZCL_TOOL_INFO`.
     lo_cl_unit_agent->execute_agent( iv_agent_name  = 'MY_FIRST_AGENT'
                                      is_prompt = VALUE #( string_content = `Process CMR N1231411KL` ) ).
 ```
+
+# Contributing & Feedback
+
+Since this project is in its early stages, community insights are invaluable. 
+
+* **Found a Bug?** Open an [Issue](https://github.com/IlyaPrusakou/aipf/issues).
+* **Want to Discuss Features?** Feel free to initiate a thread in GitHub Discussions regarding agentic workflows in ABAP.
+* **Contributions**: Pull requests are welcome! If you plan to make significant architectural modifications, please open an issue first to discuss your intended changes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
