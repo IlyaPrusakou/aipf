@@ -5,7 +5,7 @@ CLASS zpru_cl_nested_llm DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_provider.
-      INTERFACES zpru_if_agent_impl.
+    INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS: call_large_language_model_int REDEFINITION.
   PRIVATE SECTION.
@@ -122,25 +122,41 @@ CLASS zpru_cl_nested_llm IMPLEMENTATION.
     <lt_output> = lt_output.
     et_key_value_pairs = lt_output.
 
+    SELECT SINGLE * FROM zpru_agent_tool
+    WHERE toolname = `NESTED_ABAP` AND
+          steptype = `B` AND
+          toolprovider = `ZPRU_CL_NESTED_CODE`
+          INTO @DATA(ls_nested_abap_tool).
+
     " tool from this agent
-    APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).
-    <ls_add_step>-tooluuid           = `1AF42792E6DC1FE187F880BE37E634D7`. " renew after data replication
-    <ls_add_step>-agentuuid          = `1AF42792E6DC1FE187F880BE37E5D4D7`. " renew after data replication
-    <ls_add_step>-toolname = `NESTED_ABAP`.
-    <ls_add_step>-toolprovider = `ZPRU_CL_NESTED_CODE`.
-    <ls_add_step>-steptype = `B`.
-    <ls_add_step>-toolschemaprovider = `ZPRU_CL_NESTED_CODE_SCHM_PRVDR`.
-    <ls_add_step>-toolinfoprovider = `ZPRU_CL_NESTED_CODE_INFO_PRVDR`.
+    IF ls_nested_abap_tool IS NOT INITIAL.
+      APPEND INITIAL LINE TO et_additional_step ASSIGNING FIELD-SYMBOL(<ls_add_step>).
+      <ls_add_step>-tooluuid           = ls_nested_abap_tool-tooluuid.
+      <ls_add_step>-agentuuid          = ls_nested_abap_tool-agentuuid.
+      <ls_add_step>-toolname = ls_nested_abap_tool-toolname.
+      <ls_add_step>-toolprovider = ls_nested_abap_tool-toolprovider.
+      <ls_add_step>-steptype = ls_nested_abap_tool-steptype.
+      <ls_add_step>-toolschemaprovider = ls_nested_abap_tool-toolschemaprovider.
+      <ls_add_step>-toolinfoprovider = ls_nested_abap_tool-toolinfoprovider.
+    ENDIF.
+
+    SELECT SINGLE * FROM zpru_agent_tool
+    WHERE toolname = `DUMMY_CODE` AND
+          steptype = `B` AND
+          toolprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`
+          INTO @DATA(ls_dummy_code_tool).
 
     " borrowed tool
-    APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
-    <ls_add_step>-tooluuid = `1AF42792E6DC1FE187F880BE37E694D7`. " renew after data replication
-    <ls_add_step>-agentuuid = `1AF42792E6DC1FE187F880BE37E5F4D7`. " renew after data replication
-    <ls_add_step>-toolname = `DUMMY_CODE`.
-    <ls_add_step>-toolprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
-    <ls_add_step>-steptype = `B`.
-    <ls_add_step>-toolschemaprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
-    <ls_add_step>-toolinfoprovider = `ZPRU_CL_DUMMY_AGENT_LOGIC`.
+    IF ls_dummy_code_tool IS NOT INITIAL.
+      APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
+      <ls_add_step>-tooluuid = ls_dummy_code_tool-tooluuid.
+      <ls_add_step>-agentuuid = ls_dummy_code_tool-agentuuid.
+      <ls_add_step>-toolname = ls_dummy_code_tool-toolname.
+      <ls_add_step>-toolprovider = ls_dummy_code_tool-toolprovider.
+      <ls_add_step>-steptype = ls_dummy_code_tool-steptype.
+      <ls_add_step>-toolschemaprovider = ls_dummy_code_tool-toolschemaprovider.
+      <ls_add_step>-toolinfoprovider = ls_dummy_code_tool-toolinfoprovider.
+    ENDIF.
 
     " transient tool
     APPEND INITIAL LINE TO et_additional_step ASSIGNING <ls_add_step>.
