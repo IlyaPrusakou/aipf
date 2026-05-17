@@ -3,7 +3,7 @@
 @EndUserText.label: 'Agent Basic'
 @Metadata.ignorePropagatedAnnotations: true
 @VDM.viewType: #BASIC
-define view entity ZI_PRU_AGENT
+define view entity ZI_PRU_AGENT 
   as select from zpru_agent
   association to many ZI_PRU_AGENT_TOOL as _tool on _tool.AIPF7AgentUuid = $projection.AIPF7AgentUuid
 {
