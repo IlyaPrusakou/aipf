@@ -38,17 +38,6 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
     * [Decision Agent](#decision-agent)
 * [Agent Composition](#agent-composition)
 * [How to implement your first agent](#how-to-implement-your-first-agent)
-    * [Implement Decision Provider](#implement-decision-provider)
-    * [Implement Agent Info Provider](#implement-agent-info-provider)
-    * [Implement System Prompt Provider](#implement-system-prompt-provider)
-    * [Short Memory Provider](#short-memory-provider)
-    * [Long Memory Provider](#long-memory-provider)
-    * [Create entry in database table ZPRU_AGENT](#create-entry-in-database-table-zpru_agent)
-    * [Implement your first tool - ABAP code tool](#implement-your-first-tool---abap-code-tool)
-    * [Implement Tool Info Provider](#implement-tool-info-provider-1)
-    * [Implement Tool Schema Provider](#implement-tool-schema-provider-1)
-    * [Create entry in database table ZPRU_AGENT_TOOL](#create-entry-in-database-table-zpru_agent_tool)
-    * [How to run Agent from your abap code](#how-to-run-agent-from-your-abap-code)
 
 ## Long Story Short
 Standard AI calls in ABAP are stateless—they send a prompt and get a response. AIPF adds the Brain and Muscles:
