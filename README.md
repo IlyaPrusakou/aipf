@@ -77,8 +77,40 @@ ENDLOOP.
 " return final response to consumer
 ```
 
+### Framework Architecture
 
+AIPF acts as an isolation layer between cognitive LLM reasoning engines and transaction-safe SAP business logic layers. It provides a standard, object-oriented lifecycle model for managing agentic behaviors:
 
+```text
+       ┌────────────────────────────────────────────────────────┐
+       │               Unstructured User Request                │
+       └───────────────────────────┬────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                    AIPF CORE ORCHESTRATION ENGINE                    │
+│                                                                      │
+│  ┌────────────────────────┐              ┌────────────────────────┐  │
+│  │   System Prompt Base   │              │  Short/Long Term State │  │
+│  │ (Context & Constraints)│              │    (Memory Singletons) │  │
+│  └───────────┬────────────┘              └───────────▲────────────┘  │
+│              │                                       │               │
+│              ▼                                       │               │
+│  ┌────────────────────────┐              ┌───────────┴────────────┐  │
+│  │  Multimodal LLM Call   │─────────────►│    Dynamic Execution   │  │
+│  │   (Cognitive Plan)     │              │    Plan Generation     │  │
+│  └────────────────────────┘              └───────────┬────────────┘  │
+└──────────────────────────────────────────────────────┼───────────────┘
+                                                       │
+                                                       ▼
+       ┌────────────────────────────────────────────────────────┐
+       │            DETERMINISTIC ABAP TOOL PIPELINE            │
+       │                                                        │
+       │  [Tool 1: RAP Modify] ──► [Tool 2: Custom Validation]  │
+       │                                                        │
+       │  [Tool 3: Master Data Query] ──► [Tool 4: BAPI/Task]   │
+       └────────────────────────────────────────────────────────┘
+```
 
 ## Installation
 
