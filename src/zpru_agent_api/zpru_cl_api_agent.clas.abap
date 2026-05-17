@@ -2921,7 +2921,7 @@ CLASS zpru_cl_api_agent IMPLEMENTATION.
       <ls_key_value>-name    = <ls_key_value_returned>-name.
       <ls_key_value>-counter = lv_count.
 
-      IF <ls_key_value>-type IS INITIAL.
+      IF <ls_key_value_returned>-type IS INITIAL.
         <ls_key_value>-type = cl_abap_typedescr=>describe_by_data( p_data = lv_string_type )->absolute_name.
       ELSE.
         <ls_key_value>-type = <ls_key_value_returned>-type.
