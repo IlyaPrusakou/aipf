@@ -9,6 +9,8 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 > ⚠️ **Development Status (Pre-Release):** This repository contains a core logic for the **Agent Integration Processing Framework (AIPF)**. The framework is currently under active development. APIs, database schemas, and tool definitions are subject to change. Feedback and early contributions are highly welcome!
 
+> 🛠️ **Ecosystem Integration:** This framework is designed and intended to be used in conjunction with the official **[ABAP AI SDK](https://help.sap.com/docs/abap-ai/generative-ai-in-abap-cloud/api-reference-guide-for-abap-ai-sdk)**. It relies on the SDK's standard enterprise capabilities to securely handle Generative AI communication layers within ABAP Cloud environments.
+
 **Important:** The Facade Pattern is currently the only tested and verified architecture for building agents in this release. For a step-by-step walkthrough on implementing your first ABAP agent using this pattern, please see the **BuildYourAgent.md** guide --- [BuildYourAgent.md](BuildYourAgent.md)
 
 ## Table of Contents

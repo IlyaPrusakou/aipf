@@ -438,12 +438,38 @@ CLASS lcl_adf_decision_provider IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD process_thinking.
-    " ── 1. Decide what your agent should do ────────
-    " Option A: Call an LLM (AI agent)
-    " DATA(lv_prompt) = is_input_prompt-string_content.
-    " DATA(lo_factory) = lcl_common_algorithms=>get_llm_api_factory( ).
-    " DATA(lo_api) = lo_factory->create_instance( 'ST-GEMINI-3.0' ).
-    " DATA(lv_response) = lo_api->execute_for_string( lv_prompt )->get_completion( ).
+Here is the fully updated BuildYourAgent.md code snippet rewritten to use the specific cl_aic_islm_compl_api_factory API architecture from the standard ABAP AI SDK documentation.
+
+This implementation accurately mirrors your architectural steps while leveraging the correct container-based messaging pattern required by SAP.
+
+Revised BuildYourAgent.md Snippet
+ABAP
+  METHOD process_thinking.
+    " ── 1. Decide what your agent should do ──────────────────
+    " Option A: Call an LLM via official ABAP AI SDK (AI agent)
+    TRY.
+        DATA(lv_prompt) = is_input_prompt-string_content.
+
+        " Instantiate the factory using your registered Intelligent Scenario name
+        FINAL(lo_ai_api) = cl_aic_islm_compl_api_factory=>get( )->create_instance( 
+          iv_scenario_name = 'ZPRU_AGENT_COGNITIVE_SCENARIO' " Your ISLM scenario name
+        ).
+
+        " Initialize the structured message container
+        FINAL(lo_messages) = lo_ai_api->create_message_container( ).
+        
+        " Populate the context, rules, and input payload
+        lo_messages->set_system_role( 'You are an orchestration agent engine. Adhere strictly to the requested JSON schema rules.' ).
+        lo_messages->add_user_message( lv_prompt ).
+
+        " Execute the orchestration request securely through the AI Core service layer
+        FINAL(lo_response) = lo_ai_api->execute_for_messages( lo_messages ).
+        DATA(lv_response) = lo_response->get_completion( ).
+
+      CATCH cx_root INTO DATA(lo_ex).
+        " Handle execution failures or scenario connection errors
+        raise_sdk_error( lo_ex->get_text( ) ).
+    ENDTRY.
 
     " Option B: Deterministic (IF-ELSE agent)
     " IF ls_input-some_field = 'A'.
