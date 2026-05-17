@@ -4,7 +4,7 @@ CLASS zpru_cl_nested_code_schm_prvdr DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-
+  INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS get_input_abap_type    REDEFINITION.
     METHODS get_input_json_schema  REDEFINITION.

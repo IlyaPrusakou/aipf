@@ -264,12 +264,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
     ls_decision_request-ragdata               = lt_rag_data.
     ls_decision_request-userdata              = lv_user_data.
 
-    lo_util->convert_to_abap( EXPORTING ir_string = io_input->get_data( )
-                              CHANGING  cr_abap   = ls_json_type ). " qqq always different type
-
-    lv_content = ls_json_type-content. " qqq just string, need to check how to handle
-
-    ls_decision_request-userprompt = lv_content.
+    ls_decision_request-userprompt = is_input_prompt-string_content.
 
     lo_decision_request->zpru_if_payload~set_data( ir_data = NEW zpru_s_decision_request( ls_decision_request ) ).
 
@@ -473,7 +468,7 @@ CLASS zpru_cl_decision_provider IMPLEMENTATION.
                                              iv_query_uuid      = iv_query_uuid
                                              io_controller      = io_controller
                                              io_last_output     = io_last_output
-                                   CHANGING  cs_reasoning_trace = ls_final_response-reasoning_trace ).
+                                   CHANGING  cs_reasoning_trace = ls_final_response-reasoningtrace ).
 
       lo_util->convert_to_string( EXPORTING ir_abap   = NEW zpru_s_final_response( ls_final_response )
                                   CHANGING  cr_string = lv_final_response_json ).

@@ -14,20 +14,18 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
 
     CLEAR: ev_built_query_uuid, ev_built_run_uuid, ev_final_response, eo_executed_controller.
 
-
     IF    iv_agent_name IS INITIAL
        OR is_prompt     IS INITIAL.
       RETURN.
     ENDIF.
 
-    lo_api_agent ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
+    lo_api_agent = zpru_cl_agent_service_mngr=>get_agent_api( ).
 
     lo_api_agent->setup_agent( EXPORTING iv_agent_name        = iv_agent_name
                                          io_parent_controller = io_parent_controller
                                IMPORTING es_agent             = DATA(ls_agent) ).
+
+    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
 
     lo_api_agent->set_input_query( is_input_query = is_prompt
                                    iv_agent_uuid  = ls_agent-agentuuid ).
@@ -50,7 +48,6 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
       lo_api_agent->complete_run( iv_run_uuid = ev_built_run_uuid ).
     ENDIF.
 
-
   ENDMETHOD.
 
   METHOD zpru_if_unit_agent~plan_execution.
@@ -65,14 +62,13 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    lo_api_agent ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
-                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
-
-    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
+    lo_api_agent = zpru_cl_agent_service_mngr=>get_agent_api( ).
 
     lo_api_agent->setup_agent( EXPORTING iv_agent_name        = iv_agent_name
                                          io_parent_controller = io_parent_controller
                                IMPORTING es_agent             = DATA(ls_agent) ).
+
+    lo_api_agent->set_rap_context_flag( iv_is_rap_context = iv_is_rap_context ).
 
     lo_api_agent->set_input_query( is_input_query = is_prompt
                                    iv_agent_uuid  = ls_agent-agentuuid ).
@@ -97,9 +93,7 @@ CLASS zpru_cl_unit_agent IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    lo_api_agent_creator ?= zpru_cl_agent_service_mngr=>get_service(
-                                iv_service = `ZPRU_IF_API_AGENT`
-                                iv_context = zpru_if_agent_frw=>cs_context-standard ).
+    lo_api_agent_creator = zpru_cl_agent_service_mngr=>get_agent_api( ).
 
     lo_api_agent = lo_api_agent_creator->restore_environment( iv_built_run_uuid   = iv_built_run_uuid
                                                               iv_built_query_uuid = iv_built_query_uuid

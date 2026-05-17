@@ -20,6 +20,7 @@ define root view entity ZC_PRU_AGENT
       AIPF7LongMemoryProvider,
       AIPF7AgentInfoProvider,
       AIPF7SystemPromptProvider,
+      AIPF7AgentMapper,
       AIPF7AgentStatus,
       AIPF7CreatedBy,
       AIPF7CreatedAt,

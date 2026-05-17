@@ -11,6 +11,10 @@ CLASS zpru_cl_agent_service_mngr DEFINITION
       RETURNING VALUE(ro_service) TYPE REF TO zpru_if_agent_frw
       RAISING   zpru_cx_agent_core.
 
+    CLASS-METHODS get_agent_api
+      RETURNING VALUE(ro_agent_api) TYPE REF TO zpru_if_api_agent
+      RAISING   zpru_cx_agent_core.
+
   PROTECTED SECTION.
     CLASS-DATA st_agent_serv TYPE STANDARD TABLE OF zpru_s_agent_serv WITH EMPTY KEY.
 ENDCLASS.
@@ -56,4 +60,10 @@ CLASS zpru_cl_agent_service_mngr IMPLEMENTATION.
       RAISE EXCEPTION NEW zpru_cx_agent_core( ).
     ENDIF.
   ENDMETHOD.
+
+  METHOD get_agent_api.
+    ro_agent_api ?= zpru_cl_agent_service_mngr=>get_service( iv_service = `ZPRU_IF_API_AGENT`
+                                                             iv_context = zpru_if_agent_frw=>cs_context-standard ).
+  ENDMETHOD.
+
 ENDCLASS.

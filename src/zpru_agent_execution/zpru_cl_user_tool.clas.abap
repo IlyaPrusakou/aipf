@@ -37,6 +37,7 @@ CLASS zpru_cl_user_tool IMPLEMENTATION.
     ev_error_flag = abap_false.
 
     preprocess_tool_execution( EXPORTING io_request              = io_request
+                                         is_agent                = is_agent
                                          is_tool_master_data     = is_tool_master_data
                                          is_execution_step       = is_execution_step
                                          io_controller           = io_controller

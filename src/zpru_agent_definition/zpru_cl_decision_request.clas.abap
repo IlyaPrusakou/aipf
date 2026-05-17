@@ -199,8 +199,8 @@ CLASS zpru_cl_decision_request IMPLEMENTATION.
           lv_string = |{ lv_string } Tool Parameter Name: { <ls_parameter>-parametername } { cl_abap_char_utilities=>newline }|.
           lv_string = |{ lv_string } Tool Parameter Explanation: { <ls_parameter>-parameterexplanation } { cl_abap_char_utilities=>newline }|.
 
-          IF <ls_parameter>-parameterdesciption  IS NOT INITIAL.
-            lv_string = |{ lv_string } Tool Parameter Description: { <ls_parameter>-parameterdesciption } { cl_abap_char_utilities=>newline }|.
+          IF <ls_parameter>-parameterdescription  IS NOT INITIAL.
+            lv_string = |{ lv_string } Tool Parameter Description: { <ls_parameter>-parameterdescription } { cl_abap_char_utilities=>newline }|.
           ENDIF.
 
           CASE <ls_parameter>-parametertype.

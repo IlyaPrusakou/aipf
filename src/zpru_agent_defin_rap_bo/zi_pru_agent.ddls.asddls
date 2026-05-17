@@ -15,6 +15,7 @@ define view entity ZI_PRU_AGENT
       longmemoryprovider   as AIPF7LongMemoryProvider,
       agentinfoprovider    as AIPF7AgentInfoProvider,
       systempromptprovider as AIPF7SystemPromptProvider,
+      agentmapper          as AIPF7AgentMapper,
       agentstatus          as AIPF7AgentStatus,
       createdby            as AIPF7CreatedBy,
       createdat            as AIPF7CreatedAt,

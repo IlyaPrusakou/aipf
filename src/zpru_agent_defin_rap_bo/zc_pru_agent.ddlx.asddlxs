@@ -63,7 +63,13 @@ annotate view ZC_PRU_AGENT with
   @UI.lineItem: [ { position: 70, label: 'SystemPromptProvider' } ]
   @UI.selectionField: [ { position: 70 } ]
   AIPF7SystemPromptProvider;
-
+  
+  @EndUserText.label: 'AgentMapper'
+  @UI.identification: [ { position: 75, label: 'AgentMapper' } ]
+  @UI.lineItem: [ { position: 75, label: 'AgentMapper' } ]
+  @UI.selectionField: [ { position: 75 } ]  
+  AIPF7AgentMapper;
+  
   @EndUserText.label: 'Status'
   @UI.identification: [ { position: 80, label: 'Status' } ]
   @UI.lineItem: [ { position: 80, label: 'Status' } ]
