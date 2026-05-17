@@ -41,6 +41,7 @@ authorization master ( global )
       AIPF7LongMemoryProvider   = longmemoryprovider;
       AIPF7AgentInfoProvider    = agentinfoprovider;
       AIPF7SystemPromptProvider = systempromptprovider;
+      AIPF7AgentMapper          = AgentMapper;
       AIPF7AgentStatus          = agentstatus;
       AIPF7CreatedBy            = createdby;
       AIPF7CreatedAt            = createdat;

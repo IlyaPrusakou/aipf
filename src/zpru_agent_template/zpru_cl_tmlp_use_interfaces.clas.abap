@@ -3,16 +3,7 @@ CLASS zpru_cl_tmlp_use_interfaces DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    inTERFACES if_serializable_object.
-    INTERFACES zpru_if_decision_provider.
-    INTERFACES zpru_if_short_memory_provider.
-    INTERFACES zpru_if_long_memory_provider.
-    INTERFACES zpru_if_agent_info_provider.
-    INTERFACES zpru_if_prompt_provider.
-    INTERFACES zpru_if_tool_provider.
-    INTERFACES zpru_if_tool_schema_provider.
-    INTERFACES zpru_if_tool_info_provider.
-    INTERFACES zpru_if_agent_singleton_meth.
+    INTERFACES zpru_if_tmlp_use_interfaces.
 
   PRIVATE SECTION.
     CLASS-DATA so_adf_short_memory TYPE REF TO lcl_adf_short_memory_provider.
@@ -113,7 +104,7 @@ CLASS zpru_cl_tmlp_use_interfaces IMPLEMENTATION.
     DATA lo_short_memory TYPE REF TO zpru_if_short_memory_provider.
 
     lo_short_memory = zpru_cl_tmlp_use_interfaces=>zpru_if_agent_singleton_meth~get_short_memory( ).
-    lo_short_memory->save_message( it_message = it_message
+    lo_short_memory->save_message( it_message    = it_message
                                    io_controller = io_controller ).
   ENDMETHOD.
 
@@ -260,6 +251,23 @@ CLASS zpru_cl_tmlp_use_interfaces IMPLEMENTATION.
     rs_abap_system_prompt = lo_prompt_provider->get_abap_system_prompt( iv_agent_uuid = iv_agent_uuid ).
   ENDMETHOD.
 
+  METHOD zpru_if_agent_mapper~map_tools_parameter.
+    DATA lo_agent_mapper TYPE REF TO zpru_if_agent_mapper.
+
+    lo_agent_mapper = NEW lcl_adf_agent_mapper( ).
+
+    lo_agent_mapper->map_tools_parameter( EXPORTING io_request                   = io_request
+                                                    iv_input_string              = iv_input_string
+                                                    is_curr_tool_master_data     = is_curr_tool_master_data
+                                                    is_curr_execution_step       = is_curr_execution_step
+                                                    io_controller                = io_controller
+                                                    io_util                      = io_util
+                                                    io_curr_tool_schema_provider = io_curr_tool_schema_provider
+                                                    it_key_value_pair            = it_key_value_pair
+                                          IMPORTING ev_error_flag                = ev_error_flag
+                                          CHANGING  cr_input                     = cr_input ).
+  ENDMETHOD.
+
   METHOD zpru_if_tool_provider~get_tool.
     DATA lo_tool_provider TYPE REF TO zpru_if_tool_provider.
 
@@ -309,25 +317,4 @@ CLASS zpru_cl_tmlp_use_interfaces IMPLEMENTATION.
                                                                        is_execution_step   = is_execution_step ).
   ENDMETHOD.
 
-  METHOD zpru_if_tool_schema_provider~output_json_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
-
-    CLEAR: ev_json_schema,
-           es_json_structure.
-
-    lo_input_schema_provider = NEW lcl_adf_schema_provider( ).
-
-    lo_input_schema_provider->output_json_schema( EXPORTING is_tool_master_data = is_tool_master_data
-                                                            is_execution_step   = is_execution_step
-                                                  IMPORTING ev_json_schema      = ev_json_schema
-                                                            es_json_structure   = es_json_structure ).
-  ENDMETHOD.
-
-  METHOD zpru_if_tool_schema_provider~output_rtts_schema.
-    DATA lo_input_schema_provider TYPE REF TO zpru_if_tool_schema_provider.
-
-    lo_input_schema_provider = NEW lcl_adf_schema_provider( ).
-    ro_structure_schema = lo_input_schema_provider->output_rtts_schema( is_tool_master_data = is_tool_master_data
-                                                                        is_execution_step   = is_execution_step ).
-  ENDMETHOD.
 ENDCLASS.

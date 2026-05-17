@@ -5,6 +5,7 @@ CLASS zpru_cl_nested_llm DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zpru_if_tool_provider.
+      INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS: call_large_language_model_int REDEFINITION.
   PRIVATE SECTION.

@@ -20,20 +20,21 @@ INTERFACE zpru_if_adf_type_and_constant
              END OF cs_step_type.
 
   TYPES: BEGIN OF ts_agent_control,
-           agentuuid             TYPE abap_boolean,
-           agentname             TYPE abap_boolean,
-           agenttype             TYPE abap_boolean,
-           decisionprovider      TYPE abap_boolean,
-           shortmemoryprovider   TYPE abap_boolean,
-           longmemoryprovider    TYPE abap_boolean,
-           agentinfoprovider     TYPE abap_boolean,
+           agentuuid            TYPE abap_boolean,
+           agentname            TYPE abap_boolean,
+           agenttype            TYPE abap_boolean,
+           decisionprovider     TYPE abap_boolean,
+           shortmemoryprovider  TYPE abap_boolean,
+           longmemoryprovider   TYPE abap_boolean,
+           agentinfoprovider    TYPE abap_boolean,
            systempromptprovider TYPE abap_boolean,
-           agentstatus                TYPE abap_boolean,
-           createdby             TYPE abap_boolean,
-           createdat             TYPE abap_boolean,
-           changedby             TYPE abap_boolean,
-           lastchanged           TYPE abap_boolean,
-           locallastchanged      TYPE abap_boolean,
+           agentmapper          TYPE abap_boolean,
+           agentstatus          TYPE abap_boolean,
+           createdby            TYPE abap_boolean,
+           createdat            TYPE abap_boolean,
+           changedby            TYPE abap_boolean,
+           lastchanged          TYPE abap_boolean,
+           locallastchanged     TYPE abap_boolean,
          END OF ts_agent_control.
 
   TYPES: BEGIN OF ts_agent_k,
@@ -70,7 +71,7 @@ INTERFACE zpru_if_adf_type_and_constant
 
   TYPES: BEGIN OF ts_agent_read_k,
            agentuuid TYPE sysuuid_x16,
-           control    TYPE ts_agent_control,
+           control   TYPE ts_agent_control,
          END OF ts_agent_read_k.
 
   TYPES tt_agent_read_k TYPE STANDARD TABLE OF ts_agent_read_k WITH EMPTY KEY.
@@ -89,13 +90,13 @@ INTERFACE zpru_if_adf_type_and_constant
            steptype           TYPE abap_boolean,
            toolschemaprovider TYPE abap_boolean,
            toolinfoprovider   TYPE abap_boolean,
-           toolisborrowed         TYPE abap_boolean,
-           toolistransient        TYPE abap_boolean,
+           toolisborrowed     TYPE abap_boolean,
+           toolistransient    TYPE abap_boolean,
          END OF ts_tool_control.
 
   TYPES: BEGIN OF ts_rba_tool_k,
            agentuuid TYPE sysuuid_x16,
-           control    TYPE ts_tool_control,
+           control   TYPE ts_tool_control,
          END OF ts_rba_tool_k.
 
   TYPES tt_rba_tool_k TYPE STANDARD TABLE OF ts_rba_tool_k WITH EMPTY KEY.
@@ -110,7 +111,7 @@ INTERFACE zpru_if_adf_type_and_constant
   TYPES: BEGIN OF ts_tool_read_k,
            agentuuid TYPE sysuuid_x16,
            tooluuid  TYPE sysuuid_x16,
-           control    TYPE ts_tool_control,
+           control   TYPE ts_tool_control,
          END OF ts_tool_read_k.
 
   TYPES tt_tool_read_k TYPE STANDARD TABLE OF ts_tool_read_k WITH EMPTY KEY.

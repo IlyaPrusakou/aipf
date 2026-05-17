@@ -4,6 +4,7 @@ CLASS zpru_cl_nested_agent_info DEFINITION INHERITING FROM zpru_cl_agent_info_pr
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+  INTERFACES zpru_if_agent_impl.
   PROTECTED SECTION.
     METHODS: get_agent_main_info REDEFINITION,
       set_agent_goals REDEFINITION,

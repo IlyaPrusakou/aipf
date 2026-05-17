@@ -1,0 +1,16 @@
+CLASS zpru_cl_nested_mapper DEFINITION
+  PUBLIC
+  INHERITING FROM zpru_cl_agent_mapper
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+    INTERFACES zpru_if_agent_impl.
+
+  PROTECTED SECTION.
+
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS zpru_cl_nested_mapper IMPLEMENTATION.
+ENDCLASS.
