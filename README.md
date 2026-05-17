@@ -76,9 +76,55 @@ ENDLOOP.
 
 
 ## Installation
-1. Install [abapGit](https://abapgit.org/).
-2. Create a new Online Repo with the URL: `https://github.com/IlyaPrusakou/aipf`
-3. Pull the objects into the system.
+
+1. **Install abapGit**: Ensure you have the abapGit client installed in your system.
+2. **Link Repository**: Create a new **Online Repo** using the following Git URL:
+   https://github.com/IlyaPrusakou/aipf
+
+3. **Pull Objects**: Pull the repository objects into your development package.
+
+## Activation Sequence & Workarounds
+
+Because of specific object dependencies and known abapGit serialization behaviors, please activate the pulled objects manually in the exact order listed below.
+
+### Step 1: Base Dictionary Elements
+Activate all **Domains** and **Data Elements** first.
+
+### Step 2: Structures & Tables (Recursive Type Workaround)
+Activate your **Structures**, **Database Tables**, and **Table Types**. 
+
+[!] Known Activation Error: You might get a "Type defined recursively" error for structure `zpru_s_dynamic_tool_param` and table type `zpru_tt_dynamic_tool_param` because they reference each other.
+
+How to fix it:
+1. Open structure `zpru_s_dynamic_tool_param`.
+2. Temporarily change the component type of `parameters` to `abap.string(0)`.
+3. Activate the structure `zpru_s_dynamic_tool_param`.
+4. Activate the table type `zpru_tt_dynamic_tool_param`.
+5. Change the component type back to `zpru_tt_dynamic_tool_param` and activate the structure once more.
+
+### Step 3: RAP Business Object Components
+Activate the RAP components in this precise order:
+1. Data Definitions (CDS Views)
+2. Behavior Definitions
+3. Access Controls & Metadata Extensions
+4. Service Definitions & Service Bindings
+5. SAP Object Node Types, Number Range Objects, & SAP Object Types
+
+### Step 4: Core Interfaces & Exception Classes
+Activate all **Interfaces** along with the core exception class: `zpru_cx_agent_core`.
+
+### Step 5: Remaining Classes (Type Reference Workaround)
+Activate all remaining classes.
+
+[!] Known Activation Error: abapGit may accidentally serialize specific component types (like `properties` or `items`) as **Reference to Object (reference to object)** instead of **Reference to Data (reference to data)**.
+
+How to fix it:
+If a class fails to activate due to this mismatch, manually change the component type definition from `reference to object` to `reference to data` in the structure/class definition, then re-run the activation.
+
+### Step 6: Initialize Test Data
+Finally, execute the following setup classes to generate the necessary number ranges and test data:
+* `zpru_cl_snro_intervals` (Creates number range intervals)
+* `zpru_cl_test_data` (Generates sample test data)
 
 ## Agent Definition
 
