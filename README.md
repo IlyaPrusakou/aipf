@@ -9,6 +9,8 @@ The name is inspired by famous **Business Object Processing Framework (BOPF)**
 
 > ⚠️ **Development Status (Pre-Release):** This repository contains a core logic for the **Agent Integration Processing Framework (AIPF)**. The framework is currently under active development. APIs, database schemas, and tool definitions are subject to change. Feedback and early contributions are highly welcome!
 
+**Important:** The Facade Pattern is currently the only tested and verified architecture for building agents in this release. For a step-by-step walkthrough on implementing your first ABAP agent using this pattern, please see the BuildYourAgent.md guide
+
 ## Table of Contents
 * [Long Story Short](#long-story-short)
 * [Installation](#installation)
